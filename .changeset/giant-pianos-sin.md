@@ -1,5 +1,0 @@
----
-"jsrepo": patch
----
-
-`*.html` support 🎉
