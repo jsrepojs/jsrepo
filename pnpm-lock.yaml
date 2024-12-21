@@ -65,6 +65,9 @@ importers:
       package-manager-detector:
         specifier: ^0.2.7
         version: 0.2.7
+      parse5:
+        specifier: ^7.2.1
+        version: 7.2.1
       pathe:
         specifier: ^1.1.2
         version: 1.1.2
@@ -2290,6 +2293,9 @@ packages:
   parse-ms@4.0.0:
     resolution: {integrity: sha512-TXfryirbmq34y8QBwgqCVLi+8oA3oWx2eAnSn62ITyEhEYaWRlVZ2DvMM9eZbMs/RfxPu/PK/aBLyGj4IrqMHw==}
     engines: {node: '>=18'}
+
+  parse5@7.2.1:
+    resolution: {integrity: sha512-BuBYQYlv1ckiPdQi/ohiivi9Sagc9JG+Ozs0r7b/0iK3sKmrb0b9FdWdBbOdx6hBCM/F9Ir82ofnBhtZOjCRPQ==}
 
   path-browserify@1.0.1:
     resolution: {integrity: sha512-b7uo2UCUOYZcnF/3ID0lulOJi/bafxa1xPe7ZPsammBSpjSWQkjNxlt635YGS2MiR9GjvuXCtz2emr3jbsz98g==}
@@ -5267,6 +5273,10 @@ snapshots:
       callsites: 3.1.0
 
   parse-ms@4.0.0: {}
+
+  parse5@7.2.1:
+    dependencies:
+      entities: 4.5.0
 
   path-browserify@1.0.1: {}
 

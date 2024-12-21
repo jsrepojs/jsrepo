@@ -136,6 +136,32 @@
 		]
 	},
 	{
+		"name": "angular",
+		"blocks": [
+			{
+				"name": "button",
+				"directory": "blocks/angular/button",
+				"category": "angular",
+				"tests": false,
+				"subdirectory": true,
+				"list": true,
+				"files": [
+					"button.html"
+				],
+				"localDependencies": [
+					"styles/test",
+					"scripts/test"
+				],
+				"dependencies": [],
+				"devDependencies": [],
+				"_imports_": {
+					"../../styles/test.scss": "{{styles/test}}.scss",
+					"../../scripts/test.js": "{{scripts/test}}.js"
+				}
+			}
+		]
+	},
+	{
 		"name": "logging",
 		"blocks": [
 			{
@@ -147,6 +173,46 @@
 				"list": true,
 				"files": [
 					"logger.ts"
+				],
+				"localDependencies": [],
+				"_imports_": {},
+				"dependencies": [],
+				"devDependencies": []
+			}
+		]
+	},
+	{
+		"name": "scripts",
+		"blocks": [
+			{
+				"name": "test",
+				"directory": "blocks/scripts",
+				"category": "scripts",
+				"tests": false,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"test.js"
+				],
+				"localDependencies": [],
+				"_imports_": {},
+				"dependencies": [],
+				"devDependencies": []
+			}
+		]
+	},
+	{
+		"name": "styles",
+		"blocks": [
+			{
+				"name": "test",
+				"directory": "blocks/styles",
+				"category": "styles",
+				"tests": false,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"test.scss"
 				],
 				"localDependencies": [],
 				"_imports_": {},

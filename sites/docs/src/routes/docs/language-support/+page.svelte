@@ -92,6 +92,20 @@
 			dependencyResolutionStatus: '🚫',
 			formattingStatus: '🚫',
 			watermarkStatus: '✅'
+		},
+		{
+			logo: sass,
+			name: '*.(sass|scss)',
+			dependencyResolutionStatus: '🚫',
+			formattingStatus: '⚠️',
+			watermarkStatus: '✅'
+		},
+		{
+			logo: html,
+			name: '*.(html)',
+			dependencyResolutionStatus: '⚠️',
+			formattingStatus: '⚠️',
+			watermarkStatus: '✅'
 		}
 	];
 </script>
@@ -136,6 +150,14 @@
 
 {#snippet css({ size }: { size: number })}
 	<Icons.CSS height={size} />
+{/snippet}
+
+{#snippet sass({ size }: { size: number })}
+	<Icons.SASS height={size} />
+{/snippet}
+
+{#snippet html({ size }: { size: number })}
+	<Icons.HTML height={size} />
 {/snippet}
 
 <DocHeader
