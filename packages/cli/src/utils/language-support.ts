@@ -145,7 +145,7 @@ const html: Lang = {
 
 		return Ok(resolveResult.unwrap());
 	},
-	comment: (content) => `/*\n${lines.join(lines.get(content), { prefix: () => '\t' })}\n*/`,
+	comment: (content) => `<!--\n${lines.join(lines.get(content), { prefix: () => '\t' })}\n-->`,
 	format: async (code, { formatter, prettierOptions }) => {
 		if (!formatter) return code;
 
