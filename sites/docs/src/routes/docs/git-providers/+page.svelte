@@ -8,7 +8,7 @@
 		logo?: (opts: { size: number }) => ReturnType<Snippet>;
 		name: string;
 		href: string;
-		status: '✅' | '⌛️' | '🚫';
+		status: '✅' | '⚠️' | '⌛️' | '🚫';
 	};
 
 	const support: Support[] = [
@@ -29,6 +29,12 @@
 			name: 'BitBucket',
 			href: '/docs/git-providers/bitbucket',
 			status: '✅'
+		},
+		{
+			logo: azureDevops,
+			name: 'AzureDevops',
+			href: '/docs/git-providers/azure-devops',
+			status: '⚠️'
 		}
 	];
 </script>
@@ -47,6 +53,10 @@
 	<Icons.BitBucket width={size} class="size-auto" />
 {/snippet}
 
+{#snippet azureDevops({ size }: { size: number })}
+	<Icons.AzureDevops width={size} class="size-auto" />
+{/snippet}
+
 <DocHeader
 	title="Git Providers"
 	description="Git Providers that jsrepo supports in your registry."
@@ -60,6 +70,7 @@
 		<li>✅: Supported</li>
 		<li>⌛️: In progress</li>
 		<li>🚫: Not in progress</li>
+		<li>⚠️: Partial support</li>
 	</ul>
 </div>
 <Table.Root class="w-fit">
@@ -78,7 +89,7 @@
 						{#if logo}
 							{@render logo({ size: 18 })}
 						{/if}
-						{#if status === '✅'}
+						{#if status === '✅' || status === '⚠️'}
 							<Link {href}>{name}</Link>
 						{:else}
 							<span class="text-muted-foreground">{name}</span>

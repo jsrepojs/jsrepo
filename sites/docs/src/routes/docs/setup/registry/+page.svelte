@@ -241,5 +241,8 @@ const add = (a: number, b: number): number => {
 		<li class="list-disc">
 			<Link target="_blank" href="https://bitbucket.org/ieedan/std">bitbucket/ieedan/std</Link>
 		</li>
+		<li class="list-disc">
+			<Link target="_blank" href="https://dev.azure.com/ieedan/_git/std">azure/ieedan/std/std</Link>
+		</li>
 	</ul>
 </div>
