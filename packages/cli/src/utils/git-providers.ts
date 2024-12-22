@@ -529,8 +529,8 @@ const azure: Provider = {
 		// checks if the type of the ref is tags or heads
 		let refs: 'heads' | 'tags' = 'heads';
 
-		if (rest[0] === 'tags') {
-			refs = 'tags';
+		if (['tags', 'heads'].includes(rest[0])) {
+			refs = rest[0] as 'heads' | 'tags';
 
 			if (rest[1] && rest[1] !== '') {
 				ref = rest[1];
