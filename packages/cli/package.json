@@ -1,7 +1,7 @@
 {
 	"name": "jsrepo",
 	"description": "A CLI to add shared code from remote repositories.",
-	"version": "1.22.0",
+	"version": "1.22.1",
 	"license": "MIT",
 	"homepage": "https://jsrepo.dev",
 	"author": {
@@ -56,6 +56,7 @@
 		"node-fetch": "^3.3.2",
 		"octokit": "^4.0.2",
 		"package-manager-detector": "^0.2.7",
+		"parse5": "^7.2.1",
 		"pathe": "^1.1.2",
 		"prettier": "^3.4.2",
 		"svelte": "^5.14.4",

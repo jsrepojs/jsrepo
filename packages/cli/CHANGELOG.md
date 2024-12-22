@@ -1,5 +1,12 @@
 # jsrepo
 
+## 1.22.1
+
+### Patch Changes
+
+- 25f9d47: `*.(sass|scss)` support 🎉
+- 25f9d47: `*.html` support 🎉
+
 ## 1.22.0
 
 ### Minor Changes

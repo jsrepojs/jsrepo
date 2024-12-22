@@ -12,6 +12,8 @@ import GitLab from './gitlab.svelte';
 import BitBucket from './bitbucket.svelte';
 import Yaml from './yaml.svelte';
 import Svg from './svg.svelte';
+import HTML from './html.svelte';
+import SASS from './sass.svelte';
 
 export interface Props extends HTMLAttributes<SVGElement> {
 	class?: string;
@@ -22,6 +24,7 @@ export interface Props extends HTMLAttributes<SVGElement> {
 export {
 	AzureDevops,
 	CSS,
+	HTML,
 	GitHub,
 	TypeScript,
 	Svelte,
@@ -32,5 +35,6 @@ export {
 	GitLab,
 	BitBucket,
 	Yaml,
+	SASS,
 	Svg
 };

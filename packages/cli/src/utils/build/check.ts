@@ -172,6 +172,11 @@ const rules = {
 				'astro',
 				'solid-js',
 				'@angular/core',
+				'@angular/common',
+				'@angular/forms',
+				'@angular/platform-browser',
+				'@angular/platform-browser-dynamic',
+				'@angular/router',
 			]);
 
 			const frameworkDeps = [...block.devDependencies, ...block.dependencies]
