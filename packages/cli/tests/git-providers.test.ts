@@ -606,7 +606,7 @@ describe('bitbucket', () => {
 
 describe('azure', () => {
 	it('Fetches the manifest from a public repo', async () => {
-		const repoURL = 'azure/aidanbleser/_git/std';
+		const repoURL = 'azure/aidanbleser/std/std';
 
 		const info = await gitProviders.azure.info(repoURL);
 
@@ -616,7 +616,7 @@ describe('azure', () => {
 	});
 
 	it('Fetches the manifest from a public repo with a tag', async () => {
-		const repoURL = 'https://dev.azure.com/aidanbleser/_git/std?path=/&version=GTv1.6.0&_a=contents';
+		const repoURL = 'azure/aidanbleser/std/std/tags/v1.6.0';
 
 		const info = await gitProviders.azure.info(repoURL);
 
