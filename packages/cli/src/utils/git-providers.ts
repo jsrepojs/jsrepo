@@ -474,8 +474,6 @@ const azure: Provider = {
 	fetchRaw: async (repoPath, resourcePath, { verbose } = {}) => {
 		const info = await azure.info(repoPath);
 
-		console.log(info);
-
 		const url = await azure.resolveRaw(info, resourcePath);
 
 		verbose?.(`Trying to fetch from ${url}`);
@@ -488,9 +486,6 @@ const azure: Provider = {
 			if (token !== undefined) {
 				headers.append('Authorization', `Bearer ${token}`);
 			}
-
-			console.log(url);
-			console.log(headers);
 
 			const response = await fetch(url, { headers });
 
