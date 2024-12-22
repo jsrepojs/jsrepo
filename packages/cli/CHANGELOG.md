@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.22.2
+
+### Patch Changes
+
+- 6a6e84d: Provider support **Azure Devops** 🎉
+
 ## 1.22.1
 
 ### Patch Changes
