@@ -17,7 +17,7 @@
 <Code
 	hideLines
 	lang="bash"
-	code={`azure/ieedan/ieedan/std/std # default branch shorthand
+	code={`azure/ieedan/std/std # default branch shorthand
 azure/ieedan/std/std/tags/v1.5.0 # tag reference
 azure/ieedan/std/std/heads/next # branch reference
 `}
