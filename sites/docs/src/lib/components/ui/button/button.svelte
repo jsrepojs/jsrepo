@@ -1,7 +1,7 @@
 <!--
-	jsrepo 1.19.1
+	jsrepo 1.22.1
 	Installed from github/ieedan/shadcn-svelte-extras
-	12-10-2024
+	12-22-2024
 -->
 
 <script lang="ts" module>
@@ -10,12 +10,12 @@
 	import { type VariantProps, tv } from 'tailwind-variants';
 
 	export const buttonVariants = tv({
-		base: 'relative overflow-hidden ring-offset-background focus-visible:ring-ring inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+		base: 'relative inline-flex items-center justify-center gap-2 overflow-hidden whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
 		variants: {
 			variant: {
 				default: 'bg-primary text-primary-foreground hover:bg-primary/90',
 				destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-				outline: 'border-input bg-background hover:bg-accent hover:text-accent-foreground border',
+				outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
 				secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
 				ghost: 'hover:bg-accent hover:text-accent-foreground',
 				link: 'text-primary underline-offset-4 hover:underline'
