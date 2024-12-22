@@ -93,6 +93,11 @@ const categories: Category[] = [
 						name: 'BitBucket',
 						href: '/docs/git-providers/bitbucket',
 						icon: Icons.BitBucket
+					},
+					{
+						name: 'AzureDevops',
+						href: '/docs/git-providers/azure-devops',
+						icon: Icons.AzureDevops
 					}
 				]
 			},

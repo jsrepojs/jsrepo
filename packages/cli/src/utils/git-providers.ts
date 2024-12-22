@@ -12,8 +12,10 @@ export type Info = {
 	refs: 'tags' | 'heads';
 	url: string;
 	name: string;
-	repoName: string;
 	owner: string;
+	/** Valid only for azure provider */
+	projectName?: string;
+	repoName: string;
 	ref: string;
 	provider: Provider;
 };
@@ -453,7 +455,103 @@ const bitbucket: Provider = {
 		repoPath.toLowerCase().startsWith('bitbucket'),
 };
 
-const providers = [github, gitlab, bitbucket];
+/** Valid paths
+ *
+ *  `azure/<org>/<project>/<repo>/(tags|heads)/<ref>`
+ */
+const azure: Provider = {
+	name: () => 'azure',
+	defaultBranch: () => 'main',
+	resolveRaw: async (repoPath, resourcePath) => {
+		const info = await azure.info(repoPath);
+
+		const versionType = info.refs === 'tags' ? 'tag' : 'branch';
+
+		return new URL(
+			`https://dev.azure.com/${info.owner}/${info.projectName}/_apis/git/repositories/${info.repoName}/items?path=${resourcePath}&api-version=7.2-preview.1&versionDescriptor.version=${info.ref}&versionDescriptor.versionType=${versionType}`
+		);
+	},
+	fetchRaw: async (repoPath, resourcePath, { verbose } = {}) => {
+		const info = await azure.info(repoPath);
+
+		const url = await azure.resolveRaw(info, resourcePath);
+
+		verbose?.(`Trying to fetch from ${url}`);
+
+		try {
+			const token = persisted.get().get(`${azure.name()}-token`);
+
+			const headers = new Headers();
+
+			if (token !== undefined) {
+				headers.append('Authorization', `Bearer ${token}`);
+			}
+
+			const response = await fetch(url, { headers });
+
+			verbose?.(`Got a response from ${url} ${response.status} ${response.statusText}`);
+
+			if (!response.ok) {
+				return rawErrorMessage(info, resourcePath, azure.defaultBranch());
+			}
+
+			return Ok(await response.text());
+		} catch (err) {
+			verbose?.(`erroring in response ${err} `);
+
+			return rawErrorMessage(info, resourcePath, azure.defaultBranch());
+		}
+	},
+	fetchManifest: async (repoPath) => {
+		const manifest = await azure.fetchRaw(repoPath, OUTPUT_FILE);
+
+		if (manifest.isErr()) return Err(manifest.unwrapErr());
+
+		const categories = v.safeParse(v.array(categorySchema), JSON.parse(manifest.unwrap()));
+
+		if (!categories.success) {
+			return Err(`Error parsing categories: ${categories.issues}`);
+		}
+
+		return Ok(categories.output);
+	},
+	info: async (repoPath) => {
+		if (typeof repoPath !== 'string') return repoPath;
+
+		const repo = repoPath.replaceAll(/(azure\/)/g, '');
+
+		const [owner, project, repoName, ...rest] = repo.split('/');
+
+		// azure/aidanbleser/std/std/heads/main
+
+		let ref = azure.defaultBranch();
+
+		// checks if the type of the ref is tags or heads
+		let refs: 'heads' | 'tags' = 'heads';
+
+		if (['tags', 'heads'].includes(rest[0])) {
+			refs = rest[0] as 'heads' | 'tags';
+
+			if (rest[1] && rest[1] !== '') {
+				ref = rest[1];
+			}
+		}
+
+		return {
+			refs,
+			url: repoPath,
+			name: azure.name(),
+			projectName: project,
+			repoName,
+			owner,
+			ref: ref,
+			provider: azure,
+		};
+	},
+	matches: (repoPath) => repoPath.toLowerCase().startsWith('azure'),
+};
+
+const providers = [github, gitlab, bitbucket, azure];
 
 const getProviderInfo = async (repo: string): Promise<Result<Info, string>> => {
 	const provider = providers.find((provider) => provider.matches(repo));
@@ -516,4 +614,4 @@ const resolvePaths = async (
 	return Ok(resolvedPaths);
 };
 
-export { github, gitlab, bitbucket, getProviderInfo, fetchBlocks, providers, resolvePaths };
+export { github, gitlab, bitbucket, azure, getProviderInfo, fetchBlocks, providers, resolvePaths };

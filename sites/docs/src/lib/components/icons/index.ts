@@ -1,4 +1,5 @@
 import type { HTMLAttributes } from 'svelte/elements';
+import AzureDevops from './azure-devops.svelte';
 import GitHub from './github.svelte';
 import CSS from './css.svelte';
 import TypeScript from './typescript.svelte';
@@ -21,6 +22,7 @@ export interface Props extends HTMLAttributes<SVGElement> {
 }
 
 export {
+	AzureDevops,
 	CSS,
 	HTML,
 	GitHub,
