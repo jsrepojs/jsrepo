@@ -1,13 +1,14 @@
 <!--
 	jsrepo 1.22.1
 	Installed from github/ieedan/shadcn-svelte-extras
-	12-22-2024
+	12-23-2024
 -->
 
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { createHighlighter } from 'shiki';
 	import { shikiContext } from '.';
+	import { LANGUAGES } from './langs';
 
 	const shiki = shikiContext.init(undefined);
 
@@ -16,21 +17,7 @@
 	onMount(() => {
 		createHighlighter({
 			themes: ['github-dark-default', 'github-light-default'],
-			// make sure you setup any languages you are going to use here
-			langs: [
-				'typescript',
-				'javascript',
-				'svelte',
-				'diff',
-				'json',
-				'yml',
-				'yaml',
-				'vue',
-				'tsx',
-				'jsx',
-				'tsx',
-				'bash'
-			]
+			langs: [...LANGUAGES]
 		}).then((highlighter) => shiki.set(highlighter));
 
 		return () => $shiki?.dispose();

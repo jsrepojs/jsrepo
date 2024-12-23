@@ -181,15 +181,15 @@
 <Code
 	lang="json"
 	code={`{
-    "rules": {
-		"no-category-index-file-dependency": "warn",
-		"no-unpinned-dependency": "warn",
-		"require-local-dependency-exists": "error",
-		"max-local-dependencies": ["warn", 10],
-		"no-circular-dependency": "error",
-		"no-unused-block": "warn",
-		"no-framework-dependency": "warn",
-	}
+		"rules": {
+			"no-category-index-file-dependency": "warn",
+			"no-unpinned-dependency": "warn",
+			"require-local-dependency-exists": "error",
+			"max-local-dependencies": ["warn", 10],
+			"no-circular-dependency": "error",
+			"no-unused-block": "warn",
+			"no-framework-dependency": "warn",
+		}
 }`}
 />
 <div class="flex flex-col gap-2">

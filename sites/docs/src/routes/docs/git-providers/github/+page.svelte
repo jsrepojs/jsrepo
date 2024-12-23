@@ -19,8 +19,7 @@
 	lang="bash"
 	code={`https://github.com/ieedan/std # default branch shorthand
 https://github.com/ieedan/std/tree/v1.5.0 # tag reference
-https://github.com/ieedan/std/tree/next # branch reference
-`}
+https://github.com/ieedan/std/tree/next # branch reference`}
 />
 <SubHeading>Using Tags for Versioning</SubHeading>
 <p>
@@ -29,16 +28,16 @@ https://github.com/ieedan/std/tree/next # branch reference
 <Code
 	lang="json"
 	code={`{
-	"$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/project-config.json",
-    // use a specific version tag
-	"repos": ["https://github.com/ieedan/std/tree/v1.5.0"],
-	"path": "src/blocks",
-	"includeTests": false,
-	"watermark": true,
-	"formatter": "prettier",
-	"paths": {
-		"*": "./src/blocks"
-	}
+		"$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/project-config.json",
+		// use a specific version tag
+		"repos": ["https://github.com/ieedan/std/tree/v1.5.0"],
+		"path": "src/blocks",
+		"includeTests": false,
+		"watermark": true,
+		"formatter": "prettier",
+		"paths": {
+			"*": "./src/blocks"
+		}
 }`}
 />
 <p>
@@ -60,16 +59,16 @@ https://github.com/ieedan/std/tree/next # branch reference
 <Code
 	lang="json"
 	code={`{
-	"$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/project-config.json",
-    // use github instead of https://github.com
-	"repos": ["github/ieedan/std"],
-	"path": "src/blocks",
-	"includeTests": false,
-	"watermark": true,
-	"formatter": "prettier",
-	"paths": {
-		"*": "./src/blocks"
-	}
+		"$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/project-config.json",
+		// use github instead of https://github.com
+		"repos": ["github/ieedan/std"],
+		"path": "src/blocks",
+		"includeTests": false,
+		"watermark": true,
+		"formatter": "prettier",
+		"paths": {
+			"*": "./src/blocks"
+		}
 }`}
 />
 <SubHeading>Rate Limiting</SubHeading>
