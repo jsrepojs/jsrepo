@@ -19,8 +19,7 @@
 	lang="bash"
 	code={`https://bitbucket.org/ieedan/std # default branch shorthand
 https://bitbucket.org/ieedan/std/src/v1.5.0 # tag reference
-https://bitbucket.org/ieedan/std/src/next # branch reference
-`}
+https://bitbucket.org/ieedan/std/src/next # branch reference`}
 />
 <SubHeading>Using Tags for Versioning</SubHeading>
 <p>
@@ -29,16 +28,16 @@ https://bitbucket.org/ieedan/std/src/next # branch reference
 <Code
 	lang="json"
 	code={`{
-	"$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/project-config.json",
-    // use a specific version tag
-	"repos": ["https://bitbucket.org/ieedan/std/src/v1.5.0"],
-	"path": "src/blocks",
-	"includeTests": false,
-	"watermark": true,
-	"formatter": "prettier",
-	"paths": {
-		"*": "./src/blocks"
-	}
+		"$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/project-config.json",
+		// use a specific version tag
+		"repos": ["https://bitbucket.org/ieedan/std/src/v1.5.0"],
+		"path": "src/blocks",
+		"includeTests": false,
+		"watermark": true,
+		"formatter": "prettier",
+		"paths": {
+			"*": "./src/blocks"
+		}
 }`}
 />
 <p>
@@ -60,15 +59,15 @@ https://bitbucket.org/ieedan/std/src/next # branch reference
 <Code
 	lang="json"
 	code={`{
-	"$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/project-config.json",
-    // use bitbucket instead of https://bitbucket.org
-	"repos": ["bitbucket/ieedan/std/src/main"],
-	"path": "src/blocks",
-	"includeTests": false,
-	"watermark": true,
-	"formatter": "prettier",
-	"paths": {
-		"*": "./src/blocks"
-	}
+		"$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/project-config.json",
+		// use bitbucket instead of https://bitbucket.org
+		"repos": ["bitbucket/ieedan/std/src/main"],
+		"path": "src/blocks",
+		"includeTests": false,
+		"watermark": true,
+		"formatter": "prettier",
+		"paths": {
+			"*": "./src/blocks"
+		}
 }`}
 />

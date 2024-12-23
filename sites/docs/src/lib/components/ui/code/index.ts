@@ -1,7 +1,7 @@
 /*
 	jsrepo 1.22.1
 	Installed from github/ieedan/shadcn-svelte-extras
-	12-22-2024
+	12-23-2024
 */
 
 import type { Writable } from 'svelte/store';

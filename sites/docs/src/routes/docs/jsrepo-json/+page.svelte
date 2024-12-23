@@ -45,12 +45,12 @@
 <Code
 	lang="json"
 	code={`{
-    "paths": {
-		// "*" is required as a fallback location if a category isn't mapped
-		"*": "./src/blocks", 
-		"components": "$lib/components",
-		"hooks": "$lib/hooks"
-	}
+	  "paths": {
+		  // "*" is required as a fallback location if a category isn't mapped
+		  "*": "./src/blocks", 
+		  "components": "$lib/components",
+		  "hooks": "$lib/hooks"
+	  }
 }`}
 />
 <SubHeading>includeTests</SubHeading>
@@ -74,7 +74,7 @@
 	was added on.
 </p>
 <Code
-	lang="ts"
+	lang="typescript"
 	code={`/*
 	jsrepo ${data.version}
 	Installed from github/ieedan/std
@@ -82,8 +82,8 @@
 */
 
 export type Point = {
-	x: number;
-	y: number;
+		x: number;
+		y: number;
 };`}
 />
 

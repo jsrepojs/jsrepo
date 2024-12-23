@@ -19,8 +19,7 @@
 	lang="bash"
 	code={`azure/ieedan/std/std # default branch shorthand
 azure/ieedan/std/std/tags/v1.5.0 # tag reference
-azure/ieedan/std/std/heads/next # branch reference
-`}
+azure/ieedan/std/std/heads/next # branch reference`}
 />
 <SubHeading>Using Tags for Versioning</SubHeading>
 <p>
@@ -29,16 +28,16 @@ azure/ieedan/std/std/heads/next # branch reference
 <Code
 	lang="json"
 	code={`{
-	"$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/project-config.json",
-    // use a specific version tag
-	"repos": ["azure/ieedan/std/std/tags/v1.5.0"],
-	"path": "src/blocks",
-	"includeTests": false,
-	"watermark": true,
-	"formatter": "prettier",
-	"paths": {
-		"*": "./src/blocks"
-	}
+		"$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/project-config.json",
+		// use a specific version tag
+		"repos": ["azure/ieedan/std/std/tags/v1.5.0"],
+		"path": "src/blocks",
+		"includeTests": false,
+		"watermark": true,
+		"formatter": "prettier",
+		"paths": {
+			"*": "./src/blocks"
+		}
 }`}
 />
 <p>
