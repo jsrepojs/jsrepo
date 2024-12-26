@@ -329,11 +329,6 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 		const packageContent = `{
   "name": "temp-package",
   "version": "0.0.1",
-  "private": true,
-  "workspaces": [],
-  "config": {
-		"ignore-workspace-root-check": true
-  }
 }`;
 
 		const packagePath = path.join(tempDirectoryRelative, 'package.json');
