@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { CodeSpan, DocHeader, Jsrepo, SubHeading } from '$lib/components/site/docs';
+	import { Blockquote, CodeSpan, DocHeader, Jsrepo, SubHeading } from '$lib/components/site/docs';
 	import { Code } from '$lib/components/ui/code';
 	import { Snippet } from '$lib/components/ui/snippet';
 </script>
@@ -110,6 +110,31 @@ Options:
   --cwd <path>                                 The current working directory. (default: ".")
   -h, --help                                   display help for command`}
 />
+<SubHeading>exec</SubHeading>
+<p>
+	The <CodeSpan>exec</CodeSpan> command allows you to execute a block with arguments.
+</p>
+<Snippet command="execute" args={['jsrepo', 'exec', '<category>/<name>']} />
+<p>or</p>
+<Snippet command="execute" args={['jsrepo', 'exec', 'github/<owner>/<name>/<category>/<name>']} />
+<Code
+	hideLines
+	hideCopy
+	code={`Usage: jsrepo exec|x [options] [script]
+
+Arguments:
+  script         Name of the script you want to execute. ex: (general/hello, github/ieedan/std/general/hello)
+
+Options:
+  --repo <repo>  Repository to download and run the script from.
+  -A, --allow    Allow jsrepo to download code from the provided repo. (default: false)
+  --cwd <path>   The current working directory. (default: ".")        
+  -h, --help     display help for command`}
+/>
+<Blockquote variant="primary">
+	For a subdirectory based block <CodeSpan>exec</CodeSpan> will attempt to execute an index file in the
+	directory.
+</Blockquote>
 <SubHeading>test</SubHeading>
 <p>
 	The <CodeSpan>test</CodeSpan> command allows you to run remote tests on your local code from the CLI.

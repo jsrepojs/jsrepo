@@ -33,11 +33,12 @@ program
 	.version(version)
 	.addCommand(commands.add)
 	.addCommand(commands.auth)
+	.addCommand(commands.build)
+	.addCommand(commands.diff)
+	.addCommand(commands.exec)
 	.addCommand(commands.init)
 	.addCommand(commands.test)
-	.addCommand(commands.build)
-	.addCommand(commands.update)
-	.addCommand(commands.diff);
+	.addCommand(commands.update);
 
 program.parse();
 

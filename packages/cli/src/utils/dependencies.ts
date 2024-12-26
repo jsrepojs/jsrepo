@@ -1,7 +1,8 @@
 import color from 'chalk';
 import { execa } from 'execa';
-import { type Agent, type ResolvedCommand, resolveCommand } from 'package-manager-detector';
+import { type Agent, resolveCommand } from 'package-manager-detector';
 import path from 'pathe';
+import { flags } from './blocks/package-managers/flags';
 import { Err, Ok, type Result } from './blocks/types/result';
 import type { ProjectConfig } from './config';
 
@@ -11,6 +12,7 @@ export type Options = {
 	/** Install as devDependency */
 	dev: boolean;
 	cwd: string;
+	ignoreWorkspace?: boolean;
 };
 
 /** Installs the provided dependencies using the provided package manager
@@ -23,13 +25,21 @@ const installDependencies = async ({
 	deps,
 	dev,
 	cwd,
+	ignoreWorkspace = false,
 }: Options): Promise<Result<string[], string>> => {
-	let add: ResolvedCommand | null;
+	const args = [...deps];
+
 	if (dev) {
-		add = resolveCommand(pm, 'install', [...deps, '-D']);
-	} else {
-		add = resolveCommand(pm, 'install', [...deps]);
+		args.push(flags[pm]['install-as-dev-dependency']);
 	}
+
+	const noWorkspace = flags[pm]['no-workspace'];
+
+	if (ignoreWorkspace && noWorkspace) {
+		args.push(noWorkspace);
+	}
+
+	const add = resolveCommand(pm, 'install', args);
 
 	if (add == null) return Err(color.red(`Could not resolve add command for '${pm}'.`));
 
