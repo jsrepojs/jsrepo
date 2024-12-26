@@ -1,7 +1,9 @@
 import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { cancel, confirm, isCancel, select, spinner } from '@clack/prompts';
 import color from 'chalk';
 import { Argument, Command, program } from 'commander';
+import { execa } from 'execa';
 import { resolveCommand } from 'package-manager-detector/commands';
 import { detect } from 'package-manager-detector/detect';
 import path from 'pathe';
@@ -14,14 +16,11 @@ import { type ProjectConfig, getProjectConfig, resolvePaths } from '../utils/con
 import { installDependencies } from '../utils/dependencies';
 import * as gitProviders from '../utils/git-providers';
 import { type ConcurrentTask, intro, runTasksConcurrently } from '../utils/prompts';
-import { fileURLToPath } from 'node:url';
-import { execa } from 'execa';
 
 const schema = v.objectWithRest(
 	{
 		repo: v.optional(v.string()),
 		allow: v.boolean(),
-		yes: v.boolean(),
 		cwd: v.string(),
 	},
 	v.unknown()
@@ -37,9 +36,8 @@ const exec = new Command('exec')
 			'Name of the script you want to execute. ex: (utils/math, github/ieedan/std/utils/math)'
 		).argOptional()
 	)
-	.option('--repo <repo>', 'Repository to download the blocks from.')
+	.option('--repo <repo>', 'Repository to download and run the script from.')
 	.option('-A, --allow', 'Allow jsrepo to download code from the provided repo.', false)
-	.option('-y, --yes', 'Skip confirmation prompt.', false)
 	.option('--cwd <path>', 'The current working directory.', process.cwd())
 	.allowExcessArguments()
 	.allowUnknownOption()
@@ -170,7 +168,7 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 	// if no blocks are provided prompt the user for what blocks they want
 	if (!script) {
 		const promptResult = await select({
-			message: 'Select which blocks to add.',
+			message: 'Select which script to run.',
 			options: Array.from(blocksMap.entries())
 				.filter(([_, value]) => value.list)
 				.map(([key, value]) => {
@@ -391,7 +389,11 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 
 	const startIndex = (command.parent.rawArgs as string[]).findIndex((arg) => arg === '--');
 
-	const passthroughArgs = command.parent.rawArgs.slice(startIndex + 1);
+	let passthroughArgs: string[] = [];
+
+	if (startIndex !== -1) {
+		passthroughArgs = command.parent.rawArgs.slice(startIndex + 1);
+	}
 
 	// run the cli
 
