@@ -33,7 +33,7 @@ const exec = new Command('exec')
 	.addArgument(
 		new Argument(
 			'script',
-			'Name of the script you want to execute. ex: (utils/math, github/ieedan/std/utils/math)'
+			'Name of the script you want to execute. ex: (general/hello, github/ieedan/std/general/hello)'
 		).argOptional()
 	)
 	.option('--repo <repo>', 'Repository to download and run the script from.')
