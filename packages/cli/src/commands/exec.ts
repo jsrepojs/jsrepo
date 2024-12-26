@@ -339,6 +339,7 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 					deps: Array.from(deps),
 					dev: false,
 					cwd: tempDirectory,
+					ignoreWorkspace: true,
 				})
 			).match(
 				(installed) => {
@@ -362,6 +363,7 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 					deps: Array.from(devDeps),
 					dev: true,
 					cwd: tempDirectory,
+					ignoreWorkspace: true,
 				})
 			).match(
 				(installed) => {
