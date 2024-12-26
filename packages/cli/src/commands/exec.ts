@@ -326,14 +326,14 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 
 	if (hasDependencies) {
 		// add package.json
-		const packageContent = `{
-  "name": "temp-package",
-  "version": "0.0.1",
-}`;
+		const packageContent = {
+			name: 'temp-package',
+			version: '0.0.1',
+		};
 
 		const packagePath = path.join(tempDirectoryRelative, 'package.json');
 
-		fs.writeFileSync(packagePath, packageContent);
+		fs.writeFileSync(packagePath, JSON.stringify(packageContent, null, '\t'));
 
 		if (deps.size > 0) {
 			if (!options.verbose) loading.start(`Installing dependencies with ${color.cyan(pm)}`);
