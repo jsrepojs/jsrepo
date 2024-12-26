@@ -203,19 +203,13 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 		(err) => program.error(err)
 	);
 
-	const cwdRelative = path.relative(process.cwd(), path.dirname(fileURLToPath(import.meta.url)));
+	const tempDirBase = 'temp-jsrepo-exec';
 
-	const tempDirectory = path.join(
-		path.dirname(fileURLToPath(import.meta.url)),
-		`temp-exec/${encodeURIComponent(script)}`
-	);
+	const tempDirectoryRelative = `./${tempDirBase}/${encodeURIComponent(script)}`;
 
-	const tempDirectoryRelative = path.join(
-		cwdRelative,
-		path.relative(path.dirname(fileURLToPath(import.meta.url)), tempDirectory)
-	);
+	const tempDirectory = path.join(process.cwd(), tempDirectoryRelative);
 
-	config.paths['*'] = `./${tempDirectoryRelative}`;
+	config.paths['*'] = tempDirectoryRelative;
 
 	fs.mkdirSync(tempDirectory, { recursive: true });
 
@@ -328,10 +322,11 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 		// add package.json
 		const packageContent = {
 			name: 'temp-package',
+			type: 'module',
 			version: '0.0.1',
 		};
 
-		const packagePath = path.join(tempDirectoryRelative, 'package.json');
+		const packagePath = path.join(tempDirectory, 'package.json');
 
 		fs.writeFileSync(packagePath, JSON.stringify(packageContent, null, '\t'));
 
@@ -343,7 +338,7 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 					pm,
 					deps: Array.from(deps),
 					dev: false,
-					cwd: tempDirectoryRelative,
+					cwd: tempDirectory,
 				})
 			).match(
 				(installed) => {
@@ -366,7 +361,7 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 					pm,
 					deps: Array.from(devDeps),
 					dev: true,
-					cwd: tempDirectoryRelative,
+					cwd: tempDirectory,
 				})
 			).match(
 				(installed) => {
@@ -417,13 +412,15 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 		program.error(color.red('Error resolving run command!'));
 	}
 
-	await execa(cmd.command, cmd.args, {
-		cwd: process.cwd(),
-		stdin: process.stdin,
-		stdout: process.stdout,
-	});
-
-	fs.rmSync(tempDirectoryRelative, { recursive: true, force: true });
+	try {
+		await execa(cmd.command, cmd.args, {
+			cwd: process.cwd(),
+			stdin: process.stdin,
+			stdout: process.stdout,
+		});
+	} finally {
+		fs.rmSync(path.join(process.cwd(), tempDirBase), { recursive: true, force: true });
+	}
 };
 
 export { exec };
