@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.23.0
+
+### Minor Changes
+
+- 17762ac: Add `exec` (`x`) command.
+
 ## 1.22.2
 
 ### Patch Changes
