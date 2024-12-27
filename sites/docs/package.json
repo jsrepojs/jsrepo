@@ -31,7 +31,6 @@
 		"package-manager-detector": "^0.2.8",
 		"prettier": "^3.4.2",
 		"prettier-plugin-svelte": "^3.3.2",
-		"runed": "^0.22.0",
 		"shiki": "^1.24.4",
 		"svelte": "^5.16.0",
 		"svelte-check": "^4.1.1",
