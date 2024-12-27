@@ -12,7 +12,6 @@ const schema = v.object({
 	token: v.optional(v.string()),
 	provider: v.optional(v.string()),
 	logout: v.boolean(),
-	cwd: v.string(),
 });
 
 type Options = v.InferInput<typeof schema>;
@@ -26,7 +25,6 @@ const auth = new Command('auth')
 		)
 	)
 	.option('--logout', 'Erase tokens from each provider from storage.', false)
-	.option('--cwd <path>', 'The current working directory.', process.cwd())
 	.action(async (opts) => {
 		const options = v.parse(schema, opts);
 

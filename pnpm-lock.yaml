@@ -118,6 +118,9 @@ importers:
       '@fontsource-variable/jetbrains-mono':
         specifier: ^5.1.1
         version: 5.1.1
+      '@fontsource/inter':
+        specifier: ^5.1.0
+        version: 5.1.0
       '@fontsource/poppins':
         specifier: ^5.1.0
         version: 5.1.0
@@ -701,6 +704,9 @@ packages:
 
   '@fontsource-variable/jetbrains-mono@5.1.1':
     resolution: {integrity: sha512-V+1aRFRvuZ66PpO30s8l/2aADKzpV9VRsO3kSZE+rTMvi4vab3cUcPHMN2z+wAvjkYJO71Yf+g3/Y6pSMmQpVQ==}
+
+  '@fontsource/inter@5.1.0':
+    resolution: {integrity: sha512-zKZR3kf1G0noIes1frLfOHP5EXVVm0M7sV/l9f/AaYf+M/DId35FO4LkigWjqWYjTJZGgplhdv4cB+ssvCqr5A==}
 
   '@fontsource/poppins@5.1.0':
     resolution: {integrity: sha512-tpLXlnNi2fwQjiipvuj4uNFHCdoLA8izRsKdoexZuEzjx0r/g1aKLf4ta6lFgF7L+/+AFdmaXFlUwwvmDzYH+g==}
@@ -3568,6 +3574,8 @@ snapshots:
   '@floating-ui/utils@0.2.8': {}
 
   '@fontsource-variable/jetbrains-mono@5.1.1': {}
+
+  '@fontsource/inter@5.1.0': {}
 
   '@fontsource/poppins@5.1.0': {}
 

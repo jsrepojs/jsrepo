@@ -24,6 +24,20 @@
 						>
 							{route.name}
 						</Command.Item>
+						{#each route.routes ?? [] as { name, href, icon: Icon }}
+							<Command.Item
+								onclick={async () => {
+									await goto(href);
+									$open = false;
+								}}
+							>
+								<span class="text-sm text-muted-foreground">{route.name} ~</span>
+								{#if Icon}
+									<Icon />
+								{/if}
+								{name}
+							</Command.Item>
+						{/each}
 					{/each}
 				</Command.Group>
 			{/each}
