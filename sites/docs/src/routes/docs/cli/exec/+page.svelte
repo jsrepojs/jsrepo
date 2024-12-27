@@ -12,6 +12,10 @@
 </p>
 <Snippet command="execute" args={['jsrepo', 'exec']} />
 <p>
+	<CodeSpan>x</CodeSpan> alias.
+</p>
+<Snippet command="execute" args={['jsrepo', 'x']} />
+<p>
 	Execute a partially qualified script using the registries in your <CodeSpan>jsrepo.json</CodeSpan>
 	file.
 </p>
