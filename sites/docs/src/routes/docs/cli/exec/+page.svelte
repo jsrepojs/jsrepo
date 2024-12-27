@@ -12,7 +12,8 @@
 </p>
 <Snippet command="execute" args={['jsrepo', 'exec']} />
 <p>
-	Execute a partially qualified script using the registries in your <CodeSpan>jsrepo.json</CodeSpan> file.
+	Execute a partially qualified script using the registries in your <CodeSpan>jsrepo.json</CodeSpan>
+	file.
 </p>
 <Snippet command="execute" args={['jsrepo', 'exec', 'github/ieedan/scripts/general/hello']} />
 <p>Include another registry in the scripts list.</p>

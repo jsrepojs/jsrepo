@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { CodeSpan, DocHeader, Jsrepo, SubHeading } from '$lib/components/site/docs';
+	import { CodeSpan, DocHeader, SubHeading } from '$lib/components/site/docs';
 	import { Snippet } from '$lib/components/ui/snippet';
 	import OptionDocs from '../option-docs.svelte';
 </script>
