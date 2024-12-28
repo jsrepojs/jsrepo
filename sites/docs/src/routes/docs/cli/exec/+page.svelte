@@ -15,6 +15,8 @@
 	<CodeSpan>x</CodeSpan> alias.
 </p>
 <Snippet command="execute" args={['jsrepo', 'x']} />
+<p>Execute with args.</p>
+<Snippet command="execute" args={['jsrepo', 'exec', '--', 'argument', '--yes']} />
 <p>
 	Execute a partially qualified script using the registries in your <CodeSpan>jsrepo.json</CodeSpan>
 	file.
@@ -23,6 +25,15 @@
 <p>Include another registry in the scripts list.</p>
 <Snippet command="execute" args={['jsrepo', 'exec', '--repo', 'github/ieedan/scripts']} />
 <SubHeading>Options</SubHeading>
+<OptionDocs name="--">
+	{#snippet description()}
+		<CodeSpan>--</CodeSpan> is a special option that will cause any args after it to be passed to the
+		script instead of jsrepo.
+	{/snippet}
+	{#snippet usage()}
+		<Snippet command="execute" args={['jsrepo', 'exec', '--', 'argument', '--yes']} />
+	{/snippet}
+</OptionDocs>
 <OptionDocs name="--repo">
 	{#snippet description()}
 		The repository to download the scripts from.
