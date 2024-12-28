@@ -2,7 +2,7 @@
 	import { Modal } from '$lib/components/ui/modal';
 	import * as Command from '$lib/components/ui/command';
 	import { commandContext } from '$lib/ts/context';
-	import { categories } from '../../../map';
+	import { categories } from '../../map';
 	import { goto } from '$app/navigation';
 
 	const open = commandContext.get();

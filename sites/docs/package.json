@@ -19,7 +19,7 @@
 		"@tailwindcss/typography": "^0.5.15",
 		"@types/eslint": "^9.6.0",
 		"autoprefixer": "^10.4.20",
-		"bits-ui": "1.0.0-next.71",
+		"bits-ui": "1.0.0-next.74",
 		"clsx": "^2.1.1",
 		"eslint": "^9.17.0",
 		"eslint-config-prettier": "^9.1.0",
