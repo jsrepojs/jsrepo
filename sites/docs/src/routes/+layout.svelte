@@ -38,16 +38,14 @@
 <Command />
 <ShikiProvider>
 	<Header {...data} />
-	<Sidebar.Provider>
-		{#if page.url.pathname.startsWith('/docs')}
-			<AppSidebar {...data} />
+	<Sidebar.Provider open={page.url.pathname.startsWith('/docs')}>
+		<AppSidebar {...data} />
 
-			{#if isMobile.current}
-				<!-- Moves the trigger with context to the header -->
-				<Portal to="#sidebar-trigger-portal-target">
-					<Sidebar.Trigger />
-				</Portal>
-			{/if}
+		{#if isMobile.current}
+			<!-- Moves the trigger with context to the header -->
+			<Portal to="#sidebar-trigger-portal-target">
+				<Sidebar.Trigger />
+			</Portal>
 		{/if}
 
 		<main class="min-h-svh w-full flex place-items-center justify-center flex-col">
