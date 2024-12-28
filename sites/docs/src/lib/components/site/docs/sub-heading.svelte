@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { onThisPage } from '$lib/ts/on-this-page';
 	import { cn } from '$lib/utils';
 	import { onMount, type Snippet } from 'svelte';
@@ -21,21 +21,21 @@
 				const newVal = val;
 
 				if (val.curr !== undefined) {
-					if (val.curr.path !== $page.url.pathname) {
+					if (val.curr.path !== page.url.pathname) {
 						newVal.curr = {
 							headings: [{ children: [], el: ref!, rank: 2 }],
-							path: $page.url.pathname
+							path: page.url.pathname
 						};
 					} else {
 						newVal.curr = {
 							headings: [...val.curr.headings, { children: [], el: ref!, rank: 2 }],
-							path: $page.url.pathname
+							path: page.url.pathname
 						};
 					}
 				} else {
 					newVal.curr = {
 						headings: [{ children: [], el: ref!, rank: 2 }],
-						path: $page.url.pathname
+						path: page.url.pathname
 					};
 				}
 

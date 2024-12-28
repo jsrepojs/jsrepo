@@ -35,7 +35,6 @@ import * as persisted from '../utils/persisted';
 import { type Task, intro, nextSteps, runTasks } from '../utils/prompts';
 
 const schema = v.object({
-	path: v.optional(v.string()),
 	repos: v.optional(v.array(v.string())),
 	watermark: v.boolean(),
 	tests: v.optional(v.boolean()),
@@ -51,7 +50,6 @@ type Options = v.InferInput<typeof schema>;
 
 const init = new Command('init')
 	.description('Initializes your project with a configuration file.')
-	.option('--path <path>', 'Path to install the blocks from.')
 	.option('--repos [repos...]', 'Repository to install the blocks from.')
 	.option(
 		'--no-watermark',

@@ -10,7 +10,7 @@
 	let { version }: Props = $props();
 </script>
 
-<footer class="border-border border-t flex place-items-center justify-center px-6">
+<footer class="border-border border-t flex place-items-center justify-center px-6 w-full">
 	<div class="w-full max-w-screen-2xl flex justify-between place-items-center h-full">
 		<div class="flex justify-center py-8">
 			<div class="flex place-items-center gap-2">

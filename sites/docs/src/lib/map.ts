@@ -68,7 +68,41 @@ const categories: Category[] = [
 			},
 			{
 				name: 'CLI',
-				href: '/docs/cli'
+				href: '/docs/cli',
+				routes: [
+					{
+						name: 'add',
+						href: '/docs/cli/add'
+					},
+					{
+						name: 'auth',
+						href: '/docs/cli/auth'
+					},
+					{
+						name: 'build',
+						href: '/docs/cli/build'
+					},
+					{
+						name: 'diff',
+						href: '/docs/cli/diff'
+					},
+					{
+						name: 'exec',
+						href: '/docs/cli/exec'
+					},
+					{
+						name: 'init',
+						href: '/docs/cli/init'
+					},
+					{
+						name: 'test',
+						href: '/docs/cli/test'
+					},
+					{
+						name: 'update',
+						href: '/docs/cli/update'
+					}
+				]
 			},
 			{
 				name: 'Language Support',
