@@ -1,5 +1,12 @@
 # jsrepo
 
+## 1.23.1
+
+### Patch Changes
+
+- 4f897ca: Update dependencies.
+- 433bca7: Remove unused and unnecessary `--cwd` option from `auth` command.
+
 ## 1.23.0
 
 ### Minor Changes
