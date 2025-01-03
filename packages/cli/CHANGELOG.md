@@ -1,5 +1,12 @@
 # jsrepo
 
+## 1.23.3
+
+### Patch Changes
+
+- 036b8c0: Add descriptions for `add`, `exec`, and `update` commands.
+- 036b8c0: Move some files to enable documentation generation.
+
 ## 1.23.2
 
 ### Patch Changes
