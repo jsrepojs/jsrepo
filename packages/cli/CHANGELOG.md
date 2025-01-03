@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.23.2
+
+### Patch Changes
+
+- 6ec9cab: Update dependencies.
+
 ## 1.23.1
 
 ### Patch Changes
