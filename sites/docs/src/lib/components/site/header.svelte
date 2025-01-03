@@ -23,7 +23,7 @@
 <header
 	class="py-2 px-4 flex place-items-center justify-center border-b border-border h-14 sticky top-0 bg-background z-40"
 >
-	<div class="flex place-items-center justify-between max-w-screen-2xl w-full">
+	<div class="flex place-items-center justify-between w-full">
 		<div class="flex place-items-center gap-6">
 			{#if isMobile.current}
 				<div id="sidebar-trigger-portal-target"></div>
