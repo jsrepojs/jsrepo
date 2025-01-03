@@ -15,7 +15,7 @@ import { Command, Option, program } from 'commander';
 import { detect, resolveCommand } from 'package-manager-detector';
 import path from 'pathe';
 import * as v from 'valibot';
-import { context } from '..';
+import { context } from '../cli';
 import * as ascii from '../utils/ascii';
 import {
 	type Formatter,

@@ -16,7 +16,7 @@ import { resolveCommand } from 'package-manager-detector/commands';
 import { detect } from 'package-manager-detector/detect';
 import path from 'pathe';
 import * as v from 'valibot';
-import { context } from '..';
+import { context } from '../cli';
 import * as ascii from '../utils/ascii';
 import { getInstalled, resolveTree } from '../utils/blocks';
 import { type Block, isTestFile } from '../utils/build';
@@ -53,6 +53,7 @@ const schema = v.object({
 type Options = v.InferInput<typeof schema>;
 
 const add = new Command('add')
+	.description('Add blocks to your project.')
 	.argument(
 		'[blocks...]',
 		'Names of the blocks you want to add to your project. ex: (utils/math, github/ieedan/std/utils/math)'

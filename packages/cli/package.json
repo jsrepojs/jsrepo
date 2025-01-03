@@ -28,12 +28,13 @@
 		"lint": "biome lint --write",
 		"check": "biome check && tsc",
 		"test": "vitest",
-		"check:types": "tsc"
+		"check:types": "tsc",
+		"build:docs": "pnpm dlx tsx ./scripts/generate-docs.ts ../../sites/docs/static/docs/cli/llms.txt"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@types/diff": "^6.0.0",
-		"@types/node": "^22.10.2",
+		"@types/node": "^22.10.5",
 		"@types/validate-npm-package-name": "^4.0.2",
 		"tsup": "^8.3.5",
 		"typescript": "^5.7.2",
@@ -46,7 +47,7 @@
 		"@vue/compiler-sfc": "^3.5.13",
 		"ansi-regex": "^6.1.0",
 		"chalk": "^5.4.1",
-		"commander": "^12.1.0",
+		"commander": "^13.0.0",
 		"conf": "^13.1.0",
 		"diff": "^7.0.0",
 		"escape-string-regexp": "^5.0.0",
@@ -54,13 +55,13 @@
 		"execa": "^9.5.2",
 		"get-tsconfig": "^4.8.1",
 		"node-fetch": "^3.3.2",
-		"octokit": "^4.0.2",
+		"octokit": "^4.0.3",
 		"package-manager-detector": "^0.2.8",
 		"parse5": "^7.2.1",
 		"pathe": "^1.1.2",
 		"prettier": "^3.4.2",
-		"svelte": "^5.16.0",
-		"ts-morph": "^24.0.0",
+		"svelte": "^5.16.1",
+		"ts-morph": "^25.0.0",
 		"valibot": "^0.42.1",
 		"validate-npm-package-name": "^6.0.0"
 	}

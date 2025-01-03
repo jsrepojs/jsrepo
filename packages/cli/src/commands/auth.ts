@@ -2,7 +2,7 @@ import { cancel, confirm, isCancel, outro, password, select } from '@clack/promp
 import color from 'chalk';
 import { Command, Option } from 'commander';
 import * as v from 'valibot';
-import { context } from '..';
+import { context } from '../cli';
 import * as ascii from '../utils/ascii';
 import { providers } from '../utils/git-providers';
 import * as persisted from '../utils/persisted';

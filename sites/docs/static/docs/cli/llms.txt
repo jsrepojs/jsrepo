@@ -1,0 +1,148 @@
+# jsrepo
+
+> A CLI to add shared code from remote repositories.
+ 
+Latest Version: 1.23.1
+
+## Commands
+
+### add
+    
+Add blocks to your project.
+
+#### Usage
+```bash
+jsrepo add [options] [blocks...]
+```
+
+#### Options
+- --repo <repo>: Repository to download the blocks from. 
+- -A, --allow: Allow jsrepo to download code from the provided repo. 
+- -y, --yes: Skip confirmation prompt. 
+- --verbose: Include debug logs. 
+- --cwd <path>: The current working directory. (default: E:\github\jsrepo\packages\cli)
+
+### auth
+    
+Provide a token for access to private repositories.
+
+#### Usage
+```bash
+jsrepo auth [options]
+```
+
+#### Options
+- --token <token>: The token to use for authenticating to your provider. 
+- --provider <name>: The provider this token belongs to. 
+- --logout: Erase tokens from each provider from storage. 
+
+### build
+    
+Builds the provided --dirs in the project root into a `jsrepo-manifest.json` file.
+
+#### Usage
+```bash
+jsrepo build [options]
+```
+
+#### Options
+- --dirs [dirs...]: The directories containing the blocks. 
+- --include-blocks [blockNames...]: Include only the blocks with these names. 
+- --include-categories [categoryNames...]: Include only the categories with these names. 
+- --exclude-blocks [blockNames...]: Do not include the blocks with these names. 
+- --exclude-categories [categoryNames...]: Do not include the categories with these names. 
+- --list-blocks [blockNames...]: List only the blocks with these names. 
+- --list-categories [categoryNames...]: List only the categories with these names. 
+- --do-not-list-blocks [blockNames...]: Do not list the blocks with these names. 
+- --do-not-list-categories [categoryNames...]: Do not list the categories with these names. 
+- --exclude-deps [deps...]: Dependencies that should not be added. 
+- --preview: Display a preview of the blocks list. 
+- --no-output: Do not output a `jsrepo-manifest.json` file. 
+- --verbose: Include debug logs. 
+- --cwd <path>: The current working directory. (default: E:\github\jsrepo\packages\cli)
+
+### diff
+    
+Compares local blocks to the blocks in the provided repository.
+
+#### Usage
+```bash
+jsrepo diff [options]
+```
+
+#### Options
+- -E, --expand: Expands the diff so you see everything. 
+- --max-unchanged <number>: Maximum unchanged lines that will show without being collapsed. (default: 3)
+- --repo <repo>: Repository to download the blocks from. 
+- -A, --allow: Allow jsrepo to download code from the provided repo. 
+- --cwd <path>: The current working directory. (default: E:\github\jsrepo\packages\cli)
+
+### exec
+    
+Execute a block as a script.
+
+#### Usage
+```bash
+jsrepo exec [options] [script]
+```
+
+#### Options
+- --repo <repo>: Repository to download and run the script from. 
+- -A, --allow: Allow jsrepo to download code from the provided repo. 
+- --cwd <path>: The current working directory. (default: E:\github\jsrepo\packages\cli)
+
+### init
+    
+Initializes your project with a configuration file.
+
+#### Usage
+```bash
+jsrepo init [options]
+```
+
+#### Options
+- --repos [repos...]: Repository to install the blocks from. 
+- --no-watermark: Will not add a watermark to each file upon adding it to your project. 
+- --tests: Will include tests with the blocks. 
+- --formatter <formatter>: What formatter to use when adding or updating blocks. 
+- -P, --project: Takes you through the steps to initialize a project. 
+- -R, --registry: Takes you through the steps to initialize a registry. 
+- --script <name>: The name of the build script. (For Registry setup) (default: build:registry)
+- -y, --yes: Skip confirmation prompt. 
+- --cwd <path>: The current working directory. (default: E:\github\jsrepo\packages\cli)
+
+### test
+    
+Tests local blocks against most recent remote tests.
+
+#### Usage
+```bash
+jsrepo test [options] [blocks...]
+```
+
+#### Options
+- --repo <repo>: Repository to download the blocks from. 
+- -A, --allow: Allow jsrepo to download code from the provided repo. 
+- --debug: Leaves the temp test file around for debugging upon failure. 
+- --verbose: Include debug logs. 
+- --cwd <path>: The current working directory. (default: E:\github\jsrepo\packages\cli)
+
+### update
+    
+Update blocks to the code in the remote repository.
+
+#### Usage
+```bash
+jsrepo update [options] [blocks...]
+```
+
+#### Options
+- --all: Update all installed components. 
+- -E, --expand: Expands the diff so you see everything. 
+- --max-unchanged <number>: Maximum unchanged lines that will show without being collapsed. (default: 3)
+- --repo <repo>: Repository to download the blocks from. 
+- -A, --allow: Allow jsrepo to download code from the provided repo. 
+- -y, --yes: Skip confirmation prompt. 
+- --verbose: Include debug logs. 
+- --cwd <path>: The current working directory. (default: E:\github\jsrepo\packages\cli)
+

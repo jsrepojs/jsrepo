@@ -8,7 +8,7 @@ import { resolveCommand } from 'package-manager-detector/commands';
 import { detect } from 'package-manager-detector/detect';
 import path from 'pathe';
 import * as v from 'valibot';
-import { context } from '..';
+import { context } from '../cli';
 import * as ascii from '../utils/ascii';
 import { resolveTree } from '../utils/blocks';
 import { isTestFile } from '../utils/build';
@@ -30,6 +30,7 @@ type Options = v.InferInput<typeof schema>;
 
 const exec = new Command('exec')
 	.alias('x')
+	.description('Execute a block as a script.')
 	.addArgument(
 		new Argument(
 			'script',

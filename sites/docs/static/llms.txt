@@ -1,0 +1,26 @@
+# jsrepo Documentation for LLMs
+
+> jsrepo is a CLI that aims to make sharing your code easy and lightweight. It builds your code into a registry and allows you to download it from the CLI a lot like shadcn-ui.
+
+## Package Documentation
+
+- [jsrepo CLI](https://jsrepo.dev/docs/cli/llms.txt)
+
+## Git Provider Support
+
+jsrepo supports GitHub, GitLab, BitBucket, and Azure DevOps
+
+## Language Support
+
+- JavaScript (*.js)
+- TypeScript (*.ts)
+- JSX (*.jsx)
+- TSX (*.tsx)
+- Svelte (*.svelte)
+- Vue (*.vue)
+- YAML (*.(yaml|yml))
+- JSON (*.(json|jsonc))
+- CSS (*.css)
+- SVG (*.svg)
+- SASS (*.(sass|scss))
+- HTML (*.html)
