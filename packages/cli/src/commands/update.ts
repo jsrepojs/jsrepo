@@ -7,7 +7,7 @@ import { resolveCommand } from 'package-manager-detector/commands';
 import { detect } from 'package-manager-detector/detect';
 import path from 'pathe';
 import * as v from 'valibot';
-import { context } from '..';
+import { context } from '../cli';
 import * as ascii from '../utils/ascii';
 import { type RemoteBlock, getInstalled, resolveTree } from '../utils/blocks';
 import { isTestFile } from '../utils/build';
@@ -35,6 +35,7 @@ const schema = v.object({
 type Options = v.InferInput<typeof schema>;
 
 const update = new Command('update')
+	.description('Update blocks to the code in the remote repository.')
 	.argument('[blocks...]', 'Names of the blocks you want to update. ex: (utils/math)')
 	.option('--all', 'Update all installed components.', false)
 	.option('-E, --expand', 'Expands the diff so you see everything.', false)

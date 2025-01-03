@@ -11,7 +11,8 @@
     "build:cli": "pnpm -F jsrepo build",
     "ci:release": "pnpm build:cli && changeset publish",
     "changeset": "changeset",
-    "dev": "pnpm -F docs dev"
+    "dev": "pnpm -F docs dev",
+    "build:cli-docs": "pnpm -F jsrepo build:docs"
   },
   "keywords": [],
   "author": "Aidan Bleser",

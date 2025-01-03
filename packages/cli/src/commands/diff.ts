@@ -5,7 +5,7 @@ import { Command, program } from 'commander';
 import { diffLines } from 'diff';
 import path from 'pathe';
 import * as v from 'valibot';
-import { context } from '..';
+import { context } from '../cli';
 import * as ascii from '../utils/ascii';
 import { getInstalled } from '../utils/blocks';
 import { type Block, isTestFile } from '../utils/build';

@@ -4,7 +4,7 @@ import color from 'chalk';
 import { Command, program } from 'commander';
 import path from 'pathe';
 import * as v from 'valibot';
-import { context } from '..';
+import { context } from '../cli';
 import * as ascii from '../utils/ascii';
 import { type Category, buildBlocksDirectory, pruneUnused } from '../utils/build';
 import { DEFAULT_CONFIG, runRules } from '../utils/build/check';
