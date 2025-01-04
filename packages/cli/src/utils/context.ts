@@ -9,6 +9,7 @@ export interface CLIContext {
 		repository: {
 			url: string;
 		};
+		latestVersion?: string;
 	};
 	/** Resolves the path relative to the root of the application
 	 *

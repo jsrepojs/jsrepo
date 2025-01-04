@@ -82,4 +82,18 @@ const rightPadMin = (str: string, length: number, padWith = ' ') => {
 	return str + padWith.repeat(length - stripAsni(str).length);
 };
 
-export { leftPad, leftPadMin, rightPad, rightPadMin };
+const centerPad = (str: string, length: number, padWith = ' ') => {
+	if (stripAsni(str).length > length) {
+		throw new Error('String length is greater than the length provided.');
+	}
+
+	const overflow = length - stripAsni(str).length;
+
+	const paddingLeft = Math.floor(overflow / 2);
+
+	const paddingRight = Math.ceil(overflow / 2);
+
+	return padWith.repeat(paddingLeft) + str + padWith.repeat(paddingRight);
+};
+
+export { leftPad, leftPadMin, rightPad, rightPadMin, centerPad };

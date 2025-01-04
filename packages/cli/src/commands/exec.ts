@@ -45,7 +45,7 @@ const exec = new Command('exec')
 	.action(async (script, opts, command) => {
 		const options = v.parse(schema, opts);
 
-		intro(context.package.version);
+		intro(context);
 
 		await _exec(script, options, command);
 	});

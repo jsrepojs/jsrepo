@@ -28,7 +28,7 @@ const auth = new Command('auth')
 	.action(async (opts) => {
 		const options = v.parse(schema, opts);
 
-		intro(context.package.version);
+		intro(context);
 
 		await _auth(options);
 
