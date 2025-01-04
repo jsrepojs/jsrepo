@@ -66,7 +66,7 @@ const add = new Command('add')
 	.action(async (blockNames, opts) => {
 		const options = v.parse(schema, opts);
 
-		intro(context.package.version);
+		intro(context);
 
 		await _add(blockNames, options);
 

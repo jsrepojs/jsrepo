@@ -1,7 +1,7 @@
 /*
-	jsrepo 1.2.4
+	jsrepo 1.22.1
 	Installed from github/ieedan/std
-	11-21-2024
+	1-4-2025
 */
 
 import ansiRegex from 'ansi-regex';

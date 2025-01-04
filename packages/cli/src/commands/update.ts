@@ -53,7 +53,7 @@ const update = new Command('update')
 	.action(async (blockNames, opts) => {
 		const options = v.parse(schema, opts);
 
-		intro(context.package.version);
+		intro(context);
 
 		await _update(blockNames, options);
 

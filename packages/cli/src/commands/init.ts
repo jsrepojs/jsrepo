@@ -74,7 +74,7 @@ const init = new Command('init')
 	.action(async (opts) => {
 		const options = v.parse(schema, opts);
 
-		intro(context.package.version);
+		intro(context);
 
 		if (options.registry !== undefined && options.project !== undefined) {
 			program.error(
