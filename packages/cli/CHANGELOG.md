@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.23.4
+
+### Patch Changes
+
+- 5764ab5: Add message to let users know that an update is available to the CLI when their version is out of date.
+
 ## 1.23.3
 
 ### Patch Changes
