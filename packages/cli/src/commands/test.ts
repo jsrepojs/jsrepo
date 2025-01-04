@@ -332,22 +332,16 @@ const _test = async (blockNames: string[], options: Options) => {
 		program.error(color.red(`Could not resolve add command for '${pm.agent}'.`));
 	}
 
-	const { command, args } = resolved;
+	const testCommand = `${resolved.command} ${resolved.args.join(' ')}`;
 
-	const testCommand = `${command} ${args.join(' ')}`;
-
-	const testingProcess = execa({
-		cwd: options.cwd,
-		stdio: ['ignore', 'pipe', 'pipe'],
-	})`${testCommand}`;
-
-	const handler = (data: string) => console.info(data.toString());
-
-	testingProcess.stdout.on('data', handler);
-	testingProcess.stderr.on('data', handler);
+	verbose(`Running ${color.cyan(testCommand)} on ${color.cyan(options.cwd)}`);
 
 	try {
-		await testingProcess;
+		await execa(resolved.command, resolved.args, {
+			cwd: options.cwd,
+			stdin: process.stdin,
+			stdout: process.stdout,
+		});
 
 		cleanUp();
 	} catch (err) {
