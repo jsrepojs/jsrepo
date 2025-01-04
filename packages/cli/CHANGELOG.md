@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.23.5
+
+### Patch Changes
+
+- eaeac96: Fix an issue where the `test` command would fail when running tests on linux.
+
 ## 1.23.4
 
 ### Patch Changes
