@@ -1,7 +1,7 @@
 /*
-	jsrepo 1.2.4
+	jsrepo 1.22.1
 	Installed from github/ieedan/std
-	11-21-2024
+	1-4-2025
 */
 
 import { stripAsni } from './strip-ansi';
@@ -82,6 +82,22 @@ const rightPadMin = (str: string, length: number, padWith = ' ') => {
 	return str + padWith.repeat(length - stripAsni(str).length);
 };
 
+/** Pads the string with the `padWith` so that it appears in the center of a new string with the provided length.
+ *
+ * @param str
+ * @param length
+ * @param padWith
+ * @returns
+ *
+ * ## Usage
+ * ```ts
+ * const str = "Hello, World!";
+ *
+ * const padded = centerPad(str, str.length + 4);
+ *
+ * console.log(padded); // '  Hello, World!  '
+ * ```
+ */
 const centerPad = (str: string, length: number, padWith = ' ') => {
 	if (stripAsni(str).length > length) {
 		throw new Error('String length is greater than the length provided.');
