@@ -390,7 +390,14 @@ const vue: Lang = {
 
 		let compiled: v.SFCScriptBlock;
 		try {
-			compiled = v.compileScript(parsed.descriptor, { id: 'shut-it' }); // you need this id to remove a warning
+			compiled = v.compileScript(parsed.descriptor, {
+				id: 'shut-it',
+				fs: {
+					fileExists: fs.existsSync,
+					readFile: (file) => fs.readFileSync(file).toString(),
+					realpath: fs.realpathSync,
+				},
+			}); // you need this id to remove a warning
 		} catch (err) {
 			return Err(`Compile error: ${err}`);
 		}
