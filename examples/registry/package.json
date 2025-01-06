@@ -11,6 +11,7 @@
 	"license": "ISC",
 	"devDependencies": {
 		"jsrepo": "^1.2.4",
+		"typescript": "^5.7.2",
 		"vitest": "^2.1.5"
 	},
 	"dependencies": {
