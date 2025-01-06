@@ -220,5 +220,44 @@
 				"devDependencies": []
 			}
 		]
+	},
+	{
+		"name": "vue",
+		"blocks": [
+			{
+				"name": "Test",
+				"directory": "blocks/vue",
+				"category": "vue",
+				"tests": false,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"Test.vue"
+				],
+				"localDependencies": [
+					"vue/type"
+				],
+				"_imports_": {
+					"./type": "{{vue/type}}"
+				},
+				"dependencies": [],
+				"devDependencies": []
+			},
+			{
+				"name": "type",
+				"directory": "blocks/vue",
+				"category": "vue",
+				"tests": false,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"type.ts"
+				],
+				"localDependencies": [],
+				"_imports_": {},
+				"dependencies": [],
+				"devDependencies": []
+			}
+		]
 	}
 ]
