@@ -15,24 +15,12 @@
 	"bugs": {
 		"url": "https://github.com/ieedan/jsrepo/issues"
 	},
-	"keywords": [
-		"repo",
-		"cli",
-		"svelte",
-		"vue",
-		"typescript",
-		"javascript",
-		"shadcn",
-		"registry"
-	],
+	"keywords": ["repo", "cli", "svelte", "vue", "typescript", "javascript", "shadcn", "registry"],
 	"type": "module",
 	"exports": "./dist/index.js",
 	"bin": "./dist/index.js",
 	"main": "./dist/index.js",
-	"files": [
-		"./schemas/**/*",
-		"dist"
-	],
+	"files": ["./schemas/**/*", "dist"],
 	"scripts": {
 		"start": "tsup --silent && node ./dist/index.js",
 		"build": "tsup",
@@ -57,7 +45,6 @@
 		"@biomejs/js-api": "^0.7.1",
 		"@biomejs/wasm-nodejs": "^1.9.4",
 		"@clack/prompts": "^0.9.0",
-		"@vue/compiler-sfc": "^3.5.13",
 		"ansi-regex": "^6.1.0",
 		"chalk": "^5.4.1",
 		"commander": "^13.0.0",
@@ -74,9 +61,10 @@
 		"pathe": "^2.0.0",
 		"prettier": "^3.4.2",
 		"semver": "^7.6.3",
-		"svelte": "^5.16.1",
+		"svelte": "^5.16.2",
 		"ts-morph": "^25.0.0",
-		"valibot": "1.0.0-beta.9",
-		"validate-npm-package-name": "^6.0.0"
+		"valibot": "1.0.0-beta.10",
+		"validate-npm-package-name": "^6.0.0",
+		"vue": "^3.5.13"
 	}
 }

@@ -2,7 +2,6 @@ import fs from 'node:fs';
 import { builtinModules } from 'node:module';
 import { Biome, Distribution } from '@biomejs/js-api';
 import type { PartialConfiguration } from '@biomejs/wasm-nodejs';
-import * as v from '@vue/compiler-sfc';
 import color from 'chalk';
 import { type Node, walk } from 'estree-walker';
 import { type TsConfigResult, createPathsMatcher, getTsconfig } from 'get-tsconfig';
@@ -12,6 +11,7 @@ import * as prettier from 'prettier';
 import * as sv from 'svelte/compiler';
 import { Project } from 'ts-morph';
 import validatePackageName from 'validate-npm-package-name';
+import * as v from 'vue/compiler-sfc';
 import * as ascii from './ascii';
 import { Err, Ok, type Result } from './blocks/types/result';
 import * as lines from './blocks/utils/lines';
@@ -392,11 +392,6 @@ const vue: Lang = {
 		try {
 			compiled = v.compileScript(parsed.descriptor, {
 				id: 'shut-it',
-				fs: {
-					fileExists: fs.existsSync,
-					readFile: (file) => fs.readFileSync(file).toString(),
-					realpath: fs.realpathSync,
-				},
 			}); // you need this id to remove a warning
 		} catch (err) {
 			return Err(`Compile error: ${err}`);
