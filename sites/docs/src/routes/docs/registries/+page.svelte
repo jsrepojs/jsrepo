@@ -8,6 +8,14 @@
 	};
 
 	const groups: Record<string, Registry[]> = {
+		React: [
+			{
+				name: 'DavidHDev/react-bits',
+				description:
+					'An open source collection of high quality, animated, interactive & fully customizable React components for building stunning, memorable user interfaces.',
+				link: 'https://github.com/DavidHDev/react-bits'
+			}
+		],
 		Svelte: [
 			{
 				name: 'shyakadavis/geist',

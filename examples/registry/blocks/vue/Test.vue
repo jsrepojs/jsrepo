@@ -1,11 +1,19 @@
 <script setup lang="ts">
-	import type { PropType } from './type';
+import {
+  AccordionRoot,
+  type AccordionRootEmits,
+  type AccordionRootProps,
+  useForwardPropsEmits,
+} from 'radix-vue'
 
-	const props = defineProps<PropType>();
+const props = defineProps<AccordionRootProps>()
+const emits = defineEmits<AccordionRootEmits>()
+
+const forwarded = useForwardPropsEmits(props, emits)
 </script>
 
 <template>
-	<div>
-		{{ value }}
-	</div>
+  <AccordionRoot v-bind="forwarded">
+    <slot />
+  </AccordionRoot>
 </template>

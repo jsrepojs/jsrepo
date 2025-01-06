@@ -234,13 +234,11 @@
 				"files": [
 					"Test.vue"
 				],
-				"localDependencies": [
-					"vue/type"
+				"localDependencies": [],
+				"_imports_": {},
+				"dependencies": [
+					"radix-vue@^1.9.12"
 				],
-				"_imports_": {
-					"./type": "{{vue/type}}"
-				},
-				"dependencies": [],
 				"devDependencies": []
 			},
 			{
