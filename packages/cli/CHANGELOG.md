@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.23.7
+
+### Patch Changes
+
+- 9ffde8a: Use `vue/compiler-sfc` instead of `@vue/compiler-sfc` to avoid compiler issues.
+
 ## 1.23.6
 
 ### Patch Changes
