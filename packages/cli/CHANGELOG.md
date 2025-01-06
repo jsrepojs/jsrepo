@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.23.6
+
+### Patch Changes
+
+- f3ecf0d: Ensure vue compiler has `fs` access.
+
 ## 1.23.5
 
 ### Patch Changes
