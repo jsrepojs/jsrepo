@@ -1,5 +1,17 @@
 # jsrepo
 
+## 1.24.0
+
+### Minor Changes
+
+- 80590cd: Remove `diff` command.
+- d30d9ce: Use `semver.satisfies` to determine if a version of a dependency is already installed when adding and updating.
+
+### Patch Changes
+
+- d30d9ce: Add `-n, --no` flag to `update` command to promote identical behavior to the now removed `diff` command.
+- d30d9ce: Update dependencies.
+
 ## 1.23.7
 
 ### Patch Changes
