@@ -25,7 +25,11 @@ ${cli.name()} ${cmd.name()} ${cmd.usage()}
 #### Options
 ${cmd.options
 	.map((opt) => {
-		return `- ${opt.flags}: ${opt.description} ${opt.defaultValue ? `(default: ${opt.defaultValue})\n` : '\n'}`;
+		let defaultValue = opt.defaultValue;
+		if (opt.flags === '--cwd <path>') {
+			defaultValue = './';
+		}
+		return `- ${opt.flags}: ${opt.description} ${defaultValue ? `(default: ${defaultValue})\n` : '\n'}`;
 	})
 	.join('')}
 `;

@@ -2,7 +2,7 @@
 
 > A CLI to add shared code from remote repositories.
  
-Latest Version: 1.23.3
+Latest Version: 1.23.7
 
 ## Commands
 
@@ -20,7 +20,7 @@ jsrepo add [options] [blocks...]
 - -A, --allow: Allow jsrepo to download code from the provided repo. 
 - -y, --yes: Skip confirmation prompt. 
 - --verbose: Include debug logs. 
-- --cwd <path>: The current working directory. (default: E:\github\jsrepo\packages\cli)
+- --cwd <path>: The current working directory. (default: ./)
 
 ### auth
     
@@ -59,23 +59,7 @@ jsrepo build [options]
 - --preview: Display a preview of the blocks list. 
 - --no-output: Do not output a `jsrepo-manifest.json` file. 
 - --verbose: Include debug logs. 
-- --cwd <path>: The current working directory. (default: E:\github\jsrepo\packages\cli)
-
-### diff
-    
-Compares local blocks to the blocks in the provided repository.
-
-#### Usage
-```bash
-jsrepo diff [options]
-```
-
-#### Options
-- -E, --expand: Expands the diff so you see everything. 
-- --max-unchanged <number>: Maximum unchanged lines that will show without being collapsed. (default: 3)
-- --repo <repo>: Repository to download the blocks from. 
-- -A, --allow: Allow jsrepo to download code from the provided repo. 
-- --cwd <path>: The current working directory. (default: E:\github\jsrepo\packages\cli)
+- --cwd <path>: The current working directory. (default: ./)
 
 ### exec
     
@@ -89,7 +73,7 @@ jsrepo exec [options] [script]
 #### Options
 - --repo <repo>: Repository to download and run the script from. 
 - -A, --allow: Allow jsrepo to download code from the provided repo. 
-- --cwd <path>: The current working directory. (default: E:\github\jsrepo\packages\cli)
+- --cwd <path>: The current working directory. (default: ./)
 
 ### init
     
@@ -109,7 +93,7 @@ jsrepo init [options]
 - -R, --registry: Takes you through the steps to initialize a registry. 
 - --script <name>: The name of the build script. (For Registry setup) (default: build:registry)
 - -y, --yes: Skip confirmation prompt. 
-- --cwd <path>: The current working directory. (default: E:\github\jsrepo\packages\cli)
+- --cwd <path>: The current working directory. (default: ./)
 
 ### test
     
@@ -125,7 +109,7 @@ jsrepo test [options] [blocks...]
 - -A, --allow: Allow jsrepo to download code from the provided repo. 
 - --debug: Leaves the temp test file around for debugging upon failure. 
 - --verbose: Include debug logs. 
-- --cwd <path>: The current working directory. (default: E:\github\jsrepo\packages\cli)
+- --cwd <path>: The current working directory. (default: ./)
 
 ### update
     
@@ -140,9 +124,10 @@ jsrepo update [options] [blocks...]
 - --all: Update all installed components. 
 - -E, --expand: Expands the diff so you see everything. 
 - --max-unchanged <number>: Maximum unchanged lines that will show without being collapsed. (default: 3)
+- -n, --no: Do update any blocks. 
 - --repo <repo>: Repository to download the blocks from. 
 - -A, --allow: Allow jsrepo to download code from the provided repo. 
 - -y, --yes: Skip confirmation prompt. 
 - --verbose: Include debug logs. 
-- --cwd <path>: The current working directory. (default: E:\github\jsrepo\packages\cli)
+- --cwd <path>: The current working directory. (default: ./)
 

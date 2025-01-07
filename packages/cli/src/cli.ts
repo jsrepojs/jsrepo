@@ -39,7 +39,6 @@ const cli = program
 	.addCommand(commands.add)
 	.addCommand(commands.auth)
 	.addCommand(commands.build)
-	.addCommand(commands.diff)
 	.addCommand(commands.exec)
 	.addCommand(commands.init)
 	.addCommand(commands.test)

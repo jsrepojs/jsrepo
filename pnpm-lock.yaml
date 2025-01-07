@@ -91,14 +91,14 @@ importers:
         specifier: ^7.6.3
         version: 7.6.3
       svelte:
-        specifier: ^5.16.2
-        version: 5.16.2
+        specifier: ^5.16.5
+        version: 5.16.5
       ts-morph:
         specifier: ^25.0.0
         version: 25.0.0
       valibot:
-        specifier: 1.0.0-beta.10
-        version: 1.0.0-beta.10(typescript@5.7.2)
+        specifier: 1.0.0-beta.11
+        version: 1.0.0-beta.11(typescript@5.7.2)
       validate-npm-package-name:
         specifier: ^6.0.0
         version: 6.0.0
@@ -110,8 +110,8 @@ importers:
         specifier: 1.9.4
         version: 1.9.4
       '@types/diff':
-        specifier: ^6.0.0
-        version: 6.0.0
+        specifier: ^7.0.0
+        version: 7.0.0
       '@types/node':
         specifier: ^22.10.5
         version: 22.10.5
@@ -1301,8 +1301,8 @@ packages:
   '@types/cookie@0.6.0':
     resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
 
-  '@types/diff@6.0.0':
-    resolution: {integrity: sha512-dhVCYGv3ZSbzmQaBSagrv1WJ6rXCdkyTcDyoNu1MD8JohI7pR7k8wdZEm+mvdxRKXyHVwckFzWU1vJc+Z29MlA==}
+  '@types/diff@7.0.0':
+    resolution: {integrity: sha512-sVpkpbnTJL9CYoDf4U+tHaQLe5HiTaHWY7m9FuYA7oMCHwC9ie0Vh9eIGapyzYrU3+pILlSY2fAc4elfw5m4dg==}
 
   '@types/eslint@9.6.1':
     resolution: {integrity: sha512-FXx2pKgId/WyYo2jXw63kk7/+TY7u7AziEJxJAnSFzHlqTAS3Ync6SvgYAN/k4/PQpnnVuzoMuVnByKK2qp0ag==}
@@ -2968,8 +2968,8 @@ packages:
     resolution: {integrity: sha512-FsA1OjAKMAFSDob6j/Tv2ZV9rY4SeqPd1WXQlQkFkePAozSHLp6tbkU9qa1xJ+uTRzMSM2Vx3USdsYZBXd3H3g==}
     engines: {node: '>=18'}
 
-  svelte@5.16.2:
-    resolution: {integrity: sha512-S4mKWbjv53ik1NtGuO95TC7kBA8GYBIeT9fM6y2wHdLNqdCmPXJSWLVuO7vlJZ7TUksp+6qnvqCCtWnVXeTCyw==}
+  svelte@5.16.5:
+    resolution: {integrity: sha512-zTG45crJUGjNYQgmQ0YDxFJ7ge1O6ZwevPxGgGOxuMOXOQhcH9LC9GEx2JS9/BlkhxdsO8ETofQ76ouFwDVpCQ==}
     engines: {node: '>=18'}
 
   tailwind-merge@2.6.0:
@@ -3180,8 +3180,8 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
-  valibot@1.0.0-beta.10:
-    resolution: {integrity: sha512-nmo3nxvXRrxwDYZznK3aTgYv7ZA/SUZJ/s+pLY4Tqsex/fgwZ9XrrQ14jjozjUaeduQ9PhXHE2Xx1uMb0HePYw==}
+  valibot@1.0.0-beta.11:
+    resolution: {integrity: sha512-Ztl5Iks1Ql7Z6CwkS5oyqguN3G8tmUiNlsHpqbDt6DLMpm+eu+n8Q7f921gI3uHvNZ8xDVkd4cEJP5t+lELOfw==}
     peerDependencies:
       typescript: '>=5'
     peerDependenciesMeta:
@@ -4417,7 +4417,7 @@ snapshots:
 
   '@types/cookie@0.6.0': {}
 
-  '@types/diff@6.0.0': {}
+  '@types/diff@7.0.0': {}
 
   '@types/eslint@9.6.1':
     dependencies:
@@ -6186,7 +6186,7 @@ snapshots:
       magic-string: 0.30.15
       zimmerframe: 1.1.2
 
-  svelte@5.16.2:
+  svelte@5.16.5:
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@jridgewell/sourcemap-codec': 1.5.0
@@ -6417,7 +6417,7 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  valibot@1.0.0-beta.10(typescript@5.7.2):
+  valibot@1.0.0-beta.11(typescript@5.7.2):
     optionalDependencies:
       typescript: 5.7.2
 

@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'pathe';
+import semver from 'semver';
 import { Err, Ok, type Result } from './blocks/types/result';
 
 const findNearestPackageJson = (startDir: string, until: string): string | undefined => {
@@ -31,6 +32,15 @@ const getPackage = (path: string): Result<Partial<PackageJson>, string> => {
 	return Ok(JSON.parse(contents));
 };
 
+const cleanVersion = (version: string) => {
+	if (version[0] === '^') {
+		return version.slice(1);
+	}
+
+	return version;
+};
+
+/** Returns only the dependencies that should be installed based on what is already in the package.json */
 const returnShouldInstall = (
 	dependencies: Set<string>,
 	devDependencies: Set<string>,
@@ -51,11 +61,14 @@ const returnShouldInstall = (
 
 				const foundDep = pkg.dependencies[name];
 
-				// if the version isn't pinned then no need to delete
-				if (version === undefined && foundDep) continue;
+				// if version isn't pinned and dep exists delete
+				if (version === undefined && foundDep) {
+					tempDeps.delete(dep);
+					continue;
+				}
 
-				// if the version installed is the same as the requested version remove the dep
-				if (foundDep && foundDep === version) {
+				// if the version installed satisfies the requested version remove the dep
+				if (foundDep && semver.satisfies(cleanVersion(foundDep), version)) {
 					tempDeps.delete(dep);
 				}
 			}
@@ -67,11 +80,14 @@ const returnShouldInstall = (
 
 				const foundDep = pkg.devDependencies[name];
 
-				// if the version isn't pinned then no need to delete
-				if (version === undefined && foundDep) continue;
+				// if version isn't pinned and dep exists delete
+				if (version === undefined && foundDep) {
+					tempDevDeps.delete(dep);
+					continue;
+				}
 
-				// if the version installed is the same as the requested version remove the dep
-				if (foundDep && foundDep === version) {
+				// if the version installed satisfies the requested version remove the dep
+				if (foundDep && semver.satisfies(cleanVersion(foundDep), version)) {
 					tempDevDeps.delete(dep);
 				}
 			}
