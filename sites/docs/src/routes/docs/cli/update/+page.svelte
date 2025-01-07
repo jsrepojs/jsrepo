@@ -41,6 +41,14 @@
 		<Snippet command="execute" args={['jsrepo', 'update', '--max-unchanged', '10']} />
 	{/snippet}
 </OptionDocs>
+<OptionDocs name="-n, --no">
+	{#snippet description()}
+		Do update any blocks.
+	{/snippet}
+	{#snippet usage()}
+		<Snippet command="execute" args={['jsrepo', 'update', '--no']} />
+	{/snippet}
+</OptionDocs>
 <OptionDocs name="--repo">
 	{#snippet description()}
 		The repository to download the blocks from.

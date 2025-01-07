@@ -1,0 +1,5 @@
+---
+"jsrepo": patch
+---
+
+Update dependencies.

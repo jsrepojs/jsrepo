@@ -25,6 +25,7 @@ const schema = v.object({
 	all: v.boolean(),
 	expand: v.boolean(),
 	maxUnchanged: v.number(),
+	no: v.boolean(),
 	repo: v.optional(v.string()),
 	allow: v.boolean(),
 	yes: v.boolean(),
@@ -45,6 +46,7 @@ const update = new Command('update')
 		(val) => Number.parseInt(val), // this is such a dumb api thing
 		3
 	)
+	.option('-n, --no', 'Do update any blocks.', false)
 	.option('--repo <repo>', 'Repository to download the blocks from.')
 	.option('-A, --allow', 'Allow jsrepo to download code from the provided repo.', false)
 	.option('-y, --yes', 'Skip confirmation prompt.', false)
@@ -155,7 +157,7 @@ const _update = async (blockNames: string[], options: Options) => {
 	// if no blocks are provided prompt the user for what blocks they want
 	if (updatingBlockNames.length === 0) {
 		const promptResult = await multiselect({
-			message: 'Which blocks would you like to update?',
+			message: `Which blocks would you like to ${options.no ? 'diff' : 'update'}?`,
 			options: installedBlocks
 				.filter((b) => b.block.list)
 				.map((block) => {
@@ -322,17 +324,21 @@ const _update = async (blockNames: string[], options: Options) => {
 
 				// if there are no changes then don't ask
 				if (changes.length > 1 || localContent === '') {
-					const confirmResult = await confirm({
-						message: 'Accept changes?',
-						initialValue: true,
-					});
+					acceptedChanges = options.yes;
 
-					if (isCancel(confirmResult)) {
-						cancel('Canceled!');
-						process.exit(0);
+					if (!options.yes && !options.no) {
+						const confirmResult = await confirm({
+							message: 'Accept changes?',
+							initialValue: true,
+						});
+
+						if (isCancel(confirmResult)) {
+							cancel('Canceled!');
+							process.exit(0);
+						}
+
+						acceptedChanges = confirmResult;
 					}
-
-					acceptedChanges = confirmResult;
 				}
 			}
 
@@ -385,7 +391,7 @@ const _update = async (blockNames: string[], options: Options) => {
 
 	if (hasDependencies) {
 		let install = options.yes;
-		if (!options.yes) {
+		if (!options.yes && !options.no) {
 			const result = await confirm({
 				message: 'Would you like to install dependencies?',
 				initialValue: true,

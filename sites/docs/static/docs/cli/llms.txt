@@ -124,6 +124,7 @@ jsrepo update [options] [blocks...]
 - --all: Update all installed components. 
 - -E, --expand: Expands the diff so you see everything. 
 - --max-unchanged <number>: Maximum unchanged lines that will show without being collapsed. (default: 3)
+- -n, --no: Do update any blocks. 
 - --repo <repo>: Repository to download the blocks from. 
 - -A, --allow: Allow jsrepo to download code from the provided repo. 
 - -y, --yes: Skip confirmation prompt. 
