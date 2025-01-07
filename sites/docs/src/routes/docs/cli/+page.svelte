@@ -22,10 +22,6 @@
 			description: 'Build your repository into a jsrepo registry.'
 		},
 		{
-			name: 'diff',
-			description: 'Compare the blocks in the registry against your local blocks.'
-		},
-		{
 			name: 'exec',
 			description: 'Execute a block as a script with arguments.'
 		},

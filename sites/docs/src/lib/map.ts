@@ -83,10 +83,6 @@ const categories: Category[] = [
 						href: '/docs/cli/build'
 					},
 					{
-						name: 'diff',
-						href: '/docs/cli/diff'
-					},
-					{
 						name: 'exec',
 						href: '/docs/cli/exec'
 					},
