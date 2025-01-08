@@ -1,5 +1,12 @@
 # jsrepo
 
+## 1.24.1
+
+### Patch Changes
+
+- e4cb5d3: Ensure imports like `foo.svelte` are resolved properly when the real path is `foo.svelte.ts`.
+- e4cb5d3: Fix an issue where resolved file extensions were left on the import even though not provided by the user.
+
 ## 1.24.0
 
 ### Minor Changes
