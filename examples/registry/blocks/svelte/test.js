@@ -1,0 +1,1 @@
+export const THING2 = 1;
