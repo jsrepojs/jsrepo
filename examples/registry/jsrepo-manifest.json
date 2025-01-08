@@ -222,6 +222,62 @@
 		]
 	},
 	{
+		"name": "svelte",
+		"blocks": [
+			{
+				"name": "component",
+				"directory": "blocks/svelte",
+				"category": "svelte",
+				"tests": false,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"component.svelte"
+				],
+				"localDependencies": [
+					"svelte/test.svelte",
+					"svelte/test"
+				],
+				"_imports_": {
+					"$svelte/test.svelte": "{{svelte/test.svelte}}",
+					"$svelte/test.js": "{{svelte/test}}.js"
+				},
+				"dependencies": [],
+				"devDependencies": []
+			},
+			{
+				"name": "test",
+				"directory": "blocks/svelte",
+				"category": "svelte",
+				"tests": false,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"test.js"
+				],
+				"localDependencies": [],
+				"_imports_": {},
+				"dependencies": [],
+				"devDependencies": []
+			},
+			{
+				"name": "test.svelte",
+				"directory": "blocks/svelte",
+				"category": "svelte",
+				"tests": false,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"test.svelte.ts"
+				],
+				"localDependencies": [],
+				"_imports_": {},
+				"dependencies": [],
+				"devDependencies": []
+			}
+		]
+	},
+	{
 		"name": "vue",
 		"blocks": [
 			{

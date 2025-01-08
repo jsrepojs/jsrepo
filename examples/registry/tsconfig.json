@@ -12,6 +12,7 @@
 			"$types/*": ["./src/types/*"],
 			"$utils/*": ["./src/utils/*"],
 			"$logging/*": ["./blocks/logging/*"],
+			"$svelte/*": ["./blocks/svelte/*"]
 		}
 	},
 	"include": ["src/**/*.ts"]

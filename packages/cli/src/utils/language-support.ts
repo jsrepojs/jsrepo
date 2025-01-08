@@ -557,10 +557,18 @@ const resolveLocalImport = (
 	isSubDir: boolean,
 	{
 		filePath,
+		dropExtension = true,
 		alias,
 		dirs,
 		cwd,
-	}: { filePath: string; dirs: string[]; alias?: string; modIsFile?: boolean; cwd: string }
+	}: {
+		filePath: string;
+		dirs: string[];
+		alias?: string;
+		modIsFile?: boolean;
+		cwd: string;
+		dropExtension?: boolean;
+	}
 ): Result<ResolveLocalImportResult | undefined, string> => {
 	if (isSubDir && (mod.startsWith('./') || mod === '.')) return Ok(undefined);
 
@@ -573,17 +581,17 @@ const resolveLocalImport = (
 	// get the full path to the current category containing folder
 	const fullDir = path.join(categoryDir, '../');
 
-	// mod paths that reference outside of the current blocks directory are invalid unless it's an alias
 	if (modPath.startsWith(fullDir)) {
-		return Ok(parsePath(modPath.slice(fullDir.length)));
+		return Ok(parsePath(modPath.slice(fullDir.length), dropExtension));
 	}
 
 	if (alias) {
 		for (const dir of dirs) {
 			const containingPath = path.resolve(path.join(cwd, dir));
 			const absPath = path.resolve(modPath);
+
 			if (absPath.startsWith(containingPath)) {
-				return Ok(parsePath(absPath.slice(containingPath.length + 1)));
+				return Ok(parsePath(absPath.slice(containingPath.length + 1), dropExtension));
 			}
 		}
 
@@ -597,7 +605,7 @@ const resolveLocalImport = (
 	);
 };
 
-const parsePath = (localPath: string): ResolveLocalImportResult => {
+const parsePath = (localPath: string, dropExtension = true): ResolveLocalImportResult => {
 	let [category, block, ...rest] = localPath.split('/');
 
 	// if undefined we assume we are pointing to the index file
@@ -608,7 +616,7 @@ const parsePath = (localPath: string): ResolveLocalImportResult => {
 	let trimmedBlock = block;
 
 	// remove file extension
-	if (trimmedBlock.includes('.')) {
+	if (dropExtension && trimmedBlock.includes('.')) {
 		trimmedBlock = trimmedBlock.slice(
 			0,
 			trimmedBlock.length - path.parse(trimmedBlock).ext.length
@@ -665,14 +673,18 @@ const tryResolveLocalAlias = (
 
 			if (!foundMod) continue;
 
-			const relativeSolved = path.relative(
+			const pathResolved = path.relative(
 				path.resolve(path.join(filePath, '../')),
-				foundMod.path
+				foundMod.prettyPath
 			);
 
-			const localDep = resolveLocalImport(relativeSolved, isSubDir, {
+			// if it is not equal the extension has already been dropped
+			const shouldDropExtension = foundMod.prettyPath === foundMod.path;
+
+			const localDep = resolveLocalImport(pathResolved, isSubDir, {
 				filePath,
 				alias: mod,
+				dropExtension: shouldDropExtension,
 				dirs,
 				cwd,
 				modIsFile: foundMod.type === 'file',
@@ -695,43 +707,44 @@ const tryResolveLocalAlias = (
  */
 const searchForModule = (
 	modPath: string
-): { path: string; type: 'file' | 'directory' } | undefined => {
+): { path: string; prettyPath: string; type: 'file' | 'directory' } | undefined => {
 	if (fs.existsSync(modPath)) {
-		return { path: modPath, type: fs.statSync(modPath).isDirectory() ? 'directory' : 'file' };
-	}
-
-	const extension = path.parse(modPath).ext;
-
-	// sometimes it will point to .js because it will resolve in prod but not for us
-	if (extension === '.js') {
-		const newPath = `${modPath.slice(0, modPath.length - 3)}.ts`;
-
-		if (fs.existsSync(newPath)) return { path: modPath, type: 'file' };
+		return {
+			path: modPath,
+			prettyPath: modPath,
+			type: fs.statSync(modPath).isDirectory() ? 'directory' : 'file',
+		};
 	}
 
 	const containing = path.join(modPath, '../');
 
-	// open containing folder
+	// if containing folder doesn't exist this can't exist
 	if (!fs.existsSync(containing)) return undefined;
+
+	const modParsed = path.parse(modPath);
+
+	// sometimes it will point to .js because it will resolve in prod but not for us
+	if (modParsed.ext === '.js') {
+		const newPath = `${modPath.slice(0, modPath.length - 3)}.ts`;
+
+		if (fs.existsSync(newPath)) return { path: newPath, prettyPath: modPath, type: 'file' };
+	}
 
 	const files = fs.readdirSync(containing);
 
 	for (const file of files) {
-		const fileWithoutExtension = path.parse(file).name;
+		const fileParsed = path.parse(file);
 
 		// this way the extension doesn't matter
-		if (fileWithoutExtension === path.basename(modPath)) {
+		if (fileParsed.name === modParsed.base) {
 			const filePath = path.join(containing, file);
 
-			let normalizedFile = filePath;
-
-			// in this case the .ts extension was obviously not intended
-			if (normalizedFile.endsWith('.ts')) {
-				normalizedFile = normalizedFile.slice(0, normalizedFile.length - 3);
-			}
+			// we remove the extension since it wasn't included by the user
+			const prettyPath = filePath.slice(0, filePath.length - fileParsed.ext.length);
 
 			return {
-				path: normalizedFile,
+				path: filePath,
+				prettyPath: prettyPath,
 				type: fs.statSync(filePath).isDirectory() ? 'directory' : 'file',
 			};
 		}
