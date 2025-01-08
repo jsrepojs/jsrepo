@@ -91,8 +91,8 @@ importers:
         specifier: ^7.6.3
         version: 7.6.3
       svelte:
-        specifier: ^5.16.5
-        version: 5.16.5
+        specifier: ^5.17.0
+        version: 5.17.0
       ts-morph:
         specifier: ^25.0.0
         version: 25.0.0
@@ -2968,8 +2968,8 @@ packages:
     resolution: {integrity: sha512-FsA1OjAKMAFSDob6j/Tv2ZV9rY4SeqPd1WXQlQkFkePAozSHLp6tbkU9qa1xJ+uTRzMSM2Vx3USdsYZBXd3H3g==}
     engines: {node: '>=18'}
 
-  svelte@5.16.5:
-    resolution: {integrity: sha512-zTG45crJUGjNYQgmQ0YDxFJ7ge1O6ZwevPxGgGOxuMOXOQhcH9LC9GEx2JS9/BlkhxdsO8ETofQ76ouFwDVpCQ==}
+  svelte@5.17.0:
+    resolution: {integrity: sha512-0DX6fZ6R3eNDCQynmOm32vN0ErbupGl23c6hWc45KIwq9cSEIOKh6xGFuXcYVjU5fU9MLZx1+oQI1miZxmx4Tg==}
     engines: {node: '>=18'}
 
   tailwind-merge@2.6.0:
@@ -6186,7 +6186,7 @@ snapshots:
       magic-string: 0.30.15
       zimmerframe: 1.1.2
 
-  svelte@5.16.5:
+  svelte@5.17.0:
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@jridgewell/sourcemap-codec': 1.5.0
