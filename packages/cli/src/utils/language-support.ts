@@ -721,16 +721,16 @@ const searchForModule = (
 	// if containing folder doesn't exist this can't exist
 	if (!fs.existsSync(containing)) return undefined;
 
+	const modParsed = path.parse(modPath);
+
 	// sometimes it will point to .js because it will resolve in prod but not for us
-	if (modPath.endsWith('.js')) {
+	if (modParsed.ext === '.js') {
 		const newPath = `${modPath.slice(0, modPath.length - 3)}.ts`;
 
 		if (fs.existsSync(newPath)) return { path: newPath, prettyPath: modPath, type: 'file' };
 	}
 
 	const files = fs.readdirSync(containing);
-
-	const modParsed = path.parse(modPath);
 
 	for (const file of files) {
 		const fileParsed = path.parse(file);
