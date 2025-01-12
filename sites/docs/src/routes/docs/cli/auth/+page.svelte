@@ -14,7 +14,7 @@
 		The token to use for authenticating to your provider.
 	{/snippet}
 	{#snippet usage()}
-		<Snippet command="execute" args={['jsrepo', 'auth', '--token', 'ghp_xxxxxxxxxxx']} />
+		<Snippet command="execute" args={['jsrepo', 'auth', '--token', 'xxxxxxxxxxx']} />
 	{/snippet}
 </OptionDocs>
 <OptionDocs name="--provider">
