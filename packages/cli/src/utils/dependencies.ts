@@ -39,7 +39,7 @@ const installDependencies = async ({
 		args.push(noWorkspace);
 	}
 
-	const add = resolveCommand(pm, 'install', args);
+	const add = resolveCommand(pm, 'add', args);
 
 	if (add == null) return Err(color.red(`Could not resolve add command for '${pm}'.`));
 

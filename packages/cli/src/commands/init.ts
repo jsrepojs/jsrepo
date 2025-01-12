@@ -566,7 +566,7 @@ const _initRegistry = async (options: Options) => {
 	let steps: string[] = [];
 
 	if (!installed && installAsDevDependency) {
-		const cmd = resolveCommand(pm, 'install', ['jsrepo', '-D']);
+		const cmd = resolveCommand(pm, 'add', ['jsrepo', '-D']);
 
 		steps.push(
 			`Install ${ascii.JSREPO} as a dev dependency \`${color.cyan(`${cmd?.command} ${cmd?.args.join(' ')}`)}\``
