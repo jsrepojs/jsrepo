@@ -30,7 +30,7 @@ https://gitlab.com/ieedan/std/-/tree/next # branch reference`}
 	code={`{
 		"$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/project-config.json",
 		// use a specific version tag
-		"repos": ["https://gitlab.com/ieedan/std/tree/v1.5.0"],
+		"repos": ["https://gitlab.com/ieedan/std/-/tree/v1.5.0"],
 		"path": "src/blocks",
 		"includeTests": false,
 		"watermark": true,

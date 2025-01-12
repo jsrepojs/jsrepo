@@ -35,6 +35,11 @@ export interface Provider {
 	 * @returns
 	 */
 	defaultBranch: () => string;
+	/** Provides an example of what a ref formatted url should look like.
+	 *
+	 * @returns
+	 */
+	refSpecifierExample: () => string;
 	/** Returns a URL to the raw path of the resource provided in the resourcePath
 	 *
 	 * @param repoPath
@@ -74,13 +79,13 @@ export interface Provider {
 	matches: (repoPath: string) => boolean;
 }
 
-const rawErrorMessage = (info: Info, filePath: string, defaultBranch: string) => {
+const rawErrorMessage = (info: Info, filePath: string) => {
 	return Err(
 		`There was an error fetching the \`${color.bold(filePath)}\` from ${color.bold(info.url)}.
 
 ${color.bold('This may be for one of the following reasons:')}
 1. The \`${color.bold(filePath)}\` or containing repository doesn't exist
-2. Your repository path is incorrect (wrong branch, wrong tag) default branches other than \`${color.bold(defaultBranch)}\` must be specified \`${color.bold('github/<owner>/<name>/tree/<branch>')}\`
+2. Your repository path is incorrect (wrong branch, wrong tag) default branches other than ${color.bold('default')} must be specified \`${color.bold(info.provider.refSpecifierExample())}\`
 3. You are using an expired access token or a token that doesn't have access to this repository
 `
 	);
@@ -95,6 +100,7 @@ ${color.bold('This may be for one of the following reasons:')}
 const github: Provider = {
 	name: () => 'github',
 	defaultBranch: () => 'main',
+	refSpecifierExample: () => 'github/<owner>/<repo>/tree/<ref>',
 	resolveRaw: async (repoPath, resourcePath) => {
 		const info = await github.info(repoPath);
 
@@ -124,14 +130,14 @@ const github: Provider = {
 			verbose?.(`Got a response from ${url} ${response.status} ${response.statusText}`);
 
 			if (!response.ok) {
-				return rawErrorMessage(info, resourcePath, github.defaultBranch());
+				return rawErrorMessage(info, resourcePath);
 			}
 
 			return Ok(await response.text());
 		} catch (err) {
 			verbose?.(`erroring in response ${err} `);
 
-			return rawErrorMessage(info, resourcePath, github.defaultBranch());
+			return rawErrorMessage(info, resourcePath);
 		}
 	},
 	fetchManifest: async (repoPath) => {
@@ -219,6 +225,7 @@ const github: Provider = {
 const gitlab: Provider = {
 	name: () => 'gitlab',
 	defaultBranch: () => 'main',
+	refSpecifierExample: () => 'gitlab/<owner>/<repo>/-/tree/<ref>',
 	resolveRaw: async (repoPath, resourcePath) => {
 		const info = await gitlab.info(repoPath);
 
@@ -248,12 +255,12 @@ const gitlab: Provider = {
 			verbose?.(`Got a response from ${url} ${response.status} ${response.statusText}`);
 
 			if (!response.ok) {
-				return rawErrorMessage(info, resourcePath, gitlab.defaultBranch());
+				return rawErrorMessage(info, resourcePath);
 			}
 
 			return Ok(await response.text());
 		} catch {
-			return rawErrorMessage(info, resourcePath, gitlab.defaultBranch());
+			return rawErrorMessage(info, resourcePath);
 		}
 	},
 	fetchManifest: async (repoPath) => {
@@ -348,6 +355,7 @@ const gitlab: Provider = {
 const bitbucket: Provider = {
 	name: () => 'bitbucket',
 	defaultBranch: () => 'master',
+	refSpecifierExample: () => 'bitbucket/<owner>/<repo>/src/<ref>',
 	resolveRaw: async (repoPath, resourcePath) => {
 		const info = await bitbucket.info(repoPath);
 
@@ -377,12 +385,12 @@ const bitbucket: Provider = {
 			verbose?.(`Got a response from ${url} ${response.status} ${response.statusText}`);
 
 			if (!response.ok) {
-				return rawErrorMessage(info, resourcePath, bitbucket.defaultBranch());
+				return rawErrorMessage(info, resourcePath);
 			}
 
 			return Ok(await response.text());
 		} catch {
-			return rawErrorMessage(info, resourcePath, bitbucket.defaultBranch());
+			return rawErrorMessage(info, resourcePath);
 		}
 	},
 	fetchManifest: async (repoPath) => {
@@ -462,6 +470,7 @@ const bitbucket: Provider = {
 const azure: Provider = {
 	name: () => 'azure',
 	defaultBranch: () => 'main',
+	refSpecifierExample: () => 'azure/<org>/<project>/<repo>/(tags|heads)/<ref>',
 	resolveRaw: async (repoPath, resourcePath) => {
 		const info = await azure.info(repoPath);
 
@@ -492,14 +501,14 @@ const azure: Provider = {
 			verbose?.(`Got a response from ${url} ${response.status} ${response.statusText}`);
 
 			if (!response.ok) {
-				return rawErrorMessage(info, resourcePath, azure.defaultBranch());
+				return rawErrorMessage(info, resourcePath);
 			}
 
 			return Ok(await response.text());
 		} catch (err) {
 			verbose?.(`erroring in response ${err} `);
 
-			return rawErrorMessage(info, resourcePath, azure.defaultBranch());
+			return rawErrorMessage(info, resourcePath);
 		}
 	},
 	fetchManifest: async (repoPath) => {
