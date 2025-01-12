@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.24.2
+
+### Patch Changes
+
+- c9c58e4: Improve error message when there is an error fetching a file to give a customized message based on the git provider used.
+
 ## 1.24.1
 
 ### Patch Changes
