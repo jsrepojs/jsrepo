@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.24.3
+
+### Patch Changes
+
+- ae93877: Use `add` instead of `install` for `package-manager-detector` when installing dependencies.
+
 ## 1.24.2
 
 ### Patch Changes
