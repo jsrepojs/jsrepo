@@ -460,7 +460,7 @@ const _update = async (blockNames: string[], options: Options) => {
 
 		if (!install) {
 			if (deps.size > 0) {
-				const cmd = resolveCommand(pm, 'install', [...deps]);
+				const cmd = resolveCommand(pm, 'add', [...deps]);
 
 				steps.push(
 					`Install dependencies \`${color.cyan(`${cmd?.command} ${cmd?.args.join(' ')}`)}\``
@@ -468,7 +468,7 @@ const _update = async (blockNames: string[], options: Options) => {
 			}
 
 			if (devDeps.size > 0) {
-				const cmd = resolveCommand(pm, 'install', [...devDeps, '-D']);
+				const cmd = resolveCommand(pm, 'add', [...devDeps, '-D']);
 
 				steps.push(
 					`Install dev dependencies \`${color.cyan(`${cmd?.command} ${cmd?.args.join(' ')}`)}\``
