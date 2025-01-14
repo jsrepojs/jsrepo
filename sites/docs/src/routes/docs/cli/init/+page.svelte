@@ -13,8 +13,10 @@
 <Snippet command="execute" args={['jsrepo', 'init', '--project']} />
 <p>Initialize a registry.</p>
 <Snippet command="execute" args={['jsrepo', 'init', '--registry']} />
+<p>Initialize a project with registries.</p>
+<Snippet command="execute" args={['jsrepo', 'init', 'github/ieedan/std']} />
 <SubHeading>Options</SubHeading>
-<OptionDocs name="--repos">
+<OptionDocs name="--repos" deprecated>
 	{#snippet description()}
 		The repositories to install the blocks from. (For project setup)
 	{/snippet}

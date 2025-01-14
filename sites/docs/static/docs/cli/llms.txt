@@ -2,7 +2,7 @@
 
 > A CLI to add shared code from remote repositories.
  
-Latest Version: 1.23.7
+Latest Version: 1.24.3
 
 ## Commands
 
@@ -81,11 +81,11 @@ Initializes your project with a configuration file.
 
 #### Usage
 ```bash
-jsrepo init [options]
+jsrepo init [options] [registries...]
 ```
 
 #### Options
-- --repos [repos...]: Repository to install the blocks from. 
+- --repos [repos...]: Repository to install the blocks from. (DEPRECATED) 
 - --no-watermark: Will not add a watermark to each file upon adding it to your project. 
 - --tests: Will include tests with the blocks. 
 - --formatter <formatter>: What formatter to use when adding or updating blocks. 
