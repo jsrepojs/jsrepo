@@ -1,5 +1,16 @@
 # jsrepo
 
+## 1.25.0
+
+### Minor Changes
+
+- c977659: Deprecate `--repos` flag for `init` command in favor of arguments.
+
+### Patch Changes
+
+- c977659: Allow for configuring repos provided from the cli to encourage path customization.
+- c977659: Allow for reconfiguring repos with the `init` command.
+
 ## 1.24.3
 
 ### Patch Changes
