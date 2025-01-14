@@ -3,6 +3,7 @@ import {
 	cancel,
 	confirm,
 	isCancel,
+	log,
 	multiselect,
 	outro,
 	password,
@@ -50,7 +51,8 @@ type Options = v.InferInput<typeof schema>;
 
 const init = new Command('init')
 	.description('Initializes your project with a configuration file.')
-	.option('--repos [repos...]', 'Repository to install the blocks from.')
+	.argument('[registries...]', 'Registries to install the blocks from.', [])
+	.option('--repos [repos...]', 'Repository to install the blocks from. (DEPRECATED)')
 	.option(
 		'--no-watermark',
 		'Will not add a watermark to each file upon adding it to your project.'
@@ -71,7 +73,7 @@ const init = new Command('init')
 	)
 	.option('-y, --yes', 'Skip confirmation prompt.', false)
 	.option('--cwd <path>', 'The current working directory.', process.cwd())
-	.action(async (opts) => {
+	.action(async (registries, opts) => {
 		const options = v.parse(schema, opts);
 
 		intro(context);
@@ -84,7 +86,17 @@ const init = new Command('init')
 			);
 		}
 
-		if (options.registry === undefined && options.project === undefined) {
+		if (options.repos !== undefined) {
+			log.warn(
+				`The ${color.gray('`--repos`')} flag is deprecated! Instead supply registries as arguments. ${color.cyan(`\`jsrepo init ${options.repos.join(' ')}\``)}`
+			);
+		}
+
+		if (
+			options.registry === undefined &&
+			options.project === undefined &&
+			registries.length === 0
+		) {
 			const response = await select({
 				message: 'Initialize a project or registry?',
 				options: [
@@ -99,21 +111,19 @@ const init = new Command('init')
 				process.exit(0);
 			}
 
-			options.registry = response === 'registry';
+			options.project = response === 'project';
 		}
 
-		if (options.registry) {
-			await _initRegistry(options);
+		if (options.project || registries.length > 0) {
+			await _initProject(registries, options);
 		} else {
-			await _initProject(options);
+			await _initRegistry(options);
 		}
 
 		outro(color.green('All done!'));
 	});
 
-const _initProject = async (options: Options) => {
-	const storage = persisted.get();
-
+const _initProject = async (registries: string[], options: Options) => {
 	const initialConfig = getProjectConfig(options.cwd);
 
 	const loading = spinner();
@@ -125,7 +135,8 @@ const _initProject = async (options: Options) => {
 		validate(value) {
 			if (value.trim() === '') return 'Please provide a value';
 		},
-		initialValue: initialConfig.isOk() ? initialConfig.unwrap().paths['*'] : './src/blocks',
+		placeholder: './src/blocks',
+		initialValue: initialConfig.isOk() ? initialConfig.unwrap().paths['*'] : undefined,
 	});
 
 	if (isCancel(defaultPathResult)) {
@@ -139,127 +150,71 @@ const _initProject = async (options: Options) => {
 		paths = { '*': defaultPathResult };
 	}
 
-	if (!options.repos) {
-		options.repos = initialConfig.isOk() ? initialConfig.unwrap().repos : [];
+	const repos = [
+		...(initialConfig.isOk() ? initialConfig.unwrap().repos : []),
+		...registries,
+		...(options.repos ?? []),
+	];
 
-		while (true) {
-			const confirmResult = await confirm({
-				message: `Add ${options.repos.length > 0 ? 'another' : 'a'} repo?`,
-				initialValue: options.repos.length === 0, // default to yes for first repo
-			});
-
-			if (isCancel(confirmResult)) {
-				cancel('Canceled!');
-				process.exit(0);
-			}
-
-			if (!confirmResult) break;
-
-			const result = await text({
-				message: 'Where should we download the blocks from?',
-				placeholder: 'github/ieedan/std',
-				validate: (val) => {
-					if (val.trim().length === 0) return 'Please provide a value';
-
-					if (!providers.find((provider) => provider.matches(val))) {
-						return `Invalid provider! Valid providers (${providers.map((provider) => provider.name()).join(', ')})`;
-					}
-				},
-			});
-
-			if (isCancel(result)) {
-				cancel('Canceled!');
-				process.exit(0);
-			}
-
-			const provider = providers.find((p) => p.matches(result));
-
-			if (!provider) {
-				program.error(color.red('Invalid provider!'));
-			}
-
-			const tokenKey = `${provider.name()}-token`;
-
-			const token = storage.get(tokenKey);
-
-			if (!token) {
-				const result = await confirm({
-					message: 'Would you like to add an auth token?',
-					initialValue: false,
+	if (repos.length > 0) {
+		for (const repo of repos) {
+			// if already present in config ask if you would like to set it up
+			if (initialConfig.isOk() && initialConfig.unwrap().repos.find((r) => r === repo)) {
+				const confirmResult = await confirm({
+					message: `Configure ${repo}?`,
+					initialValue: options.yes,
 				});
 
-				if (isCancel(result)) {
+				if (isCancel(confirmResult)) {
 					cancel('Canceled!');
 					process.exit(0);
 				}
 
-				if (result) {
-					const response = await password({
-						message: 'Paste your token',
-						validate(value) {
-							if (value.trim() === '') return 'Please provide a value';
-						},
-					});
-
-					if (isCancel(response)) {
-						cancel('Canceled!');
-						process.exit(0);
-					}
-
-					storage.set(tokenKey, response);
-				}
+				if (!confirmResult) continue;
 			}
 
-			loading.start(`Fetching categories from ${color.cyan(result)}`);
+			log.info(`Configuring ${color.cyan(repo)}`);
 
-			const manifestResult = await provider.fetchManifest(result);
-
-			loading.stop(`Fetched categories from ${color.cyan(result)}`);
-
-			if (manifestResult.isErr()) {
-				program.error(color.red(manifestResult.unwrapErr()));
-			}
-
-			const categories = manifestResult.unwrap();
-
-			const configurePaths = await multiselect({
-				message: 'Which category paths would you like to configure?',
-				options: categories.map((cat) => ({ label: cat.name, value: cat.name })),
-				required: false,
-			});
-
-			if (isCancel(configurePaths)) {
-				cancel('Canceled!');
-				process.exit(0);
-			}
-
-			if (configurePaths.length > 0) {
-				for (const category of configurePaths) {
-					const configuredValue = paths[category];
-
-					const categoryPath = await text({
-						message: `Where should ${category} be added in your project?`,
-						validate(value) {
-							if (value.trim() === '') return 'Please provide a value';
-						},
-						placeholder: configuredValue ? configuredValue : `./src/${category}`,
-						defaultValue: configuredValue,
-						initialValue: configuredValue,
-					});
-
-					if (isCancel(categoryPath)) {
-						cancel('Canceled!');
-						process.exit(0);
-					}
-
-					paths[category] = categoryPath;
-				}
-			}
-
-			options.repos.push(result);
+			paths = await promptForConfigPaths(repo, paths);
 		}
 	}
 
+	while (true) {
+		const confirmResult = await confirm({
+			message: `Add ${repos.length > 0 ? 'another' : 'a'} repo?`,
+			initialValue: repos.length === 0, // default to yes for first repo
+		});
+
+		if (isCancel(confirmResult)) {
+			cancel('Canceled!');
+			process.exit(0);
+		}
+
+		if (!confirmResult) break;
+
+		const result = await text({
+			message: 'Where should we download the blocks from?',
+			placeholder: 'github/ieedan/std',
+			validate: (val) => {
+				if (val.trim().length === 0) return 'Please provide a value';
+
+				if (!providers.find((provider) => provider.matches(val))) {
+					return `Invalid provider! Valid providers (${providers.map((provider) => provider.name()).join(', ')})`;
+				}
+			},
+		});
+
+		if (isCancel(result)) {
+			cancel('Canceled!');
+			process.exit(0);
+		}
+
+		paths = await promptForConfigPaths(result, paths);
+
+		repos.push(result);
+	}
+
+	// configure formatter
 	if (!options.formatter) {
 		let defaultFormatter = initialConfig.isErr()
 			? 'none'
@@ -294,7 +249,7 @@ const _initProject = async (options: Options) => {
 
 	const config: ProjectConfig = {
 		$schema: `https://unpkg.com/jsrepo@${context.package.version}/schemas/project-config.json`,
-		repos: options.repos,
+		repos,
 		includeTests:
 			initialConfig.isOk() && options.tests === undefined
 				? initialConfig.unwrap().includeTests
@@ -320,9 +275,109 @@ const _initProject = async (options: Options) => {
 		formatter: config.formatter,
 	});
 
+	if (!fs.existsSync(options.cwd)) {
+		fs.mkdirSync(options.cwd, { recursive: true });
+	}
+
 	fs.writeFileSync(configPath, configContent);
 
 	loading.stop(`Wrote config to \`${PROJECT_CONFIG_NAME}\`.`);
+};
+
+const promptForConfigPaths = async (repo: string, paths: Paths): Promise<Paths> => {
+	const loading = spinner();
+
+	const storage = persisted.get();
+
+	const provider = providers.find((p) => p.matches(repo));
+
+	if (!provider) {
+		program.error(
+			color.red(
+				`Invalid provider! Valid providers (${providers.map((provider) => provider.name()).join(', ')})`
+			)
+		);
+	}
+
+	const tokenKey = `${provider.name()}-token`;
+
+	const token = storage.get(tokenKey);
+
+	if (!token) {
+		const result = await confirm({
+			message: 'Would you like to add an auth token?',
+			initialValue: false,
+		});
+
+		if (isCancel(result)) {
+			cancel('Canceled!');
+			process.exit(0);
+		}
+
+		if (result) {
+			const response = await password({
+				message: 'Paste your token',
+				validate(value) {
+					if (value.trim() === '') return 'Please provide a value';
+				},
+			});
+
+			if (isCancel(response)) {
+				cancel('Canceled!');
+				process.exit(0);
+			}
+
+			storage.set(tokenKey, response);
+		}
+	}
+
+	loading.start(`Fetching categories from ${color.cyan(repo)}`);
+
+	const manifestResult = await provider.fetchManifest(repo);
+
+	loading.stop(`Fetched categories from ${color.cyan(repo)}`);
+
+	if (manifestResult.isErr()) {
+		program.error(color.red(manifestResult.unwrapErr()));
+	}
+
+	const categories = manifestResult.unwrap();
+
+	const configurePaths = await multiselect({
+		message: 'Which category paths would you like to configure?',
+		options: categories.map((cat) => ({ label: cat.name, value: cat.name })),
+		required: false,
+	});
+
+	if (isCancel(configurePaths)) {
+		cancel('Canceled!');
+		process.exit(0);
+	}
+
+	if (configurePaths.length > 0) {
+		for (const category of configurePaths) {
+			const configuredValue = paths[category];
+
+			const categoryPath = await text({
+				message: `Where should ${category} be added in your project?`,
+				validate(value) {
+					if (value.trim() === '') return 'Please provide a value';
+				},
+				placeholder: configuredValue ? configuredValue : `./src/${category}`,
+				defaultValue: configuredValue,
+				initialValue: configuredValue,
+			});
+
+			if (isCancel(categoryPath)) {
+				cancel('Canceled!');
+				process.exit(0);
+			}
+
+			paths[category] = categoryPath;
+		}
+	}
+
+	return paths;
 };
 
 const _initRegistry = async (options: Options) => {
