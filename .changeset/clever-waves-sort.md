@@ -2,4 +2,4 @@
 "jsrepo": minor
 ---
 
-Add support for registries served from a custom url.
+Support for self-hosted registries. 🎉
