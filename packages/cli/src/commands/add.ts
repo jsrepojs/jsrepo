@@ -175,7 +175,7 @@ const _add = async (blockNames: string[], options: Options) => {
 		mustResolveRepos.add(repo);
 	}
 
-	if (!resolveAllRepos) {
+	if (!resolveAllRepos && blockNames.length > 0) {
 		repoPaths = Array.from(mustResolveRepos);
 	}
 
