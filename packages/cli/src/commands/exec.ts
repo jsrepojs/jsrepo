@@ -1,5 +1,4 @@
 import fs from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import { cancel, confirm, isCancel, select, spinner } from '@clack/prompts';
 import color from 'chalk';
 import { Argument, Command, program } from 'commander';

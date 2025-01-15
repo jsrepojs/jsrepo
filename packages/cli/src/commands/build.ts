@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { log, multiselect, outro, spinner } from '@clack/prompts';
+import { log, outro, spinner } from '@clack/prompts';
 import color from 'chalk';
 import { Command, program } from 'commander';
 import path from 'pathe';
