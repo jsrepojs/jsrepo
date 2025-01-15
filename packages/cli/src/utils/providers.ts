@@ -618,10 +618,12 @@ const http: Provider = {
 	defaultBranch: () => '',
 	refSpecifierExample: () => '',
 	parseBlockSpecifier: (blockSpecifier) => {
-		const segments = blockSpecifier.split('/');
+		const url = new URL(blockSpecifier);
+
+		const segments = url.pathname.split('/');
 
 		return [
-			segments.slice(0, segments.length - 2).join('/'),
+			new URL(segments.slice(0, segments.length - 2).join('/'), url.origin).toString(),
 			segments.slice(segments.length - 2).join('/'),
 		];
 	},
