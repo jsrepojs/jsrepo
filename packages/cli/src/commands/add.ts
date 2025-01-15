@@ -243,9 +243,7 @@ const _add = async (blockNames: string[], options: Options) => {
 
 	verbose(`Retrieved blocks from ${color.cyan(repoPaths.join(', '))}`);
 
-	const installedBlocks = getInstalled(blocksMap, config, options.cwd).map(
-		(val) => val.specifier
-	);
+	let installedBlocks = getInstalled(blocksMap, config, options.cwd).map((val) => val.specifier);
 
 	let installingBlockNames = blockNames;
 
@@ -398,6 +396,9 @@ const _add = async (blockNames: string[], options: Options) => {
 		}
 
 		store.set(zeroConfigKey, config);
+
+		// re-run to get installed blocks at the provided path
+		installedBlocks = getInstalled(blocksMap, config, options.cwd).map((val) => val.specifier);
 	}
 
 	const { prettierOptions, biomeOptions } = await loadFormatterConfig({
