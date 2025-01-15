@@ -2,4 +2,4 @@
 "jsrepo": patch
 ---
 
-When adding with zero-config you will now be prompted to overwrite blocks if they already exist at the provided path.
+When adding blocks with zero-config you will now be prompted before overwriting an existing block
