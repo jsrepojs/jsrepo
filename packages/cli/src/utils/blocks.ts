@@ -6,7 +6,7 @@ import { Err, Ok, type Result } from './blocks/types/result';
 import { mapToArray } from './blocks/utils/map-to-array';
 import type { Block } from './build';
 import { type ProjectConfig, resolvePaths } from './config';
-import * as gitProviders from './git-providers';
+import * as gitProviders from './providers';
 
 export type RemoteBlock = Block & { sourceRepo: gitProviders.Info };
 
@@ -27,8 +27,10 @@ const resolveTree = async (
 	for (const blockSpecifier of blockSpecifiers) {
 		let block: RemoteBlock | undefined = undefined;
 
+		const provider = gitProviders.providers.find((p) => blockSpecifier.startsWith(p.name()));
+
 		// if the block starts with github (or another provider) we know it has been resolved
-		if (!gitProviders.providers.find((p) => blockSpecifier.startsWith(p.name()))) {
+		if (!provider) {
 			if (repoPaths.length === 0) {
 				return Err(
 					color.red(
@@ -41,9 +43,11 @@ const resolveTree = async (
 
 			// check every repo for the block and return the first block found
 			for (const { info: providerInfo } of repoPaths) {
-				const tempBlock = blocksMap.get(
-					`${providerInfo.name}/${providerInfo.owner}/${providerInfo.repoName}/${blockSpecifier}`
+				const [repoIdent, specifier] = providerInfo.provider.parseBlockSpecifier(
+					`${providerInfo.url}/${blockSpecifier}`
 				);
+
+				const tempBlock = blocksMap.get(`${repoIdent}/${specifier}`);
 
 				if (tempBlock === undefined) continue;
 
@@ -53,11 +57,10 @@ const resolveTree = async (
 			}
 		} else {
 			// get shortened name
-			const [providerName, owner, repoName, ...rest] = blockSpecifier.split('/');
+			const [repoIdent, specifier] = provider.parseBlockSpecifier(blockSpecifier);
 
-			block = blocksMap.get(
-				`${providerName}/${owner}/${repoName}/${rest.slice(rest.length - 2).join('/')}`
-			);
+			// just beautifies name a bit
+			block = blocksMap.get(`${repoIdent}/${specifier}`);
 		}
 
 		if (!block) {

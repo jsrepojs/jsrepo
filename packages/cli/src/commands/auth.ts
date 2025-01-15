@@ -4,9 +4,9 @@ import { Command, Option } from 'commander';
 import * as v from 'valibot';
 import { context } from '../cli';
 import * as ascii from '../utils/ascii';
-import { providers } from '../utils/git-providers';
 import * as persisted from '../utils/persisted';
 import { intro } from '../utils/prompts';
+import { providers } from '../utils/providers';
 
 const schema = v.object({
 	token: v.optional(v.string()),

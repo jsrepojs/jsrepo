@@ -30,10 +30,10 @@ import {
 } from '../utils/config';
 import { installDependencies } from '../utils/dependencies';
 import { loadFormatterConfig } from '../utils/format';
-import { providers } from '../utils/git-providers';
 import { json } from '../utils/language-support';
 import * as persisted from '../utils/persisted';
 import { type Task, intro, nextSteps, runTasks } from '../utils/prompts';
+import { providers } from '../utils/providers';
 
 const schema = v.object({
 	repos: v.optional(v.array(v.string())),

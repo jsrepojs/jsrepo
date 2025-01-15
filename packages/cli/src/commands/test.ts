@@ -14,8 +14,8 @@ import { getInstalled } from '../utils/blocks';
 import { type Block, isTestFile } from '../utils/build';
 import { getProjectConfig, resolvePaths } from '../utils/config';
 import { OUTPUT_FILE } from '../utils/context';
-import * as gitProviders from '../utils/git-providers';
 import { intro } from '../utils/prompts';
+import * as gitProviders from '../utils/providers';
 
 const schema = v.object({
 	repo: v.optional(v.string()),

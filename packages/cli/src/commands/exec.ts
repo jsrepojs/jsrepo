@@ -14,8 +14,8 @@ import { resolveTree } from '../utils/blocks';
 import { isTestFile } from '../utils/build';
 import { type ProjectConfig, getProjectConfig, resolvePaths } from '../utils/config';
 import { installDependencies } from '../utils/dependencies';
-import * as gitProviders from '../utils/git-providers';
 import { type ConcurrentTask, intro, runTasksConcurrently } from '../utils/prompts';
+import * as gitProviders from '../utils/providers';
 
 const schema = v.objectWithRest(
 	{

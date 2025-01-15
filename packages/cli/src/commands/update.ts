@@ -17,9 +17,9 @@ import { formatDiff } from '../utils/diff';
 import { transformRemoteContent } from '../utils/files';
 import { loadFormatterConfig } from '../utils/format';
 import { getWatermark } from '../utils/get-watermark';
-import * as gitProviders from '../utils/git-providers';
 import { returnShouldInstall } from '../utils/package';
 import { type Task, intro, nextSteps, runTasks } from '../utils/prompts';
+import * as gitProviders from '../utils/providers';
 
 const schema = v.object({
 	all: v.boolean(),

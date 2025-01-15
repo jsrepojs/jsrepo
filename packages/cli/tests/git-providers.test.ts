@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import * as gitProviders from '../src/utils/git-providers';
+import * as gitProviders from '../src/utils/providers';
 
 describe('github', () => {
 	it('Fetches the manifest from a public repo', async () => {

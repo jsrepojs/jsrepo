@@ -40,6 +40,7 @@ export interface Provider {
 	 * @returns
 	 */
 	refSpecifierExample: () => string;
+	parseBlockSpecifier: (blockSpecifier: string) => [string, string];
 	/** Returns a URL to the raw path of the resource provided in the resourcePath
 	 *
 	 * @param repoPath
@@ -101,6 +102,19 @@ const github: Provider = {
 	name: () => 'github',
 	defaultBranch: () => 'main',
 	refSpecifierExample: () => 'github/<owner>/<repo>/tree/<ref>',
+	parseBlockSpecifier: (blockSpecifier) => {
+		const [_, owner, repoName, ...rest] = blockSpecifier.split('/');
+
+		let repo: string;
+		// if rest is greater than 2 it isn't the block specifier so it is part of the path
+		if (rest.length > 2) {
+			repo = `github/${owner}/${repoName}/${rest.slice(0, rest.length - 2).join('/')}`;
+		} else {
+			repo = `github/${owner}/${repoName}`;
+		}
+
+		return [repo, rest.slice(rest.length - 2).join('/')];
+	},
 	resolveRaw: async (repoPath, resourcePath) => {
 		const info = await github.info(repoPath);
 
@@ -226,6 +240,19 @@ const gitlab: Provider = {
 	name: () => 'gitlab',
 	defaultBranch: () => 'main',
 	refSpecifierExample: () => 'gitlab/<owner>/<repo>/-/tree/<ref>',
+	parseBlockSpecifier: (blockSpecifier) => {
+		const [_, owner, repoName, ...rest] = blockSpecifier.split('/');
+
+		let repo: string;
+		// if rest is greater than 2 it isn't the block specifier so it is part of the path
+		if (rest.length > 2) {
+			repo = `gitlab/${owner}/${repoName}/${rest.slice(0, rest.length - 2).join('/')}`;
+		} else {
+			repo = `gitlab/${owner}/${repoName}`;
+		}
+
+		return [repo, rest.slice(rest.length - 2).join('/')];
+	},
 	resolveRaw: async (repoPath, resourcePath) => {
 		const info = await gitlab.info(repoPath);
 
@@ -356,6 +383,19 @@ const bitbucket: Provider = {
 	name: () => 'bitbucket',
 	defaultBranch: () => 'master',
 	refSpecifierExample: () => 'bitbucket/<owner>/<repo>/src/<ref>',
+	parseBlockSpecifier: (blockSpecifier) => {
+		const [_, owner, repoName, ...rest] = blockSpecifier.split('/');
+
+		let repo: string;
+		// if rest is greater than 2 it isn't the block specifier so it is part of the path
+		if (rest.length > 2) {
+			repo = `azure/${owner}/${repoName}/${rest.slice(0, rest.length - 2).join('/')}`;
+		} else {
+			repo = `azure/${owner}/${repoName}`;
+		}
+
+		return [repo, rest.slice(rest.length - 2).join('/')];
+	},
 	resolveRaw: async (repoPath, resourcePath) => {
 		const info = await bitbucket.info(repoPath);
 
@@ -471,6 +511,19 @@ const azure: Provider = {
 	name: () => 'azure',
 	defaultBranch: () => 'main',
 	refSpecifierExample: () => 'azure/<org>/<project>/<repo>/(tags|heads)/<ref>',
+	parseBlockSpecifier: (blockSpecifier) => {
+		const [providerName, owner, org, repoName, ...rest] = blockSpecifier.split('/');
+
+		let repo: string;
+		// if rest is greater than 2 it isn't the block specifier so it is part of the path
+		if (rest.length > 2) {
+			repo = `${providerName}/${owner}/${org}/${repoName}${rest.slice(0, rest.length - 2).join('/')}`;
+		} else {
+			repo = `${providerName}/${owner}/${org}/${repoName}`;
+		}
+
+		return [repo, rest.slice(rest.length - 2).join('/')];
+	},
 	resolveRaw: async (repoPath, resourcePath) => {
 		const info = await azure.info(repoPath);
 
@@ -560,7 +613,87 @@ const azure: Provider = {
 	matches: (repoPath) => repoPath.toLowerCase().startsWith('azure'),
 };
 
-const providers = [github, gitlab, bitbucket, azure];
+const http: Provider = {
+	name: () => 'http',
+	defaultBranch: () => '',
+	refSpecifierExample: () => '',
+	parseBlockSpecifier: (blockSpecifier) => {
+		const segments = blockSpecifier.split('/');
+
+		return [
+			segments.slice(0, segments.length - 2).join('/'),
+			segments.slice(segments.length - 2).join('/'),
+		];
+	},
+	info: async (path: string | Info) => {
+		if (typeof path !== 'string') return path;
+
+		return {
+			name: http.name(),
+			url: path,
+			provider: http,
+
+			// nothing else is important
+			owner: '',
+			ref: '',
+			refs: 'heads',
+			repoName: '',
+			projectName: '',
+		} satisfies Info;
+	},
+	resolveRaw: async (repoPath, resourcePath) => {
+		const info = await http.info(repoPath);
+
+		return new URL(resourcePath, info.url);
+	},
+	fetchRaw: async (repoPath, resourcePath, { verbose } = {}) => {
+		const info = await http.info(repoPath);
+
+		const url = await http.resolveRaw(info, resourcePath);
+
+		verbose?.(`Trying to fetch from ${url}`);
+
+		try {
+			// const token = persisted.get().get(`${github.name()}-token`);
+
+			const headers = new Headers();
+
+			// if (token !== undefined) {
+			// 	headers.append("Authorization", `token ${token}`);
+			// }
+
+			const response = await fetch(url, { headers });
+
+			verbose?.(`Got a response from ${url} ${response.status} ${response.statusText}`);
+
+			if (!response.ok) {
+				return rawErrorMessage(info, resourcePath);
+			}
+
+			return Ok(await response.text());
+		} catch (err) {
+			verbose?.(`erroring in response ${err} `);
+
+			return rawErrorMessage(info, resourcePath);
+		}
+	},
+	fetchManifest: async (repoPath) => {
+		const manifest = await http.fetchRaw(repoPath, OUTPUT_FILE);
+
+		if (manifest.isErr()) return Err(manifest.unwrapErr());
+
+		const categories = v.safeParse(v.array(categorySchema), JSON.parse(manifest.unwrap()));
+
+		if (!categories.success) {
+			return Err(`Error parsing categories: ${categories.issues}`);
+		}
+
+		return Ok(categories.output);
+	},
+	matches: (url) => url.startsWith('http'),
+};
+
+const providers = [github, gitlab, bitbucket, azure, http];
 
 const getProviderInfo = async (repo: string): Promise<Result<Info, string>> => {
 	const provider = providers.find((provider) => provider.matches(repo));
@@ -586,13 +719,14 @@ const fetchBlocks = async (
 
 		for (const category of categories) {
 			for (const block of category.blocks) {
-				blocksMap.set(
-					`${info.name}/${info.owner}/${info.repoName}/${category.name}/${block.name}`,
-					{
-						...block,
-						sourceRepo: info,
-					}
+				const [repoIdent, blockSpecifier] = info.provider.parseBlockSpecifier(
+					`${info.url}/${block.category}/${block.name}`
 				);
+
+				blocksMap.set(`${repoIdent}/${blockSpecifier}`, {
+					...block,
+					sourceRepo: info,
+				});
 			}
 		}
 	}
@@ -623,4 +757,14 @@ const resolvePaths = async (
 	return Ok(resolvedPaths);
 };
 
-export { github, gitlab, bitbucket, azure, getProviderInfo, fetchBlocks, providers, resolvePaths };
+export {
+	github,
+	gitlab,
+	bitbucket,
+	azure,
+	http,
+	getProviderInfo,
+	fetchBlocks,
+	providers,
+	resolvePaths,
+};
