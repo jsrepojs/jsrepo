@@ -142,4 +142,8 @@ const getInstalled = (
 	return installedBlocks;
 };
 
-export { resolveTree, getInstalled };
+const fullyQualifiedName = (url: string, category: string, name: string) => {
+	return new URL(`${category}/${name}`, url).toString();
+};
+
+export { resolveTree, getInstalled, fullyQualifiedName };
