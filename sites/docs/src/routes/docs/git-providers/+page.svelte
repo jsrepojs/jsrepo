@@ -64,10 +64,10 @@
 
 <DocHeader
 	title="Git Providers"
-	description="Git Providers that jsrepo supports in your registry."
+	description="Providers that jsrepo supports for serving your registry."
 />
 <p>
-	<Jsrepo /> supports a variety of registry providers as well as custom urls.
+	<Jsrepo /> supports a variety of git providers as well as custom urls.
 </p>
 <div class="flex flex-col gap-1">
 	<span>Legend:</span>
