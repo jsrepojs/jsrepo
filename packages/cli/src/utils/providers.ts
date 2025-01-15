@@ -702,7 +702,7 @@ const getProviderInfo = async (repo: string): Promise<Result<Info, string>> => {
 	}
 
 	return Err(
-		`Only ${providers.map((p, i) => `${i === providers.length - 1 ? 'and' : ''}${color.cyan(p.name())}`).join(', ')} repositories are supported at this time!`
+		`Only ${providers.map((p, i) => `${i === providers.length - 1 ? 'and ' : ''}${color.bold(p.name())}`).join(', ')} registries are supported at this time!`
 	);
 };
 
