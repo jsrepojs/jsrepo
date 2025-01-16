@@ -33,7 +33,7 @@ import { loadFormatterConfig } from '../utils/format';
 import { json } from '../utils/language-support';
 import * as persisted from '../utils/persisted';
 import { type Task, intro, nextSteps, runTasks } from '../utils/prompts';
-import { providers } from '../utils/providers';
+import { http, providers } from '../utils/providers';
 
 const schema = v.object({
 	repos: v.optional(v.array(v.string())),
@@ -175,7 +175,7 @@ const _initProject = async (registries: string[], options: Options) => {
 
 			log.info(`Configuring ${color.cyan(repo)}`);
 
-			paths = await promptForConfigPaths(repo, paths);
+			paths = await promptForProviderConfig(repo, paths);
 		}
 	}
 
@@ -209,7 +209,7 @@ const _initProject = async (registries: string[], options: Options) => {
 			process.exit(0);
 		}
 
-		paths = await promptForConfigPaths(result, paths);
+		paths = await promptForProviderConfig(result, paths);
 
 		repos.push(result);
 	}
@@ -284,7 +284,7 @@ const _initProject = async (registries: string[], options: Options) => {
 	loading.stop(`Wrote config to \`${PROJECT_CONFIG_NAME}\`.`);
 };
 
-const promptForConfigPaths = async (repo: string, paths: Paths): Promise<Paths> => {
+const promptForProviderConfig = async (repo: string, paths: Paths): Promise<Paths> => {
 	const loading = spinner();
 
 	const storage = persisted.get();
@@ -303,7 +303,8 @@ const promptForConfigPaths = async (repo: string, paths: Paths): Promise<Paths> 
 
 	const token = storage.get(tokenKey);
 
-	if (!token) {
+	// don't ask if the provider is a custom domain
+	if (!token && provider.name() !== http.name()) {
 		const result = await confirm({
 			message: 'Would you like to add an auth token?',
 			initialValue: false,
