@@ -6,7 +6,7 @@ import type { Category } from '../src/utils/build';
 import type { RegistryConfig } from '../src/utils/config';
 import { assertFilesExist } from './utils';
 
-describe('add', () => {
+describe('build', () => {
 	const testDir = path.join(__dirname, '../temp-test/build');
 
 	beforeAll(async () => {
@@ -36,7 +36,7 @@ describe('add', () => {
 
 		fs.writeFileSync('package.json', JSON.stringify(pkg));
 
-		const config: RegistryConfig = {
+		const buildConfig: RegistryConfig = {
 			$schema: '',
 			dirs: ['./src'],
 			includeBlocks: [],
@@ -50,82 +50,30 @@ describe('add', () => {
 			excludeDeps: [],
 		};
 
-		fs.writeFileSync('jsrepo-build-config.json', JSON.stringify(config));
+		fs.writeFileSync('jsrepo-build-config.json', JSON.stringify(buildConfig));
 
-		fs.mkdirSync('./src/utils', { recursive: true });
-
-		fs.writeFileSync(
-			'./src/utils/add.ts',
-			`import { log } from "./log";
-
-export const add = (a: number, b: number) => a + b;
-
-export const logAnswer = (a: number, b: number) => log(\`Answer is: \${add(a, b)}\`);`
-		);
-		fs.writeFileSync(
-			'./src/utils/log.ts',
-			`import color from "chalk";
-            
-export const log = (msg: string) => console.info(color.cyan(msg));`
-		);
-
-		// build
-
-		await cli.parseAsync(['node', 'jsrepo', 'build', '--cwd', testDir]);
-
-		const manifest = JSON.parse(
-			fs.readFileSync('jsrepo-manifest.json').toString()
-		) as Category[];
-
-		expect(manifest).toStrictEqual([
-			{
-				blocks: [
-					{
-						_imports_: {
-							'./log': '{{utils/log}}',
-						},
-						category: 'utils',
-						dependencies: [],
-						devDependencies: [],
-						directory: 'src/utils',
-						files: ['add.ts'],
-						list: true,
-						localDependencies: ['utils/log'],
-						name: 'add',
-						subdirectory: false,
-						tests: false,
-					},
-					{
-						_imports_: {},
-						category: 'utils',
-						dependencies: ['chalk@^5.3.0'],
-						devDependencies: [],
-						directory: 'src/utils',
-						files: ['log.ts'],
-						list: true,
-						localDependencies: [],
-						name: 'log',
-						subdirectory: false,
-						tests: false,
-					},
-				],
-				name: 'utils',
+		const tsConfig = {
+			compilerOptions: {
+				esModuleInterop: true,
+				forceConsistentCasingInFileNames: true,
+				isolatedModules: true,
+				moduleResolution: 'Bundler',
+				module: 'ES2022',
+				target: 'ES2022',
+				skipLibCheck: true,
+				strict: true,
+				paths: {
+					'$types/*': ['./src/types/*'],
+				},
 			},
-		] satisfies Category[]);
-	});
-
-	it('builds and copies files to correct location', async () => {
-		// create package.json
-		const pkg = {
-			name: 'registry',
-			dependencies: {
-				chalk: '^5.3.0',
-			},
+			include: ['src/**/*.ts'],
 		};
 
-		fs.writeFileSync('package.json', JSON.stringify(pkg));
+		fs.writeFileSync('tsconfig.json', JSON.stringify(tsConfig));
 
 		fs.mkdirSync('./src/utils', { recursive: true });
+
+		fs.mkdirSync('./src/types', { recursive: true });
 
 		fs.writeFileSync(
 			'./src/utils/add.ts',
@@ -135,12 +83,22 @@ export const add = (a: number, b: number) => a + b;
 
 export const logAnswer = (a: number, b: number) => log(\`Answer is: \${add(a, b)}\`);`
 		);
+
 		fs.writeFileSync(
 			'./src/utils/log.ts',
 			`import color from "chalk";
             
 export const log = (msg: string) => console.info(color.cyan(msg));`
 		);
+
+		fs.writeFileSync(
+			'./src/utils/math.ts',
+			`import type { Point } from "$types/point";
+
+export const createPoint = (x: number, y: number): Point => { x, y };`
+		);
+
+		fs.writeFileSync('./src/types/point.ts', 'export type Point = { x: number; y: number; };');
 
 		// build
 
@@ -150,8 +108,6 @@ export const log = (msg: string) => console.info(color.cyan(msg));`
 			'build',
 			'--cwd',
 			testDir,
-			'--dirs',
-			'./src',
 			'--output-dir',
 			'./registry',
 		]);
@@ -162,40 +118,75 @@ export const log = (msg: string) => console.info(color.cyan(msg));`
 
 		expect(manifest).toStrictEqual([
 			{
+				name: 'types',
 				blocks: [
 					{
+						name: 'point',
+						directory: 'src/types',
+						category: 'types',
+						tests: false,
+						subdirectory: false,
+						list: true,
+						files: ['point.ts'],
+						localDependencies: [],
+						_imports_: {},
+						dependencies: [],
+						devDependencies: [],
+					},
+				],
+			},
+			{
+				name: 'utils',
+				blocks: [
+					{
+						name: 'add',
+						directory: 'src/utils',
+						category: 'utils',
+						tests: false,
+						subdirectory: false,
+						list: true,
+						files: ['add.ts'],
+						localDependencies: ['utils/log'],
 						_imports_: {
 							'./log': '{{utils/log}}',
 						},
-						category: 'utils',
 						dependencies: [],
 						devDependencies: [],
-						directory: 'src/utils',
-						files: ['add.ts'],
-						list: true,
-						localDependencies: ['utils/log'],
-						name: 'add',
-						subdirectory: false,
-						tests: false,
 					},
 					{
-						_imports_: {},
+						name: 'log',
+						directory: 'src/utils',
 						category: 'utils',
+						tests: false,
+						subdirectory: false,
+						list: true,
+						files: ['log.ts'],
+						localDependencies: [],
+						_imports_: {},
 						dependencies: ['chalk@^5.3.0'],
 						devDependencies: [],
+					},
+					{
+						name: 'math',
 						directory: 'src/utils',
-						files: ['log.ts'],
-						list: true,
-						localDependencies: [],
-						name: 'log',
-						subdirectory: false,
+						category: 'utils',
 						tests: false,
+						subdirectory: false,
+						list: true,
+						files: ['math.ts'],
+						localDependencies: ['types/point'],
+						_imports_: {
+							'$types/point': '{{types/point}}',
+						},
+						dependencies: [],
+						devDependencies: [],
 					},
 				],
-				name: 'utils',
 			},
 		] satisfies Category[]);
 
-		assertFilesExist('./registry/src/utils', 'add.ts', 'log.ts');
+		// ensure files were copied correctly
+		assertFilesExist('./registry/src/utils', 'add.ts', 'log.ts', 'math.ts');
+		assertFilesExist('./registry/src/types', 'point.ts');
 	});
 });
