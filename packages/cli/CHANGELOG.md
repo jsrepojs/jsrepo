@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.26.4
+
+### Patch Changes
+
+- 6c21d16: Allow relative imports from anywhere in the project.
+
 ## 1.26.3
 
 ### Patch Changes
