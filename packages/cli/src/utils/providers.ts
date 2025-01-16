@@ -80,7 +80,7 @@ export interface Provider {
 	matches: (repoPath: string) => boolean;
 }
 
-const rawErrorMessage = (info: Info, filePath: string) => {
+const gitProviderErrorMessage = (info: Info, filePath: string) => {
 	return Err(
 		`There was an error fetching the \`${color.bold(filePath)}\` from ${color.bold(info.url)}.
 
@@ -144,14 +144,14 @@ const github: Provider = {
 			verbose?.(`Got a response from ${url} ${response.status} ${response.statusText}`);
 
 			if (!response.ok) {
-				return rawErrorMessage(info, resourcePath);
+				return gitProviderErrorMessage(info, resourcePath);
 			}
 
 			return Ok(await response.text());
 		} catch (err) {
-			verbose?.(`erroring in response ${err} `);
+			verbose?.(`error in response ${err} `);
 
-			return rawErrorMessage(info, resourcePath);
+			return gitProviderErrorMessage(info, resourcePath);
 		}
 	},
 	fetchManifest: async (repoPath) => {
@@ -282,12 +282,12 @@ const gitlab: Provider = {
 			verbose?.(`Got a response from ${url} ${response.status} ${response.statusText}`);
 
 			if (!response.ok) {
-				return rawErrorMessage(info, resourcePath);
+				return gitProviderErrorMessage(info, resourcePath);
 			}
 
 			return Ok(await response.text());
 		} catch {
-			return rawErrorMessage(info, resourcePath);
+			return gitProviderErrorMessage(info, resourcePath);
 		}
 	},
 	fetchManifest: async (repoPath) => {
@@ -425,12 +425,12 @@ const bitbucket: Provider = {
 			verbose?.(`Got a response from ${url} ${response.status} ${response.statusText}`);
 
 			if (!response.ok) {
-				return rawErrorMessage(info, resourcePath);
+				return gitProviderErrorMessage(info, resourcePath);
 			}
 
 			return Ok(await response.text());
 		} catch {
-			return rawErrorMessage(info, resourcePath);
+			return gitProviderErrorMessage(info, resourcePath);
 		}
 	},
 	fetchManifest: async (repoPath) => {
@@ -554,14 +554,14 @@ const azure: Provider = {
 			verbose?.(`Got a response from ${url} ${response.status} ${response.statusText}`);
 
 			if (!response.ok) {
-				return rawErrorMessage(info, resourcePath);
+				return gitProviderErrorMessage(info, resourcePath);
 			}
 
 			return Ok(await response.text());
 		} catch (err) {
-			verbose?.(`erroring in response ${err} `);
+			verbose?.(`error in response ${err} `);
 
-			return rawErrorMessage(info, resourcePath);
+			return gitProviderErrorMessage(info, resourcePath);
 		}
 	},
 	fetchManifest: async (repoPath) => {
@@ -613,6 +613,14 @@ const azure: Provider = {
 	matches: (repoPath) => repoPath.toLowerCase().startsWith('azure'),
 };
 
+const httpErrorMessage = (url: string, filePath: string, error: string) => {
+	return Err(
+		`There was an error fetching ${color.bold(new URL(filePath, url).toString())}
+	
+${color.bold(error)}`
+	);
+};
+
 const http: Provider = {
 	name: () => 'http',
 	defaultBranch: () => '',
@@ -656,27 +664,23 @@ const http: Provider = {
 		verbose?.(`Trying to fetch from ${url}`);
 
 		try {
-			// const token = persisted.get().get(`${github.name()}-token`);
-
-			const headers = new Headers();
-
-			// if (token !== undefined) {
-			// 	headers.append("Authorization", `token ${token}`);
-			// }
-
-			const response = await fetch(url, { headers });
+			const response = await fetch(url);
 
 			verbose?.(`Got a response from ${url} ${response.status} ${response.statusText}`);
 
 			if (!response.ok) {
-				return rawErrorMessage(info, resourcePath);
+				return httpErrorMessage(
+					info.url,
+					resourcePath,
+					`The server responded with: ${response.status}: ${response.statusText}`
+				);
 			}
 
 			return Ok(await response.text());
 		} catch (err) {
-			verbose?.(`erroring in response ${err} `);
+			verbose?.(`error in response ${err} `);
 
-			return rawErrorMessage(info, resourcePath);
+			return httpErrorMessage(info.url, resourcePath, String(err));
 		}
 	},
 	fetchManifest: async (repoPath) => {
