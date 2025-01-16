@@ -23,6 +23,7 @@ const resolveTree = async (
 	repoPaths: providers.ResolvedRepo[],
 	installed: Map<string, InstallingBlock> = new Map()
 ): Promise<Result<InstallingBlock[], string>> => {
+	console.log(blocksMap);
 	const blocks = new Map<string, InstallingBlock>();
 
 	for (const blockSpecifier of blockSpecifiers) {
@@ -48,7 +49,7 @@ const resolveTree = async (
 					url.join(providerInfo.url, blockSpecifier)
 				);
 
-				const tempBlock = blocksMap.get(`${repoIdent}/${specifier}`);
+				const tempBlock = blocksMap.get(url.join(repoIdent, specifier));
 
 				if (tempBlock === undefined) continue;
 
