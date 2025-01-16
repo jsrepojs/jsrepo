@@ -2,7 +2,7 @@
 
 > A CLI to add shared code from remote repositories.
  
-Latest Version: 1.24.3
+Latest Version: 1.25.0
 
 ## Commands
 
@@ -47,6 +47,7 @@ jsrepo build [options]
 
 #### Options
 - --dirs [dirs...]: The directories containing the blocks. 
+- --output-dir <dir>: The directory to output the registry to. (Copies jsrepo-manifest.json + all required files) 
 - --include-blocks [blockNames...]: Include only the blocks with these names. 
 - --include-categories [categoryNames...]: Include only the categories with these names. 
 - --exclude-blocks [blockNames...]: Do not include the blocks with these names. 

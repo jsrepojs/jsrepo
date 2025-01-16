@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { log, multiselect, outro, spinner } from '@clack/prompts';
+import { log, outro, spinner } from '@clack/prompts';
 import color from 'chalk';
 import { Command, program } from 'commander';
 import path from 'pathe';
@@ -14,6 +14,7 @@ import { intro } from '../utils/prompts';
 
 const schema = v.object({
 	dirs: v.optional(v.array(v.string())),
+	outputDir: v.optional(v.string()),
 	includeBlocks: v.optional(v.array(v.string())),
 	includeCategories: v.optional(v.array(v.string())),
 	excludeBlocks: v.optional(v.array(v.string())),
@@ -34,6 +35,10 @@ type Options = v.InferInput<typeof schema>;
 const build = new Command('build')
 	.description(`Builds the provided --dirs in the project root into a \`${OUTPUT_FILE}\` file.`)
 	.option('--dirs [dirs...]', 'The directories containing the blocks.')
+	.option(
+		'--output-dir <dir>',
+		'The directory to output the registry to. (Copies jsrepo-manifest.json + all required files)'
+	)
 	.option('--include-blocks [blockNames...]', 'Include only the blocks with these names.')
 	.option(
 		'--include-categories [categoryNames...]',
@@ -77,6 +82,7 @@ const _build = async (options: Options) => {
 				return {
 					$schema: '',
 					dirs: options.dirs ?? [],
+					outputDir: options.outputDir,
 					doNotListBlocks: options.doNotListBlocks ?? [],
 					doNotListCategories: options.doNotListCategories ?? [],
 					listBlocks: options.listBlocks ?? [],
@@ -95,6 +101,7 @@ const _build = async (options: Options) => {
 			// overwrites config with flag values
 
 			if (options.dirs) mergedVal.dirs = options.dirs;
+			if (options.outputDir) mergedVal.outputDir = options.outputDir;
 			if (options.doNotListBlocks) mergedVal.doNotListBlocks = options.doNotListBlocks;
 			if (options.doNotListCategories)
 				mergedVal.doNotListCategories = options.doNotListCategories;
@@ -114,14 +121,42 @@ const _build = async (options: Options) => {
 		(err) => program.error(color.red(err))
 	);
 
-	const outFile = path.join(options.cwd, OUTPUT_FILE);
+	let outDir: string;
+
+	if (config.outputDir) {
+		outDir = path.join(options.cwd, config.outputDir);
+	} else {
+		outDir = options.cwd;
+	}
+
+	const manifestOut = path.join(outDir, OUTPUT_FILE);
+
+	if (options.output && fs.existsSync(manifestOut)) {
+		// we need to remove all previously copied directories
+		if (config.outputDir) {
+			// read old manifest to determine where the unwanted files are
+			// we can't just rm -rf because other static files could be hosted out of the same directory
+			const oldCategories = JSON.parse(fs.readFileSync(manifestOut).toString()) as Category[];
+
+			// first just remove all the files
+			for (const category of oldCategories) {
+				for (const block of category.blocks) {
+					const newDirPath = path.join(outDir, block.directory);
+
+					if (fs.existsSync(newDirPath)) {
+						fs.rmSync(newDirPath, { recursive: true });
+					}
+				}
+			}
+		}
+
+		fs.rmSync(manifestOut);
+	}
 
 	for (const dir of config.dirs) {
 		const dirPath = path.join(options.cwd, dir);
 
 		loading.start(`Building ${color.cyan(dirPath)}`);
-
-		if (options.output && fs.existsSync(outFile)) fs.rmSync(outFile);
 
 		const builtCategories = buildBlocksDirectory(dirPath, { cwd: options.cwd, config });
 
@@ -190,11 +225,34 @@ const _build = async (options: Options) => {
 	}
 
 	if (options.output) {
-		loading.start(`Writing output to \`${color.cyan(outFile)}\``);
+		if (config.outputDir) {
+			loading.start(`Copying registry files to \`${color.cyan(outDir)}\``);
 
-		fs.writeFileSync(outFile, JSON.stringify(categories, null, '\t'));
+			// copy the files for each block in each category
+			for (const category of categories) {
+				for (const block of category.blocks) {
+					const originalPath = path.join(options.cwd, block.directory);
+					const newDirPath = path.join(outDir, block.directory);
 
-		loading.stop(`Wrote output to \`${color.cyan(outFile)}\``);
+					if (!fs.existsSync(newDirPath)) {
+						fs.mkdirSync(newDirPath, { recursive: true });
+					}
+
+					for (const file of block.files) {
+						fs.copyFileSync(path.join(originalPath, file), path.join(newDirPath, file));
+					}
+				}
+			}
+
+			loading.stop(`Copied registry files to \`${color.cyan(outDir)}\``);
+		}
+
+		loading.start(`Writing output to \`${color.cyan(manifestOut)}\``);
+
+		// write the manifest
+		fs.writeFileSync(manifestOut, JSON.stringify(categories, null, '\t'));
+
+		loading.stop(`Wrote output to \`${color.cyan(manifestOut)}\``);
 	}
 };
 

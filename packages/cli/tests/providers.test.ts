@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import * as gitProviders from '../src/utils/git-providers';
+import * as providers from '../src/utils/providers';
 
 describe('github', () => {
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'github/ieedan/std';
 
-		const info = await gitProviders.github.info(repoURL);
+		const info = await providers.github.info(repoURL);
 
-		const content = await gitProviders.github.fetchManifest(info);
+		const content = await providers.github.fetchManifest(info);
 
 		expect(content.isErr()).toBe(false);
 	});
@@ -15,9 +15,9 @@ describe('github', () => {
 	it('Fetches the manifest from a public repo with a tag', async () => {
 		const repoURL = 'https://github.com/ieedan/std/tree/v1.6.0';
 
-		const info = await gitProviders.github.info(repoURL);
+		const info = await providers.github.info(repoURL);
 
-		const content = await gitProviders.github.fetchRaw(info, 'jsrepo-manifest.json');
+		const content = await providers.github.fetchRaw(info, 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{
@@ -206,9 +206,9 @@ describe('gitlab', () => {
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'gitlab/ieedan/std';
 
-		const info = await gitProviders.gitlab.info(repoURL);
+		const info = await providers.gitlab.info(repoURL);
 
-		const content = await gitProviders.gitlab.fetchManifest(info);
+		const content = await providers.gitlab.fetchManifest(info);
 
 		expect(content.isErr()).toBe(false);
 	});
@@ -216,9 +216,9 @@ describe('gitlab', () => {
 	it('Fetches the manifest from a public repo with a tag', async () => {
 		const repoURL = 'https://gitlab.com/ieedan/std/-/tree/v1.6.0';
 
-		const info = await gitProviders.gitlab.info(repoURL);
+		const info = await providers.gitlab.info(repoURL);
 
-		const content = await gitProviders.gitlab.fetchRaw(info, 'jsrepo-manifest.json');
+		const content = await providers.gitlab.fetchRaw(info, 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{
@@ -407,9 +407,9 @@ describe('bitbucket', () => {
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'bitbucket/ieedan/std';
 
-		const info = await gitProviders.bitbucket.info(repoURL);
+		const info = await providers.bitbucket.info(repoURL);
 
-		const content = await gitProviders.bitbucket.fetchManifest(info);
+		const content = await providers.bitbucket.fetchManifest(info);
 
 		expect(content.isErr()).toBe(false);
 	});
@@ -417,9 +417,9 @@ describe('bitbucket', () => {
 	it('Fetches the manifest from a public repo with a tag', async () => {
 		const repoURL = 'https://bitbucket.org/ieedan/std/src/v1.6.0';
 
-		const info = await gitProviders.bitbucket.info(repoURL);
+		const info = await providers.bitbucket.info(repoURL);
 
-		const content = await gitProviders.bitbucket.fetchRaw(info, 'jsrepo-manifest.json');
+		const content = await providers.bitbucket.fetchRaw(info, 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{
@@ -608,9 +608,9 @@ describe('azure', () => {
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'azure/ieedan/std/std';
 
-		const info = await gitProviders.azure.info(repoURL);
+		const info = await providers.azure.info(repoURL);
 
-		const content = await gitProviders.azure.fetchManifest(info);
+		const content = await providers.azure.fetchManifest(info);
 
 		expect(content.isErr()).toBe(false);
 	});
@@ -618,9 +618,9 @@ describe('azure', () => {
 	it('Fetches the manifest from a public repo with a tag', async () => {
 		const repoURL = 'azure/ieedan/std/std/tags/v1.6.0';
 
-		const info = await gitProviders.azure.info(repoURL);
+		const info = await providers.azure.info(repoURL);
 
-		const content = await gitProviders.azure.fetchRaw(info, 'jsrepo-manifest.json');
+		const content = await providers.azure.fetchRaw(info, 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{
@@ -802,5 +802,310 @@ describe('azure', () => {
 	}
 ]
 `);
+	});
+});
+
+describe('http', () => {
+	it('Fetches the manifest', async () => {
+		const repoURL = 'https://jsrepo-http.vercel.app';
+
+		const info = await providers.http.info(repoURL);
+
+		const content = await providers.http.fetchRaw(info, 'jsrepo-manifest.json');
+
+		expect(content.unwrap()).toBe(`[
+	{
+		"name": "types",
+		"blocks": [
+			{
+				"name": "result",
+				"directory": "src/types",
+				"category": "types",
+				"tests": true,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"result.ts",
+					"result.test.ts"
+				],
+				"localDependencies": [],
+				"_imports_": {},
+				"dependencies": [],
+				"devDependencies": []
+			}
+		]
+	},
+	{
+		"name": "utils",
+		"blocks": [
+			{
+				"name": "array-sum",
+				"directory": "src/utils",
+				"category": "utils",
+				"tests": true,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"array-sum.ts",
+					"array-sum.test.ts"
+				],
+				"localDependencies": [],
+				"_imports_": {},
+				"dependencies": [],
+				"devDependencies": []
+			},
+			{
+				"name": "array-to-map",
+				"directory": "src/utils",
+				"category": "utils",
+				"tests": true,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"array-to-map.ts",
+					"array-to-map.test.ts"
+				],
+				"localDependencies": [],
+				"_imports_": {},
+				"dependencies": [],
+				"devDependencies": []
+			},
+			{
+				"name": "dispatcher",
+				"directory": "src/utils",
+				"category": "utils",
+				"tests": true,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"dispatcher.ts",
+					"dispatcher.test.ts"
+				],
+				"localDependencies": [],
+				"_imports_": {},
+				"dependencies": [],
+				"devDependencies": []
+			},
+			{
+				"name": "ipv4-address",
+				"directory": "src/utils",
+				"category": "utils",
+				"tests": true,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"ipv4-address.ts",
+					"ipv4-address.test.ts"
+				],
+				"localDependencies": [
+					"types/result",
+					"utils/is-number"
+				],
+				"_imports_": {
+					"../types/result": "{{types/result}}",
+					"./is-number": "{{utils/is-number}}"
+				},
+				"dependencies": [],
+				"devDependencies": []
+			},
+			{
+				"name": "is-number",
+				"directory": "src/utils",
+				"category": "utils",
+				"tests": true,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"is-number.ts",
+					"is-number.test.ts"
+				],
+				"localDependencies": [],
+				"_imports_": {},
+				"dependencies": [],
+				"devDependencies": []
+			},
+			{
+				"name": "lines",
+				"directory": "src/utils",
+				"category": "utils",
+				"tests": true,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"lines.ts",
+					"lines.test.ts"
+				],
+				"localDependencies": [
+					"utils/pad"
+				],
+				"_imports_": {
+					"./pad": "{{utils/pad}}"
+				},
+				"dependencies": [],
+				"devDependencies": []
+			},
+			{
+				"name": "map-to-array",
+				"directory": "src/utils",
+				"category": "utils",
+				"tests": true,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"map-to-array.ts",
+					"map-to-array.test.ts"
+				],
+				"localDependencies": [],
+				"_imports_": {},
+				"dependencies": [],
+				"devDependencies": []
+			},
+			{
+				"name": "math",
+				"directory": "src/utils/math",
+				"category": "utils",
+				"tests": true,
+				"subdirectory": true,
+				"list": true,
+				"files": [
+					"circle.test.ts",
+					"circle.ts",
+					"conversions.test.ts",
+					"conversions.ts",
+					"fractions.test.ts",
+					"fractions.ts",
+					"gcf.test.ts",
+					"gcf.ts",
+					"index.ts",
+					"triangles.test.ts",
+					"triangles.ts",
+					"types.ts"
+				],
+				"localDependencies": [],
+				"dependencies": [],
+				"devDependencies": [],
+				"_imports_": {}
+			},
+			{
+				"name": "pad",
+				"directory": "src/utils",
+				"category": "utils",
+				"tests": true,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"pad.ts",
+					"pad.test.ts"
+				],
+				"localDependencies": [
+					"utils/strip-ansi"
+				],
+				"_imports_": {
+					"./strip-ansi": "{{utils/strip-ansi}}"
+				},
+				"dependencies": [],
+				"devDependencies": []
+			},
+			{
+				"name": "perishable-list",
+				"directory": "src/utils",
+				"category": "utils",
+				"tests": true,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"perishable-list.ts",
+					"perishable-list.test.ts"
+				],
+				"localDependencies": [],
+				"_imports_": {},
+				"dependencies": [],
+				"devDependencies": []
+			},
+			{
+				"name": "rand",
+				"directory": "src/utils",
+				"category": "utils",
+				"tests": true,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"rand.ts",
+					"rand.test.ts"
+				],
+				"localDependencies": [],
+				"_imports_": {},
+				"dependencies": [],
+				"devDependencies": []
+			},
+			{
+				"name": "sleep",
+				"directory": "src/utils",
+				"category": "utils",
+				"tests": true,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"sleep.ts",
+					"sleep.test.ts"
+				],
+				"localDependencies": [],
+				"_imports_": {},
+				"dependencies": [],
+				"devDependencies": []
+			},
+			{
+				"name": "stopwatch",
+				"directory": "src/utils",
+				"category": "utils",
+				"tests": true,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"stopwatch.ts",
+					"stopwatch.test.ts"
+				],
+				"localDependencies": [],
+				"_imports_": {},
+				"dependencies": [],
+				"devDependencies": []
+			},
+			{
+				"name": "strip-ansi",
+				"directory": "src/utils",
+				"category": "utils",
+				"tests": true,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"strip-ansi.ts",
+					"strip-ansi.test.ts"
+				],
+				"localDependencies": [],
+				"_imports_": {},
+				"dependencies": [
+					"ansi-regex@^6.1.0"
+				],
+				"devDependencies": []
+			},
+			{
+				"name": "truncate",
+				"directory": "src/utils",
+				"category": "utils",
+				"tests": true,
+				"subdirectory": false,
+				"list": true,
+				"files": [
+					"truncate.ts",
+					"truncate.test.ts"
+				],
+				"localDependencies": [],
+				"_imports_": {},
+				"dependencies": [],
+				"devDependencies": []
+			}
+		]
+	}
+]`);
 	});
 });

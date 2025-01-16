@@ -6,9 +6,9 @@ import { Err, Ok, type Result } from './blocks/types/result';
 import { mapToArray } from './blocks/utils/map-to-array';
 import type { Block } from './build';
 import { type ProjectConfig, resolvePaths } from './config';
-import * as gitProviders from './git-providers';
+import * as providers from './providers';
 
-export type RemoteBlock = Block & { sourceRepo: gitProviders.Info };
+export type RemoteBlock = Block & { sourceRepo: providers.Info };
 
 export type InstallingBlock = {
 	name: string;
@@ -19,7 +19,7 @@ export type InstallingBlock = {
 const resolveTree = async (
 	blockSpecifiers: string[],
 	blocksMap: Map<string, RemoteBlock>,
-	repoPaths: gitProviders.ResolvedRepo[],
+	repoPaths: providers.ResolvedRepo[],
 	installed: Map<string, InstallingBlock> = new Map()
 ): Promise<Result<InstallingBlock[], string>> => {
 	const blocks = new Map<string, InstallingBlock>();
@@ -27,13 +27,15 @@ const resolveTree = async (
 	for (const blockSpecifier of blockSpecifiers) {
 		let block: RemoteBlock | undefined = undefined;
 
+		const provider = providers.providers.find((p) => blockSpecifier.startsWith(p.name()));
+
 		// if the block starts with github (or another provider) we know it has been resolved
-		if (!gitProviders.providers.find((p) => blockSpecifier.startsWith(p.name()))) {
+		if (!provider) {
 			if (repoPaths.length === 0) {
 				return Err(
 					color.red(
-						`If your config doesn't repos then you must provide the repo in the block specifier ex: \`${color.bold(
-							`github/<owner>/<name>/${blockSpecifier}`
+						`If your config doesn't contain repos then you must provide the repo in the block specifier ex: \`${color.bold(
+							`github/ieedan/std/${blockSpecifier}`
 						)}\`!`
 					)
 				);
@@ -41,9 +43,11 @@ const resolveTree = async (
 
 			// check every repo for the block and return the first block found
 			for (const { info: providerInfo } of repoPaths) {
-				const tempBlock = blocksMap.get(
-					`${providerInfo.name}/${providerInfo.owner}/${providerInfo.repoName}/${blockSpecifier}`
+				const [repoIdent, specifier] = providerInfo.provider.parseBlockSpecifier(
+					`${providerInfo.url}/${blockSpecifier}`
 				);
+
+				const tempBlock = blocksMap.get(`${repoIdent}/${specifier}`);
 
 				if (tempBlock === undefined) continue;
 
@@ -53,11 +57,10 @@ const resolveTree = async (
 			}
 		} else {
 			// get shortened name
-			const [providerName, owner, repoName, ...rest] = blockSpecifier.split('/');
+			const [repoIdent, specifier] = provider.parseBlockSpecifier(blockSpecifier);
 
-			block = blocksMap.get(
-				`${providerName}/${owner}/${repoName}/${rest.slice(rest.length - 2).join('/')}`
-			);
+			// just beautifies name a bit
+			block = blocksMap.get(`${repoIdent}/${specifier}`);
 		}
 
 		if (!block) {
@@ -139,4 +142,14 @@ const getInstalled = (
 	return installedBlocks;
 };
 
-export { resolveTree, getInstalled };
+const fullyQualifiedName = (url: string, category: string, name: string) => {
+	let normalizedUrl = url;
+
+	if (normalizedUrl.endsWith('/')) {
+		normalizedUrl = normalizedUrl.slice(0, normalizedUrl.length - 1);
+	}
+
+	return `${normalizedUrl}/${category}/${name}`;
+};
+
+export { resolveTree, getInstalled, fullyQualifiedName };

@@ -9,6 +9,10 @@
 				"type": "string"
 			}
 		},
+		"outputDir": {
+			"description": "The directory to output the registry to. (Copies jsrepo-manifest.json + all required files)",
+			"type": "string"
+		},
 		"includeBlocks": {
 			"description": "The names of the blocks that should be included in the manifest.",
 			"type": "array",

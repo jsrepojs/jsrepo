@@ -4,9 +4,9 @@ import { Command, Option } from 'commander';
 import * as v from 'valibot';
 import { context } from '../cli';
 import * as ascii from '../utils/ascii';
-import { providers } from '../utils/git-providers';
 import * as persisted from '../utils/persisted';
 import { intro } from '../utils/prompts';
+import { http, providers } from '../utils/providers';
 
 const schema = v.object({
 	token: v.optional(v.string()),
@@ -16,12 +16,14 @@ const schema = v.object({
 
 type Options = v.InferInput<typeof schema>;
 
+const authProviders = providers.filter((p) => p.name() !== http.name());
+
 const auth = new Command('auth')
 	.description('Provide a token for access to private repositories.')
 	.option('--token <token>', 'The token to use for authenticating to your provider.')
 	.addOption(
 		new Option('--provider <name>', 'The provider this token belongs to.').choices(
-			providers.map((provider) => provider.name())
+			authProviders.map((provider) => provider.name())
 		)
 	)
 	.option('--logout', 'Erase tokens from each provider from storage.', false)
@@ -39,7 +41,7 @@ const _auth = async (options: Options) => {
 	const storage = persisted.get();
 
 	if (options.logout) {
-		for (const provider of providers) {
+		for (const provider of authProviders) {
 			const tokenKey = `${provider.name()}-token`;
 
 			if (storage.get(tokenKey) === undefined) {
@@ -69,14 +71,14 @@ const _auth = async (options: Options) => {
 		return;
 	}
 
-	if (providers.length > 1) {
+	if (authProviders.length > 1) {
 		const response = await select({
 			message: 'Which provider is this token for?',
-			options: providers.map((provider) => ({
+			options: authProviders.map((provider) => ({
 				label: provider.name(),
 				value: provider.name(),
 			})),
-			initialValue: providers[0].name(),
+			initialValue: authProviders[0].name(),
 		});
 
 		if (isCancel(response)) {
@@ -86,7 +88,7 @@ const _auth = async (options: Options) => {
 
 		options.provider = response;
 	} else {
-		options.provider = providers[0].name();
+		options.provider = authProviders[0].name();
 	}
 
 	if (options.token === undefined) {

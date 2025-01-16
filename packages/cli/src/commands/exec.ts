@@ -1,5 +1,4 @@
 import fs from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import { cancel, confirm, isCancel, select, spinner } from '@clack/prompts';
 import color from 'chalk';
 import { Argument, Command, program } from 'commander';
@@ -14,8 +13,8 @@ import { resolveTree } from '../utils/blocks';
 import { isTestFile } from '../utils/build';
 import { type ProjectConfig, getProjectConfig, resolvePaths } from '../utils/config';
 import { installDependencies } from '../utils/dependencies';
-import * as gitProviders from '../utils/git-providers';
 import { type ConcurrentTask, intro, runTasksConcurrently } from '../utils/prompts';
+import * as providers from '../utils/providers';
 
 const schema = v.objectWithRest(
 	{
@@ -84,7 +83,7 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 	if (options.repo) repoPaths = [options.repo];
 
 	// we are only getting repos for blocks that specified repos
-	if (script && gitProviders.providers.find((p) => script?.startsWith(p.name()))) {
+	if (script && providers.providers.find((p) => script?.startsWith(p.name()))) {
 		const [providerName, owner, repoName, ...rest] = script.split('/');
 
 		let repo: string;
@@ -146,8 +145,8 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 
 	loading.start(`Fetching scripts from ${color.cyan(repoPaths.join(', '))}`);
 
-	const resolvedRepos: gitProviders.ResolvedRepo[] = (
-		await gitProviders.resolvePaths(...repoPaths)
+	const resolvedRepos: providers.ResolvedRepo[] = (
+		await providers.resolvePaths(...repoPaths)
 	).match(
 		(val) => val,
 		({ repo, message }) => {
@@ -156,7 +155,7 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 		}
 	);
 
-	const blocksMap = (await gitProviders.fetchBlocks(...resolvedRepos)).match(
+	const blocksMap = (await providers.fetchBlocks(...resolvedRepos)).match(
 		(val) => val,
 		({ repo, message }) => {
 			loading.stop(`Failed fetching scripts from ${color.cyan(repo)}`);

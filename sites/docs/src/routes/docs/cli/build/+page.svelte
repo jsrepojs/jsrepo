@@ -23,6 +23,20 @@
 		<Snippet command="execute" args={['jsrepo', 'build', '--dirs', './src', './blocks']} />
 	{/snippet}
 </OptionDocs>
+<OptionDocs name="--output-dir">
+	{#snippet description()}
+		Directory to copy the <CodeSpan>jsrepo-manifest.json</CodeSpan> and all required registry files to
+		once the build is complete. This is useful when you want to host your registry on a custom domain
+		from a different directory from where the code actually lives. Corresponding config key: <Link
+			href="/docs/jsrepo-build-config-json#outputDir"
+		>
+			outputDir
+		</Link>
+	{/snippet}
+	{#snippet usage()}
+		<Snippet command="execute" args={['jsrepo', 'build', '--output-dir', './static/new-york']} />
+	{/snippet}
+</OptionDocs>
 <OptionDocs name="--include-blocks">
 	{#snippet description()}
 		Include only the blocks with these names. Corresponding config key: <Link

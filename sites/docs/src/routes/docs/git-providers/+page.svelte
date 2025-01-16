@@ -35,6 +35,11 @@
 			name: 'AzureDevops',
 			href: '/docs/git-providers/azure-devops',
 			status: '⚠️'
+		},
+		{
+			name: 'Self Hosted',
+			href: '/docs/git-providers/self-hosted',
+			status: '✅'
 		}
 	];
 </script>
@@ -59,10 +64,10 @@
 
 <DocHeader
 	title="Git Providers"
-	description="Git Providers that jsrepo supports in your registry."
+	description="Providers that jsrepo supports for serving your registry."
 />
 <p>
-	<Jsrepo /> has to resolve paths to git providers meaning they must be explicity supported.
+	<Jsrepo /> supports a variety of git providers as well as custom urls.
 </p>
 <div class="flex flex-col gap-1">
 	<span>Legend:</span>

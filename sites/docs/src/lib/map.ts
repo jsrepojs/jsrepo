@@ -105,7 +105,7 @@ const categories: Category[] = [
 				href: '/docs/language-support'
 			},
 			{
-				name: 'Git Providers',
+				name: 'Providers',
 				href: '/docs/git-providers',
 				activeForSubdirectories: true,
 				routes: [
@@ -128,6 +128,10 @@ const categories: Category[] = [
 						name: 'AzureDevops',
 						href: '/docs/git-providers/azure-devops',
 						icon: Icons.AzureDevops
+					},
+					{
+						name: 'Self Hosted',
+						href: '/docs/git-providers/self-hosted'
 					}
 				]
 			},

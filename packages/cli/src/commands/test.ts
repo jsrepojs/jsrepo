@@ -10,12 +10,12 @@ import { Project } from 'ts-morph';
 import * as v from 'valibot';
 import { context } from '../cli';
 import * as ascii from '../utils/ascii';
-import { getInstalled } from '../utils/blocks';
+import { fullyQualifiedName, getInstalled } from '../utils/blocks';
 import { type Block, isTestFile } from '../utils/build';
 import { getProjectConfig, resolvePaths } from '../utils/config';
 import { OUTPUT_FILE } from '../utils/context';
-import * as gitProviders from '../utils/git-providers';
 import { intro } from '../utils/prompts';
+import * as providers from '../utils/providers';
 
 const schema = v.object({
 	repo: v.optional(v.string()),
@@ -45,7 +45,7 @@ const test = new Command('test')
 		outro(color.green('All done!'));
 	});
 
-type RemoteBlock = Block & { sourceRepo: gitProviders.Info };
+type RemoteBlock = Block & { sourceRepo: providers.Info };
 
 const _test = async (blockNames: string[], options: Options) => {
 	const verbose = (msg: string) => {
@@ -87,7 +87,7 @@ const _test = async (blockNames: string[], options: Options) => {
 	if (!options.verbose) loading.start(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
 
 	for (const repo of repoPaths) {
-		const providerInfo: gitProviders.Info = (await gitProviders.getProviderInfo(repo)).match(
+		const providerInfo: providers.Info = (await providers.getProviderInfo(repo)).match(
 			(info) => info,
 			(err) => program.error(color.red(err))
 		);
@@ -98,6 +98,7 @@ const _test = async (blockNames: string[], options: Options) => {
 
 		if (manifest.isErr()) {
 			if (!options.verbose) loading.stop(`Error fetching ${color.cyan(repo)}`);
+
 			program.error(
 				color.red(
 					`There was an error fetching the \`${OUTPUT_FILE}\` from the repository ${color.cyan(
@@ -112,13 +113,10 @@ const _test = async (blockNames: string[], options: Options) => {
 		for (const category of categories) {
 			for (const block of category.blocks) {
 				// blocks will override each other
-				blocksMap.set(
-					`${providerInfo.name}/${providerInfo.owner}/${providerInfo.repoName}/${category.name}/${block.name}`,
-					{
-						...block,
-						sourceRepo: providerInfo,
-					}
-				);
+				blocksMap.set(fullyQualifiedName(providerInfo.url, category.name, block.name), {
+					...block,
+					sourceRepo: providerInfo,
+				});
 			}
 		}
 	}
@@ -160,14 +158,20 @@ const _test = async (blockNames: string[], options: Options) => {
 	for (const blockSpecifier of testingBlocks) {
 		let block: RemoteBlock | undefined = undefined;
 
+		const provider = providers.providers.find((p) => blockSpecifier.startsWith(p.name()));
+
 		// if the block starts with github (or another provider) we know it has been resolved
-		if (!gitProviders.providers.find((p) => blockSpecifier.startsWith(p.name()))) {
+		if (!provider) {
 			for (const repo of repoPaths) {
 				// we unwrap because we already checked this
-				const providerInfo = (await gitProviders.getProviderInfo(repo)).unwrap();
+				const providerInfo = (await providers.getProviderInfo(repo)).unwrap();
+
+				const [parsedRepo] = providerInfo.provider.parseBlockSpecifier(providerInfo.url);
+
+				const [category, blockName] = blockSpecifier.split('/');
 
 				const tempBlock = blocksMap.get(
-					`${providerInfo.name}/${providerInfo.owner}/${providerInfo.repoName}/${blockSpecifier}`
+					fullyQualifiedName(parsedRepo, category, blockName)
 				);
 
 				if (tempBlock === undefined) continue;
@@ -177,37 +181,24 @@ const _test = async (blockNames: string[], options: Options) => {
 				break;
 			}
 		} else {
-			if (repoPaths.length === 0) {
-				const [providerName, owner, repoName, ...rest] = blockSpecifier.split('/');
+			const [repo] = provider.parseBlockSpecifier(blockSpecifier);
 
-				let repo: string;
-				// if rest is greater than 2 it isn't the block specifier so it is part of the path
-				if (rest.length > 2) {
-					repo = `${providerName}/${owner}/${repoName}/${rest.slice(0, rest.length - 2).join('/')}`;
-				} else {
-					repo = `${providerName}/${owner}/${repoName}`;
-				}
+			const providerInfo = (await providers.getProviderInfo(repo)).match(
+				(val) => val,
+				(err) => program.error(color.red(err))
+			);
 
-				const providerInfo = (await gitProviders.getProviderInfo(repo)).match(
-					(val) => val,
-					(err) => program.error(color.red(err))
-				);
+			const categories = (await providerInfo.provider.fetchManifest(providerInfo)).match(
+				(val) => val,
+				(err) => program.error(color.red(err))
+			);
 
-				const categories = (await providerInfo.provider.fetchManifest(providerInfo)).match(
-					(val) => val,
-					(err) => program.error(color.red(err))
-				);
-
-				for (const category of categories) {
-					for (const block of category.blocks) {
-						blocksMap.set(
-							`${providerInfo.name}/${providerInfo.owner}/${providerInfo.repoName}/${category.name}/${block.name}`,
-							{
-								...block,
-								sourceRepo: providerInfo,
-							}
-						);
-					}
+			for (const category of categories) {
+				for (const block of category.blocks) {
+					blocksMap.set(fullyQualifiedName(repo, block.category, block.name), {
+						...block,
+						sourceRepo: providerInfo,
+					});
 				}
 			}
 
@@ -234,7 +225,7 @@ const _test = async (blockNames: string[], options: Options) => {
 	for (const { block } of testingBlocksMapped) {
 		const providerInfo = block.sourceRepo;
 
-		const fullSpecifier = `${block.sourceRepo.url}/${block.category}/${block.name}`;
+		const fullSpecifier = fullyQualifiedName(block.sourceRepo.url, block.category, block.name);
 
 		if (!options.verbose) {
 			loading.start(`Setting up test file for ${color.cyan(fullSpecifier)}`);

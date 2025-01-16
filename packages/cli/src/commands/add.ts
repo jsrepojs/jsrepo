@@ -31,7 +31,6 @@ import { installDependencies } from '../utils/dependencies';
 import { transformRemoteContent } from '../utils/files';
 import { loadFormatterConfig } from '../utils/format';
 import { getWatermark } from '../utils/get-watermark';
-import * as gitProviders from '../utils/git-providers';
 import { returnShouldInstall } from '../utils/package';
 import * as persisted from '../utils/persisted';
 import {
@@ -41,6 +40,7 @@ import {
 	runTasksConcurrently,
 	truncatedList,
 } from '../utils/prompts';
+import * as providers from '../utils/providers';
 
 const schema = v.object({
 	repo: v.optional(v.string()),
@@ -73,7 +73,7 @@ const add = new Command('add')
 		outro(color.green('All done!'));
 	});
 
-type RemoteBlock = Block & { sourceRepo: gitProviders.Info };
+type RemoteBlock = Block & { sourceRepo: providers.Info };
 
 const _add = async (blockNames: string[], options: Options) => {
 	const verbose = (msg: string) => {
@@ -130,26 +130,31 @@ const _add = async (blockNames: string[], options: Options) => {
 	}
 
 	let repoPaths = config.repos;
+	const mustResolveRepos = new Set<string>();
+	let resolveAllRepos = false;
 
 	// we just want to override all others if supplied via the CLI
-	if (options.repo) repoPaths = [options.repo];
+	if (options.repo) {
+		repoPaths = [options.repo];
+	}
 
 	// resolve repos for blocks
 	for (const blockSpecifier of blockNames) {
+		const provider = providers.providers.find((p) => blockSpecifier.startsWith(p.name()));
+
 		// we are only getting repos for blocks that specified repos
-		if (!gitProviders.providers.find((p) => blockSpecifier.startsWith(p.name()))) continue;
-
-		const [providerName, owner, repoName, ...rest] = blockSpecifier.split('/');
-
-		let repo: string;
-		// if rest is greater than 2 it isn't the block specifier so it is part of the path
-		if (rest.length > 2) {
-			repo = `${providerName}/${owner}/${repoName}/${rest.slice(0, rest.length - 2).join('/')}`;
-		} else {
-			repo = `${providerName}/${owner}/${repoName}`;
+		if (!provider) {
+			// if a block doesn't specify a repo we must resolve all
+			resolveAllRepos = true;
+			continue;
 		}
 
-		if (!repoPaths.find((repoPath) => repoPath === repo)) {
+		const [repo] = provider.parseBlockSpecifier(blockSpecifier);
+
+		const alreadyExists =
+			!config.repos.find((repoPath) => repoPath === repo) && !mustResolveRepos.has(repo);
+
+		if (!alreadyExists) {
 			if (!options.allow) {
 				const result = await confirm({
 					message: `Allow ${ascii.JSREPO} to download and run code from ${color.cyan(repo)}?`,
@@ -162,8 +167,16 @@ const _add = async (blockNames: string[], options: Options) => {
 				}
 			}
 
+			// only add if it doesn't exist
 			repoPaths.push(repo);
 		}
+
+		// this way we add the config.repos as well
+		mustResolveRepos.add(repo);
+	}
+
+	if (!resolveAllRepos && blockNames.length > 0) {
+		repoPaths = Array.from(mustResolveRepos);
 	}
 
 	if (!options.allow && options.repo) {
@@ -202,8 +215,8 @@ const _add = async (blockNames: string[], options: Options) => {
 
 	if (!options.verbose) loading.start(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
 
-	const resolvedRepos: gitProviders.ResolvedRepo[] = (
-		await gitProviders.resolvePaths(...repoPaths)
+	const resolvedRepos: providers.ResolvedRepo[] = (
+		await providers.resolvePaths(...repoPaths)
 	).match(
 		(val) => val,
 		({ repo, message }) => {
@@ -217,7 +230,7 @@ const _add = async (blockNames: string[], options: Options) => {
 	verbose(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
 
 	const blocksMap: Map<string, RemoteBlock> = (
-		await gitProviders.fetchBlocks(...resolvedRepos)
+		await providers.fetchBlocks(...resolvedRepos)
 	).match(
 		(val) => val,
 		({ repo, message }) => {
@@ -230,9 +243,7 @@ const _add = async (blockNames: string[], options: Options) => {
 
 	verbose(`Retrieved blocks from ${color.cyan(repoPaths.join(', '))}`);
 
-	const installedBlocks = getInstalled(blocksMap, config, options.cwd).map(
-		(val) => val.specifier
-	);
+	let installedBlocks = getInstalled(blocksMap, config, options.cwd).map((val) => val.specifier);
 
 	let installingBlockNames = blockNames;
 
@@ -385,6 +396,9 @@ const _add = async (blockNames: string[], options: Options) => {
 		}
 
 		store.set(zeroConfigKey, config);
+
+		// re-run to get installed blocks at the provided path
+		installedBlocks = getInstalled(blocksMap, config, options.cwd).map((val) => val.specifier);
 	}
 
 	const { prettierOptions, biomeOptions } = await loadFormatterConfig({
