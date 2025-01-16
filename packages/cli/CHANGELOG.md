@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.26.2
+
+### Patch Changes
+
+- 8e3c183: Improve error message when fetching for a self-hosted registry.
+
 ## 1.26.1
 
 ### Patch Changes
