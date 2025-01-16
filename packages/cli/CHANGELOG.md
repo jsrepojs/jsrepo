@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.26.5
+
+### Patch Changes
+
+- 881e470: Fix url handling (again).
+
 ## 1.26.4
 
 ### Patch Changes
