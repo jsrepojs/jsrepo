@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.26.1
+
+### Patch Changes
+
+- 36771a9: Fix an issue where aliases with an extension could cause the build to fail.
+
 ## 1.26.0
 
 ### Minor Changes
