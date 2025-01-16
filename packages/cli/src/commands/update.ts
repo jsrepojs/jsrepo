@@ -10,6 +10,7 @@ import * as v from 'valibot';
 import { context } from '../cli';
 import * as ascii from '../utils/ascii';
 import { type RemoteBlock, getInstalled, resolveTree } from '../utils/blocks';
+import * as url from '../utils/blocks/utils/url';
 import { isTestFile } from '../utils/build';
 import { getProjectConfig, resolvePaths } from '../utils/config';
 import { installDependencies } from '../utils/dependencies';
@@ -205,7 +206,7 @@ const _update = async (blockNames: string[], options: Options) => {
 	const resolvedPaths = resolvedPathsResult.unwrap();
 
 	for (const { block } of updatingBlocks) {
-		const fullSpecifier = `${block.sourceRepo.url}/${block.category}/${block.name}`;
+		const fullSpecifier = url.join(block.sourceRepo.url, block.category, block.name);
 
 		const watermark = getWatermark(context.package.version, block.sourceRepo.url);
 

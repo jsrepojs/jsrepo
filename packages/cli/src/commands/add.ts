@@ -19,6 +19,7 @@ import * as v from 'valibot';
 import { context } from '../cli';
 import * as ascii from '../utils/ascii';
 import { getInstalled, resolveTree } from '../utils/blocks';
+import * as url from '../utils/blocks/utils/url';
 import { type Block, isTestFile } from '../utils/build';
 import {
 	type Formatter,
@@ -290,8 +291,6 @@ const _add = async (blockNames: string[], options: Options) => {
 
 	verbose(`Installing blocks ${color.cyan(installingBlockNames.join(', '))}`);
 
-	if (options.verbose) console.log('Blocks map: ', blocksMap);
-
 	const installingBlocks = (
 		await resolveTree(installingBlockNames, blocksMap, resolvedRepos)
 	).match(
@@ -419,7 +418,7 @@ const _add = async (blockNames: string[], options: Options) => {
 	let overwriteAll: boolean | undefined;
 
 	for (const { block } of installingBlocks) {
-		const fullSpecifier = `${block.sourceRepo.url}/${block.category}/${block.name}`;
+		const fullSpecifier = url.join(block.sourceRepo.url, block.category, block.name);
 		const shortSpecifier = `${block.category}/${block.name}`;
 		const watermark = getWatermark(context.package.version, block.sourceRepo.url);
 
