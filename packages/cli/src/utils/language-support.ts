@@ -585,23 +585,17 @@ const resolveLocalImport = (
 		return Ok(parsePath(modPath.slice(fullDir.length), dropExtension));
 	}
 
-	if (alias) {
-		for (const dir of dirs) {
-			const containingPath = path.resolve(path.join(cwd, dir));
-			const absPath = path.resolve(modPath);
+	for (const dir of dirs) {
+		const containingPath = path.resolve(path.join(cwd, dir));
+		const absPath = path.resolve(modPath);
 
-			if (absPath.startsWith(containingPath)) {
-				return Ok(parsePath(absPath.slice(containingPath.length + 1), dropExtension));
-			}
+		if (absPath.startsWith(containingPath)) {
+			return Ok(parsePath(absPath.slice(containingPath.length + 1), dropExtension));
 		}
-
-		return Err(
-			`${filePath}:\n${alias} references code not contained in ${color.bold(dirs.join(', '))} and cannot be resolved.`
-		);
 	}
 
 	return Err(
-		`${filePath}:\n${mod} references code not contained in ${categoryDir} and cannot be resolved.`
+		`${filePath}:\n${alias ? alias : mod} references code not contained in ${color.bold(dirs.join(', '))} and cannot be resolved.`
 	);
 };
 
