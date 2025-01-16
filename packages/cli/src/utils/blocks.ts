@@ -4,10 +4,10 @@ import { program } from 'commander';
 import path from 'pathe';
 import { Err, Ok, type Result } from './blocks/types/result';
 import { mapToArray } from './blocks/utils/map-to-array';
+import * as url from './blocks/utils/url';
 import type { Block } from './build';
 import { type ProjectConfig, resolvePaths } from './config';
 import * as providers from './providers';
-import { removeTrailingSlash } from './url';
 
 export type RemoteBlock = Block & { sourceRepo: providers.Info };
 
@@ -45,7 +45,7 @@ const resolveTree = async (
 			// check every repo for the block and return the first block found
 			for (const { info: providerInfo } of repoPaths) {
 				const [repoIdent, specifier] = providerInfo.provider.parseBlockSpecifier(
-					`${providerInfo.url}/${blockSpecifier}`
+					url.join(providerInfo.url, blockSpecifier)
 				);
 
 				const tempBlock = blocksMap.get(`${repoIdent}/${specifier}`);
@@ -61,7 +61,7 @@ const resolveTree = async (
 			const [repoIdent, specifier] = provider.parseBlockSpecifier(blockSpecifier);
 
 			// just beautifies name a bit
-			block = blocksMap.get(`${repoIdent}/${specifier}`);
+			block = blocksMap.get(url.join(repoIdent, specifier));
 		}
 
 		if (!block) {
@@ -143,8 +143,4 @@ const getInstalled = (
 	return installedBlocks;
 };
 
-const fullyQualifiedName = (url: string, category: string, name: string) => {
-	return `${removeTrailingSlash(url)}/${category}/${name}`;
-};
-
-export { resolveTree, getInstalled, fullyQualifiedName };
+export { resolveTree, getInstalled };

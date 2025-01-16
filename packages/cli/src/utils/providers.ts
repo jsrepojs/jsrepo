@@ -4,10 +4,10 @@ import { Octokit } from 'octokit';
 import * as v from 'valibot';
 import type { RemoteBlock } from './blocks';
 import { Err, Ok, type Result } from './blocks/types/result';
+import * as u from './blocks/utils/url';
 import { type Category, categorySchema } from './build';
 import { OUTPUT_FILE } from './context';
 import * as persisted from './persisted';
-import { addTrailingSlash, removeTrailingSlash } from './url';
 
 export type Info = {
 	refs: 'tags' | 'heads';
@@ -641,7 +641,7 @@ const http: Provider = {
 
 		return {
 			name: http.name(),
-			url: addTrailingSlash(path),
+			url: u.addTrailingSlash(path),
 			provider: http,
 
 			// nothing else is important
@@ -727,10 +727,10 @@ const fetchBlocks = async (
 		for (const category of categories) {
 			for (const block of category.blocks) {
 				const [repoIdent, blockSpecifier] = info.provider.parseBlockSpecifier(
-					`${info.url}/${block.category}/${block.name}`
+					u.join(info.url, block.category, block.name)
 				);
 
-				blocksMap.set(`${repoIdent}/${blockSpecifier}`, {
+				blocksMap.set(u.join(repoIdent, blockSpecifier), {
 					...block,
 					sourceRepo: info,
 				});

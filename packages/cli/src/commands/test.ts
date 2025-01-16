@@ -10,7 +10,8 @@ import { Project } from 'ts-morph';
 import * as v from 'valibot';
 import { context } from '../cli';
 import * as ascii from '../utils/ascii';
-import { fullyQualifiedName, getInstalled } from '../utils/blocks';
+import { getInstalled } from '../utils/blocks';
+import * as url from '../utils/blocks/utils/url';
 import { type Block, isTestFile } from '../utils/build';
 import { getProjectConfig, resolvePaths } from '../utils/config';
 import { OUTPUT_FILE } from '../utils/context';
@@ -113,7 +114,7 @@ const _test = async (blockNames: string[], options: Options) => {
 		for (const category of categories) {
 			for (const block of category.blocks) {
 				// blocks will override each other
-				blocksMap.set(fullyQualifiedName(providerInfo.url, category.name, block.name), {
+				blocksMap.set(url.join(providerInfo.url, category.name, block.name), {
 					...block,
 					sourceRepo: providerInfo,
 				});
@@ -170,9 +171,7 @@ const _test = async (blockNames: string[], options: Options) => {
 
 				const [category, blockName] = blockSpecifier.split('/');
 
-				const tempBlock = blocksMap.get(
-					fullyQualifiedName(parsedRepo, category, blockName)
-				);
+				const tempBlock = blocksMap.get(url.join(parsedRepo, category, blockName));
 
 				if (tempBlock === undefined) continue;
 
@@ -195,7 +194,7 @@ const _test = async (blockNames: string[], options: Options) => {
 
 			for (const category of categories) {
 				for (const block of category.blocks) {
-					blocksMap.set(fullyQualifiedName(repo, block.category, block.name), {
+					blocksMap.set(url.join(repo, block.category, block.name), {
 						...block,
 						sourceRepo: providerInfo,
 					});
@@ -225,7 +224,7 @@ const _test = async (blockNames: string[], options: Options) => {
 	for (const { block } of testingBlocksMapped) {
 		const providerInfo = block.sourceRepo;
 
-		const fullSpecifier = fullyQualifiedName(block.sourceRepo.url, block.category, block.name);
+		const fullSpecifier = url.join(block.sourceRepo.url, block.category, block.name);
 
 		if (!options.verbose) {
 			loading.start(`Setting up test file for ${color.cyan(fullSpecifier)}`);
