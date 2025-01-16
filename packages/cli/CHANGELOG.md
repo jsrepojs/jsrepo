@@ -1,5 +1,18 @@
 # jsrepo
 
+## 1.26.0
+
+### Minor Changes
+
+- 57c21d6: Support for self-hosted registries. 🎉
+- ad0ba56: Add `outputDir` config key to allow copying the registry to a different location on build. Useful for hosting registries on your own domain.
+
+### Patch Changes
+
+- 449e1a5: Add tests for `add` and `build` commands.
+- c208ee4: When adding blocks with zero-config you will now be prompted before overwriting an existing block
+- 57c21d6: When supplying a fully qualified block while using a config. Repos in the config are no longer fetched unless necessary.
+
 ## 1.25.0
 
 ### Minor Changes
