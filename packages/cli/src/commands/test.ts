@@ -168,7 +168,11 @@ const _test = async (blockNames: string[], options: Options) => {
 
 				const [parsedRepo] = providerInfo.provider.parseBlockSpecifier(providerInfo.url);
 
-				const tempBlock = blocksMap.get(new URL(blockSpecifier, parsedRepo).toString());
+				const [category, blockName] = blockSpecifier.split('/');
+
+				const tempBlock = blocksMap.get(
+					fullyQualifiedName(parsedRepo, category, blockName)
+				);
 
 				if (tempBlock === undefined) continue;
 

@@ -143,7 +143,13 @@ const getInstalled = (
 };
 
 const fullyQualifiedName = (url: string, category: string, name: string) => {
-	return new URL(`${category}/${name}`, url).toString();
+	let normalizedUrl = url;
+
+	if (normalizedUrl.endsWith('/')) {
+		normalizedUrl = normalizedUrl.slice(0, normalizedUrl.length - 1);
+	}
+
+	return `${normalizedUrl}/${category}/${name}`;
 };
 
 export { resolveTree, getInstalled, fullyQualifiedName };
