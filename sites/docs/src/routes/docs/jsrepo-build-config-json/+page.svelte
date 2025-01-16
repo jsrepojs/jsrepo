@@ -39,6 +39,21 @@
     ]
 }`}
 />
+<SubHeading>outputDir</SubHeading>
+<p>
+	<CodeSpan>outputDir</CodeSpan> is an optional key that allows you to copy the resulting
+	<CodeSpan>jsrepo-manifest.json</CodeSpan> and any required files to a custom directory.
+</p>
+<p>
+	This is useful if you want to host the registry in a different location from where the code
+	actually lives. (This should NOT be used when hosting your registry from a git repository)
+</p>
+<Code
+	lang="json"
+	code={`{
+    "outputDir": "./static/new-york"
+}`}
+/>
 <SubHeading>listBlocks</SubHeading>
 <p>
 	<CodeSpan>listBlocks</CodeSpan> is a list of block names that should be listed when the user runs the
