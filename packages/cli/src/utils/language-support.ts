@@ -595,7 +595,7 @@ const resolveLocalImport = (
 	}
 
 	return Err(
-		`${filePath}:\n${alias} references code not contained in ${color.bold(dirs.join(', '))} and cannot be resolved.`
+		`${filePath}:\n${alias ? alias : mod} references code not contained in ${color.bold(dirs.join(', '))} and cannot be resolved.`
 	);
 };
 
