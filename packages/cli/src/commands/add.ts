@@ -40,7 +40,7 @@ import {
 	runTasksConcurrently,
 	truncatedList,
 } from '../utils/prompts';
-import * as gitProviders from '../utils/providers';
+import * as providers from '../utils/providers';
 
 const schema = v.object({
 	repo: v.optional(v.string()),
@@ -73,7 +73,7 @@ const add = new Command('add')
 		outro(color.green('All done!'));
 	});
 
-type RemoteBlock = Block & { sourceRepo: gitProviders.Info };
+type RemoteBlock = Block & { sourceRepo: providers.Info };
 
 const _add = async (blockNames: string[], options: Options) => {
 	const verbose = (msg: string) => {
@@ -140,7 +140,7 @@ const _add = async (blockNames: string[], options: Options) => {
 
 	// resolve repos for blocks
 	for (const blockSpecifier of blockNames) {
-		const provider = gitProviders.providers.find((p) => blockSpecifier.startsWith(p.name()));
+		const provider = providers.providers.find((p) => blockSpecifier.startsWith(p.name()));
 
 		// we are only getting repos for blocks that specified repos
 		if (!provider) {
@@ -215,8 +215,8 @@ const _add = async (blockNames: string[], options: Options) => {
 
 	if (!options.verbose) loading.start(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
 
-	const resolvedRepos: gitProviders.ResolvedRepo[] = (
-		await gitProviders.resolvePaths(...repoPaths)
+	const resolvedRepos: providers.ResolvedRepo[] = (
+		await providers.resolvePaths(...repoPaths)
 	).match(
 		(val) => val,
 		({ repo, message }) => {
@@ -230,7 +230,7 @@ const _add = async (blockNames: string[], options: Options) => {
 	verbose(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
 
 	const blocksMap: Map<string, RemoteBlock> = (
-		await gitProviders.fetchBlocks(...resolvedRepos)
+		await providers.fetchBlocks(...resolvedRepos)
 	).match(
 		(val) => val,
 		({ repo, message }) => {

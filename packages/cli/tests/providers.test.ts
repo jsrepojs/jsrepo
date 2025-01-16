@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import * as gitProviders from '../src/utils/providers';
+import * as providers from '../src/utils/providers';
 
 describe('github', () => {
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'github/ieedan/std';
 
-		const info = await gitProviders.github.info(repoURL);
+		const info = await providers.github.info(repoURL);
 
-		const content = await gitProviders.github.fetchManifest(info);
+		const content = await providers.github.fetchManifest(info);
 
 		expect(content.isErr()).toBe(false);
 	});
@@ -15,9 +15,9 @@ describe('github', () => {
 	it('Fetches the manifest from a public repo with a tag', async () => {
 		const repoURL = 'https://github.com/ieedan/std/tree/v1.6.0';
 
-		const info = await gitProviders.github.info(repoURL);
+		const info = await providers.github.info(repoURL);
 
-		const content = await gitProviders.github.fetchRaw(info, 'jsrepo-manifest.json');
+		const content = await providers.github.fetchRaw(info, 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{
@@ -206,9 +206,9 @@ describe('gitlab', () => {
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'gitlab/ieedan/std';
 
-		const info = await gitProviders.gitlab.info(repoURL);
+		const info = await providers.gitlab.info(repoURL);
 
-		const content = await gitProviders.gitlab.fetchManifest(info);
+		const content = await providers.gitlab.fetchManifest(info);
 
 		expect(content.isErr()).toBe(false);
 	});
@@ -216,9 +216,9 @@ describe('gitlab', () => {
 	it('Fetches the manifest from a public repo with a tag', async () => {
 		const repoURL = 'https://gitlab.com/ieedan/std/-/tree/v1.6.0';
 
-		const info = await gitProviders.gitlab.info(repoURL);
+		const info = await providers.gitlab.info(repoURL);
 
-		const content = await gitProviders.gitlab.fetchRaw(info, 'jsrepo-manifest.json');
+		const content = await providers.gitlab.fetchRaw(info, 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{
@@ -407,9 +407,9 @@ describe('bitbucket', () => {
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'bitbucket/ieedan/std';
 
-		const info = await gitProviders.bitbucket.info(repoURL);
+		const info = await providers.bitbucket.info(repoURL);
 
-		const content = await gitProviders.bitbucket.fetchManifest(info);
+		const content = await providers.bitbucket.fetchManifest(info);
 
 		expect(content.isErr()).toBe(false);
 	});
@@ -417,9 +417,9 @@ describe('bitbucket', () => {
 	it('Fetches the manifest from a public repo with a tag', async () => {
 		const repoURL = 'https://bitbucket.org/ieedan/std/src/v1.6.0';
 
-		const info = await gitProviders.bitbucket.info(repoURL);
+		const info = await providers.bitbucket.info(repoURL);
 
-		const content = await gitProviders.bitbucket.fetchRaw(info, 'jsrepo-manifest.json');
+		const content = await providers.bitbucket.fetchRaw(info, 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{
@@ -608,9 +608,9 @@ describe('azure', () => {
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'azure/ieedan/std/std';
 
-		const info = await gitProviders.azure.info(repoURL);
+		const info = await providers.azure.info(repoURL);
 
-		const content = await gitProviders.azure.fetchManifest(info);
+		const content = await providers.azure.fetchManifest(info);
 
 		expect(content.isErr()).toBe(false);
 	});
@@ -618,9 +618,9 @@ describe('azure', () => {
 	it('Fetches the manifest from a public repo with a tag', async () => {
 		const repoURL = 'azure/ieedan/std/std/tags/v1.6.0';
 
-		const info = await gitProviders.azure.info(repoURL);
+		const info = await providers.azure.info(repoURL);
 
-		const content = await gitProviders.azure.fetchRaw(info, 'jsrepo-manifest.json');
+		const content = await providers.azure.fetchRaw(info, 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{
@@ -809,9 +809,9 @@ describe('http', () => {
 	it('Fetches the manifest', async () => {
 		const repoURL = 'https://jsrepo-http.vercel.app';
 
-		const info = await gitProviders.http.info(repoURL);
+		const info = await providers.http.info(repoURL);
 
-		const content = await gitProviders.http.fetchRaw(info, 'jsrepo-manifest.json');
+		const content = await providers.http.fetchRaw(info, 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{

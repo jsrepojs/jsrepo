@@ -19,7 +19,7 @@ import { loadFormatterConfig } from '../utils/format';
 import { getWatermark } from '../utils/get-watermark';
 import { returnShouldInstall } from '../utils/package';
 import { type Task, intro, nextSteps, runTasks } from '../utils/prompts';
-import * as gitProviders from '../utils/providers';
+import * as providers from '../utils/providers';
 
 const schema = v.object({
 	all: v.boolean(),
@@ -85,7 +85,7 @@ const _update = async (blockNames: string[], options: Options) => {
 
 	// ensure blocks do not provide repos
 	for (const blockSpecifier of blockNames) {
-		if (gitProviders.providers.find((p) => blockSpecifier.startsWith(p.name()))) {
+		if (providers.providers.find((p) => blockSpecifier.startsWith(p.name()))) {
 			program.error(
 				color.red(
 					`Invalid value provided for block names \`${color.bold(blockSpecifier)}\`. Block names are expected to be provided in the format of \`${color.bold('<category>/<name>')}\``
@@ -110,8 +110,8 @@ const _update = async (blockNames: string[], options: Options) => {
 
 	if (!options.verbose) loading.start(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
 
-	const resolvedRepos: gitProviders.ResolvedRepo[] = (
-		await gitProviders.resolvePaths(...repoPaths)
+	const resolvedRepos: providers.ResolvedRepo[] = (
+		await providers.resolvePaths(...repoPaths)
 	).match(
 		(val) => val,
 		({ repo, message }) => {
@@ -125,7 +125,7 @@ const _update = async (blockNames: string[], options: Options) => {
 	verbose(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
 
 	const blocksMap: Map<string, RemoteBlock> = (
-		await gitProviders.fetchBlocks(...resolvedRepos)
+		await providers.fetchBlocks(...resolvedRepos)
 	).match(
 		(val) => val,
 		({ repo, message }) => {

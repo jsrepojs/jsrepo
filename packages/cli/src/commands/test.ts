@@ -15,7 +15,7 @@ import { type Block, isTestFile } from '../utils/build';
 import { getProjectConfig, resolvePaths } from '../utils/config';
 import { OUTPUT_FILE } from '../utils/context';
 import { intro } from '../utils/prompts';
-import * as gitProviders from '../utils/providers';
+import * as providers from '../utils/providers';
 
 const schema = v.object({
 	repo: v.optional(v.string()),
@@ -45,7 +45,7 @@ const test = new Command('test')
 		outro(color.green('All done!'));
 	});
 
-type RemoteBlock = Block & { sourceRepo: gitProviders.Info };
+type RemoteBlock = Block & { sourceRepo: providers.Info };
 
 const _test = async (blockNames: string[], options: Options) => {
 	const verbose = (msg: string) => {
@@ -87,7 +87,7 @@ const _test = async (blockNames: string[], options: Options) => {
 	if (!options.verbose) loading.start(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
 
 	for (const repo of repoPaths) {
-		const providerInfo: gitProviders.Info = (await gitProviders.getProviderInfo(repo)).match(
+		const providerInfo: providers.Info = (await providers.getProviderInfo(repo)).match(
 			(info) => info,
 			(err) => program.error(color.red(err))
 		);
@@ -158,13 +158,13 @@ const _test = async (blockNames: string[], options: Options) => {
 	for (const blockSpecifier of testingBlocks) {
 		let block: RemoteBlock | undefined = undefined;
 
-		const provider = gitProviders.providers.find((p) => blockSpecifier.startsWith(p.name()));
+		const provider = providers.providers.find((p) => blockSpecifier.startsWith(p.name()));
 
 		// if the block starts with github (or another provider) we know it has been resolved
 		if (!provider) {
 			for (const repo of repoPaths) {
 				// we unwrap because we already checked this
-				const providerInfo = (await gitProviders.getProviderInfo(repo)).unwrap();
+				const providerInfo = (await providers.getProviderInfo(repo)).unwrap();
 
 				const [parsedRepo] = providerInfo.provider.parseBlockSpecifier(providerInfo.url);
 
@@ -179,7 +179,7 @@ const _test = async (blockNames: string[], options: Options) => {
 		} else {
 			const [repo] = provider.parseBlockSpecifier(blockSpecifier);
 
-			const providerInfo = (await gitProviders.getProviderInfo(repo)).match(
+			const providerInfo = (await providers.getProviderInfo(repo)).match(
 				(val) => val,
 				(err) => program.error(color.red(err))
 			);

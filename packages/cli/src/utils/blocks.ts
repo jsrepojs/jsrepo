@@ -6,9 +6,9 @@ import { Err, Ok, type Result } from './blocks/types/result';
 import { mapToArray } from './blocks/utils/map-to-array';
 import type { Block } from './build';
 import { type ProjectConfig, resolvePaths } from './config';
-import * as gitProviders from './providers';
+import * as providers from './providers';
 
-export type RemoteBlock = Block & { sourceRepo: gitProviders.Info };
+export type RemoteBlock = Block & { sourceRepo: providers.Info };
 
 export type InstallingBlock = {
 	name: string;
@@ -19,7 +19,7 @@ export type InstallingBlock = {
 const resolveTree = async (
 	blockSpecifiers: string[],
 	blocksMap: Map<string, RemoteBlock>,
-	repoPaths: gitProviders.ResolvedRepo[],
+	repoPaths: providers.ResolvedRepo[],
 	installed: Map<string, InstallingBlock> = new Map()
 ): Promise<Result<InstallingBlock[], string>> => {
 	const blocks = new Map<string, InstallingBlock>();
@@ -27,7 +27,7 @@ const resolveTree = async (
 	for (const blockSpecifier of blockSpecifiers) {
 		let block: RemoteBlock | undefined = undefined;
 
-		const provider = gitProviders.providers.find((p) => blockSpecifier.startsWith(p.name()));
+		const provider = providers.providers.find((p) => blockSpecifier.startsWith(p.name()));
 
 		// if the block starts with github (or another provider) we know it has been resolved
 		if (!provider) {
