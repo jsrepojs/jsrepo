@@ -2,8 +2,8 @@ import fs from 'node:fs';
 import path from 'pathe';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { cli } from '../src/cli';
-import type { RegistryConfig } from '../src/utils/config';
 import type { Category } from '../src/utils/build';
+import type { RegistryConfig } from '../src/utils/config';
 
 describe('add', () => {
 	const testDir = path.join(__dirname, '../temp-test/build');

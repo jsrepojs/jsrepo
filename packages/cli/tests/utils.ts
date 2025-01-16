@@ -1,5 +1,5 @@
-import { expect } from 'vitest';
 import fs from 'node:fs';
+import { expect } from 'vitest';
 
 export const assertFilesExist = (dir: string, ...files: string[]) => {
 	const fileSet = new Set(files);
