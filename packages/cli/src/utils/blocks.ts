@@ -34,8 +34,8 @@ const resolveTree = async (
 			if (repoPaths.length === 0) {
 				return Err(
 					color.red(
-						`If your config doesn't repos then you must provide the repo in the block specifier ex: \`${color.bold(
-							`github/<owner>/<name>/${blockSpecifier}`
+						`If your config doesn't contain repos then you must provide the repo in the block specifier ex: \`${color.bold(
+							`github/ieedan/std/${blockSpecifier}`
 						)}\`!`
 					)
 				);
