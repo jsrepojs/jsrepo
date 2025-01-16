@@ -93,7 +93,7 @@ export const log = (msg: string) => console.info(color.cyan(msg));`
 
 		fs.writeFileSync(
 			'./src/utils/math.ts',
-			`import type { Point } from "$types/point";
+			`import type { Point } from "$types/point.js";
 
 export const createPoint = (x: number, y: number): Point => { x, y };`
 		);
@@ -176,7 +176,7 @@ export const createPoint = (x: number, y: number): Point => { x, y };`
 						files: ['math.ts'],
 						localDependencies: ['types/point'],
 						_imports_: {
-							'$types/point': '{{types/point}}',
+							'$types/point.js': '{{types/point}}.js',
 						},
 						dependencies: [],
 						devDependencies: [],
