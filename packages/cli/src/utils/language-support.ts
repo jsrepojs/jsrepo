@@ -679,7 +679,11 @@ const tryResolveLocalAlias = (
 			);
 
 			// if it is not equal the extension has already been dropped
-			const shouldDropExtension = foundMod.prettyPath === foundMod.path;
+			// we omit the '' extension because it there is no extension there is nothing to be dropped
+			const shouldDropExtension = resolutionEquality(foundMod.prettyPath, foundMod.path, [
+				'.js',
+				'.ts',
+			]);
 
 			const localDep = resolveLocalImport(pathResolved, isSubDir, {
 				filePath,
@@ -699,6 +703,28 @@ const tryResolveLocalAlias = (
 	}
 
 	return Ok(undefined);
+};
+
+/** Node allows no extension or a .js extension or a .ts extension to all resolve to the same place because of this we employ a different method of equality.
+ *
+ *  Basically we want to treat a path with a .js extension as equal to the same path with a .ts extension and vise versa.
+ */
+const resolutionEquality = (pathA: string, pathB: string, validExtensions = ['.ts', '.js', '']) => {
+	if (pathA === pathB) return true;
+
+	const parsedA = path.parse(pathA);
+	const parsedB = path.parse(pathB);
+
+	const pathAWithoutExtension = path.join(parsedA.dir, parsedA.name);
+	const pathBWithoutExtension = path.join(parsedB.dir, parsedB.name);
+
+	// if paths without extension aren't equal then return false
+	if (pathAWithoutExtension !== pathBWithoutExtension) return false;
+
+	// as long as both paths have a .js or .ts extension we can be sure that they are equal
+	if (validExtensions.includes(parsedA.ext) && validExtensions.includes(parsedB.ext)) return true;
+
+	return false;
 };
 
 /** Searches around for the module
@@ -835,4 +861,17 @@ const resolveRemoteDeps = (
 
 const languages: Lang[] = [css, html, json, jsonc, sass, svelte, svg, typescript, vue, yaml];
 
-export { css, html, json, jsonc, sass, svelte, svg, typescript, vue, yaml, languages };
+export {
+	css,
+	html,
+	json,
+	jsonc,
+	sass,
+	svelte,
+	svg,
+	typescript,
+	vue,
+	yaml,
+	languages,
+	resolutionEquality,
+};
