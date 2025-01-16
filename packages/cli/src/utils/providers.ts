@@ -7,6 +7,7 @@ import { Err, Ok, type Result } from './blocks/types/result';
 import { type Category, categorySchema } from './build';
 import { OUTPUT_FILE } from './context';
 import * as persisted from './persisted';
+import { addTrailingSlash, removeTrailingSlash } from './url';
 
 export type Info = {
 	refs: 'tags' | 'heads';
@@ -640,7 +641,7 @@ const http: Provider = {
 
 		return {
 			name: http.name(),
-			url: path,
+			url: addTrailingSlash(path),
 			provider: http,
 
 			// nothing else is important

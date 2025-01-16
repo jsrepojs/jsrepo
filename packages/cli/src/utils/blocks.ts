@@ -7,6 +7,7 @@ import { mapToArray } from './blocks/utils/map-to-array';
 import type { Block } from './build';
 import { type ProjectConfig, resolvePaths } from './config';
 import * as providers from './providers';
+import { removeTrailingSlash } from './url';
 
 export type RemoteBlock = Block & { sourceRepo: providers.Info };
 
@@ -143,13 +144,7 @@ const getInstalled = (
 };
 
 const fullyQualifiedName = (url: string, category: string, name: string) => {
-	let normalizedUrl = url;
-
-	if (normalizedUrl.endsWith('/')) {
-		normalizedUrl = normalizedUrl.slice(0, normalizedUrl.length - 1);
-	}
-
-	return `${normalizedUrl}/${category}/${name}`;
+	return `${removeTrailingSlash(url)}/${category}/${name}`;
 };
 
 export { resolveTree, getInstalled, fullyQualifiedName };
