@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.26.3
+
+### Patch Changes
+
+- bdb3460: Ensure urls with or without a trailing slash are treated the same.
+
 ## 1.26.2
 
 ### Patch Changes
