@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.26.6
+
+### Patch Changes
+
+- 2091a2c: Remove debug log.
+
 ## 1.26.5
 
 ### Patch Changes
