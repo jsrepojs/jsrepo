@@ -23,7 +23,6 @@ const resolveTree = async (
 	repoPaths: providers.ResolvedRepo[],
 	installed: Map<string, InstallingBlock> = new Map()
 ): Promise<Result<InstallingBlock[], string>> => {
-	console.log(blocksMap);
 	const blocks = new Map<string, InstallingBlock>();
 
 	for (const blockSpecifier of blockSpecifiers) {
