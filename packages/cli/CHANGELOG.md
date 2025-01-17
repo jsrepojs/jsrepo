@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.27.0
+
+### Minor Changes
+
+- 4d372c6: Respect `.gitignore` when running `build`. `.git` and `node_modules` are always ignored.
+
 ## 1.26.6
 
 ### Patch Changes
