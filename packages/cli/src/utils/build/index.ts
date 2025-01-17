@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import color from 'chalk';
 import { program } from 'commander';
+import type { Ignore } from 'ignore';
 import path from 'pathe';
 import * as v from 'valibot';
 import * as ascii from '../ascii';
@@ -39,6 +40,7 @@ const isTestFile = (file: string): boolean =>
 
 type Options = {
 	cwd: string;
+	ignore: Ignore;
 	config: RegistryConfig;
 };
 
@@ -51,6 +53,7 @@ const buildBlocksDirectory = (
 	blocksPath: string,
 	{
 		cwd,
+		ignore,
 		config: {
 			excludeDeps,
 			includeBlocks,
@@ -77,6 +80,8 @@ const buildBlocksDirectory = (
 
 	for (const categoryPath of paths) {
 		const categoryDir = path.join(blocksPath, categoryPath);
+
+		if (ignore.ignores(path.relative(cwd, categoryDir))) continue;
 
 		if (fs.statSync(categoryDir).isFile()) continue;
 

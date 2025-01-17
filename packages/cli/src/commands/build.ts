@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import { log, outro, spinner } from '@clack/prompts';
 import color from 'chalk';
 import { Command, program } from 'commander';
+import ignore from 'ignore';
 import path from 'pathe';
 import * as v from 'valibot';
 import { context } from '../cli';
@@ -11,6 +12,9 @@ import { DEFAULT_CONFIG, runRules } from '../utils/build/check';
 import { type RegistryConfig, getRegistryConfig } from '../utils/config';
 import { OUTPUT_FILE } from '../utils/context';
 import { intro } from '../utils/prompts';
+
+// sensible defaults for ignored directories
+const IGNORED_DIRS = ['.git', 'node_modules'] as const;
 
 const schema = v.object({
 	dirs: v.optional(v.array(v.string())),
@@ -153,12 +157,28 @@ const _build = async (options: Options) => {
 		fs.rmSync(manifestOut);
 	}
 
+	const ig = ignore();
+
+	try {
+		const ignoreFile = fs.readFileSync(path.join(options.cwd, '.gitignore')).toString();
+
+		ig.add(ignoreFile);
+	} catch {
+		// just continue on
+	}
+
+	ig.add(IGNORED_DIRS);
+
 	for (const dir of config.dirs) {
 		const dirPath = path.join(options.cwd, dir);
 
 		loading.start(`Building ${color.cyan(dirPath)}`);
 
-		const builtCategories = buildBlocksDirectory(dirPath, { cwd: options.cwd, config });
+		const builtCategories = buildBlocksDirectory(dirPath, {
+			cwd: options.cwd,
+			ignore: ig,
+			config,
+		});
 
 		for (const category of builtCategories) {
 			if (categories.find((cat) => cat.name === category.name) !== undefined) {

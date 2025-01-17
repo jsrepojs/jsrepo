@@ -38,11 +38,11 @@ describe('build', () => {
 
 		const buildConfig: RegistryConfig = {
 			$schema: '',
-			dirs: ['./src'],
+			dirs: ['./src', './'],
 			includeBlocks: [],
 			includeCategories: [],
 			excludeBlocks: [],
-			excludeCategories: [],
+			excludeCategories: ['src'],
 			doNotListBlocks: [],
 			doNotListCategories: [],
 			listBlocks: [],
@@ -71,7 +71,13 @@ describe('build', () => {
 
 		fs.writeFileSync('tsconfig.json', JSON.stringify(tsConfig));
 
+		fs.writeFileSync('.gitignore', 'ignored');
+
 		fs.mkdirSync('./src/utils', { recursive: true });
+
+		fs.mkdirSync('./ignored/stuff', { recursive: true });
+
+		fs.writeFileSync('./ignored/stuff/ignore.ts', '');
 
 		fs.mkdirSync('./src/types', { recursive: true });
 
