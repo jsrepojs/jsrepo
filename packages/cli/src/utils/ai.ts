@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { cancel, isCancel, password, type spinner } from '@clack/prompts';
+import ollama from 'ollama';
 import OpenAI from 'openai';
 import * as lines from './blocks/utils/lines';
 import * as persisted from './persisted';
@@ -18,7 +19,7 @@ export interface Model {
 	}) => Promise<string>;
 }
 
-export type ModelName = 'Claude 3.5 Sonnet' | 'ChatGPT 4o-mini' | 'ChatGPT 4o';
+export type ModelName = 'Claude 3.5 Sonnet' | 'ChatGPT 4o-mini' | 'ChatGPT 4o' | 'Llama 3.2';
 
 type Prompt = {
 	system: string;
@@ -94,6 +95,23 @@ const models: Record<ModelName, Model> = {
 			});
 
 			if (!verbose) loading.stop(`${'ChatGPT 4o-mini'} updated the file`);
+
+			if (!text) return newFile.content;
+
+			return unwrapCodeFromQuotes(text);
+		},
+	},
+	'Llama 3.2': {
+		updateFile: async ({ originalFile, newFile, loading, verbose }) => {
+			if (!verbose) loading.start(`Asking ${'Llama 3.2'}`);
+
+			const prompt = createUpdatePrompt({ originalFile, newFile });
+
+			verbose?.(`Prompting ${'Llama 3.2'} with:\n${JSON.stringify(prompt, null, '\t')}`);
+
+			const text = await getNextCompletionOllama({ model: 'llama3.2', prompt });
+
+			if (!verbose) loading.stop(`${'Llama 3.2'} updated the file`);
 
 			if (!text) return newFile.content;
 
@@ -176,13 +194,37 @@ const getNextCompletionAnthropic = async ({
 	return first.text;
 };
 
+const getNextCompletionOllama = async ({
+	prompt,
+	model,
+}: {
+	prompt: Prompt;
+	model: string;
+}): Promise<string | null> => {
+	const resp = await ollama.chat({
+		model,
+		messages: [
+			{
+				role: 'system',
+				content: prompt.system,
+			},
+			{
+				role: 'user',
+				content: prompt.message,
+			},
+		],
+	});
+
+	return resp.message.content;
+};
+
 const createUpdatePrompt = ({
 	originalFile,
 	newFile,
 }: { originalFile: File; newFile: File }): Prompt => {
 	return {
 		system: 'You will respond only with the resulting code. DO NOT format the code with markdown, DO NOT put the code inside of triple quotes, only return the code as a raw string.',
-		message: `Help me merge these two files. 
+		message: `Help me merge these two files. DO NOT make unnecessary changes. 
 I expect the original code to maintain the same behavior as it currently has while including any added functionality from the new file.
 This means stuff like defaults or configuration should normally stay intact unless the new behaviors in the new file depend on those defaults or configuration.
 This is my current file ${originalFile.path}:
