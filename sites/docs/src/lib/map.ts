@@ -12,6 +12,7 @@ export type Route = {
 	hide?: boolean;
 	icon?: typeof Icons.GitHub;
 	routes?: Route[];
+	badge?: 'Updated' | 'New';
 };
 
 const categories: Category[] = [
@@ -96,7 +97,8 @@ const categories: Category[] = [
 					},
 					{
 						name: 'update',
-						href: '/docs/cli/update'
+						href: '/docs/cli/update',
+						badge: 'Updated'
 					}
 				]
 			},
