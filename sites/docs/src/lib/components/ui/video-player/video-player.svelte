@@ -19,7 +19,7 @@
 	let {
 		ref = $bindable(),
 		paused = $bindable(),
-		loading = $bindable(true),
+		loading = $bindable(false),
 		hideSkeleton = false,
 		src,
 		autoplay,
@@ -77,7 +77,7 @@
 		data-visible={!loading}
 		{...rest}
 	>
-		<source {src} />
+		<source {src} type="video/mp4"/>
 		<track kind="captions" />
 	</video>
 	{#if !loading && !controls}
