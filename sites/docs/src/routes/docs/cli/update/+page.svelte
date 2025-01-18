@@ -1,5 +1,12 @@
 <script lang="ts">
-	import { CodeSpan, DocHeader, Jsrepo, SubHeading } from '$lib/components/site/docs';
+	import {
+		Blockquote,
+		CodeSpan,
+		DocHeader,
+		Jsrepo,
+		Link,
+		SubHeading
+	} from '$lib/components/site/docs';
 	import { Snippet } from '$lib/components/ui/snippet';
 	import { VideoPlayer } from '$lib/components/ui/video-player';
 	import OptionDocs from '../option-docs.svelte';
@@ -28,6 +35,31 @@
 </p>
 <p>See the demo below:</p>
 <VideoPlayer src="/demos/update-w-ai.mp4" aspectRatio="16:9" />
+<Blockquote>
+	The models in the demo above may not be up to date see the model list below.
+</Blockquote>
+<ul>
+	<li>
+		-
+		<Link href="https://console.anthropic.com/settings/keys">Claude 3.5 Sonnet</Link>
+		(API Key required)
+	</li>
+	<li>
+		-
+		<Link href="https://platform.openai.com/settings/organization/api-keys">ChatGPT 4o</Link>
+		(API Key required)
+	</li>
+	<li>
+		-
+		<Link href="https://platform.openai.com/settings/organization/api-keys">ChatGPT 4o-mini</Link>
+		(API Key required)
+	</li>
+	<li>
+		-
+		<Link href="https://github.com/ollama/ollama#model-library">Phi4</Link>
+		(via Ollama)
+	</li>
+</ul>
 <SubHeading>Options</SubHeading>
 <OptionDocs name="--all">
 	{#snippet description()}
