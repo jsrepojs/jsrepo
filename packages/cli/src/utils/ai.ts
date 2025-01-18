@@ -5,17 +5,165 @@ import * as lines from './blocks/utils/lines';
 import * as persisted from './persisted';
 
 export interface Model {
-	mergeFile: (originalFile: string, newFile: string) => Promise<string>;
+	updateFile: (originalFile: string, newFile: string) => Promise<string>;
 }
 
-export type ModelName = 'Claude 3.5 Sonnet' | 'ChatGPT 4o-mini';
+export type ModelName = 'Claude 3.5 Sonnet' | 'ChatGPT 4o-mini' | 'ChatGPT 4o';
 
-/** The prompt given to each model */
-const prompt = {
-	system: 'You will respond only with the resulting code. DO NOT format the code with markdown, DO NOT put the code inside of triple quotes, only return the code as a raw string.',
-	construct: (originalFile: string, newFile: string) => {
-		return `Help me merge these two files. 
-I want my existing code to work the same as it does while implementing any sensible changes from the new file. 
+type Prompt = {
+	system: string;
+	message: string;
+};
+
+const models: Record<ModelName, Model> = {
+	'Claude 3.5 Sonnet': {
+		updateFile: async (originalFile: string, newFile: string) => {
+			const apiKey = await getApiKey('Anthropic');
+
+			const loading = spinner();
+
+			loading.start(`Asking ${'Claude 3.5 Sonnet'}`);
+
+			const text = await getNextCompletionAnthropic({
+				model: 'claude-3-5-sonnet-latest',
+				prompt: createUpdatePrompt(originalFile, newFile),
+				apiKey,
+				maxTokens: (originalFile.length + newFile.length) * 2,
+			});
+
+			loading.stop();
+
+			if (!text) return newFile;
+
+			return unwrapCodeFromQuotes(text);
+		},
+	},
+	'ChatGPT 4o': {
+		updateFile: async (originalFile: string, newFile: string) => {
+			const apiKey = await getApiKey('OpenAI');
+
+			const loading = spinner();
+
+			loading.start(`Asking ${'ChatGPT 4o'}`);
+
+			const text = await getNextCompletionOpenAI({
+				model: 'gpt-4o',
+				prompt: createUpdatePrompt(originalFile, newFile),
+				apiKey,
+				maxTokens: (originalFile.length + newFile.length) * 2,
+			});
+
+			loading.stop();
+
+			if (!text) return newFile;
+
+			return unwrapCodeFromQuotes(text);
+		},
+	},
+	'ChatGPT 4o-mini': {
+		updateFile: async (originalFile: string, newFile: string) => {
+			const apiKey = await getApiKey('OpenAI');
+
+			const loading = spinner();
+
+			loading.start(`Asking ${'ChatGPT 4o-mini'}`);
+
+			const text = await getNextCompletionOpenAI({
+				model: 'gpt-4o-mini',
+				prompt: createUpdatePrompt(originalFile, newFile),
+				apiKey,
+				maxTokens: (originalFile.length + newFile.length) * 2,
+			});
+
+			loading.stop();
+
+			if (!text) return newFile;
+
+			return unwrapCodeFromQuotes(text);
+		},
+	},
+};
+
+const getNextCompletionOpenAI = async ({
+	prompt,
+	maxTokens,
+	model,
+	apiKey,
+}: {
+	prompt: Prompt;
+	maxTokens: number;
+	model: OpenAI.Chat.ChatModel;
+	apiKey: string;
+}): Promise<string | null> => {
+	const openai = new OpenAI({ apiKey });
+
+	const msg = await openai.chat.completions.create({
+		model,
+		max_tokens: maxTokens,
+		messages: [
+			{
+				role: 'system',
+				content: prompt.system,
+			},
+			{
+				role: 'user',
+				content: prompt.message,
+			},
+		],
+	});
+
+	const first = msg.choices[0];
+
+	if (first.message.content === null) return null;
+
+	return first.message.content;
+};
+
+const getNextCompletionAnthropic = async ({
+	prompt,
+	maxTokens,
+	model,
+	apiKey,
+}: {
+	prompt: Prompt;
+	maxTokens: number;
+	model: Anthropic.Messages.Model;
+	apiKey: string;
+}): Promise<string | null> => {
+	const anthropic = new Anthropic({ apiKey });
+
+	const msg = await anthropic.messages.create({
+		model,
+		max_tokens: maxTokens,
+		temperature: 0.5,
+		system: prompt.system,
+		messages: [
+			{
+				role: 'user',
+				content: [
+					{
+						type: 'text',
+						text: prompt.message,
+					},
+				],
+			},
+		],
+	});
+
+	const first = msg.content[0];
+
+	// if we don't get it in the format you want just return the new file
+	if (first.type !== 'text') return null;
+
+	return first.text;
+};
+
+const createUpdatePrompt = (originalFile: string, newFile: string): Prompt => {
+	return {
+		system: 'You will respond only with the resulting code. DO NOT format the code with markdown, DO NOT put the code inside of triple quotes, only return the code as a raw string.',
+		message: `Help me merge these two files. 
+I expect the original code to maintain the same behavior as it currently has while including any added functionality from the new file.
+This means stuff like defaults or configuration should normally stay intact unless the new behaviors in the new file depend on those defaults or configuration.
 This is my current file:
 \`\`\`
 ${originalFile}
@@ -25,82 +173,8 @@ This is the file that has changes I want to update with:
 \`\`\`
 ${newFile}
 \`\`\`
-	`;
-	},
-};
-
-const models: Record<ModelName, Model> = {
-	'Claude 3.5 Sonnet': {
-		mergeFile: async (originalFile: string, newFile: string) => {
-			const key = await getApiKey('Claude 3.5 Sonnet');
-
-			const anthropic = new Anthropic({ apiKey: key });
-
-			const loading = spinner();
-
-			loading.start(`Asking ${'Claude 3.5 Sonnet'}`);
-
-			const msg = await anthropic.messages.create({
-				model: 'claude-3-5-sonnet-latest',
-				max_tokens: originalFile.length + newFile.length,
-				temperature: 0.5,
-				system: prompt.system,
-				messages: [
-					{
-						role: 'user',
-						content: [
-							{
-								type: 'text',
-								text: prompt.construct(originalFile, newFile),
-							},
-						],
-					},
-				],
-			});
-
-			loading.stop();
-
-			const first = msg.content[0];
-
-			// if we don't get it in the format you want just return the new file
-			if (first.type !== 'text') return newFile;
-
-			return unwrapCodeFromQuotes(first.text);
-		},
-	},
-	'ChatGPT 4o-mini': {
-		mergeFile: async (originalFile: string, newFile: string) => {
-			const key = await getApiKey('ChatGPT 4o-mini');
-
-			const openai = new OpenAI({ apiKey: key });
-
-			const loading = spinner();
-
-			loading.start(`Asking ${'ChatGPT 4o-mini'}`);
-
-			const msg = await openai.chat.completions.create({
-				model: 'gpt-4o-mini',
-				messages: [
-					{
-						role: 'system',
-						content: prompt.system,
-					},
-					{
-						role: 'user',
-						content: prompt.construct(originalFile, newFile),
-					},
-				],
-			});
-
-			loading.stop();
-
-			const first = msg.choices[0];
-
-			if (first.message.content === null) return newFile;
-
-			return unwrapCodeFromQuotes(first.message.content);
-		},
-	},
+	`,
+	};
 };
 
 /** The AI isn't always that smart and likes to wrap the code in quotes even though I beg it not to.
@@ -131,7 +205,7 @@ export const unwrapCodeFromQuotes = (quoted: string): string => {
  * @param name
  * @returns
  */
-const getApiKey = async (name: ModelName): Promise<string> => {
+const getApiKey = async (name: 'OpenAI' | 'Anthropic'): Promise<string> => {
 	const KEY = `${name}-api-key`;
 
 	const storage = persisted.get();
@@ -141,9 +215,9 @@ const getApiKey = async (name: ModelName): Promise<string> => {
 	if (!apiKey) {
 		// prompt for api key
 		const result = await password({
-			message: `Paste your api key for ${name}:`,
+			message: `Paste your ${name} API key:`,
 			validate(value) {
-				if (value.trim() === '') return 'Please provide a value';
+				if (value.trim() === '') return 'Please provide an API key';
 			},
 		});
 

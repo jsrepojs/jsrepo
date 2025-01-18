@@ -330,14 +330,14 @@ const _update = async (blockNames: string[], options: Options) => {
 						if (!options.yes && !options.no) {
 							// prompt the user
 							const confirmResult = await select({
-								message: '',
+								message: 'Accept changes?',
 								options: [
 									{
-										label: 'Accept changes',
+										label: 'Accept',
 										value: 'accept',
 									},
 									{
-										label: 'Reject changes',
+										label: 'Reject',
 										value: 'reject',
 									},
 									{
@@ -369,7 +369,7 @@ const _update = async (blockNames: string[], options: Options) => {
 
 								model = modelResult as ModelName;
 
-								remoteContent = await models[model].mergeFile(
+								remoteContent = await models[model].updateFile(
 									localContent,
 									originalRemoteContent
 								);
