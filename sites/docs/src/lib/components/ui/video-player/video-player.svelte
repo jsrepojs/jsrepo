@@ -19,7 +19,7 @@
 	let {
 		ref = $bindable(),
 		paused = $bindable(),
-		loading = $bindable(false),
+		loading = $bindable(true),
 		hideSkeleton = false,
 		src,
 		autoplay,
@@ -30,6 +30,7 @@
 
 	let height = $state(0);
 	let width = $state(0);
+	let duration = $state();
 
 	const togglePlay = () => {
 		if (ref?.paused) {
@@ -48,6 +49,12 @@
 
 		return parseFloat(width) / parseFloat(height);
 	};
+
+	$effect(() => {
+		if (!duration) return;
+
+		loading = false;
+	})
 </script>
 
 <div
@@ -75,6 +82,7 @@
 		bind:paused
 		class="w-full data-[visible=false]:hidden"
 		data-visible={!loading}
+		bind:duration={duration}
 		{...rest}
 	>
 		<source {src} type="video/mp4"/>
