@@ -16,7 +16,7 @@ import { isTestFile } from '../utils/build';
 import { getProjectConfig, resolvePaths } from '../utils/config';
 import { installDependencies } from '../utils/dependencies';
 import { formatDiff } from '../utils/diff';
-import { transformRemoteContent } from '../utils/files';
+import { formatFile, transformRemoteContent } from '../utils/files';
 import { loadFormatterConfig } from '../utils/format';
 import { getWatermark } from '../utils/get-watermark';
 import { returnShouldInstall } from '../utils/package';
@@ -374,6 +374,16 @@ const _update = async (blockNames: string[], options: Options) => {
 									originalRemoteContent
 								);
 
+								remoteContent = await formatFile({
+									file: {
+										content: remoteContent,
+										destPath: file.destPath,
+									},
+									biomeOptions,
+									prettierOptions,
+									config,
+								});
+
 								continue;
 							}
 
@@ -382,6 +392,8 @@ const _update = async (blockNames: string[], options: Options) => {
 							break;
 						}
 					}
+
+					break; // there were no changes or changes were automatically accepted
 				}
 			}
 

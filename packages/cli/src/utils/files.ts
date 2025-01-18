@@ -81,4 +81,47 @@ const transformRemoteContent = async ({
 	return Ok(content);
 };
 
-export { transformRemoteContent };
+type FormatOptions = {
+	file: {
+		/** The content of the file */
+		content: string;
+		/** The dest path of the file used to determine the language */
+		destPath: string;
+	};
+	config: ProjectConfig;
+	prettierOptions: prettier.Options | null;
+	biomeOptions: PartialConfiguration | null;
+};
+
+/** Auto detects the language and formats the file content.
+ *
+ * @param param0
+ * @returns
+ */
+const formatFile = async ({
+	file,
+	config,
+	prettierOptions,
+	biomeOptions,
+}: FormatOptions): Promise<string> => {
+	const lang = languages.find((lang) => lang.matches(file.destPath));
+
+	let newContent = file.content;
+
+	if (lang) {
+		try {
+			newContent = await lang.format(file.content, {
+				filePath: file.destPath,
+				formatter: config.formatter,
+				prettierOptions,
+				biomeOptions,
+			});
+		} catch {
+			return newContent;
+		}
+	}
+
+	return newContent;
+};
+
+export { transformRemoteContent, formatFile };
