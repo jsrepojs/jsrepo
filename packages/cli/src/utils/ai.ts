@@ -19,7 +19,7 @@ export interface Model {
 	}) => Promise<string>;
 }
 
-export type ModelName = 'Claude 3.5 Sonnet' | 'ChatGPT 4o-mini' | 'ChatGPT 4o' | 'Llama 3.2';
+export type ModelName = 'Claude 3.5 Sonnet' | 'ChatGPT 4o-mini' | 'ChatGPT 4o' | 'Phi4';
 
 type Prompt = {
 	system: string;
@@ -101,17 +101,17 @@ const models: Record<ModelName, Model> = {
 			return unwrapCodeFromQuotes(text);
 		},
 	},
-	'Llama 3.2': {
+	Phi4: {
 		updateFile: async ({ originalFile, newFile, loading, verbose }) => {
-			if (!verbose) loading.start(`Asking ${'Llama 3.2'}`);
+			if (!verbose) loading.start(`Asking ${'Phi4'}`);
 
 			const prompt = createUpdatePrompt({ originalFile, newFile });
 
-			verbose?.(`Prompting ${'Llama 3.2'} with:\n${JSON.stringify(prompt, null, '\t')}`);
+			verbose?.(`Prompting ${'Phi4'} with:\n${JSON.stringify(prompt, null, '\t')}`);
 
-			const text = await getNextCompletionOllama({ model: 'llama3.2', prompt });
+			const text = await getNextCompletionOllama({ model: 'phi4', prompt });
 
-			if (!verbose) loading.stop(`${'Llama 3.2'} updated the file`);
+			if (!verbose) loading.stop(`${'Phi4'} updated the file`);
 
 			if (!text) return newFile.content;
 
