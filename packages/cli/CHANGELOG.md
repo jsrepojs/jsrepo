@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.28.0
+
+### Minor Changes
+
+- f52c4db: feat: ✨ Update with AI ✨ Adds "Update with AI" to the "Accept changes?" prompt when running `jsrepo update`. This allows for smarter updates when overwriting the entire file isn't what you want.
+
 ## 1.27.0
 
 ### Minor Changes

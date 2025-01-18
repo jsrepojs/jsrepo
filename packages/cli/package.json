@@ -1,7 +1,7 @@
 {
 	"name": "jsrepo",
 	"description": "A CLI to add shared code from remote repositories.",
-	"version": "1.27.0",
+	"version": "1.28.0",
 	"license": "MIT",
 	"homepage": "https://jsrepo.dev",
 	"author": {
@@ -15,12 +15,24 @@
 	"bugs": {
 		"url": "https://github.com/ieedan/jsrepo/issues"
 	},
-	"keywords": ["repo", "cli", "svelte", "vue", "typescript", "javascript", "shadcn", "registry"],
+	"keywords": [
+		"repo",
+		"cli",
+		"svelte",
+		"vue",
+		"typescript",
+		"javascript",
+		"shadcn",
+		"registry"
+	],
 	"type": "module",
 	"exports": "./dist/index.js",
 	"bin": "./dist/index.js",
 	"main": "./dist/index.js",
-	"files": ["./schemas/**/*", "dist"],
+	"files": [
+		"./schemas/**/*",
+		"dist"
+	],
 	"scripts": {
 		"start": "tsup --silent && node ./dist/index.js",
 		"build": "tsup",
