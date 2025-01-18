@@ -1,6 +1,14 @@
 <script lang="ts">
-	import { CodeSpan, DocHeader, SubHeading } from '$lib/components/site/docs';
+	import {
+		Blockquote,
+		CodeSpan,
+		DocHeader,
+		Jsrepo,
+		Link,
+		SubHeading
+	} from '$lib/components/site/docs';
 	import { Snippet } from '$lib/components/ui/snippet';
+	import { VideoPlayer } from '$lib/components/ui/video-player';
 	import OptionDocs from '../option-docs.svelte';
 </script>
 
@@ -14,6 +22,44 @@
 <Snippet command="execute" args={['jsrepo', 'update']} />
 <p>Update a specific block.</p>
 <Snippet command="execute" args={['jsrepo', 'update', 'utils/math']} />
+<SubHeading>✨ Update with AI ✨</SubHeading>
+<p>
+	<Jsrepo /> now supports updating your components using an LLM. This is great for when you have updated
+	local components and overwriting from remote is not an option.
+</p>
+<p>
+	Now after viewing the diff between the local and remote file you have 3 options. "Accept",
+	"Reject" and "Update with AI". If you choose "Update with AI" you will be prompted to choose a
+	model and provide the an API token. Once you have provided your API token <Jsrepo /> prompts the LLM
+	to update the file then returns the diff of the local file to the updated remote file.
+</p>
+<p>See the demo below:</p>
+<VideoPlayer src="/demos/update-w-ai.mp4" aspectRatio="16:9" />
+<Blockquote>
+	The models in the demo above may not be up to date see the model list below.
+</Blockquote>
+<ul>
+	<li>
+		-
+		<Link href="https://console.anthropic.com/settings/keys">Claude 3.5 Sonnet</Link>
+		(API Key required)
+	</li>
+	<li>
+		-
+		<Link href="https://platform.openai.com/settings/organization/api-keys">ChatGPT 4o</Link>
+		(API Key required)
+	</li>
+	<li>
+		-
+		<Link href="https://platform.openai.com/settings/organization/api-keys">ChatGPT 4o-mini</Link>
+		(API Key required)
+	</li>
+	<li>
+		-
+		<Link href="https://github.com/ollama/ollama#model-library">Phi4</Link>
+		(via Ollama)
+	</li>
+</ul>
 <SubHeading>Options</SubHeading>
 <OptionDocs name="--all">
 	{#snippet description()}

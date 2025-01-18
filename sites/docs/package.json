@@ -14,25 +14,25 @@
 	"devDependencies": {
 		"@fontsource-variable/jetbrains-mono": "^5.1.2",
 		"@fontsource/inter": "^5.1.1",
-		"@sveltejs/kit": "^2.15.2",
+		"@sveltejs/kit": "^2.16.0",
 		"@sveltejs/vite-plugin-svelte": "^5.0.3",
 		"@tailwindcss/typography": "^0.5.16",
 		"@types/eslint": "^9.6.0",
 		"autoprefixer": "^10.4.20",
-		"bits-ui": "1.0.0-next.74",
+		"bits-ui": "1.0.0-next.77",
 		"clsx": "^2.1.1",
 		"eslint": "^9.18.0",
 		"eslint-config-prettier": "^10.0.1",
 		"eslint-plugin-svelte": "^2.46.1",
 		"globals": "^15.14.0",
-		"lucide-svelte": "^0.471.0",
+		"lucide-svelte": "^0.473.0",
 		"mode-watcher": "^0.5.0",
 		"octokit": "^4.1.0",
 		"package-manager-detector": "^0.2.8",
 		"prettier": "^3.4.2",
 		"prettier-plugin-svelte": "^3.3.3",
-		"shiki": "^1.27.0",
-		"svelte": "^5.17.5",
+		"shiki": "^1.27.2",
+		"svelte": "^5.19.0",
 		"svelte-check": "^4.1.4",
 		"svelte-persisted-store": "^0.12.0",
 		"tailwind-merge": "^2.6.0",
@@ -45,6 +45,6 @@
 		"vite": "^6.0.7"
 	},
 	"dependencies": {
-		"@sveltejs/adapter-vercel": "^5.5.2"
+		"@sveltejs/adapter-vercel": "^5.5.3"
 	}
 }

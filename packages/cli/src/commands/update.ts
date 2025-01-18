@@ -1,5 +1,14 @@
 import fs from 'node:fs';
-import { cancel, confirm, isCancel, multiselect, outro, spinner } from '@clack/prompts';
+import {
+	cancel,
+	confirm,
+	isCancel,
+	log,
+	multiselect,
+	outro,
+	select,
+	spinner,
+} from '@clack/prompts';
 import color from 'chalk';
 import { Command, program } from 'commander';
 import { diffLines } from 'diff';
@@ -8,6 +17,7 @@ import { detect } from 'package-manager-detector/detect';
 import path from 'pathe';
 import * as v from 'valibot';
 import { context } from '../cli';
+import { type ModelName, models } from '../utils/ai';
 import * as ascii from '../utils/ascii';
 import { type RemoteBlock, getInstalled, resolveTree } from '../utils/blocks';
 import * as url from '../utils/blocks/utils/url';
@@ -15,7 +25,7 @@ import { isTestFile } from '../utils/build';
 import { getProjectConfig, resolvePaths } from '../utils/config';
 import { installDependencies } from '../utils/dependencies';
 import { formatDiff } from '../utils/diff';
-import { transformRemoteContent } from '../utils/files';
+import { formatFile, transformRemoteContent } from '../utils/files';
 import { loadFormatterConfig } from '../utils/format';
 import { getWatermark } from '../utils/get-watermark';
 import { returnShouldInstall } from '../utils/package';
@@ -205,6 +215,8 @@ const _update = async (blockNames: string[], options: Options) => {
 
 	const resolvedPaths = resolvedPathsResult.unwrap();
 
+	let model: ModelName = 'Claude 3.5 Sonnet';
+
 	for (const { block } of updatingBlocks) {
 		const fullSpecifier = url.join(block.sourceRepo.url, block.category, block.name);
 
@@ -278,7 +290,9 @@ const _update = async (blockNames: string[], options: Options) => {
 				program.error(color.red(remoteContentResult.unwrapErr()));
 			}
 
-			const remoteContent = remoteContentResult.unwrap();
+			const originalRemoteContent = remoteContentResult.unwrap();
+
+			let remoteContent = remoteContentResult.unwrap();
 
 			let acceptedChanges = options.yes;
 
@@ -290,56 +304,122 @@ const _update = async (blockNames: string[], options: Options) => {
 					localContent = fs.readFileSync(file.destPath).toString();
 				}
 
-				const changes = diffLines(localContent, remoteContent);
-
-				const from = path.join(
-					`${providerInfo.name}/${providerInfo.owner}/${providerInfo.repoName}`,
-					file.fileName
-				);
+				const from = url.join(providerInfo.url, file.fileName);
 
 				const to = path.relative(options.cwd, file.destPath);
 
-				const formattedDiff = formatDiff({
-					from,
-					to,
-					changes,
-					expand: options.expand,
-					maxUnchanged: options.maxUnchanged,
-					colorAdded: color.greenBright,
-					colorRemoved: color.redBright,
-					colorCharsAdded: color.bgGreenBright,
-					colorCharsRemoved: color.bgRedBright,
-					prefix: () => `${ascii.VERTICAL_LINE}  `,
-					onUnchanged: ({ from, to, prefix }) =>
-						`${prefix?.() ?? ''}${color.cyan(from)} → ${color.gray(to)} ${color.gray('(unchanged)')}\n`,
-					intro: ({ from, to, changes, prefix }) => {
-						const totalChanges = changes.filter((a) => a.added).length;
+				while (true) {
+					const changes = diffLines(localContent, remoteContent);
 
-						return `${prefix?.() ?? ''}${color.cyan(from)} → ${color.gray(to)} (${totalChanges} change${
-							totalChanges === 1 ? '' : 's'
-						})\n${prefix?.() ?? ''}\n`;
-					},
-				});
+					// print diff
+					const formattedDiff = formatDiff({
+						from,
+						to,
+						changes,
+						expand: options.expand,
+						maxUnchanged: options.maxUnchanged,
+						prefix: () => `${ascii.VERTICAL_LINE}  `,
+						onUnchanged: ({ from, to, prefix }) =>
+							`${prefix?.() ?? ''}${color.cyan(from)} → ${color.gray(to)} ${color.gray('(unchanged)')}\n`,
+						intro: ({ from, to, changes, prefix }) => {
+							const totalChanges = changes.filter((a) => a.added || a.removed).length;
 
-				process.stdout.write(formattedDiff);
+							return `${prefix?.() ?? ''}${color.cyan(from)} → ${color.gray(to)} (${totalChanges} change${
+								totalChanges === 1 ? '' : 's'
+							})\n${prefix?.() ?? ''}\n`;
+						},
+					});
 
-				// if there are no changes then don't ask
-				if (changes.length > 1 || localContent === '') {
-					acceptedChanges = options.yes;
+					process.stdout.write(formattedDiff);
 
-					if (!options.yes && !options.no) {
-						const confirmResult = await confirm({
-							message: 'Accept changes?',
-							initialValue: true,
-						});
+					// if there are no changes then don't ask
+					if (changes.length > 1 || localContent === '') {
+						acceptedChanges = options.yes;
 
-						if (isCancel(confirmResult)) {
-							cancel('Canceled!');
-							process.exit(0);
+						if (!options.yes && !options.no) {
+							// prompt the user
+							const confirmResult = await select({
+								message: 'Accept changes?',
+								options: [
+									{
+										label: 'Accept',
+										value: 'accept',
+									},
+									{
+										label: 'Reject',
+										value: 'reject',
+									},
+									{
+										label: `✨ ${color.yellow('Update with AI')} ✨`,
+										value: 'update',
+									},
+								],
+							});
+
+							if (isCancel(confirmResult)) {
+								cancel('Canceled!');
+								process.exit(0);
+							}
+
+							if (confirmResult === 'update') {
+								// prompt for model
+								const modelResult = await select({
+									message: 'Select a model',
+									options: Object.keys(models).map((key) => ({
+										label: key,
+										value: key,
+									})),
+								});
+
+								if (isCancel(modelResult)) {
+									cancel('Canceled!');
+									process.exit(0);
+								}
+
+								model = modelResult as ModelName;
+
+								try {
+									remoteContent = await models[model].updateFile({
+										originalFile: {
+											content: localContent,
+											path: to,
+										},
+										newFile: {
+											content: originalRemoteContent,
+											path: from,
+										},
+										loading,
+										verbose: options.verbose ? verbose : undefined,
+									});
+								} catch (err) {
+									loading.stop();
+									log.error(color.red(`Error getting completions: ${err}`));
+									process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
+									continue;
+								}
+
+								remoteContent = await formatFile({
+									file: {
+										content: remoteContent,
+										destPath: file.destPath,
+									},
+									biomeOptions,
+									prettierOptions,
+									config,
+								});
+
+								process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
+
+								continue;
+							}
+
+							acceptedChanges = confirmResult === 'accept';
+
+							break;
 						}
-
-						acceptedChanges = confirmResult;
 					}
+
+					break; // there were no changes or changes were automatically accepted
 				}
 			}
 

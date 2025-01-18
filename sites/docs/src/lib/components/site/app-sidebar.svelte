@@ -6,6 +6,7 @@
 	import * as Collapsible from '$lib/components/ui/collapsible/index.js';
 	import { active } from '$lib/actions/active.svelte';
 	import { ChevronRight } from 'lucide-svelte';
+	import { Badge } from '$lib/components/ui/badge';
 
 	type Props = {
 		version: string;
@@ -59,6 +60,9 @@
 													<item.icon />
 												{/if}
 												{item.name}
+												{#if item.badge}
+													<Badge>{item.badge}</Badge>
+												{/if}
 											</a>
 										{/snippet}
 									</Sidebar.MenuButton>
@@ -80,6 +84,9 @@
 																<subItem.icon />
 															{/if}
 															<span>{subItem.name}</span>
+															{#if subItem.badge}
+																<Badge>{subItem.badge}</Badge>
+															{/if}
 														</Sidebar.MenuSubButton>
 													</Sidebar.MenuSubItem>
 												{/each}

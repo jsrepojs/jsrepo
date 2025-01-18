@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Snippet } from '$lib/components/ui/snippet';
 	import { Button } from '$lib/components/ui/button';
+	import AnimatedGradientText from '$lib/components/animations/animated-gradient-text.svelte';
 </script>
 
 <svelte:head>
@@ -16,6 +17,9 @@
 		<div
 			class="flex flex-col gap-5 justify-center place-items-center w-full min-h-[calc(100vh-3.5rem)]"
 		>
+			<AnimatedGradientText href="/docs/cli/update#%E2%9C%A8%20Update%20with%20AI%20%E2%9C%A8">
+				Introducing ✨ Update with AI ✨
+			</AnimatedGradientText>
 			<div class="flex place-items-center gap-4 justify-center w-full">
 				<h1
 					class="bg-primary text-primary-foreground select-none sm:text-6xl text-4xl font-serif font-bold py-4 px-4 w-fit"
