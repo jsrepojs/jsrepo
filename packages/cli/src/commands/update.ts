@@ -1,5 +1,14 @@
 import fs from 'node:fs';
-import { cancel, confirm, isCancel, multiselect, outro, select, spinner } from '@clack/prompts';
+import {
+	cancel,
+	confirm,
+	isCancel,
+	log,
+	multiselect,
+	outro,
+	select,
+	spinner,
+} from '@clack/prompts';
 import color from 'chalk';
 import { Command, program } from 'commander';
 import { diffLines } from 'diff';
@@ -313,7 +322,7 @@ const _update = async (blockNames: string[], options: Options) => {
 						onUnchanged: ({ from, to, prefix }) =>
 							`${prefix?.() ?? ''}${color.cyan(from)} → ${color.gray(to)} ${color.gray('(unchanged)')}\n`,
 						intro: ({ from, to, changes, prefix }) => {
-							const totalChanges = changes.filter((a) => a.added).length;
+							const totalChanges = changes.filter((a) => a.added || a.removed).length;
 
 							return `${prefix?.() ?? ''}${color.cyan(from)} → ${color.gray(to)} (${totalChanges} change${
 								totalChanges === 1 ? '' : 's'
@@ -369,10 +378,25 @@ const _update = async (blockNames: string[], options: Options) => {
 
 								model = modelResult as ModelName;
 
-								remoteContent = await models[model].updateFile(
-									localContent,
-									originalRemoteContent
-								);
+								try {
+									remoteContent = await models[model].updateFile({
+										originalFile: {
+											content: localContent,
+											path: to,
+										},
+										newFile: {
+											content: originalRemoteContent,
+											path: from,
+										},
+										loading,
+										verbose: options.verbose ? verbose : undefined,
+									});
+								} catch (err) {
+									loading.stop();
+									log.error(color.red(`Error getting completions: ${err}`));
+									process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
+									continue;
+								}
 
 								remoteContent = await formatFile({
 									file: {
@@ -383,6 +407,8 @@ const _update = async (blockNames: string[], options: Options) => {
 									prettierOptions,
 									config,
 								});
+
+								process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
 
 								continue;
 							}

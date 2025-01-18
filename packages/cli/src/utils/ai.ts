@@ -1,11 +1,21 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { cancel, isCancel, password, spinner } from '@clack/prompts';
+import { cancel, isCancel, password, type spinner } from '@clack/prompts';
 import OpenAI from 'openai';
 import * as lines from './blocks/utils/lines';
 import * as persisted from './persisted';
 
+type File = {
+	path: string;
+	content: string;
+};
+
 export interface Model {
-	updateFile: (originalFile: string, newFile: string) => Promise<string>;
+	updateFile: (opts: {
+		originalFile: File;
+		newFile: File;
+		loading: ReturnType<typeof spinner>;
+		verbose?: (msg: string) => void;
+	}) => Promise<string>;
 }
 
 export type ModelName = 'Claude 3.5 Sonnet' | 'ChatGPT 4o-mini' | 'ChatGPT 4o';
@@ -17,67 +27,75 @@ type Prompt = {
 
 const models: Record<ModelName, Model> = {
 	'Claude 3.5 Sonnet': {
-		updateFile: async (originalFile: string, newFile: string) => {
+		updateFile: async ({ originalFile, newFile, loading, verbose }) => {
 			const apiKey = await getApiKey('Anthropic');
 
-			const loading = spinner();
+			if (!verbose) loading.start(`Asking ${'Claude 3.5 Sonnet'}`);
 
-			loading.start(`Asking ${'Claude 3.5 Sonnet'}`);
+			const prompt = createUpdatePrompt({ originalFile, newFile });
+
+			verbose?.(
+				`Prompting ${'Claude 3.5 Sonnet'} with:\n${JSON.stringify(prompt, null, '\t')}`
+			);
 
 			const text = await getNextCompletionAnthropic({
 				model: 'claude-3-5-sonnet-latest',
-				prompt: createUpdatePrompt(originalFile, newFile),
+				prompt,
 				apiKey,
-				maxTokens: (originalFile.length + newFile.length) * 2,
+				maxTokens: (originalFile.content.length + newFile.content.length) * 2,
 			});
 
-			loading.stop();
+			if (!verbose) loading.stop(`${'Claude 3.5 Sonnet'} updated the file`);
 
-			if (!text) return newFile;
+			if (!text) return newFile.content;
 
 			return unwrapCodeFromQuotes(text);
 		},
 	},
 	'ChatGPT 4o': {
-		updateFile: async (originalFile: string, newFile: string) => {
+		updateFile: async ({ originalFile, newFile, loading, verbose }) => {
 			const apiKey = await getApiKey('OpenAI');
 
-			const loading = spinner();
+			if (!verbose) loading.start(`Asking ${'ChatGPT 4o'}`);
 
-			loading.start(`Asking ${'ChatGPT 4o'}`);
+			const prompt = createUpdatePrompt({ originalFile, newFile });
+
+			verbose?.(`Prompting ${'ChatGPT 4o'} with:\n${JSON.stringify(prompt, null, '\t')}`);
 
 			const text = await getNextCompletionOpenAI({
 				model: 'gpt-4o',
-				prompt: createUpdatePrompt(originalFile, newFile),
+				prompt,
 				apiKey,
-				maxTokens: (originalFile.length + newFile.length) * 2,
+				maxTokens: (originalFile.content.length + newFile.content.length) * 2,
 			});
 
-			loading.stop();
+			if (!verbose) loading.stop(`${'ChatGPT 4o'} updated the file`);
 
-			if (!text) return newFile;
+			if (!text) return newFile.content;
 
 			return unwrapCodeFromQuotes(text);
 		},
 	},
 	'ChatGPT 4o-mini': {
-		updateFile: async (originalFile: string, newFile: string) => {
+		updateFile: async ({ originalFile, newFile, loading, verbose }) => {
 			const apiKey = await getApiKey('OpenAI');
 
-			const loading = spinner();
+			if (!verbose) loading.start(`Asking ${'ChatGPT 4o-mini'}`);
 
-			loading.start(`Asking ${'ChatGPT 4o-mini'}`);
+			const prompt = createUpdatePrompt({ originalFile, newFile });
+
+			verbose?.(`Prompting ${'ChatGPT 4o'} with:\n${JSON.stringify(prompt, null, '\t')}`);
 
 			const text = await getNextCompletionOpenAI({
 				model: 'gpt-4o-mini',
-				prompt: createUpdatePrompt(originalFile, newFile),
+				prompt,
 				apiKey,
-				maxTokens: (originalFile.length + newFile.length) * 2,
+				maxTokens: (originalFile.content.length + newFile.content.length) * 2,
 			});
 
-			loading.stop();
+			if (!verbose) loading.stop(`${'ChatGPT 4o-mini'} updated the file`);
 
-			if (!text) return newFile;
+			if (!text) return newFile.content;
 
 			return unwrapCodeFromQuotes(text);
 		},
@@ -99,7 +117,7 @@ const getNextCompletionOpenAI = async ({
 
 	const msg = await openai.chat.completions.create({
 		model,
-		max_tokens: maxTokens,
+		max_completion_tokens: maxTokens,
 		messages: [
 			{
 				role: 'system',
@@ -134,7 +152,7 @@ const getNextCompletionAnthropic = async ({
 
 	const msg = await anthropic.messages.create({
 		model,
-		max_tokens: maxTokens,
+		max_tokens: Math.min(maxTokens, 8192),
 		temperature: 0.5,
 		system: prompt.system,
 		messages: [
@@ -158,20 +176,23 @@ const getNextCompletionAnthropic = async ({
 	return first.text;
 };
 
-const createUpdatePrompt = (originalFile: string, newFile: string): Prompt => {
+const createUpdatePrompt = ({
+	originalFile,
+	newFile,
+}: { originalFile: File; newFile: File }): Prompt => {
 	return {
 		system: 'You will respond only with the resulting code. DO NOT format the code with markdown, DO NOT put the code inside of triple quotes, only return the code as a raw string.',
 		message: `Help me merge these two files. 
 I expect the original code to maintain the same behavior as it currently has while including any added functionality from the new file.
 This means stuff like defaults or configuration should normally stay intact unless the new behaviors in the new file depend on those defaults or configuration.
-This is my current file:
+This is my current file ${originalFile.path}:
 \`\`\`
-${originalFile}
+${originalFile.content}
 \`\`\`
 	
-This is the file that has changes I want to update with:
+This is the file that has changes I want to update with ${newFile.path}:
 \`\`\`
-${newFile}
+${newFile.content}
 \`\`\`
 	`,
 	};
