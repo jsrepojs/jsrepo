@@ -54,7 +54,7 @@
 		if (!duration) return;
 
 		loading = false;
-	})
+	});
 </script>
 
 <div
@@ -82,10 +82,10 @@
 		bind:paused
 		class="w-full data-[visible=false]:hidden"
 		data-visible={!loading}
-		bind:duration={duration}
+		bind:duration
 		{...rest}
 	>
-		<source {src} type="video/mp4"/>
+		<source {src} type="video/mp4" />
 		<track kind="captions" />
 	</video>
 	{#if !loading && !controls}

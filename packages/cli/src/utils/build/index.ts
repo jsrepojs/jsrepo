@@ -81,9 +81,14 @@ const buildBlocksDirectory = (
 	for (const categoryPath of paths) {
 		const categoryDir = path.join(blocksPath, categoryPath);
 
-		if (ignore.ignores(path.relative(cwd, categoryDir))) continue;
+		const stat = fs.statSync(categoryDir);
 
-		if (fs.statSync(categoryDir).isFile()) continue;
+		if (stat.isFile()) continue;
+
+		// we append a '/' to tell ignore that this is a directory not a file
+		const ignorable = `${path.relative(cwd, categoryDir)}/`;
+
+		if (ignore.ignores(ignorable)) continue;
 
 		const categoryName = path.basename(categoryPath);
 
