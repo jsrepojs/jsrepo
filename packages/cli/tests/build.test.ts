@@ -71,13 +71,19 @@ describe('build', () => {
 
 		fs.writeFileSync('tsconfig.json', JSON.stringify(tsConfig));
 
-		fs.writeFileSync('.gitignore', 'ignored');
+		fs.writeFileSync(
+			'.gitignore',
+			`ignored
+/.ignored/`
+		);
 
 		fs.mkdirSync('./src/utils', { recursive: true });
 
-		fs.mkdirSync('./ignored/stuff', { recursive: true });
+		fs.mkdirSync('./ignored/', { recursive: true });
+		fs.mkdirSync('./.ignored/', { recursive: true });
 
-		fs.writeFileSync('./ignored/stuff/ignore.ts', '');
+		fs.writeFileSync('./ignored/b.ts', '');
+		fs.writeFileSync('./.ignored/a.ts', '');
 
 		fs.mkdirSync('./src/types', { recursive: true });
 
