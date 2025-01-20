@@ -58,7 +58,7 @@
 </script>
 
 <div
-	class="relative group w-full"
+	class="relative group w-full bg-accent/10"
 	style="aspect-ratio: {loading ? solveAspectRatio(aspectRatio) : 'auto'};"
 >
 	{#if loading && !hideSkeleton}
