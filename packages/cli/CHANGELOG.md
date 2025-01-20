@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.28.1
+
+### Patch Changes
+
+- 9b9ddee: Ensure `/.a/` ignore syntax works during build.
+
 ## 1.28.0
 
 ### Minor Changes
