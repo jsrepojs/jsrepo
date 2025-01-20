@@ -23,7 +23,8 @@
 		},
 		{
 			title: 'Building the shadcn/ui registry with jsrepo',
-			description: 'How to build shadcn/ui into a jsrepo registry using some of the newest jsrepo features.',
+			description:
+				'How to build shadcn/ui into a jsrepo registry using some of the newest jsrepo features.',
 			src: 'https://www.youtube.com/embed/tj7BUE9V7fw?si=igyhrWX4_yeajIUJ'
 		}
 	];
