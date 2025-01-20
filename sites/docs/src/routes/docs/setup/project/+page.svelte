@@ -64,14 +64,11 @@
 }`}
 />
 <p>
-	Now that you've created the <CodeSpan>jsrepo.json</CodeSpan> you can start adding blocks from repositories.
+	Now that you've created the <CodeSpan>jsrepo.json</CodeSpan> you can start adding blocks from registries.
 </p>
 <Snippet command="execute" args={['jsrepo', 'add']} />
 <p>
-	If you need to update a block you just run <CodeSpan>add</CodeSpan> again and choose to overwrite it.
+	To update blocks you can run <CodeSpan>update</CodeSpan> this will show a diff for each changed file
+	and allow you to choose to accept or reject the changes.
 </p>
-<p>
-	You can use the <CodeSpan>diff</CodeSpan> command to check what changes will be made to your code when
-	you run the <CodeSpan>add</CodeSpan> command.
-</p>
-<Snippet command="execute" args={['jsrepo', 'diff']} />
+<Snippet command="execute" args={['jsrepo', 'update']} />
