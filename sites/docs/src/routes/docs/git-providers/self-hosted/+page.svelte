@@ -11,20 +11,22 @@
 	exactly how things are served. As well as enabling you to do things like distributing your registry
 	on a private network.
 </p>
+<p>Let's show how you might set this up in a SvelteKit app!</p>
 <p>
-	You can start hosting your own registry by building the <CodeSpan>jsrepo-manifest.json</CodeSpan> at
-	the root of where your blocks are hosted.
+	In this case we will have our block located under
+	<CodeSpan>./src/lib</CodeSpan> where
+	<CodeSpan>components</CodeSpan> is the category and
+	<CodeSpan>button</CodeSpan> is one of our blocks:
 </p>
-<p>For example in a SvelteKit app:</p>
 <Code
 	hideLines
 	code={`root
 ├── .svelte-kit
 ├── src
+│	└── lib
+│		└── components
+│			└── button
 ├── static
-│   ├── blocks
-│   │   └── ...
-│   └── jsrepo-manifest.json
 ├── .gitignore
 ├── .npmrc
 ├── package.json
@@ -32,8 +34,17 @@
 ├── tsconfig.json
 └── vite.config.ts`}
 />
-<p>Here we put the blocks directly in the static directory so that you simply access them with:</p>
+<p>
+	We will serve our registry out of the <CodeSpan>./static</CodeSpan> folder (for react this would be
+	<CodeSpan>./public</CodeSpan>) so that users can access our blocks by running:
+</p>
 <Snippet command="execute" args={['jsrepo', 'add', '--repo', 'https://example.com/']} />
+<p>
+	To do this we need to build the registry using the <CodeSpan>--output-dir</CodeSpan> flag. This flag
+	will copy the registry to whatever directory we specify in this case <CodeSpan>./static</CodeSpan
+	>:
+</p>
+<Snippet command="execute" args={['jsrepo', 'build', '--output-dir', './static']} />
 <p>
 	You can also customize where blocks are served. You just need to tell jsrepo where the
 	<CodeSpan>jsrepo-manifest.json</CodeSpan> is.

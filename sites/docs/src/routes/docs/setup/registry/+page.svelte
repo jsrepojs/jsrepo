@@ -86,7 +86,7 @@
 ├  Next Steps ────────────────────────────────────────────────┐
 │                                                             │
 │  1. Add categories to \`./src\`.                              │
-│  2. Run \`pnpm run build:registry\` to build the registry.    │
+│  2. Run \`npm run build:registry\` to build the registry.    │
 │                                                             │
 ├─────────────────────────────────────────────────────────────┘
 │
@@ -142,33 +142,16 @@
 	Commit the output <CodeSpan>jsrepo-manifest.json</CodeSpan> to a public repository and you should now
 	be able to access your blocks by running:
 </p>
-<Snippet
-	command="execute"
-	args={['jsrepo', 'add', '--repo', 'github/<owner>/<repo>/<category>/<name>']}
-/>
+<Snippet command="execute" args={['jsrepo', 'add', '--repo', 'github/<owner>/<repo>']} />
 <SubHeading>Dependencies</SubHeading>
-<p>
-	Your blocks can depend on other blocks under the same directory of your project and they will also
-	be added when users add that block.
-</p>
+<p>Your blocks can depend on npm packages as well as other blocks in your project.</p>
 <p>
 	<span class="font-serif text-sm">blocks/utils/math/add.ts</span>
 </p>
 <Code
 	lang="ts"
-	code={`import { print } from "../print"; // import the print block
-
-const add = (a: number, b: number): number => {
-  print(\`result is: \${a + b}\`)
-}`}
-/>
-<p>
-	Your blocks can also depend on npm packages and they will be installed when users add your block.
-</p>
-<Code
-	lang="ts"
-	code={`import { print } from "../print"; // import the print block
-import color from "chalk"; // import the chalk package
+	code={`import { print } from "../print"; // another block
+import color from "chalk"; // npm package
 
 const add = (a: number, b: number): number => {
   print(\`result is: \${color.cyan(\`\${a + b}\`)}\`)
@@ -212,8 +195,7 @@ const add = (a: number, b: number): number => {
 </p>
 <p>
 	However if you are using a <CodeSpan>*.jsx</CodeSpan> based framework we don't assume anything for
-	you. There are a lot of different library's that use <CodeSpan>*.jsx</CodeSpan> so we'd be making an
-	ass of ourselves.
+	you.
 </p>
 <p>
 	Instead when running the <CodeSpan>build</CodeSpan> command you can provide the
