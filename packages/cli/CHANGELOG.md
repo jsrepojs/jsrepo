@@ -1,5 +1,12 @@
 # jsrepo
 
+## 1.28.2
+
+### Patch Changes
+
+- 1bc5b91: Update `no-framework-dependency` list to include `@sveltejs/kit`
+- fbd749a: Ensure dependency versions are correctly parsed when adding/updating blocks.
+
 ## 1.28.1
 
 ### Patch Changes
