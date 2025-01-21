@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'pathe';
 import semver from 'semver';
 import { Err, Ok, type Result } from './blocks/types/result';
+import { parsePackageName } from './parse-package-name';
 
 const findNearestPackageJson = (startDir: string, until: string): string | undefined => {
 	const packagePath = path.join(startDir, 'package.json');
@@ -57,7 +58,8 @@ const returnShouldInstall = (
 
 		if (pkg.dependencies) {
 			for (const dep of tempDeps) {
-				const [name, version] = dep.split('@');
+				// this was already parsed when building
+				const { name, version } = parsePackageName(dep).unwrap();
 
 				const foundDep = pkg.dependencies[name];
 
@@ -76,7 +78,8 @@ const returnShouldInstall = (
 
 		if (pkg.devDependencies) {
 			for (const dep of tempDevDeps) {
-				const [name, version] = dep.split('@');
+				// this was already parsed when building
+				const { name, version } = parsePackageName(dep).unwrap();
 
 				const foundDep = pkg.devDependencies[name];
 
