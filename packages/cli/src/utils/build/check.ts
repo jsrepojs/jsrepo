@@ -156,6 +156,7 @@ const rules = {
 			const FRAMEWORKS = new Set([
 				// svelte
 				'svelte',
+				'@sveltejs/kit',
 
 				// vue
 				'vue',
@@ -167,16 +168,18 @@ const rules = {
 				'next',
 				'@remix-run/react',
 
-				// misc
-				'@builder.io/qwik',
-				'astro',
-				'solid-js',
+				// angular
 				'@angular/core',
 				'@angular/common',
 				'@angular/forms',
 				'@angular/platform-browser',
 				'@angular/platform-browser-dynamic',
 				'@angular/router',
+
+				// misc
+				'@builder.io/qwik',
+				'astro',
+				'solid-js',
 			]);
 
 			const frameworkDeps = [...block.devDependencies, ...block.dependencies]
