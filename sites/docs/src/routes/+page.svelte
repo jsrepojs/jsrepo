@@ -2,6 +2,7 @@
 	import AnimatedGradientText from '$lib/components/animations/animated-gradient-text.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { cn } from '$lib/utils/utils';
+	import { ArrowUpRight } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 
 	let focusedIndex = $state(0);
@@ -43,8 +44,12 @@
 		return val + 1;
 	};
 
+	let mounted = $state(false);
+
 	onMount(() => {
 		focusIndex();
+
+		mounted = true;
 
 		const interval = setInterval(() => {
 			focusedIndex = loopIncrement(focusedIndex, 2);
@@ -74,7 +79,9 @@
 			class="flex flex-col gap-5 justify-center place-items-center w-full min-h-[calc(100vh-3.5rem)]"
 		>
 			<AnimatedGradientText href="/docs/cli/update#%E2%9C%A8%20Update%20with%20AI%20%E2%9C%A8">
-				Introducing ✨ Update with AI ✨
+				Introducing | Update with AI <ArrowUpRight
+					class="size-3 mb-0.5 text-muted-foreground inline"
+				/>
 			</AnimatedGradientText>
 
 			<div class="relative">
@@ -99,7 +106,8 @@
 
 				<div
 					bind:this={sightRef}
-					class="border-2 absolute border-primary transition-all duration-1000"
+					data-visible={mounted}
+					class="border-2 absolute border-primary transition-all duration-1000 data-[visible=false]:opacity-0"
 				></div>
 
 				<div class="flex place-items-center justify-center mt-2 sm:mt-8">
