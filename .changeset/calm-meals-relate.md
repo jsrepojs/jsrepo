@@ -2,4 +2,4 @@
 "jsrepo": patch
 ---
 
-perf: Resolve repository paths in parallel.
+perf: Resolve repository paths and fetch jsrepo-manifest.json in parallel.

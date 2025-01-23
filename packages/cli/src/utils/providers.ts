@@ -754,26 +754,34 @@ const fetchBlocks = async (
 	...repos: ResolvedRepo[]
 ): Promise<Result<Map<string, RemoteBlock>, { message: string; repo: string }>> => {
 	const blocksMap = new Map<string, RemoteBlock>();
-	for (const { path: repo, info } of repos) {
-		const getManifestResult = await info.provider.fetchManifest(info);
 
-		if (getManifestResult.isErr()) return Err({ message: getManifestResult.unwrapErr(), repo });
+	const errors = await Promise.all(
+		repos.map(async ({ path: repo, info }) => {
+			const getManifestResult = await info.provider.fetchManifest(info);
 
-		const categories = getManifestResult.unwrap();
+			if (getManifestResult.isErr())
+				return Err({ message: getManifestResult.unwrapErr(), repo });
 
-		for (const category of categories) {
-			for (const block of category.blocks) {
-				const [repoIdent, blockSpecifier] = info.provider.parseBlockSpecifier(
-					u.join(info.url, block.category, block.name)
-				);
+			const categories = getManifestResult.unwrap();
 
-				blocksMap.set(u.join(repoIdent, blockSpecifier), {
-					...block,
-					sourceRepo: info,
-				});
+			for (const category of categories) {
+				for (const block of category.blocks) {
+					const [repoIdent, blockSpecifier] = info.provider.parseBlockSpecifier(
+						u.join(info.url, block.category, block.name)
+					);
+
+					blocksMap.set(u.join(repoIdent, blockSpecifier), {
+						...block,
+						sourceRepo: info,
+					});
+				}
 			}
-		}
-	}
+		})
+	);
+
+	const err = errors.find((err) => err !== undefined);
+
+	if (err) return err;
 
 	return Ok(blocksMap);
 };
@@ -788,7 +796,7 @@ const resolvePaths = async (
 ): Promise<Result<ResolvedRepo[], { message: string; repo: string }>> => {
 	const resolvedPaths: ResolvedRepo[] = [];
 
-	await Promise.all(
+	const errors = await Promise.all(
 		repos.map(async (repo) => {
 			const getProviderResult = await getProviderInfo(repo);
 
@@ -800,6 +808,10 @@ const resolvePaths = async (
 			resolvedPaths.push({ path: repo, info: providerInfo });
 		})
 	);
+
+	const err = errors.find((err) => err !== undefined);
+
+	if (err) return err;
 
 	return Ok(resolvedPaths);
 };
