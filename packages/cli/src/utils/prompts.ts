@@ -137,7 +137,7 @@ const newerVersionAvailable = (name: string, oldVersion: string, newVersion: str
 		textAlignment: 'center',
 	});
 
-	return `${box}`;
+	return box;
 };
 
 const _intro = ({ package: pkg }: CLIContext) => {
