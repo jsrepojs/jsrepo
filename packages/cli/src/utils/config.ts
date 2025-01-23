@@ -3,6 +3,7 @@ import { createPathsMatcher, getTsconfig } from 'get-tsconfig';
 import path from 'pathe';
 import * as v from 'valibot';
 import { Err, Ok, type Result } from './blocks/types/result';
+import type { Block } from './build';
 import { ruleConfigSchema } from './build/check';
 
 const PROJECT_CONFIG_NAME = 'jsrepo.json';
@@ -143,6 +144,25 @@ const resolvePath = (
 	return path.relative(cwd, paths[0]);
 };
 
+/** Gets the path where the block should be installed.
+ *
+ * @param block
+ * @param resolvedPaths
+ * @param cwd
+ * @returns
+ */
+const getPathForBlock = (block: Block, resolvedPaths: Paths, cwd: string): string => {
+	let directory: string;
+
+	if (resolvedPaths[block.category] !== undefined) {
+		directory = path.join(cwd, resolvedPaths[block.category]);
+	} else {
+		directory = path.join(cwd, resolvedPaths['*'], block.category);
+	}
+
+	return directory;
+};
+
 export {
 	PROJECT_CONFIG_NAME,
 	REGISTRY_CONFIG_NAME,
@@ -152,4 +172,5 @@ export {
 	registryConfigSchema,
 	formatterSchema,
 	resolvePaths,
+	getPathForBlock,
 };

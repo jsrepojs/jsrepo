@@ -15,6 +15,7 @@ describe('add', () => {
 			includeTests: false,
 			paths: {
 				'*': './src',
+				types: './types',
 			},
 			repos: [registry],
 			watermark: true,
@@ -58,6 +59,16 @@ describe('add', () => {
 			'triangles.ts',
 			'types.ts',
 		];
+
+		assertFilesExist(blockBaseDir, ...expectedFiles);
+	});
+
+	it('adds block to correct directory', async () => {
+		await addBlock('github/ieedan/std/tree/v2.2.0', 'types/result');
+
+		const blockBaseDir = './types';
+
+		const expectedFiles = ['result.ts'];
 
 		assertFilesExist(blockBaseDir, ...expectedFiles);
 	});

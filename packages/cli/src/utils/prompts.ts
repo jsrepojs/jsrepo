@@ -1,10 +1,9 @@
 import { intro, spinner } from '@clack/prompts';
+import boxen, { type Options as BoxenOptions } from 'boxen';
 import color from 'chalk';
 import { detectSync, resolveCommand } from 'package-manager-detector';
 import semver from 'semver';
 import * as ascii from './ascii';
-import * as lines from './blocks/utils/lines';
-import { centerPad, rightPad, rightPadMin } from './blocks/utils/pad';
 import { stripAsni } from './blocks/utils/strip-ansi';
 import type { CLIContext } from './context';
 
@@ -85,35 +84,29 @@ const runTasksConcurrently = async ({
 	}
 };
 
+export const boxenDefaultOptions: BoxenOptions = {
+	padding: 1,
+	borderColor: 'gray',
+	borderStyle: {
+		topLeft: stripAsni(ascii.JUNCTION_RIGHT),
+		bottomLeft: stripAsni(ascii.JUNCTION_RIGHT),
+		topRight: stripAsni(ascii.TOP_RIGHT_CORNER),
+		top: stripAsni(ascii.HORIZONTAL_LINE),
+		bottom: stripAsni(ascii.HORIZONTAL_LINE),
+		bottomRight: stripAsni(ascii.BOTTOM_RIGHT_CORNER),
+		left: stripAsni(ascii.VERTICAL_LINE),
+		right: stripAsni(ascii.VERTICAL_LINE),
+	},
+};
+
 const nextSteps = (steps: string[]): string => {
-	let max = 20;
-	steps.map((val) => {
-		const reset = rightPad(stripAsni(val), 4);
-
-		if (reset.length > max) max = reset.length;
+	const box = boxen(steps.join('\n'), {
+		...boxenDefaultOptions,
+		title: 'Next Steps',
+		textAlignment: 'left',
 	});
 
-	const NEXT_STEPS = 'Next Steps';
-
-	let result = `${ascii.VERTICAL_LINE}\n`;
-
-	// top
-	result += `${ascii.JUNCTION_RIGHT}  ${NEXT_STEPS} ${ascii.HORIZONTAL_LINE.repeat(
-		max - NEXT_STEPS.length - 1
-	)}${ascii.TOP_RIGHT_CORNER}\n`;
-
-	result += `${ascii.VERTICAL_LINE} ${' '.repeat(max)} ${ascii.VERTICAL_LINE}\n`;
-
-	steps.map((step) => {
-		result += `${ascii.VERTICAL_LINE}  ${rightPadMin(step, max - 1)} ${ascii.VERTICAL_LINE}\n`;
-	});
-
-	result += `${ascii.VERTICAL_LINE} ${' '.repeat(max)} ${ascii.VERTICAL_LINE}\n`;
-
-	// bottom
-	result += `${ascii.JUNCTION_RIGHT}${ascii.HORIZONTAL_LINE.repeat(max + 2)}${ascii.BOTTOM_RIGHT_CORNER}\n`;
-
-	return result;
+	return `${ascii.VERTICAL_LINE}\n${box}\n`;
 };
 
 const truncatedList = (items: string[], maxLength = 3) => {
@@ -137,30 +130,14 @@ const newerVersionAvailable = (name: string, oldVersion: string, newVersion: str
 		`${color.yellowBright('Star')} on GitHub for updates: https://github.com/ieedan/jsrepo`,
 	];
 
-	let max = 30;
-	text.map((line) => {
-		const reset = stripAsni(line);
-
-		if (reset.length + 4 > max) max = reset.length + 4;
+	const box = boxen(text.join('\n'), {
+		borderColor: 'gray',
+		padding: 1,
+		margin: 1,
+		textAlignment: 'center',
 	});
 
-	let result = '\n';
-
-	// top
-	result += `${ascii.TOP_LEFT_CORNER}${ascii.HORIZONTAL_LINE.repeat(max)}${ascii.TOP_RIGHT_CORNER}\n`;
-
-	result += `${ascii.VERTICAL_LINE}${' '.repeat(max)}${ascii.VERTICAL_LINE}\n`;
-
-	for (const line of text) {
-		result += `${ascii.VERTICAL_LINE}${centerPad(line, max)}${ascii.VERTICAL_LINE}\n`;
-	}
-
-	result += `${ascii.VERTICAL_LINE}${' '.repeat(max)}${ascii.VERTICAL_LINE}\n`;
-
-	// bottom
-	result += `${ascii.BOTTOM_LEFT_CORNER}${ascii.HORIZONTAL_LINE.repeat(max)}${ascii.BOTTOM_RIGHT_CORNER}\n`;
-
-	return lines.join(lines.get(result), { prefix: () => ' ' });
+	return box;
 };
 
 const _intro = ({ package: pkg }: CLIContext) => {

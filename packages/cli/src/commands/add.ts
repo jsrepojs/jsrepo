@@ -24,6 +24,7 @@ import { type Block, isTestFile } from '../utils/build';
 import {
 	type Formatter,
 	type ProjectConfig,
+	getPathForBlock,
 	getProjectConfig,
 	projectConfigSchema,
 	resolvePaths,
@@ -426,13 +427,7 @@ const _add = async (blockNames: string[], options: Options) => {
 
 		verbose(`Setting up ${fullSpecifier}`);
 
-		let directory: string;
-
-		if (resolvedPaths[block.category] !== undefined) {
-			directory = path.join(options.cwd, resolvedPaths[block.category]);
-		} else {
-			directory = path.join(options.cwd, resolvedPaths['*'], block.category);
-		}
+		const directory = getPathForBlock(block, resolvedPaths, options.cwd);
 
 		const blockExists = installedBlocks.find((b) => shortSpecifier === b);
 

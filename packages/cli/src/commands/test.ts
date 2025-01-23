@@ -13,7 +13,7 @@ import * as ascii from '../utils/ascii';
 import { getInstalled } from '../utils/blocks';
 import * as url from '../utils/blocks/utils/url';
 import { type Block, isTestFile } from '../utils/build';
-import { getProjectConfig, resolvePaths } from '../utils/config';
+import { getPathForBlock, getProjectConfig, resolvePaths } from '../utils/config';
 import { OUTPUT_FILE } from '../utils/context';
 import { intro } from '../utils/prompts';
 import * as providers from '../utils/providers';
@@ -235,13 +235,7 @@ const _test = async (blockNames: string[], options: Options) => {
 			continue;
 		}
 
-		let directory: string;
-
-		if (resolvedPaths[block.category] !== undefined) {
-			directory = path.join(options.cwd, resolvedPaths[block.category]);
-		} else {
-			directory = path.join(options.cwd, resolvedPaths['*'], block.category);
-		}
+		let directory = getPathForBlock(block, resolvedPaths, options.cwd);
 
 		directory = path.relative(tempTestDirectory, directory);
 

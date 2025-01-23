@@ -41,6 +41,18 @@ export interface Provider {
 	 * @returns
 	 */
 	refSpecifierExample: () => string;
+	/** Returns a normalized URL for the provider.
+	 *
+	 * ```ts
+	 * // https://github.com/ieedan/std -> github/ieedan/std
+	 * // https://github.com/ieedan/std/tree/v2.0.0 -> github/ieedan/std
+	 * // https://example.com/new-york -> https://example.com/new-york
+	 * ```
+	 *
+	 * @param repoPath
+	 * @returns
+	 */
+	baseUrl: (repoPath: string | Info) => Promise<string>;
 	parseBlockSpecifier: (blockSpecifier: string) => [string, string];
 	/** Returns a URL to the raw path of the resource provided in the resourcePath
 	 *
@@ -103,6 +115,11 @@ const github: Provider = {
 	name: () => 'github',
 	defaultBranch: () => 'main',
 	refSpecifierExample: () => 'github/<owner>/<repo>/tree/<ref>',
+	baseUrl: async (repoPath) => {
+		const info = await github.info(repoPath);
+
+		return `github/${info.owner}/${info.repoName}`;
+	},
 	parseBlockSpecifier: (blockSpecifier) => {
 		const [_, owner, repoName, ...rest] = blockSpecifier.split('/');
 
@@ -241,6 +258,11 @@ const gitlab: Provider = {
 	name: () => 'gitlab',
 	defaultBranch: () => 'main',
 	refSpecifierExample: () => 'gitlab/<owner>/<repo>/-/tree/<ref>',
+	baseUrl: async (repoPath) => {
+		const info = await gitlab.info(repoPath);
+
+		return `gitlab/${info.owner}/${info.repoName}`;
+	},
 	parseBlockSpecifier: (blockSpecifier) => {
 		const [_, owner, repoName, ...rest] = blockSpecifier.split('/');
 
@@ -384,6 +406,11 @@ const bitbucket: Provider = {
 	name: () => 'bitbucket',
 	defaultBranch: () => 'master',
 	refSpecifierExample: () => 'bitbucket/<owner>/<repo>/src/<ref>',
+	baseUrl: async (repoPath) => {
+		const info = await bitbucket.info(repoPath);
+
+		return `bitbucket/${info.owner}/${info.repoName}`;
+	},
 	parseBlockSpecifier: (blockSpecifier) => {
 		const [_, owner, repoName, ...rest] = blockSpecifier.split('/');
 
@@ -512,15 +539,20 @@ const azure: Provider = {
 	name: () => 'azure',
 	defaultBranch: () => 'main',
 	refSpecifierExample: () => 'azure/<org>/<project>/<repo>/(tags|heads)/<ref>',
+	baseUrl: async (repoPath) => {
+		const info = await bitbucket.info(repoPath);
+
+		return `azure/${info.owner}/${info.projectName}/${info.repoName}`;
+	},
 	parseBlockSpecifier: (blockSpecifier) => {
-		const [providerName, owner, org, repoName, ...rest] = blockSpecifier.split('/');
+		const [providerName, owner, project, repoName, ...rest] = blockSpecifier.split('/');
 
 		let repo: string;
 		// if rest is greater than 2 it isn't the block specifier so it is part of the path
 		if (rest.length > 2) {
-			repo = `${providerName}/${owner}/${org}/${repoName}${rest.slice(0, rest.length - 2).join('/')}`;
+			repo = `${providerName}/${owner}/${project}/${repoName}${rest.slice(0, rest.length - 2).join('/')}`;
 		} else {
-			repo = `${providerName}/${owner}/${org}/${repoName}`;
+			repo = `${providerName}/${owner}/${project}/${repoName}`;
 		}
 
 		return [repo, rest.slice(rest.length - 2).join('/')];
@@ -626,6 +658,11 @@ const http: Provider = {
 	name: () => 'http',
 	defaultBranch: () => '',
 	refSpecifierExample: () => '',
+	baseUrl: async (repoPath) => {
+		const info = await http.info(repoPath);
+
+		return info.url;
+	},
 	parseBlockSpecifier: (blockSpecifier) => {
 		const url = new URL(blockSpecifier);
 
@@ -717,26 +754,34 @@ const fetchBlocks = async (
 	...repos: ResolvedRepo[]
 ): Promise<Result<Map<string, RemoteBlock>, { message: string; repo: string }>> => {
 	const blocksMap = new Map<string, RemoteBlock>();
-	for (const { path: repo, info } of repos) {
-		const getManifestResult = await info.provider.fetchManifest(info);
 
-		if (getManifestResult.isErr()) return Err({ message: getManifestResult.unwrapErr(), repo });
+	const errors = await Promise.all(
+		repos.map(async ({ path: repo, info }) => {
+			const getManifestResult = await info.provider.fetchManifest(info);
 
-		const categories = getManifestResult.unwrap();
+			if (getManifestResult.isErr())
+				return Err({ message: getManifestResult.unwrapErr(), repo });
 
-		for (const category of categories) {
-			for (const block of category.blocks) {
-				const [repoIdent, blockSpecifier] = info.provider.parseBlockSpecifier(
-					u.join(info.url, block.category, block.name)
-				);
+			const categories = getManifestResult.unwrap();
 
-				blocksMap.set(u.join(repoIdent, blockSpecifier), {
-					...block,
-					sourceRepo: info,
-				});
+			for (const category of categories) {
+				for (const block of category.blocks) {
+					const [repoIdent, blockSpecifier] = info.provider.parseBlockSpecifier(
+						u.join(info.url, block.category, block.name)
+					);
+
+					blocksMap.set(u.join(repoIdent, blockSpecifier), {
+						...block,
+						sourceRepo: info,
+					});
+				}
 			}
-		}
-	}
+		})
+	);
+
+	const err = errors.find((err) => err !== undefined);
+
+	if (err) return err;
 
 	return Ok(blocksMap);
 };
@@ -751,15 +796,22 @@ const resolvePaths = async (
 ): Promise<Result<ResolvedRepo[], { message: string; repo: string }>> => {
 	const resolvedPaths: ResolvedRepo[] = [];
 
-	for (const repo of repos) {
-		const getProviderResult = await getProviderInfo(repo);
+	const errors = await Promise.all(
+		repos.map(async (repo) => {
+			const getProviderResult = await getProviderInfo(repo);
 
-		if (getProviderResult.isErr()) return Err({ message: getProviderResult.unwrapErr(), repo });
+			if (getProviderResult.isErr())
+				return Err({ message: getProviderResult.unwrapErr(), repo });
 
-		const providerInfo = getProviderResult.unwrap();
+			const providerInfo = getProviderResult.unwrap();
 
-		resolvedPaths.push({ path: repo, info: providerInfo });
-	}
+			resolvedPaths.push({ path: repo, info: providerInfo });
+		})
+	);
+
+	const err = errors.find((err) => err !== undefined);
+
+	if (err) return err;
 
 	return Ok(resolvedPaths);
 };

@@ -6,7 +6,7 @@ import { Err, Ok, type Result } from './blocks/types/result';
 import { mapToArray } from './blocks/utils/map-to-array';
 import * as url from './blocks/utils/url';
 import type { Block } from './build';
-import { type ProjectConfig, resolvePaths } from './config';
+import { type ProjectConfig, getPathForBlock, resolvePaths } from './config';
 import * as providers from './providers';
 
 export type RemoteBlock = Block & { sourceRepo: providers.Info };
@@ -119,13 +119,7 @@ const getInstalled = (
 	const resolvedPaths = resolvedPathsResult.unwrap();
 
 	for (const [_, block] of blocks) {
-		let baseDir: string;
-
-		if (resolvedPaths[block.category] !== undefined) {
-			baseDir = path.join(cwd, resolvedPaths[block.category]);
-		} else {
-			baseDir = path.join(cwd, resolvedPaths['*'], block.category);
-		}
+		const baseDir = getPathForBlock(block, resolvedPaths, cwd);
 
 		let blockPath = path.join(baseDir, block.files[0]);
 		if (block.subdirectory) {
