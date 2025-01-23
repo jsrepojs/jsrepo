@@ -1,5 +1,13 @@
 # jsrepo
 
+## 1.28.3
+
+### Patch Changes
+
+- 9b9b4a2: perf: Resolve repository paths and fetch jsrepo-manifest.json in parallel.
+- 53ddf84: chore: Bump deps
+- 53ddf84: fix: Wrap overflowed text in boxes
+
 ## 1.28.2
 
 ### Patch Changes
