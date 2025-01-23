@@ -22,7 +22,7 @@ import * as ascii from '../utils/ascii';
 import { type RemoteBlock, getInstalled, resolveTree } from '../utils/blocks';
 import * as url from '../utils/blocks/utils/url';
 import { isTestFile } from '../utils/build';
-import { getProjectConfig, resolvePaths } from '../utils/config';
+import { getPathForBlock, getProjectConfig, resolvePaths } from '../utils/config';
 import { installDependencies } from '../utils/dependencies';
 import { formatDiff } from '../utils/diff';
 import { formatFile, transformRemoteContent } from '../utils/files';
@@ -226,13 +226,7 @@ const _update = async (blockNames: string[], options: Options) => {
 
 		verbose(`Attempting to add ${fullSpecifier}`);
 
-		let directory: string;
-
-		if (resolvedPaths[block.category] !== undefined) {
-			directory = path.join(options.cwd, resolvedPaths[block.category]);
-		} else {
-			directory = path.join(options.cwd, resolvedPaths['*'], block.category);
-		}
+		const directory = getPathForBlock(block, resolvedPaths, options.cwd);
 
 		const files: { content: string; destPath: string; fileName: string }[] = [];
 
