@@ -1,28 +1,27 @@
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/0b947e63-7783-4682-a061-fe7608de5e41">
+  <a href="https://jsrepo.dev">
+    <picture>
+      <img src="https://github.com/user-attachments/assets/f1c70c20-3a4c-4d36-a21e-4d87cdf4f203">
+    </picture>
+    <h1 align="center">jsrepo</h1>
+  </a>
 </p>
 
-# jsrepo
+<p align="center">
+  <a aria-label="jsrepo logo" href="https://jsrepo.dev">
+    <img alt="" src="https://jsrepo.dev/badges/jsrepo.svg">
+  </a> 
+</p>
 
+**jsrepo** is a CLI to build and distribute your code.
 
-```bash
-npx jsrepo init
-```
+## Getting Started
 
-# About
-https://jsrepo.dev/about
+- [Create a registry](https://jsrepo.dev/docs/setup/registry)
+- [Download your blocks](https://jsrepo.dev/docs/setup/project)
 
-# Docs
-https://jsrepo.dev
+## Demos
 
-# Badges
-
-| Badge                                                   | URL                                         |
-| ------------------------------------------------------- | ------------------------------------------- |
-| ![jsrepo](./sites/docs/static/badges/jsrepo.svg)        | https://jsrepo.dev/badges/jsrepo.svg        |
-| ![jsrepo](./sites/docs/static/badges/build/passing.svg) | https://jsrepo.dev/badges/build/passing.svg |
-| ![jsrepo](./sites/docs/static/badges/build/failing.svg) | https://jsrepo.dev/badges/build/failing.svg |
-
-# Demo
-
-https://youtu.be/IyJQI3z8PWg?si=kIZon7M7eTEvz6E0
+- [Create your first registry](https://youtu.be/IyJQI3z8PWg)
+- [Build your own shadcn-style library with jsrepo](https://youtu.be/zWfBt1vKb84)
+- [Building the shadcn/ui registry with jsrepo](https://youtu.be/tj7BUE9V7fw)
