@@ -5,7 +5,7 @@
 # jsrepo
 
 ```bash
-npx jsrepo init
+npm install jsrepo@latest -g
 ```
 
 CLI for [jsrepo](https://jsrepo.dev). Used to build and download code from registries that **YOU** own.
