@@ -1,5 +1,5 @@
 import type { Block, Category } from '../utils/build';
-import type { RegistryConfig, ProjectConfig } from '../utils/config';
+import type { ProjectConfig, RegistryConfig } from '../utils/config';
 
 type Manifest = Category[];
 
