@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.28.4
+
+### Patch Changes
+
+- d6bc0ee: Expose registry types.
+
 ## 1.28.3
 
 ### Patch Changes
