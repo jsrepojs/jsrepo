@@ -1,5 +1,4 @@
 import { assert, describe, expect, it } from 'vitest';
-import * as providers from '../src/utils/providers';
 import * as registry from '../src/utils/registry-providers';
 
 describe('github', () => {
@@ -846,9 +845,13 @@ describe('http', () => {
 	it('Fetches the manifest', async () => {
 		const repoURL = 'https://jsrepo-http.vercel.app';
 
-		const info = await providers.http.info(repoURL);
+		const provider = registry.selectProvider(repoURL);
 
-		const content = await providers.http.fetchRaw(info, 'jsrepo-manifest.json');
+		assert(provider !== undefined);
+
+		const providerState = await provider.state(repoURL);
+
+		const content = await registry.fetchRaw(providerState, 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{

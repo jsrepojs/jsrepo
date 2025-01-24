@@ -1,15 +1,16 @@
 import * as registry from 'valibot';
 import type { Manifest } from '../../registry';
 import { Err, Ok, type Result } from '../blocks/types/result';
+import { categorySchema } from '../build';
 import { OUTPUT_FILE } from '../context';
+import { azure } from './azure';
+import { bitbucket } from './bitbucket';
 import { github } from './github';
 import { gitlab } from './gitlab';
+import { http } from './http';
 import type { RegistryProvider, RegistryProviderState } from './types';
-import { categorySchema } from '../build';
-import { bitbucket } from './bitbucket';
-import { azure } from './azure';
 
-export const providers = [github, gitlab, bitbucket, azure];
+export const providers = [github, gitlab, bitbucket, azure, http];
 
 export const selectProvider = (url: string): RegistryProvider | undefined => {
 	const provider = providers.find((p) => p.matches(url));
@@ -34,7 +35,7 @@ export const fetchRaw = async (
 	try {
 		const headers = new Headers();
 
-		if (token !== undefined) {
+		if (token !== undefined && state.provider.authHeader) {
 			const [key, value] = state.provider.authHeader(token);
 
 			headers.append(key, value);
@@ -45,17 +46,19 @@ export const fetchRaw = async (
 		verbose?.(`Got a response from ${url} ${response.status} ${response.statusText}`);
 
 		if (!response.ok) {
-			return Err(state.provider.formatFetchError(state, resourcePath));
+			return Err(
+				state.provider.formatFetchError(
+					state,
+					resourcePath,
+					`${response.status} ${response.statusText}`
+				)
+			);
 		}
 
-		const content = await response.text();
-
-		console.log(content);
-
-		return Ok(content);
+		return Ok(await response.text());
 	} catch (err) {
 		console.log(err);
-		return Err(state.provider.formatFetchError(state, resourcePath));
+		return Err(state.provider.formatFetchError(state, resourcePath, err));
 	}
 };
 
@@ -79,4 +82,4 @@ export const fetchManifest = async (
 	return Ok(categories.output);
 };
 
-export { github, gitlab, bitbucket, azure };
+export { github, gitlab, bitbucket, azure, http };

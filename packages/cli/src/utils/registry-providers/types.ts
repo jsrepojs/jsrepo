@@ -33,9 +33,9 @@ export interface RegistryProvider {
 	 * @param token
 	 * @returns
 	 */
-	authHeader: (token: string) => [string, string];
+	authHeader?: (token: string) => [string, string];
 	/** Returns a formatted error for a fetch error giving possible reasons for failure */
-	formatFetchError: (state: RegistryProviderState, filePath: string) => string;
+	formatFetchError: (state: RegistryProviderState, filePath: string, error: unknown) => string;
 }
 
 export type ParseOptions = {

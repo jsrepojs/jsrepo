@@ -1,6 +1,6 @@
 import color from 'chalk';
-import type { ParseOptions, RegistryProvider, RegistryProviderState } from './types';
 import { startsWithOneOf } from '../blocks/utils/strings';
+import type { ParseOptions, RegistryProvider, RegistryProviderState } from './types';
 
 const DEFAULT_BRANCH = 'main';
 
@@ -41,7 +41,7 @@ export const gitlab: RegistryProvider = {
 				const headers = new Headers();
 
 				if (token !== undefined) {
-					const [key, value] = gitlab.authHeader(token);
+					const [key, value] = gitlab.authHeader!(token);
 
 					headers.append(key, value);
 				}
@@ -112,7 +112,7 @@ const parseUrl = (
 
 	let [owner, repoName, ...rest] = repo.split('/');
 
-	let specifier: string | undefined = undefined;
+	let specifier: string | undefined;
 
 	if (fullyQualified) {
 		specifier = rest.slice(rest.length - 2).join('/');
