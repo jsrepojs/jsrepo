@@ -1,13 +1,18 @@
-import { describe, expect, it } from 'vitest';
+import { assert, describe, expect, it } from 'vitest';
 import * as providers from '../src/utils/providers';
+import * as registry from '../src/utils/registry-providers';
 
 describe('github', () => {
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'github/ieedan/std';
 
-		const info = await providers.github.info(repoURL);
+		const provider = registry.selectProvider(repoURL);
 
-		const content = await providers.github.fetchManifest(info);
+		assert(provider !== undefined);
+
+		const providerState = await provider.state(repoURL);
+
+		const content = await registry.fetchManifest(providerState);
 
 		expect(content.isErr()).toBe(false);
 	});
@@ -15,9 +20,14 @@ describe('github', () => {
 	it('Fetches the manifest from a public repo with a tag', async () => {
 		const repoURL = 'https://github.com/ieedan/std/tree/v1.6.0';
 
-		const info = await providers.github.info(repoURL);
+		const provider = registry.selectProvider(repoURL);
 
-		const content = await providers.github.fetchRaw(info, 'jsrepo-manifest.json');
+		assert(provider !== undefined);
+
+		const providerState = await provider.state(repoURL);
+
+		// this way we just get the text and skip the schema validation
+		const content = await registry.fetchRaw(providerState, 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{
@@ -206,9 +216,13 @@ describe('gitlab', () => {
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'gitlab/ieedan/std';
 
-		const info = await providers.gitlab.info(repoURL);
+		const provider = registry.selectProvider(repoURL);
 
-		const content = await providers.gitlab.fetchManifest(info);
+		assert(provider !== undefined);
+
+		const providerState = await provider.state(repoURL);
+
+		const content = await registry.fetchManifest(providerState);
 
 		expect(content.isErr()).toBe(false);
 	});
@@ -216,9 +230,14 @@ describe('gitlab', () => {
 	it('Fetches the manifest from a public repo with a tag', async () => {
 		const repoURL = 'https://gitlab.com/ieedan/std/-/tree/v1.6.0';
 
-		const info = await providers.gitlab.info(repoURL);
+		const provider = registry.selectProvider(repoURL);
 
-		const content = await providers.gitlab.fetchRaw(info, 'jsrepo-manifest.json');
+		assert(provider !== undefined);
+
+		const providerState = await provider.state(repoURL);
+
+		// this way we just get the text and skip the schema validation
+		const content = await registry.fetchRaw(providerState, 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{

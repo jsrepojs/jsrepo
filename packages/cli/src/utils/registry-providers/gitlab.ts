@@ -1,29 +1,27 @@
 import color from 'chalk';
-import { Octokit } from 'octokit';
 import type { ParseOptions, RegistryProvider, RegistryProviderState } from './types';
 import { startsWithOneOf } from '../blocks/utils/strings';
 
 const DEFAULT_BRANCH = 'main';
 
-export interface GitHubProviderState extends RegistryProviderState {
+export interface GitLabProviderState extends RegistryProviderState {
 	owner: string;
 	repoName: string;
-	refs: 'tags' | 'heads';
 	ref: string;
 }
 
 /** Valid paths
  *
- * `https://github.com/<owner>/<repo>`
+ * `https://gitlab.com/ieedan/std`
  *
- * `github/<owner>/<repo>`
+ * `https://gitlab.com/ieedan/std/-/tree/next`
  *
- * `github/<owner>/<repo>/tree/<ref>`
+ * `https://gitlab.com/ieedan/std/-/tree/v2.0.0`
  */
-export const github: RegistryProvider = {
-	name: 'github',
+export const gitlab: RegistryProvider = {
+	name: 'gitlab',
 
-	matches: (url) => startsWithOneOf(url.toLowerCase(), ['github', 'https://github.com']),
+	matches: (url) => startsWithOneOf(url.toLowerCase(), ['gitlab', 'https://gitlab.com']),
 
 	parse: (url, opts) => {
 		const parsed = parseUrl(url, opts);
@@ -37,65 +35,62 @@ export const github: RegistryProvider = {
 	state: async (url, { token } = {}) => {
 		let { url: normalizedUrl, owner, repoName, ref } = parseUrl(url, { fullyQualified: false });
 
-		const octokit = new Octokit({ auth: token });
-
 		if (ref === undefined) {
 			try {
-				const { data: repo } = await octokit.rest.repos.get({ owner, repo: repoName });
+				const headers = new Headers();
 
-				ref = repo.default_branch;
-			} catch {
-				// we just want to continue on blissfully unaware the user will get an error later
-				ref = DEFAULT_BRANCH;
-			}
-		}
+				if (token !== undefined) {
+					const [key, value] = gitlab.authHeader(token);
 
-		// checks if the type of the ref is tags or heads
-		let refs: 'heads' | 'tags' = 'heads';
-		// no need to check if ref is main
-		if (ref !== DEFAULT_BRANCH) {
-			try {
-				const { data: tags } = await octokit.rest.git.listMatchingRefs({
-					owner,
-					repo: repoName,
-					ref: 'tags',
-				});
+					headers.append(key, value);
+				}
 
-				if (tags.some((tag) => tag.ref === `refs/tags/${ref}`)) {
-					refs = 'tags';
+				const response = await fetch(
+					`https://gitlab.com/api/v4/projects/${encodeURIComponent(`${owner}/${repoName}`)}`,
+					{
+						headers,
+					}
+				);
+
+				if (response.ok) {
+					const data = await response.json();
+
+					ref = data.default_branch as string;
+				} else {
+					ref = DEFAULT_BRANCH;
 				}
 			} catch {
-				refs = 'heads';
+				// well find out it isn't correct later with a better error
+				ref = DEFAULT_BRANCH;
 			}
 		}
 
 		return {
 			owner,
-			refs,
-			ref,
 			repoName,
+			ref,
 			url: normalizedUrl,
-			provider: github,
-		} satisfies GitHubProviderState;
+			provider: gitlab,
+		} satisfies GitLabProviderState;
 	},
 
 	resolveRaw: async (state, resourcePath) => {
 		// essentially assert that we are using the correct state
-		if (state.provider.name !== github.name) {
+		if (state.provider.name !== gitlab.name) {
 			throw new Error(
 				`You passed the incorrect state object (${state.provider.name}) to the github provider.`
 			);
 		}
 
-		const { owner, repoName, refs, ref } = state as GitHubProviderState;
+		const { owner, repoName, ref } = state as GitLabProviderState;
 
 		return new URL(
-			resourcePath,
-			`https://raw.githubusercontent.com/${owner}/${repoName}/refs/${refs}/${ref}/`
+			`${encodeURIComponent(resourcePath)}/raw?ref=${ref}`,
+			`https://gitlab.com/api/v4/projects/${encodeURIComponent(`${owner}/${repoName}`)}/repository/files/`
 		);
 	},
 
-	authHeader: (token) => ['Authorization', `token ${token}`],
+	authHeader: (token) => ['PRIVATE-TOKEN', token],
 
 	formatFetchError: (state, filePath) => {
 		return `There was an error fetching \`${color.bold(filePath)}\` from ${color.bold(state.url)}.
@@ -110,9 +105,9 @@ ${color.bold('This may be for one of the following reasons:')}
 
 const parseUrl = (
 	url: string,
-	{ fullyQualified = false }: ParseOptions
+	{ fullyQualified }: ParseOptions
 ): { url: string; owner: string; repoName: string; ref?: string; specifier?: string } => {
-	const repo = url.replaceAll(/(https:\/\/github.com\/)|(github\/)/g, '');
+	const repo = url.replaceAll(/(https:\/\/gitlab.com\/)|(gitlab\/)/g, '');
 
 	let [owner, repoName, ...rest] = repo.split('/');
 
@@ -124,19 +119,25 @@ const parseUrl = (
 		rest = rest.slice(0, rest.length - 2);
 	}
 
-	let ref: string | undefined;
+	const DEFAULT_BRANCH = 'main';
 
-	if (rest.length > 0) {
-		if (rest[0] === 'tree') {
-			ref = rest[1];
+	let ref = DEFAULT_BRANCH;
+
+	if (rest[0] === '-' && rest[1] === 'tree') {
+		if (rest[2].includes('?')) {
+			const [tempRef] = rest[2].split('?');
+
+			ref = tempRef;
+		} else {
+			ref = rest[2];
 		}
 	}
 
 	return {
-		url: `github/${owner}/${repoName}${ref ? `/tree/${ref}` : ''}`,
-		specifier,
-		owner,
+		url: `gitlab/${owner}/${repoName}${ref ? `/-/tree/${ref}` : ''}`,
+		owner: owner,
 		repoName: repoName,
 		ref,
+		specifier,
 	};
 };

@@ -1,63 +1,78 @@
-import { github } from "./github";
+import * as registry from 'valibot';
+import type { Manifest } from '../../registry';
+import { Err, Ok, type Result } from '../blocks/types/result';
+import { OUTPUT_FILE } from '../context';
+import { github } from './github';
+import { gitlab } from './gitlab';
+import type { RegistryProvider, RegistryProviderState } from './types';
+import { categorySchema } from '../build';
 
-export type ParseOptions = {
-	/** Set true when the provided path ends with `<category>/<block>` */
-	fullyQualified?: boolean;
+export const providers = [github, gitlab];
+
+export const selectProvider = (url: string): RegistryProvider | undefined => {
+	const provider = providers.find((p) => p.matches(url));
+
+	return provider;
 };
 
-export type ParseResult = {
-	/** a universal url ex: `https://github.com/ieedan/std -> github/ieedan/std` */
-	url: string;
-	/** The block specifier `<category>/<block>` */
-	specifier?: string;
+export type FetchOptions = {
+	token: string;
+	verbose: (str: string) => void;
 };
 
-export type StateOptions = {
-	token?: string;
+export const fetchRaw = async (
+	state: RegistryProviderState,
+	resourcePath: string,
+	{ verbose, token }: Partial<FetchOptions> = {}
+): Promise<Result<string, string>> => {
+	const url = await state.provider.resolveRaw(state, resourcePath);
+
+	verbose?.(`Trying to fetch from ${url}`);
+
+	try {
+		const headers = new Headers();
+
+		if (token !== undefined) {
+			const [key, value] = state.provider.authHeader(token);
+
+			headers.append(key, value);
+		}
+
+		const response = await fetch(url, { headers });
+
+		verbose?.(`Got a response from ${url} ${response.status} ${response.statusText}`);
+
+		if (!response.ok) {
+			return Err(state.provider.formatFetchError(state, resourcePath));
+		}
+
+		const content = await response.text();
+
+		console.log(content);
+
+		return Ok(content);
+	} catch (err) {
+		console.log(err);
+		return Err(state.provider.formatFetchError(state, resourcePath));
+	}
 };
 
-export interface RegistryProvider {
-	/** Short name for the provider that will be used when it is displayed to the user */
-	name: string;
-	/** Used to determine if the provided url belongs to this provider
-	 *
-	 * @param url
-	 * @returns
-	 */
-	matches: (url: string) => boolean;
-	/** Parse a URL that belongs to the provider
-	 *
-	 * @param url
-	 * @param opts
-	 * @returns
-	 */
-	parse: (url: string, opts: ParseOptions) => ParseResult;
-	/** Gets the provider state by parsing the url and taking care of any loose ends
-	 *
-	 * @param url
-	 * @returns
-	 */
-	state: (url: string, opts?: StateOptions) => Promise<RegistryProviderState>;
-	/** Returns a URL to the raw path of the resource provided in the resourcePath
-	 *
-	 * @param repoPath
-	 * @param resourcePath
-	 * @returns
-	 */
-	resolveRaw: (state: RegistryProviderState, resourcePath: string) => Promise<URL>;
-	/** Different providers use different authorization schemes. 
-	 *  Provide this method with a token to get the key value pair for the authorization header.
-	 *
-	 * @param token
-	 * @returns
-	 */
-	authHeader: (token: string) => [string, string];
-}
+export const fetchManifest = async (
+	state: RegistryProviderState,
+	opts: Partial<FetchOptions> = {}
+): Promise<Result<Manifest, string>> => {
+	const manifest = await fetchRaw(state, OUTPUT_FILE, opts);
 
-/** Pass this to the `.provider` property of this to access the methods for this provider */
-export interface RegistryProviderState {
-	url: string;
-	provider: RegistryProvider;
-}
+	if (manifest.isErr()) return Err(manifest.unwrapErr());
 
-const providers = [github];
+	const categories = registry.safeParse(
+		registry.array(categorySchema),
+		JSON.parse(manifest.unwrap())
+	);
+
+	if (!categories.success) {
+		return Err(`Error parsing categories: ${categories.issues}`);
+	}
+
+	return Ok(categories.output);
+};
