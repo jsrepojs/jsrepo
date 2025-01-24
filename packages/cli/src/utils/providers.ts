@@ -31,28 +31,11 @@ export interface Provider {
 	 * @returns the name of the provider
 	 */
 	name: () => string;
-	/** Get the name of the default branch
-	 *
-	 * @returns
-	 */
-	defaultBranch: () => string;
 	/** Provides an example of what a ref formatted url should look like.
 	 *
 	 * @returns
 	 */
 	refSpecifierExample: () => string;
-	/** Returns a normalized URL for the provider.
-	 *
-	 * ```ts
-	 * // https://github.com/ieedan/std -> github/ieedan/std
-	 * // https://github.com/ieedan/std/tree/v2.0.0 -> github/ieedan/std
-	 * // https://example.com/new-york -> https://example.com/new-york
-	 * ```
-	 *
-	 * @param repoPath
-	 * @returns
-	 */
-	baseUrl: (repoPath: string | Info) => Promise<string>;
 	parseBlockSpecifier: (blockSpecifier: string) => [string, string];
 	/** Returns a URL to the raw path of the resource provided in the resourcePath
 	 *
@@ -95,7 +78,7 @@ export interface Provider {
 
 const gitProviderErrorMessage = (info: Info, filePath: string) => {
 	return Err(
-		`There was an error fetching the \`${color.bold(filePath)}\` from ${color.bold(info.url)}.
+		`There was an error fetching \`${color.bold(filePath)}\` from ${color.bold(info.url)}.
 
 ${color.bold('This may be for one of the following reasons:')}
 1. The \`${color.bold(filePath)}\` or containing repository doesn't exist
@@ -113,13 +96,7 @@ ${color.bold('This may be for one of the following reasons:')}
  */
 const github: Provider = {
 	name: () => 'github',
-	defaultBranch: () => 'main',
 	refSpecifierExample: () => 'github/<owner>/<repo>/tree/<ref>',
-	baseUrl: async (repoPath) => {
-		const info = await github.info(repoPath);
-
-		return `github/${info.owner}/${info.repoName}`;
-	},
 	parseBlockSpecifier: (blockSpecifier) => {
 		const [_, owner, repoName, ...rest] = blockSpecifier.split('/');
 
@@ -192,7 +169,9 @@ const github: Provider = {
 
 		const [owner, repoName, ...rest] = repo.split('/');
 
-		let ref = github.defaultBranch();
+		const DEFAULT_BRANCH = 'main';
+
+		let ref = DEFAULT_BRANCH;
 
 		const token = persisted.get().get(`${github.name()}-token`);
 
@@ -213,7 +192,7 @@ const github: Provider = {
 		// checks if the type of the ref is tags or heads
 		let refs: 'heads' | 'tags' = 'heads';
 		// no need to check if ref is main
-		if (ref !== github.defaultBranch()) {
+		if (ref !== DEFAULT_BRANCH) {
 			try {
 				const { data: tags } = await octokit.rest.git.listMatchingRefs({
 					owner,
@@ -256,13 +235,7 @@ const github: Provider = {
  */
 const gitlab: Provider = {
 	name: () => 'gitlab',
-	defaultBranch: () => 'main',
 	refSpecifierExample: () => 'gitlab/<owner>/<repo>/-/tree/<ref>',
-	baseUrl: async (repoPath) => {
-		const info = await gitlab.info(repoPath);
-
-		return `gitlab/${info.owner}/${info.repoName}`;
-	},
 	parseBlockSpecifier: (blockSpecifier) => {
 		const [_, owner, repoName, ...rest] = blockSpecifier.split('/');
 
@@ -333,7 +306,9 @@ const gitlab: Provider = {
 
 		const [owner, repoName, ...rest] = repo.split('/');
 
-		let ref = gitlab.defaultBranch();
+		const DEFAULT_BRANCH = 'main';
+
+		let ref = DEFAULT_BRANCH;
 		let refs: Info['refs'] = 'heads';
 
 		if (rest[0] === '-' && rest[1] === 'tree') {
@@ -404,13 +379,7 @@ const gitlab: Provider = {
  */
 const bitbucket: Provider = {
 	name: () => 'bitbucket',
-	defaultBranch: () => 'master',
 	refSpecifierExample: () => 'bitbucket/<owner>/<repo>/src/<ref>',
-	baseUrl: async (repoPath) => {
-		const info = await bitbucket.info(repoPath);
-
-		return `bitbucket/${info.owner}/${info.repoName}`;
-	},
 	parseBlockSpecifier: (blockSpecifier) => {
 		const [_, owner, repoName, ...rest] = blockSpecifier.split('/');
 
@@ -484,7 +453,9 @@ const bitbucket: Provider = {
 		// pretty sure this just auto detects
 		const refs = 'heads';
 
-		let ref = bitbucket.defaultBranch();
+		const DEFAULT_BRANCH = 'master';
+
+		let ref = DEFAULT_BRANCH;
 
 		if (rest[0] === 'src') {
 			ref = rest[1];
@@ -537,13 +508,7 @@ const bitbucket: Provider = {
  */
 const azure: Provider = {
 	name: () => 'azure',
-	defaultBranch: () => 'main',
 	refSpecifierExample: () => 'azure/<org>/<project>/<repo>/(tags|heads)/<ref>',
-	baseUrl: async (repoPath) => {
-		const info = await bitbucket.info(repoPath);
-
-		return `azure/${info.owner}/${info.projectName}/${info.repoName}`;
-	},
 	parseBlockSpecifier: (blockSpecifier) => {
 		const [providerName, owner, project, repoName, ...rest] = blockSpecifier.split('/');
 
@@ -617,9 +582,9 @@ const azure: Provider = {
 
 		const [owner, project, repoName, ...rest] = repo.split('/');
 
-		// azure/aidanbleser/std/std/heads/main
+		const DEFAULT_BRANCH = 'main';
 
-		let ref = azure.defaultBranch();
+		let ref = DEFAULT_BRANCH;
 
 		// checks if the type of the ref is tags or heads
 		let refs: 'heads' | 'tags' = 'heads';
@@ -656,13 +621,7 @@ ${color.bold(error)}`
 
 const http: Provider = {
 	name: () => 'http',
-	defaultBranch: () => '',
-	refSpecifierExample: () => '',
-	baseUrl: async (repoPath) => {
-		const info = await http.info(repoPath);
-
-		return info.url;
-	},
+	refSpecifierExample: () => 'https://example.com',
 	parseBlockSpecifier: (blockSpecifier) => {
 		const url = new URL(blockSpecifier);
 
