@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-	entry: ['src/index.ts'],
+	entry: ['src/index.ts', 'src/registry/index.ts'],
 	format: ['esm'],
 	platform: 'node',
 	target: 'es2022',
@@ -10,7 +10,8 @@ export default defineConfig({
 	minify: true,
 	treeshake: true,
 	splitting: true,
-	dts: false,
+	sourcemap: true,
+	dts: true,
 	banner: {
 		js: '#!/usr/bin/env node',
 	},
