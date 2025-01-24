@@ -6,8 +6,10 @@ import { github } from './github';
 import { gitlab } from './gitlab';
 import type { RegistryProvider, RegistryProviderState } from './types';
 import { categorySchema } from '../build';
+import { bitbucket } from './bitbucket';
+import { azure } from './azure';
 
-export const providers = [github, gitlab];
+export const providers = [github, gitlab, bitbucket, azure];
 
 export const selectProvider = (url: string): RegistryProvider | undefined => {
 	const provider = providers.find((p) => p.matches(url));
@@ -76,3 +78,5 @@ export const fetchManifest = async (
 
 	return Ok(categories.output);
 };
+
+export { github, gitlab, bitbucket, azure };

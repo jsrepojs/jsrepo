@@ -2,9 +2,9 @@ import color from 'chalk';
 import type { ParseOptions, RegistryProvider, RegistryProviderState } from './types';
 import { startsWithOneOf } from '../blocks/utils/strings';
 
-const DEFAULT_BRANCH = 'main';
+const DEFAULT_BRANCH = 'master';
 
-export interface GitLabProviderState extends RegistryProviderState {
+export interface BitBucketProviderState extends RegistryProviderState {
 	owner: string;
 	repoName: string;
 	ref: string;
@@ -12,16 +12,17 @@ export interface GitLabProviderState extends RegistryProviderState {
 
 /** Valid paths
  *
- * `https://gitlab.com/ieedan/std`
+ * `https://bitbucket.org/ieedan/std/src/main/`
  *
- * `https://gitlab.com/ieedan/std/-/tree/next`
+ * `https://bitbucket.org/ieedan/std/src/next/`
  *
- * `https://gitlab.com/ieedan/std/-/tree/v2.0.0`
+ * `https://bitbucket.org/ieedan/std/src/v2.0.0/`
+ *
  */
-export const gitlab: RegistryProvider = {
-	name: 'gitlab',
+export const bitbucket: RegistryProvider = {
+	name: 'bitbucket',
 
-	matches: (url) => startsWithOneOf(url.toLowerCase(), ['gitlab', 'https://gitlab.com']),
+	matches: (url) => startsWithOneOf(url.toLowerCase(), ['bitbucket', 'https://bitbucket.org']),
 
 	parse: (url, opts) => {
 		const parsed = parseUrl(url, opts);
@@ -41,13 +42,13 @@ export const gitlab: RegistryProvider = {
 				const headers = new Headers();
 
 				if (token !== undefined) {
-					const [key, value] = gitlab.authHeader(token);
+					const [key, value] = bitbucket.authHeader(token);
 
 					headers.append(key, value);
 				}
 
 				const response = await fetch(
-					`https://gitlab.com/api/v4/projects/${encodeURIComponent(`${owner}/${repoName}`)}`,
+					`https://api.bitbucket.org/2.0/repositories/${owner}/${repoName}`,
 					{
 						headers,
 					}
@@ -56,7 +57,7 @@ export const gitlab: RegistryProvider = {
 				if (response.ok) {
 					const data = await response.json();
 
-					ref = data.default_branch as string;
+					ref = data.mainbranch.name as string;
 				} else {
 					ref = DEFAULT_BRANCH;
 				}
@@ -68,30 +69,30 @@ export const gitlab: RegistryProvider = {
 
 		return {
 			owner,
-			repoName,
 			ref,
+			repoName,
 			url: normalizedUrl,
-			provider: gitlab,
-		} satisfies GitLabProviderState;
+			provider: bitbucket,
+		} satisfies BitBucketProviderState;
 	},
 
 	resolveRaw: async (state, resourcePath) => {
 		// essentially assert that we are using the correct state
-		if (state.provider.name !== gitlab.name) {
+		if (state.provider.name !== bitbucket.name) {
 			throw new Error(
-				`You passed the incorrect state object (${state.provider.name}) to the ${gitlab.name} provider.`
+				`You passed the incorrect state object (${state.provider.name}) to the ${bitbucket.name} provider.`
 			);
 		}
 
-		const { owner, repoName, ref } = state as GitLabProviderState;
+		const { owner, repoName, ref } = state as BitBucketProviderState;
 
 		return new URL(
-			`${encodeURIComponent(resourcePath)}/raw?ref=${ref}`,
-			`https://gitlab.com/api/v4/projects/${encodeURIComponent(`${owner}/${repoName}`)}/repository/files/`
+			resourcePath,
+			`https://api.bitbucket.org/2.0/repositories/${owner}/${repoName}/src/${ref}/`
 		);
 	},
 
-	authHeader: (token) => ['PRIVATE-TOKEN', token],
+	authHeader: (token) => ['Authorization', `Bearer ${token}`],
 
 	formatFetchError: (state, filePath) => {
 		return `There was an error fetching \`${color.bold(filePath)}\` from ${color.bold(state.url)}.
@@ -106,9 +107,9 @@ ${color.bold('This may be for one of the following reasons:')}
 
 const parseUrl = (
 	url: string,
-	{ fullyQualified }: ParseOptions
+	{ fullyQualified = false }: ParseOptions
 ): { url: string; owner: string; repoName: string; ref?: string; specifier?: string } => {
-	const repo = url.replaceAll(/(https:\/\/gitlab.com\/)|(gitlab\/)/g, '');
+	const repo = url.replaceAll(/(https:\/\/bitbucket.org\/)|(bitbucket\/)/g, '');
 
 	let [owner, repoName, ...rest] = repo.split('/');
 
@@ -122,21 +123,15 @@ const parseUrl = (
 
 	let ref: string | undefined;
 
-	if (rest[0] === '-' && rest[1] === 'tree') {
-		if (rest[2].includes('?')) {
-			const [tempRef] = rest[2].split('?');
-
-			ref = tempRef;
-		} else {
-			ref = rest[2];
-		}
+	if (rest[0] === 'src') {
+		ref = rest[1];
 	}
 
 	return {
-		url: `gitlab/${owner}/${repoName}${ref ? `/-/tree/${ref}` : ''}`,
-		owner: owner,
+		url: `bitbucket/${owner}/${repoName}${ref ? `/src/${ref}` : ''}`,
+		specifier,
+		owner,
 		repoName: repoName,
 		ref,
-		specifier,
 	};
 };

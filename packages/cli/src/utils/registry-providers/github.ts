@@ -39,6 +39,10 @@ export const github: RegistryProvider = {
 
 		const octokit = new Octokit({ auth: token });
 
+		// checks if the type of the ref is tags or heads
+		let refs: 'heads' | 'tags' = 'heads';
+
+		// fetch default branch if ref was not provided
 		if (ref === undefined) {
 			try {
 				const { data: repo } = await octokit.rest.repos.get({ owner, repo: repoName });
@@ -48,24 +52,24 @@ export const github: RegistryProvider = {
 				// we just want to continue on blissfully unaware the user will get an error later
 				ref = DEFAULT_BRANCH;
 			}
-		}
+		} else {
+			// no need to check if ref is main
 
-		// checks if the type of the ref is tags or heads
-		let refs: 'heads' | 'tags' = 'heads';
-		// no need to check if ref is main
-		if (ref !== DEFAULT_BRANCH) {
-			try {
-				const { data: tags } = await octokit.rest.git.listMatchingRefs({
-					owner,
-					repo: repoName,
-					ref: 'tags',
-				});
+			// this isn't a double case it's possible that DEFAULT_BRANCH and repo.default_branch are not equal
+			if (ref !== DEFAULT_BRANCH) {
+				try {
+					const { data: tags } = await octokit.rest.git.listMatchingRefs({
+						owner,
+						repo: repoName,
+						ref: 'tags',
+					});
 
-				if (tags.some((tag) => tag.ref === `refs/tags/${ref}`)) {
-					refs = 'tags';
+					if (tags.some((tag) => tag.ref === `refs/tags/${ref}`)) {
+						refs = 'tags';
+					}
+				} catch {
+					refs = 'heads';
 				}
-			} catch {
-				refs = 'heads';
 			}
 		}
 
@@ -83,7 +87,7 @@ export const github: RegistryProvider = {
 		// essentially assert that we are using the correct state
 		if (state.provider.name !== github.name) {
 			throw new Error(
-				`You passed the incorrect state object (${state.provider.name}) to the github provider.`
+				`You passed the incorrect state object (${state.provider.name}) to the ${github.name} provider.`
 			);
 		}
 

@@ -69,7 +69,7 @@
 		"node-fetch": "^3.3.2",
 		"octokit": "^4.1.0",
 		"ollama": "^0.5.12",
-		"openai": "^4.80.0",
+		"openai": "^4.80.1",
 		"package-manager-detector": "^0.2.8",
 		"parse5": "^7.2.1",
 		"pathe": "^2.0.2",

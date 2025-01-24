@@ -426,9 +426,13 @@ describe('bitbucket', () => {
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'bitbucket/ieedan/std';
 
-		const info = await providers.bitbucket.info(repoURL);
+		const provider = registry.selectProvider(repoURL);
 
-		const content = await providers.bitbucket.fetchManifest(info);
+		assert(provider !== undefined);
+
+		const providerState = await provider.state(repoURL);
+
+		const content = await registry.fetchManifest(providerState);
 
 		expect(content.isErr()).toBe(false);
 	});
@@ -436,9 +440,14 @@ describe('bitbucket', () => {
 	it('Fetches the manifest from a public repo with a tag', async () => {
 		const repoURL = 'https://bitbucket.org/ieedan/std/src/v1.6.0';
 
-		const info = await providers.bitbucket.info(repoURL);
+		const provider = registry.selectProvider(repoURL);
 
-		const content = await providers.bitbucket.fetchRaw(info, 'jsrepo-manifest.json');
+		assert(provider !== undefined);
+
+		const providerState = await provider.state(repoURL);
+
+		// this way we just get the text and skip the schema validation
+		const content = await registry.fetchRaw(providerState, 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{
@@ -627,9 +636,13 @@ describe('azure', () => {
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'azure/ieedan/std/std';
 
-		const info = await providers.azure.info(repoURL);
+		const provider = registry.selectProvider(repoURL);
 
-		const content = await providers.azure.fetchManifest(info);
+		assert(provider !== undefined);
+
+		const providerState = await provider.state(repoURL);
+
+		const content = await registry.fetchManifest(providerState);
 
 		expect(content.isErr()).toBe(false);
 	});
@@ -637,9 +650,14 @@ describe('azure', () => {
 	it('Fetches the manifest from a public repo with a tag', async () => {
 		const repoURL = 'azure/ieedan/std/std/tags/v1.6.0';
 
-		const info = await providers.azure.info(repoURL);
+		const provider = registry.selectProvider(repoURL);
 
-		const content = await providers.azure.fetchRaw(info, 'jsrepo-manifest.json');
+		assert(provider !== undefined);
+
+		const providerState = await provider.state(repoURL);
+
+		// this way we just get the text and skip the schema validation
+		const content = await registry.fetchRaw(providerState, 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{
