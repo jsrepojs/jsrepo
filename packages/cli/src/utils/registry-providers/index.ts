@@ -1,4 +1,5 @@
-import * as registry from 'valibot';
+import nodeFetch from 'node-fetch';
+import * as v from 'valibot';
 import type { Manifest } from '../../registry';
 import { Err, Ok, type Result } from '../blocks/types/result';
 import { categorySchema } from '../build';
@@ -41,7 +42,7 @@ export const fetchRaw = async (
 			headers.append(key, value);
 		}
 
-		const response = await fetch(url, { headers });
+		const response = await nodeFetch(url, { headers });
 
 		verbose?.(`Got a response from ${url} ${response.status} ${response.statusText}`);
 
@@ -57,7 +58,6 @@ export const fetchRaw = async (
 
 		return Ok(await response.text());
 	} catch (err) {
-		console.log(err);
 		return Err(state.provider.formatFetchError(state, resourcePath, err));
 	}
 };
@@ -70,10 +70,7 @@ export const fetchManifest = async (
 
 	if (manifest.isErr()) return Err(manifest.unwrapErr());
 
-	const categories = registry.safeParse(
-		registry.array(categorySchema),
-		JSON.parse(manifest.unwrap())
-	);
+	const categories = v.safeParse(v.array(categorySchema), JSON.parse(manifest.unwrap()));
 
 	if (!categories.success) {
 		return Err(`Error parsing categories: ${categories.issues}`);
@@ -81,5 +78,7 @@ export const fetchManifest = async (
 
 	return Ok(categories.output);
 };
+
+export * from './types';
 
 export { github, gitlab, bitbucket, azure, http };

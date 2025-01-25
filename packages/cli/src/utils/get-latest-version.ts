@@ -1,5 +1,7 @@
+import nodeFetch from 'node-fetch';
 import { Err, Ok, type Result } from './blocks/types/result';
 import * as persisted from './persisted';
+import type { Package } from './parse-package-name';
 
 const LATEST_VERSION_KEY = 'latest-version';
 const EXPIRATION_TIME = 60 * 60 * 1000; // 1 hour
@@ -37,7 +39,7 @@ export const getLatestVersion = async (): Promise<Result<string, string>> => {
 			controller.abort();
 		}, 1000);
 
-		const response = await fetch(
+		const response = await nodeFetch(
 			'https://raw.githubusercontent.com/ieedan/jsrepo/refs/heads/main/packages/cli/package.json',
 			{
 				signal: controller.signal,
@@ -50,7 +52,7 @@ export const getLatestVersion = async (): Promise<Result<string, string>> => {
 			return Err('Error getting version');
 		}
 
-		const { version: ver } = await response.json();
+		const { version: ver } = (await response.json()) as Package;
 
 		version = ver;
 

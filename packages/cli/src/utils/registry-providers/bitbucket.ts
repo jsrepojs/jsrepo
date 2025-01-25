@@ -1,4 +1,5 @@
 import color from 'chalk';
+import nodeFetch from 'node-fetch';
 import { startsWithOneOf } from '../blocks/utils/strings';
 import type { ParseOptions, RegistryProvider, RegistryProviderState } from './types';
 
@@ -49,7 +50,7 @@ export const bitbucket: RegistryProvider = {
 					headers.append(key, value);
 				}
 
-				const response = await fetch(
+				const response = await nodeFetch(
 					`https://api.bitbucket.org/2.0/repositories/${owner}/${repoName}`,
 					{
 						headers,
@@ -59,6 +60,7 @@ export const bitbucket: RegistryProvider = {
 				if (response.ok) {
 					const data = await response.json();
 
+					// @ts-ignore yes but we know
 					ref = data.mainbranch.name as string;
 				} else {
 					ref = DEFAULT_BRANCH;
