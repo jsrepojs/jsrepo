@@ -12,6 +12,8 @@ export interface BitBucketProviderState extends RegistryProviderState {
 
 /** Valid paths
  *
+ * `bitbucket/ieedan/std`
+ *
  * `https://bitbucket.org/ieedan/std/src/main/`
  *
  * `https://bitbucket.org/ieedan/std/src/next/`

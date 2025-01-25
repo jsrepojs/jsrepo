@@ -104,7 +104,7 @@ const parseUrl = (
 		rest = rest.slice(0, rest.length - 2);
 	}
 
-	let ref = DEFAULT_BRANCH;
+	let ref: string = DEFAULT_BRANCH;
 
 	// checks if the type of the ref is tags or heads
 	let refs: 'heads' | 'tags' = 'heads';

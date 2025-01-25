@@ -1,7 +1,71 @@
 import { assert, describe, expect, it } from 'vitest';
 import * as registry from '../src/utils/registry-providers';
+import type { ParseOptions, ParseResult } from '../src/utils/registry-providers/types';
+
+type ParseTestCase = {
+	url: string;
+	opts: ParseOptions;
+	expected: ParseResult;
+};
 
 describe('github', () => {
+	it('correctly parses urls', () => {
+		const cases: ParseTestCase[] = [
+			{
+				url: 'https://github.com/ieedan/std',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'github/ieedan/std',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'github/ieedan/std',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'github/ieedan/std',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'github/ieedan/std/tree/v2.0.0',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'github/ieedan/std/tree/v2.0.0',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'https://github.com/ieedan/std/tree/v2.0.0',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'github/ieedan/std/tree/v2.0.0',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'github/ieedan/std/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'github/ieedan/std',
+					specifier: 'utils/math',
+				},
+			},
+			{
+				url: 'https://github.com/ieedan/std/tree/v2.0.0/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'github/ieedan/std/tree/v2.0.0',
+					specifier: 'utils/math',
+				},
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.github.parse(c.url, c.opts)).toStrictEqual(c.expected);
+		}
+	});
+
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'github/ieedan/std';
 
@@ -212,6 +276,79 @@ describe('github', () => {
 });
 
 describe('gitlab', () => {
+	it('correctly parses urls', () => {
+		const cases: ParseTestCase[] = [
+			{
+				url: 'https://gitlab.com/ieedan/std',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'gitlab/ieedan/std',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'gitlab/ieedan/std',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'gitlab/ieedan/std',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'gitlab/ieedan/std/-/tree/next',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'gitlab/ieedan/std/-/tree/next',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'https://gitlab.com/ieedan/std/-/tree/v2.0.0',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'gitlab/ieedan/std/-/tree/v2.0.0',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'https://gitlab.com/ieedan/std/-/tree/v2.0.0?ref_type=tags',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'gitlab/ieedan/std/-/tree/v2.0.0',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'https://gitlab.com/ieedan/std/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'gitlab/ieedan/std',
+					specifier: 'utils/math',
+				},
+			},
+			{
+				url: 'gitlab/ieedan/std/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'gitlab/ieedan/std',
+					specifier: 'utils/math',
+				},
+			},
+			{
+				url: 'gitlab/ieedan/std/-/tree/v2.0.0/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'gitlab/ieedan/std/-/tree/v2.0.0',
+					specifier: 'utils/math',
+				},
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.gitlab.parse(c.url, c.opts)).toStrictEqual(c.expected);
+		}
+	});
+
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'gitlab/ieedan/std';
 
@@ -422,6 +559,55 @@ describe('gitlab', () => {
 });
 
 describe('bitbucket', () => {
+	it('correctly parses urls', () => {
+		const cases: ParseTestCase[] = [
+			{
+				url: 'https://bitbucket.org/ieedan/std/src/main/',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'bitbucket/ieedan/std/src/main',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'bitbucket/ieedan/std',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'bitbucket/ieedan/std',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'bitbucket/ieedan/std/src/next',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'bitbucket/ieedan/std/src/next',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'bitbucket/ieedan/std/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'bitbucket/ieedan/std',
+					specifier: 'utils/math',
+				},
+			},
+			{
+				url: 'bitbucket/ieedan/std/src/next/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'bitbucket/ieedan/std/src/next',
+					specifier: 'utils/math',
+				},
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.bitbucket.parse(c.url, c.opts)).toStrictEqual(c.expected);
+		}
+	});
+
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'bitbucket/ieedan/std';
 
@@ -632,6 +818,47 @@ describe('bitbucket', () => {
 });
 
 describe('azure', () => {
+	it('correctly parses urls', () => {
+		const cases: ParseTestCase[] = [
+			{
+				url: 'azure/ieedan/std/std',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'azure/ieedan/std/std/heads/main',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'azure/ieedan/std/std/tags/v2.0.0',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'azure/ieedan/std/std/tags/v2.0.0',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'azure/ieedan/std/std/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'azure/ieedan/std/std/heads/main',
+					specifier: 'utils/math',
+				},
+			},
+			{
+				url: 'azure/ieedan/std/std/tags/v2.0.0/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'azure/ieedan/std/std/tags/v2.0.0',
+					specifier: 'utils/math',
+				},
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.azure.parse(c.url, c.opts)).toStrictEqual(c.expected);
+		}
+	});
+
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'azure/ieedan/std/std';
 
@@ -842,6 +1069,47 @@ describe('azure', () => {
 });
 
 describe('http', () => {
+	it('correctly parses urls', () => {
+		const cases: ParseTestCase[] = [
+			{
+				url: 'https://example.com/',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'https://example.com',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'https://example.com/new-york',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'https://example.com/new-york',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'https://example.com/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'https://example.com',
+					specifier: 'utils/math',
+				},
+			},
+			{
+				url: 'https://example.com/new-york/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'https://example.com/new-york',
+					specifier: 'utils/math',
+				},
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.http.parse(c.url, c.opts)).toStrictEqual(c.expected);
+		}
+	});
+
 	it('Fetches the manifest', async () => {
 		const repoURL = 'https://jsrepo-http.vercel.app';
 

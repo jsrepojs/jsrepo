@@ -17,6 +17,8 @@ export interface GitLabProviderState extends RegistryProviderState {
  * `https://gitlab.com/ieedan/std/-/tree/next`
  *
  * `https://gitlab.com/ieedan/std/-/tree/v2.0.0`
+ *
+ * `https://gitlab.com/ieedan/std/-/tree/v2.0.0?ref_type=tags`
  */
 export const gitlab: RegistryProvider = {
 	name: 'gitlab',
