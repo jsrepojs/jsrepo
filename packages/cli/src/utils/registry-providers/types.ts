@@ -14,6 +14,16 @@ export interface RegistryProvider {
 	 * @returns
 	 */
 	parse: (url: string, opts: ParseOptions) => ParseResult;
+	/** Parses the url and returns the origin of the url.
+	 *
+	 * `github/ieedan/std/tree/next -> github/ieedan/std`
+	 *
+	 * `https://example.com/new-york -> https://example.com`
+	 *
+	 * @param url
+	 * @returns
+	 */
+	baseUrl: (url: string) => string;
 	/** Gets the provider state by parsing the url and taking care of any loose ends
 	 *
 	 * @param url

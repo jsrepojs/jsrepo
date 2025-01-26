@@ -29,6 +29,12 @@ export const azure: RegistryProvider = {
 		};
 	},
 
+	baseUrl: (url) => {
+		const { owner, repoName } = parseUrl(url, { fullyQualified: false });
+
+		return `https://dev.azure.com/${owner}/_git/${repoName}`;
+	},
+
 	state: async (url) => {
 		const {
 			url: normalizedUrl,

@@ -8,6 +8,11 @@ type ParseTestCase = {
 	expected: ParseResult;
 };
 
+type BaseUrlTestCase = {
+	url: string;
+	expected: string;
+};
+
 describe('github', () => {
 	it('correctly parses urls', () => {
 		const cases: ParseTestCase[] = [
@@ -63,6 +68,27 @@ describe('github', () => {
 
 		for (const c of cases) {
 			expect(registry.github.parse(c.url, c.opts)).toStrictEqual(c.expected);
+		}
+	});
+
+	it('correctly parses base url', () => {
+		const cases: BaseUrlTestCase[] = [
+			{
+				url: 'github/ieedan/std',
+				expected: 'https://github.com/ieedan/std',
+			},
+			{
+				url: 'https://github.com/ieedan/std',
+				expected: 'https://github.com/ieedan/std',
+			},
+			{
+				url: 'github/ieedan/std/tree/next',
+				expected: 'https://github.com/ieedan/std',
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.github.baseUrl(c.url)).toBe(c.expected);
 		}
 	});
 
@@ -345,6 +371,27 @@ describe('gitlab', () => {
 		}
 	});
 
+	it('correctly parses base url', () => {
+		const cases: BaseUrlTestCase[] = [
+			{
+				url: 'gitlab/ieedan/std',
+				expected: 'https://gitlab.com/ieedan/std',
+			},
+			{
+				url: 'https://gitlab.com/ieedan/std',
+				expected: 'https://gitlab.com/ieedan/std',
+			},
+			{
+				url: 'gitlab/ieedan/std/tree/next',
+				expected: 'https://gitlab.com/ieedan/std',
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.gitlab.baseUrl(c.url)).toBe(c.expected);
+		}
+	});
+
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'gitlab/ieedan/std';
 
@@ -600,6 +647,27 @@ describe('bitbucket', () => {
 		}
 	});
 
+	it('correctly parses base url', () => {
+		const cases: BaseUrlTestCase[] = [
+			{
+				url: 'bitbucket/ieedan/std',
+				expected: 'https://bitbucket.org/ieedan/std',
+			},
+			{
+				url: 'https://bitbucket.org/ieedan/std',
+				expected: 'https://bitbucket.org/ieedan/std',
+			},
+			{
+				url: 'bitbucket/ieedan/std/tree/next',
+				expected: 'https://bitbucket.org/ieedan/std',
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.bitbucket.baseUrl(c.url)).toBe(c.expected);
+		}
+	});
+
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'bitbucket/ieedan/std';
 
@@ -847,6 +915,23 @@ describe('azure', () => {
 		}
 	});
 
+	it('correctly parses base url', () => {
+		const cases: BaseUrlTestCase[] = [
+			{
+				url: 'azure/ieedan/std/std',
+				expected: 'https://dev.azure.com/ieedan/_git/std',
+			},
+			{
+				url: 'azure/ieedan/std/std/heads/next',
+				expected: 'https://dev.azure.com/ieedan/_git/std',
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.azure.baseUrl(c.url)).toBe(c.expected);
+		}
+	});
+
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'azure/ieedan/std/std';
 
@@ -1091,6 +1176,23 @@ describe('http', () => {
 
 		for (const c of cases) {
 			expect(registry.http.parse(c.url, c.opts)).toStrictEqual(c.expected);
+		}
+	});
+
+	it('correctly parses base url', () => {
+		const cases: BaseUrlTestCase[] = [
+			{
+				url: 'https://example.com/',
+				expected: 'https://example.com',
+			},
+			{
+				url: 'https://example.com/new-york',
+				expected: 'https://example.com',
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.http.baseUrl(c.url)).toBe(c.expected);
 		}
 	});
 

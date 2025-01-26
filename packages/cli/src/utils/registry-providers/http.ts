@@ -22,6 +22,12 @@ export const http: RegistryProvider = {
 		};
 	},
 
+	baseUrl: (url) => {
+		const { url: u } = parseUrl(url, { fullyQualified: false });
+
+		return new URL(u).origin;
+	},
+
 	state: async (url) => {
 		const { url: normalizedUrl } = parseUrl(url, { fullyQualified: false });
 

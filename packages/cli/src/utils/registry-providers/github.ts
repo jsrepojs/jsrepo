@@ -34,6 +34,12 @@ export const github: RegistryProvider = {
 		};
 	},
 
+	baseUrl: (url) => {
+		const { owner, repoName } = parseUrl(url, { fullyQualified: false });
+
+		return `https://github.com/${owner}/${repoName}`;
+	},
+
 	state: async (url, { token } = {}) => {
 		let { url: normalizedUrl, owner, repoName, ref } = parseUrl(url, { fullyQualified: false });
 

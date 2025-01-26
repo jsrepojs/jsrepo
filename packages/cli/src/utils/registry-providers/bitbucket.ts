@@ -35,6 +35,12 @@ export const bitbucket: RegistryProvider = {
 		};
 	},
 
+	baseUrl: (url) => {
+		const { owner, repoName } = parseUrl(url, { fullyQualified: false });
+
+		return `https://bitbucket.org/${owner}/${repoName}`;
+	},
+
 	state: async (url, { token, fetch: f = fetch } = {}) => {
 		let { url: normalizedUrl, owner, repoName, ref } = parseUrl(url, { fullyQualified: false });
 
