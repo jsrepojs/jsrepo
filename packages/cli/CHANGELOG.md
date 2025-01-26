@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.29.0
+
+### Minor Changes
+
+- 074fb73: re-write internal apis to make the public api usable in the browser. (No change for cli users)
+
 ## 1.28.4
 
 ### Patch Changes
