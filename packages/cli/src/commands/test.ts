@@ -94,8 +94,6 @@ const _test = async (blockNames: string[], options: Options) => {
 
 	verbose(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
 
-	if (!options.verbose) loading.start(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
-
 	const blocksMap: Map<string, registry.RemoteBlock> = (
 		await registry.fetchBlocks(...resolvedRepos)
 	).match(
