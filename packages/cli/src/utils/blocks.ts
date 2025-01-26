@@ -7,28 +7,26 @@ import { mapToArray } from './blocks/utils/map-to-array';
 import * as url from './blocks/utils/url';
 import type { Block } from './build';
 import { type ProjectConfig, getPathForBlock, resolvePaths } from './config';
-import * as providers from './providers';
-
-export type RemoteBlock = Block & { sourceRepo: providers.Info };
+import * as registry from './registry-providers/internal';
 
 export type InstallingBlock = {
 	name: string;
 	subDependency: boolean;
-	block: RemoteBlock;
+	block: registry.RemoteBlock;
 };
 
 const resolveTree = async (
 	blockSpecifiers: string[],
-	blocksMap: Map<string, RemoteBlock>,
-	repoPaths: providers.ResolvedRepo[],
+	blocksMap: Map<string, registry.RemoteBlock>,
+	repoPaths: registry.RegistryProviderState[],
 	installed: Map<string, InstallingBlock> = new Map()
 ): Promise<Result<InstallingBlock[], string>> => {
 	const blocks = new Map<string, InstallingBlock>();
 
 	for (const blockSpecifier of blockSpecifiers) {
-		let block: RemoteBlock | undefined = undefined;
+		let block: registry.RemoteBlock | undefined = undefined;
 
-		const provider = providers.providers.find((p) => blockSpecifier.startsWith(p.name()));
+		const provider = registry.selectProvider(blockSpecifier);
 
 		// if the block starts with github (or another provider) we know it has been resolved
 		if (!provider) {
@@ -43,12 +41,13 @@ const resolveTree = async (
 			}
 
 			// check every repo for the block and return the first block found
-			for (const { info: providerInfo } of repoPaths) {
-				const [repoIdent, specifier] = providerInfo.provider.parseBlockSpecifier(
-					url.join(providerInfo.url, blockSpecifier)
+			for (const providerState of repoPaths) {
+				const { url: repoIdent, specifier } = providerState.provider.parse(
+					url.join(providerState.url, blockSpecifier),
+					{ fullyQualified: true }
 				);
 
-				const tempBlock = blocksMap.get(url.join(repoIdent, specifier));
+				const tempBlock = blocksMap.get(url.join(repoIdent, specifier!));
 
 				if (tempBlock === undefined) continue;
 
@@ -58,10 +57,12 @@ const resolveTree = async (
 			}
 		} else {
 			// get shortened name
-			const [repoIdent, specifier] = provider.parseBlockSpecifier(blockSpecifier);
+			const { url: repoIdent, specifier } = provider.parse(blockSpecifier, {
+				fullyQualified: true,
+			});
 
 			// just beautifies name a bit
-			block = blocksMap.get(url.join(repoIdent, specifier));
+			block = blocksMap.get(url.join(repoIdent, specifier!));
 		}
 
 		if (!block) {

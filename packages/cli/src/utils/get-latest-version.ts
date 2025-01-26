@@ -1,7 +1,7 @@
 import nodeFetch from 'node-fetch';
 import { Err, Ok, type Result } from './blocks/types/result';
-import * as persisted from './persisted';
 import type { Package } from './parse-package-name';
+import * as persisted from './persisted';
 
 const LATEST_VERSION_KEY = 'latest-version';
 const EXPIRATION_TIME = 60 * 60 * 1000; // 1 hour

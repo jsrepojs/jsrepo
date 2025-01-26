@@ -6,7 +6,7 @@ import { context } from '../cli';
 import * as ascii from '../utils/ascii';
 import * as persisted from '../utils/persisted';
 import { intro } from '../utils/prompts';
-import { http, providers } from '../utils/providers';
+import { http, providers } from '../utils/registry-providers/internal';
 
 const schema = v.object({
 	token: v.optional(v.string()),
@@ -16,14 +16,14 @@ const schema = v.object({
 
 type Options = v.InferInput<typeof schema>;
 
-const authProviders = providers.filter((p) => p.name() !== http.name());
+const authProviders = providers.filter((p) => p.name !== http.name);
 
 const auth = new Command('auth')
 	.description('Provide a token for access to private repositories.')
 	.option('--token <token>', 'The token to use for authenticating to your provider.')
 	.addOption(
 		new Option('--provider <name>', 'The provider this token belongs to.').choices(
-			authProviders.map((provider) => provider.name())
+			authProviders.map((provider) => provider.name)
 		)
 	)
 	.option('--logout', 'Erase tokens from each provider from storage.', false)
@@ -42,20 +42,18 @@ const _auth = async (options: Options) => {
 
 	if (options.logout) {
 		for (const provider of authProviders) {
-			const tokenKey = `${provider.name()}-token`;
+			const tokenKey = `${provider.name}-token`;
 
 			if (storage.get(tokenKey) === undefined) {
 				process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
 				process.stdout.write(
-					color.gray(
-						`${ascii.VERTICAL_LINE}  Already logged out of ${provider.name()}.\n`
-					)
+					color.gray(`${ascii.VERTICAL_LINE}  Already logged out of ${provider.name}.\n`)
 				);
 				continue;
 			}
 
 			const response = await confirm({
-				message: `Remove ${provider.name()} token?`,
+				message: `Remove ${provider.name} token?`,
 				initialValue: true,
 			});
 
@@ -75,10 +73,10 @@ const _auth = async (options: Options) => {
 		const response = await select({
 			message: 'Which provider is this token for?',
 			options: authProviders.map((provider) => ({
-				label: provider.name(),
-				value: provider.name(),
+				label: provider.name,
+				value: provider.name,
 			})),
-			initialValue: authProviders[0].name(),
+			initialValue: authProviders[0].name,
 		});
 
 		if (isCancel(response)) {
@@ -88,7 +86,7 @@ const _auth = async (options: Options) => {
 
 		options.provider = response;
 	} else {
-		options.provider = authProviders[0].name();
+		options.provider = authProviders[0].name;
 	}
 
 	if (options.token === undefined) {

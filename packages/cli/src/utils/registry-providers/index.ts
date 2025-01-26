@@ -1,4 +1,3 @@
-import nodeFetch from 'node-fetch';
 import * as v from 'valibot';
 import type { Manifest } from '../../registry';
 import { Err, Ok, type Result } from '../blocks/types/result';
@@ -21,13 +20,15 @@ export const selectProvider = (url: string): RegistryProvider | undefined => {
 
 export type FetchOptions = {
 	token: string;
+	/** Override the fetch method. If you are using this in a node environment you will want to pass `node-fetch` */
+	fetch?: typeof fetch;
 	verbose: (str: string) => void;
 };
 
 export const fetchRaw = async (
 	state: RegistryProviderState,
 	resourcePath: string,
-	{ verbose, token }: Partial<FetchOptions> = {}
+	{ verbose, fetch: f = fetch, token }: Partial<FetchOptions> = {}
 ): Promise<Result<string, string>> => {
 	const url = await state.provider.resolveRaw(state, resourcePath);
 
@@ -42,7 +43,7 @@ export const fetchRaw = async (
 			headers.append(key, value);
 		}
 
-		const response = await nodeFetch(url, { headers });
+		const response = await f(url, { headers });
 
 		verbose?.(`Got a response from ${url} ${response.status} ${response.statusText}`);
 
@@ -64,9 +65,9 @@ export const fetchRaw = async (
 
 export const fetchManifest = async (
 	state: RegistryProviderState,
-	opts: Partial<FetchOptions> = {}
+	{ fetch: f = fetch, ...rest }: Partial<FetchOptions> = {}
 ): Promise<Result<Manifest, string>> => {
-	const manifest = await fetchRaw(state, OUTPUT_FILE, opts);
+	const manifest = await fetchRaw(state, OUTPUT_FILE, { fetch: f, ...rest });
 
 	if (manifest.isErr()) return Err(manifest.unwrapErr());
 

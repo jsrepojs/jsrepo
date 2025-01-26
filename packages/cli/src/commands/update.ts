@@ -19,7 +19,7 @@ import * as v from 'valibot';
 import { context } from '../cli';
 import { type ModelName, models } from '../utils/ai';
 import * as ascii from '../utils/ascii';
-import { type RemoteBlock, getInstalled, resolveTree } from '../utils/blocks';
+import { getInstalled, resolveTree } from '../utils/blocks';
 import * as url from '../utils/blocks/utils/url';
 import { isTestFile } from '../utils/build';
 import { getPathForBlock, getProjectConfig, resolvePaths } from '../utils/config';
@@ -30,7 +30,7 @@ import { loadFormatterConfig } from '../utils/format';
 import { getWatermark } from '../utils/get-watermark';
 import { returnShouldInstall } from '../utils/package';
 import { type Task, intro, nextSteps, runTasks } from '../utils/prompts';
-import * as providers from '../utils/providers';
+import * as registry from '../utils/registry-providers/internal';
 
 const schema = v.object({
 	all: v.boolean(),
@@ -96,7 +96,7 @@ const _update = async (blockNames: string[], options: Options) => {
 
 	// ensure blocks do not provide repos
 	for (const blockSpecifier of blockNames) {
-		if (providers.providers.find((p) => blockSpecifier.startsWith(p.name()))) {
+		if (registry.providers.find((p) => blockSpecifier.startsWith(p.name))) {
 			program.error(
 				color.red(
 					`Invalid value provided for block names \`${color.bold(blockSpecifier)}\`. Block names are expected to be provided in the format of \`${color.bold('<category>/<name>')}\``
@@ -121,8 +121,8 @@ const _update = async (blockNames: string[], options: Options) => {
 
 	if (!options.verbose) loading.start(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
 
-	const resolvedRepos: providers.ResolvedRepo[] = (
-		await providers.resolvePaths(...repoPaths)
+	const resolvedRepos: registry.RegistryProviderState[] = (
+		await registry.forEachPathGetProviderState(...repoPaths)
 	).match(
 		(val) => val,
 		({ repo, message }) => {
@@ -135,8 +135,8 @@ const _update = async (blockNames: string[], options: Options) => {
 
 	verbose(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
 
-	const blocksMap: Map<string, RemoteBlock> = (
-		await providers.fetchBlocks(...resolvedRepos)
+	const blocksMap: Map<string, registry.RemoteBlock> = (
+		await registry.fetchBlocks(...resolvedRepos)
 	).match(
 		(val) => val,
 		({ repo, message }) => {
@@ -222,7 +222,7 @@ const _update = async (blockNames: string[], options: Options) => {
 
 		const watermark = getWatermark(context.package.version, block.sourceRepo.url);
 
-		const providerInfo = block.sourceRepo;
+		const providerState = block.sourceRepo;
 
 		verbose(`Attempting to add ${fullSpecifier}`);
 
@@ -231,7 +231,7 @@ const _update = async (blockNames: string[], options: Options) => {
 		const files: { content: string; destPath: string; fileName: string }[] = [];
 
 		const getSourceFile = async (filePath: string) => {
-			const content = await providerInfo.provider.fetchRaw(providerInfo, filePath, {
+			const content = await registry.fetchRaw(providerState, filePath, {
 				verbose,
 			});
 
@@ -298,7 +298,7 @@ const _update = async (blockNames: string[], options: Options) => {
 					localContent = fs.readFileSync(file.destPath).toString();
 				}
 
-				const from = url.join(providerInfo.url, file.fileName);
+				const from = url.join(providerState.url, file.fileName);
 
 				const to = path.relative(options.cwd, file.destPath);
 
