@@ -1,8 +1,7 @@
 import * as v from 'valibot';
-import type { Manifest } from '../../registry';
+import { MANIFEST_FILE } from '../../constants';
+import { type Manifest, categorySchema } from '../../types';
 import { Err, Ok, type Result } from '../blocks/types/result';
-import { categorySchema } from '../build';
-import { OUTPUT_FILE } from '../context';
 import { azure } from './azure';
 import { bitbucket } from './bitbucket';
 import { github } from './github';
@@ -67,7 +66,7 @@ export const fetchManifest = async (
 	state: RegistryProviderState,
 	{ fetch: f = fetch, ...rest }: Partial<FetchOptions> = {}
 ): Promise<Result<Manifest, string>> => {
-	const manifest = await fetchRaw(state, OUTPUT_FILE, { fetch: f, ...rest });
+	const manifest = await fetchRaw(state, MANIFEST_FILE, { fetch: f, ...rest });
 
 	if (manifest.isErr()) return Err(manifest.unwrapErr());
 

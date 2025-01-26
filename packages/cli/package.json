@@ -19,12 +19,8 @@
 	"type": "module",
 	"exports": {
 		".": {
-			"types": "./dist/index.d.ts",
-			"default": "./dist/index.js"
-		},
-		"./registry": {
-			"types": "./dist/registry/index.d.ts",
-			"default": "./dist/registry/index.js"
+			"types": "./dist/api/index.d.ts",
+			"default": "./dist/api/index.js"
 		}
 	},
 	"bin": "./dist/index.js",

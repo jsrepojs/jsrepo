@@ -1,5 +1,4 @@
 import color from 'chalk';
-import nodeFetch from 'node-fetch';
 import { startsWithOneOf } from '../blocks/utils/strings';
 import type { ParseOptions, RegistryProvider, RegistryProviderState } from './types';
 
@@ -35,7 +34,7 @@ export const gitlab: RegistryProvider = {
 		};
 	},
 
-	state: async (url, { token } = {}) => {
+	state: async (url, { token, fetch: f = fetch } = {}) => {
 		let { url: normalizedUrl, owner, repoName, ref } = parseUrl(url, { fullyQualified: false });
 
 		// fetch default branch if ref was not provided
@@ -49,7 +48,7 @@ export const gitlab: RegistryProvider = {
 					headers.append(key, value);
 				}
 
-				const response = await nodeFetch(
+				const response = await f(
 					`https://gitlab.com/api/v4/projects/${encodeURIComponent(`${owner}/${repoName}`)}`,
 					{
 						headers,

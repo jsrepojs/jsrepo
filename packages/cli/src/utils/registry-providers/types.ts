@@ -52,6 +52,8 @@ export type ParseResult = {
 
 export type StateOptions = {
 	token?: string;
+	/** Override the fetch method. If you are using this in a node environment you will want to pass `node-fetch` */
+	fetch?: typeof fetch;
 };
 
 /** Pass this to the `.provider` property of this to access the methods for this provider */

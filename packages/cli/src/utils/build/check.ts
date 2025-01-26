@@ -1,6 +1,6 @@
 import color from 'chalk';
 import * as v from 'valibot';
-import type { Block, Category } from '.';
+import type { Block, Category } from '../../types';
 import * as ascii from '../ascii';
 import type { RegistryConfig } from '../config';
 import { parsePackageName } from '../parse-package-name';

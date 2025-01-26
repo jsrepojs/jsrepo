@@ -11,9 +11,9 @@ import {
 	providers,
 	selectProvider,
 } from '.';
+import type { Block } from '../../types';
 import { Err, Ok, type Result } from '../blocks/types/result';
 import * as u from '../blocks/utils/url';
-import type { Block } from '../build';
 import * as persisted from '../persisted';
 import type { RegistryProvider, RegistryProviderState } from './types';
 
@@ -59,16 +59,20 @@ export const getProviderToken = (provider: RegistryProvider): string | undefined
 };
 
 /** Parses the provided url and returns the state.
- * 
- * @param repo 
- * @returns 
+ *
+ * @param repo
+ * @returns
  */
 export const getProviderState = async (
 	repo: string
 ): Promise<Result<RegistryProviderState, string>> => {
 	const provider = selectProvider(repo);
 	if (provider) {
-		const state = await provider.state(repo, { token: getProviderToken(provider) });
+		const state = await provider.state(repo, {
+			token: getProviderToken(provider),
+			// @ts-expect-error but it does work
+			fetch: nodeFetch,
+		});
 
 		return Ok(state);
 	}

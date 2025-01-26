@@ -20,7 +20,7 @@ import { context } from '../cli';
 import * as ascii from '../utils/ascii';
 import { getInstalled, resolveTree } from '../utils/blocks';
 import * as url from '../utils/blocks/utils/url';
-import { type Block, isTestFile } from '../utils/build';
+import { isTestFile } from '../utils/build';
 import {
 	type Formatter,
 	type ProjectConfig,

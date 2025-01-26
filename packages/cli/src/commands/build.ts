@@ -6,11 +6,12 @@ import ignore from 'ignore';
 import path from 'pathe';
 import * as v from 'valibot';
 import { context } from '../cli';
+import { MANIFEST_FILE } from '../constants';
+import type { Category } from '../types';
 import * as ascii from '../utils/ascii';
-import { type Category, buildBlocksDirectory, pruneUnused } from '../utils/build';
+import { buildBlocksDirectory, pruneUnused } from '../utils/build';
 import { DEFAULT_CONFIG, runRules } from '../utils/build/check';
 import { type RegistryConfig, getRegistryConfig } from '../utils/config';
-import { OUTPUT_FILE } from '../utils/context';
 import { intro } from '../utils/prompts';
 
 // sensible defaults for ignored directories
@@ -37,7 +38,7 @@ const schema = v.object({
 type Options = v.InferInput<typeof schema>;
 
 const build = new Command('build')
-	.description(`Builds the provided --dirs in the project root into a \`${OUTPUT_FILE}\` file.`)
+	.description(`Builds the provided --dirs in the project root into a \`${MANIFEST_FILE}\` file.`)
 	.option('--dirs [dirs...]', 'The directories containing the blocks.')
 	.option(
 		'--output-dir <dir>',
@@ -62,7 +63,7 @@ const build = new Command('build')
 	)
 	.option('--exclude-deps [deps...]', 'Dependencies that should not be added.')
 	.option('--preview', 'Display a preview of the blocks list.')
-	.option('--no-output', `Do not output a \`${OUTPUT_FILE}\` file.`)
+	.option('--no-output', `Do not output a \`${MANIFEST_FILE}\` file.`)
 	.option('--verbose', 'Include debug logs.', false)
 	.option('--cwd <path>', 'The current working directory.', process.cwd())
 	.action(async (opts) => {
@@ -133,7 +134,7 @@ const _build = async (options: Options) => {
 		outDir = options.cwd;
 	}
 
-	const manifestOut = path.join(outDir, OUTPUT_FILE);
+	const manifestOut = path.join(outDir, MANIFEST_FILE);
 
 	if (options.output && fs.existsSync(manifestOut)) {
 		// we need to remove all previously copied directories

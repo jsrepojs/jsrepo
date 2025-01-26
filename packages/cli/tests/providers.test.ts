@@ -1,5 +1,5 @@
 import { assert, describe, expect, it } from 'vitest';
-import * as registry from '../src/utils/registry-providers';
+import * as registry from '../src/utils/registry-providers/internal';
 import type { ParseOptions, ParseResult } from '../src/utils/registry-providers/types';
 
 type ParseTestCase = {
@@ -69,13 +69,11 @@ describe('github', () => {
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'github/ieedan/std';
 
-		const provider = registry.selectProvider(repoURL);
+		const providerState = await registry.getProviderState(repoURL);
 
-		assert(provider !== undefined);
+		assert(providerState.isOk());
 
-		const providerState = await provider.state(repoURL);
-
-		const content = await registry.fetchManifest(providerState);
+		const content = await registry.fetchManifest(providerState.unwrap());
 
 		expect(content.isErr()).toBe(false);
 	});
@@ -83,14 +81,12 @@ describe('github', () => {
 	it('Fetches the manifest from a public repo with a tag', async () => {
 		const repoURL = 'https://github.com/ieedan/std/tree/v1.6.0';
 
-		const provider = registry.selectProvider(repoURL);
+		const providerState = await registry.getProviderState(repoURL);
 
-		assert(provider !== undefined);
-
-		const providerState = await provider.state(repoURL);
+		assert(providerState.isOk());
 
 		// this way we just get the text and skip the schema validation
-		const content = await registry.fetchRaw(providerState, 'jsrepo-manifest.json');
+		const content = await registry.fetchRaw(providerState.unwrap(), 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{
@@ -352,13 +348,11 @@ describe('gitlab', () => {
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'gitlab/ieedan/std';
 
-		const provider = registry.selectProvider(repoURL);
+		const providerState = await registry.getProviderState(repoURL);
 
-		assert(provider !== undefined);
+		assert(providerState.isOk());
 
-		const providerState = await provider.state(repoURL);
-
-		const content = await registry.fetchManifest(providerState);
+		const content = await registry.fetchManifest(providerState.unwrap());
 
 		expect(content.isErr()).toBe(false);
 	});
@@ -366,14 +360,12 @@ describe('gitlab', () => {
 	it('Fetches the manifest from a public repo with a tag', async () => {
 		const repoURL = 'https://gitlab.com/ieedan/std/-/tree/v1.6.0';
 
-		const provider = registry.selectProvider(repoURL);
+		const providerState = await registry.getProviderState(repoURL);
 
-		assert(provider !== undefined);
-
-		const providerState = await provider.state(repoURL);
+		assert(providerState.isOk());
 
 		// this way we just get the text and skip the schema validation
-		const content = await registry.fetchRaw(providerState, 'jsrepo-manifest.json');
+		const content = await registry.fetchRaw(providerState.unwrap(), 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{
@@ -611,13 +603,11 @@ describe('bitbucket', () => {
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'bitbucket/ieedan/std';
 
-		const provider = registry.selectProvider(repoURL);
+		const providerState = await registry.getProviderState(repoURL);
 
-		assert(provider !== undefined);
+		assert(providerState.isOk());
 
-		const providerState = await provider.state(repoURL);
-
-		const content = await registry.fetchManifest(providerState);
+		const content = await registry.fetchManifest(providerState.unwrap());
 
 		expect(content.isErr()).toBe(false);
 	});
@@ -625,14 +615,12 @@ describe('bitbucket', () => {
 	it('Fetches the manifest from a public repo with a tag', async () => {
 		const repoURL = 'https://bitbucket.org/ieedan/std/src/v1.6.0';
 
-		const provider = registry.selectProvider(repoURL);
+		const providerState = await registry.getProviderState(repoURL);
 
-		assert(provider !== undefined);
-
-		const providerState = await provider.state(repoURL);
+		assert(providerState.isOk());
 
 		// this way we just get the text and skip the schema validation
-		const content = await registry.fetchRaw(providerState, 'jsrepo-manifest.json');
+		const content = await registry.fetchRaw(providerState.unwrap(), 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{
@@ -862,13 +850,11 @@ describe('azure', () => {
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'azure/ieedan/std/std';
 
-		const provider = registry.selectProvider(repoURL);
+		const providerState = await registry.getProviderState(repoURL);
 
-		assert(provider !== undefined);
+		assert(providerState.isOk());
 
-		const providerState = await provider.state(repoURL);
-
-		const content = await registry.fetchManifest(providerState);
+		const content = await registry.fetchManifest(providerState.unwrap());
 
 		expect(content.isErr()).toBe(false);
 	});
@@ -876,14 +862,12 @@ describe('azure', () => {
 	it('Fetches the manifest from a public repo with a tag', async () => {
 		const repoURL = 'azure/ieedan/std/std/tags/v1.6.0';
 
-		const provider = registry.selectProvider(repoURL);
+		const providerState = await registry.getProviderState(repoURL);
 
-		assert(provider !== undefined);
-
-		const providerState = await provider.state(repoURL);
+		assert(providerState.isOk());
 
 		// this way we just get the text and skip the schema validation
-		const content = await registry.fetchRaw(providerState, 'jsrepo-manifest.json');
+		const content = await registry.fetchRaw(providerState.unwrap(), 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{
@@ -1113,13 +1097,12 @@ describe('http', () => {
 	it('Fetches the manifest', async () => {
 		const repoURL = 'https://jsrepo-http.vercel.app';
 
-		const provider = registry.selectProvider(repoURL);
+		const providerState = await registry.getProviderState(repoURL);
 
-		assert(provider !== undefined);
+		assert(providerState.isOk());
 
-		const providerState = await provider.state(repoURL);
-
-		const content = await registry.fetchRaw(providerState, 'jsrepo-manifest.json');
+		// this way we just get the text and skip the schema validation
+		const content = await registry.fetchRaw(providerState.unwrap(), 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{

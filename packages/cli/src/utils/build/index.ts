@@ -4,34 +4,11 @@ import { program } from 'commander';
 import type { Ignore } from 'ignore';
 import path from 'pathe';
 import * as v from 'valibot';
+import { type Block, type Category, categorySchema } from '../../types';
 import * as ascii from '../ascii';
 import type { RegistryConfig } from '../config';
 import { languages } from '../language-support';
 import { isDependedOn } from './check';
-
-export const blockSchema = v.object({
-	name: v.string(),
-	category: v.string(),
-	localDependencies: v.array(v.string()),
-	dependencies: v.array(v.string()),
-	devDependencies: v.array(v.string()),
-	tests: v.boolean(),
-	list: v.optional(v.boolean(), true),
-	/** Where to find the block relative to root */
-	directory: v.string(),
-	subdirectory: v.boolean(),
-	files: v.array(v.string()),
-	_imports_: v.record(v.string(), v.string()),
-});
-
-export const categorySchema = v.object({
-	name: v.string(),
-	blocks: v.array(blockSchema),
-});
-
-export type Category = v.InferOutput<typeof categorySchema>;
-
-export type Block = v.InferOutput<typeof blockSchema>;
 
 const TEST_SUFFIXES = ['.test.ts', '_test.ts', '.test.js', '_test.js'] as const;
 

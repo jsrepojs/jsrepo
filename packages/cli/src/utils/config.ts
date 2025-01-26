@@ -2,8 +2,8 @@ import fs from 'node:fs';
 import { createPathsMatcher, getTsconfig } from 'get-tsconfig';
 import path from 'pathe';
 import * as v from 'valibot';
+import type { Block } from '../types';
 import { Err, Ok, type Result } from './blocks/types/result';
-import type { Block } from './build';
 import { ruleConfigSchema } from './build/check';
 
 const PROJECT_CONFIG_NAME = 'jsrepo.json';
