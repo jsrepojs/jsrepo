@@ -1,3 +1,3 @@
-import Search from "./search.svelte";
+import Search from './search.svelte';
 
-export { Search }
+export { Search };

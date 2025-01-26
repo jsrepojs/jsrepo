@@ -1,16 +1,9 @@
 <script lang="ts">
+	import Registry from './registry.svelte';
+
 	let { data } = $props();
 </script>
 
-<div class="h-svh flex flex-col place-items-center max-w-3xl">
-	<div class="">
-		<h1>Blocks</h1>
-		<ul class="flex flex-col">
-			{#each data.manifest as category}
-				{#each category.blocks as block}
-					<span>{block.category}/{block.name}</span>
-				{/each}
-			{/each}
-		</ul>
-	</div>
+<div class="min-h-svh flex flex-col place-items-center py-2 w-full">
+	<Registry {...data} />
 </div>

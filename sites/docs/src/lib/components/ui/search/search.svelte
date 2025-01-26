@@ -8,9 +8,9 @@
 		value?: string;
 		searching?: boolean;
 		placeholder?: string;
-        /** Debounce for the `oninput` event */
+		/** Debounce for the `oninput` event */
 		onDebounce?: (value: string) => void;
-        /** Time before `onDebounce` fires */
+		/** Time before `onDebounce` fires */
 		debounceMs?: number;
 	}
 
@@ -24,7 +24,7 @@
 		...rest
 	}: Props = $props();
 
-	let debounceTimeout = $state<NodeJS.Timeout>();
+	let debounceTimeout = $state<ReturnType<typeof setTimeout>>();
 
 	const debounce = () => {
 		clearTimeout(debounceTimeout);
@@ -52,7 +52,7 @@
 		bind:value
 		class="grow w-full bg-transparent outline-none focus:outline-none h-full placeholder:text-muted-foreground"
 		{placeholder}
-        oninput={debounce}
+		oninput={debounce}
 	/>
 	<div class="absolute size-12 right-0 top-0">
 		{#if searching}

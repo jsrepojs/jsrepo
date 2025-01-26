@@ -13,6 +13,7 @@
 
 	// reset invalid whenever the user types
 	$effect(() => {
+		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 		search;
 
 		untrack(() => {

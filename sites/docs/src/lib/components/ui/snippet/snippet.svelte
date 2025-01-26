@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Command } from 'package-manager-detector';
 	import { resolveCommand } from 'package-manager-detector/commands';
-	import CopyButton from './copy-button.svelte';
+	import CopyButton from './pm-copy-button.svelte';
 	import { cn } from '$lib/utils';
 	import { pmContext } from '$lib/ts/context';
 
