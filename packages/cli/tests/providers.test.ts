@@ -1,13 +1,105 @@
-import { describe, expect, it } from 'vitest';
-import * as providers from '../src/utils/providers';
+import { assert, describe, expect, it } from 'vitest';
+import * as registry from '../src/utils/registry-providers/internal';
+import type { ParseOptions, ParseResult } from '../src/utils/registry-providers/types';
+
+type ParseTestCase = {
+	url: string;
+	opts: ParseOptions;
+	expected: ParseResult;
+};
+
+type BaseUrlTestCase = {
+	url: string;
+	expected: string;
+};
 
 describe('github', () => {
+	it('correctly parses urls', () => {
+		const cases: ParseTestCase[] = [
+			{
+				url: 'https://github.com/ieedan/std',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'github/ieedan/std',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'github/ieedan/std',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'github/ieedan/std',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'github/ieedan/std/tree/v2.0.0',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'github/ieedan/std/tree/v2.0.0',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'https://github.com/ieedan/std/tree/v2.0.0',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'github/ieedan/std/tree/v2.0.0',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'github/ieedan/std/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'github/ieedan/std',
+					specifier: 'utils/math',
+				},
+			},
+			{
+				url: 'https://github.com/ieedan/std/tree/v2.0.0/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'github/ieedan/std/tree/v2.0.0',
+					specifier: 'utils/math',
+				},
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.github.parse(c.url, c.opts)).toStrictEqual(c.expected);
+		}
+	});
+
+	it('correctly parses base url', () => {
+		const cases: BaseUrlTestCase[] = [
+			{
+				url: 'github/ieedan/std',
+				expected: 'https://github.com/ieedan/std',
+			},
+			{
+				url: 'https://github.com/ieedan/std',
+				expected: 'https://github.com/ieedan/std',
+			},
+			{
+				url: 'github/ieedan/std/tree/next',
+				expected: 'https://github.com/ieedan/std',
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.github.baseUrl(c.url)).toBe(c.expected);
+		}
+	});
+
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'github/ieedan/std';
 
-		const info = await providers.github.info(repoURL);
+		const providerState = await registry.getProviderState(repoURL);
 
-		const content = await providers.github.fetchManifest(info);
+		assert(providerState.isOk());
+
+		const content = await registry.fetchManifest(providerState.unwrap());
 
 		expect(content.isErr()).toBe(false);
 	});
@@ -15,9 +107,12 @@ describe('github', () => {
 	it('Fetches the manifest from a public repo with a tag', async () => {
 		const repoURL = 'https://github.com/ieedan/std/tree/v1.6.0';
 
-		const info = await providers.github.info(repoURL);
+		const providerState = await registry.getProviderState(repoURL);
 
-		const content = await providers.github.fetchRaw(info, 'jsrepo-manifest.json');
+		assert(providerState.isOk());
+
+		// this way we just get the text and skip the schema validation
+		const content = await registry.fetchRaw(providerState.unwrap(), 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{
@@ -203,12 +298,108 @@ describe('github', () => {
 });
 
 describe('gitlab', () => {
+	it('correctly parses urls', () => {
+		const cases: ParseTestCase[] = [
+			{
+				url: 'https://gitlab.com/ieedan/std',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'gitlab/ieedan/std',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'gitlab/ieedan/std',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'gitlab/ieedan/std',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'gitlab/ieedan/std/-/tree/next',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'gitlab/ieedan/std/-/tree/next',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'https://gitlab.com/ieedan/std/-/tree/v2.0.0',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'gitlab/ieedan/std/-/tree/v2.0.0',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'https://gitlab.com/ieedan/std/-/tree/v2.0.0?ref_type=tags',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'gitlab/ieedan/std/-/tree/v2.0.0',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'https://gitlab.com/ieedan/std/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'gitlab/ieedan/std',
+					specifier: 'utils/math',
+				},
+			},
+			{
+				url: 'gitlab/ieedan/std/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'gitlab/ieedan/std',
+					specifier: 'utils/math',
+				},
+			},
+			{
+				url: 'gitlab/ieedan/std/-/tree/v2.0.0/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'gitlab/ieedan/std/-/tree/v2.0.0',
+					specifier: 'utils/math',
+				},
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.gitlab.parse(c.url, c.opts)).toStrictEqual(c.expected);
+		}
+	});
+
+	it('correctly parses base url', () => {
+		const cases: BaseUrlTestCase[] = [
+			{
+				url: 'gitlab/ieedan/std',
+				expected: 'https://gitlab.com/ieedan/std',
+			},
+			{
+				url: 'https://gitlab.com/ieedan/std',
+				expected: 'https://gitlab.com/ieedan/std',
+			},
+			{
+				url: 'gitlab/ieedan/std/tree/next',
+				expected: 'https://gitlab.com/ieedan/std',
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.gitlab.baseUrl(c.url)).toBe(c.expected);
+		}
+	});
+
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'gitlab/ieedan/std';
 
-		const info = await providers.gitlab.info(repoURL);
+		const providerState = await registry.getProviderState(repoURL);
 
-		const content = await providers.gitlab.fetchManifest(info);
+		assert(providerState.isOk());
+
+		const content = await registry.fetchManifest(providerState.unwrap());
 
 		expect(content.isErr()).toBe(false);
 	});
@@ -216,9 +407,12 @@ describe('gitlab', () => {
 	it('Fetches the manifest from a public repo with a tag', async () => {
 		const repoURL = 'https://gitlab.com/ieedan/std/-/tree/v1.6.0';
 
-		const info = await providers.gitlab.info(repoURL);
+		const providerState = await registry.getProviderState(repoURL);
 
-		const content = await providers.gitlab.fetchRaw(info, 'jsrepo-manifest.json');
+		assert(providerState.isOk());
+
+		// this way we just get the text and skip the schema validation
+		const content = await registry.fetchRaw(providerState.unwrap(), 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{
@@ -404,12 +598,84 @@ describe('gitlab', () => {
 });
 
 describe('bitbucket', () => {
+	it('correctly parses urls', () => {
+		const cases: ParseTestCase[] = [
+			{
+				url: 'https://bitbucket.org/ieedan/std/src/main/',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'bitbucket/ieedan/std/src/main',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'bitbucket/ieedan/std',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'bitbucket/ieedan/std',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'bitbucket/ieedan/std/src/next',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'bitbucket/ieedan/std/src/next',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'bitbucket/ieedan/std/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'bitbucket/ieedan/std',
+					specifier: 'utils/math',
+				},
+			},
+			{
+				url: 'bitbucket/ieedan/std/src/next/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'bitbucket/ieedan/std/src/next',
+					specifier: 'utils/math',
+				},
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.bitbucket.parse(c.url, c.opts)).toStrictEqual(c.expected);
+		}
+	});
+
+	it('correctly parses base url', () => {
+		const cases: BaseUrlTestCase[] = [
+			{
+				url: 'bitbucket/ieedan/std',
+				expected: 'https://bitbucket.org/ieedan/std',
+			},
+			{
+				url: 'https://bitbucket.org/ieedan/std',
+				expected: 'https://bitbucket.org/ieedan/std',
+			},
+			{
+				url: 'bitbucket/ieedan/std/tree/next',
+				expected: 'https://bitbucket.org/ieedan/std',
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.bitbucket.baseUrl(c.url)).toBe(c.expected);
+		}
+	});
+
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'bitbucket/ieedan/std';
 
-		const info = await providers.bitbucket.info(repoURL);
+		const providerState = await registry.getProviderState(repoURL);
 
-		const content = await providers.bitbucket.fetchManifest(info);
+		assert(providerState.isOk());
+
+		const content = await registry.fetchManifest(providerState.unwrap());
 
 		expect(content.isErr()).toBe(false);
 	});
@@ -417,9 +683,12 @@ describe('bitbucket', () => {
 	it('Fetches the manifest from a public repo with a tag', async () => {
 		const repoURL = 'https://bitbucket.org/ieedan/std/src/v1.6.0';
 
-		const info = await providers.bitbucket.info(repoURL);
+		const providerState = await registry.getProviderState(repoURL);
 
-		const content = await providers.bitbucket.fetchRaw(info, 'jsrepo-manifest.json');
+		assert(providerState.isOk());
+
+		// this way we just get the text and skip the schema validation
+		const content = await registry.fetchRaw(providerState.unwrap(), 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{
@@ -605,12 +874,72 @@ describe('bitbucket', () => {
 });
 
 describe('azure', () => {
+	it('correctly parses urls', () => {
+		const cases: ParseTestCase[] = [
+			{
+				url: 'azure/ieedan/std/std',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'azure/ieedan/std/std/heads/main',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'azure/ieedan/std/std/tags/v2.0.0',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'azure/ieedan/std/std/tags/v2.0.0',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'azure/ieedan/std/std/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'azure/ieedan/std/std/heads/main',
+					specifier: 'utils/math',
+				},
+			},
+			{
+				url: 'azure/ieedan/std/std/tags/v2.0.0/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'azure/ieedan/std/std/tags/v2.0.0',
+					specifier: 'utils/math',
+				},
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.azure.parse(c.url, c.opts)).toStrictEqual(c.expected);
+		}
+	});
+
+	it('correctly parses base url', () => {
+		const cases: BaseUrlTestCase[] = [
+			{
+				url: 'azure/ieedan/std/std',
+				expected: 'https://dev.azure.com/ieedan/_git/std',
+			},
+			{
+				url: 'azure/ieedan/std/std/heads/next',
+				expected: 'https://dev.azure.com/ieedan/_git/std',
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.azure.baseUrl(c.url)).toBe(c.expected);
+		}
+	});
+
 	it('Fetches the manifest from a public repo', async () => {
 		const repoURL = 'azure/ieedan/std/std';
 
-		const info = await providers.azure.info(repoURL);
+		const providerState = await registry.getProviderState(repoURL);
 
-		const content = await providers.azure.fetchManifest(info);
+		assert(providerState.isOk());
+
+		const content = await registry.fetchManifest(providerState.unwrap());
 
 		expect(content.isErr()).toBe(false);
 	});
@@ -618,9 +947,12 @@ describe('azure', () => {
 	it('Fetches the manifest from a public repo with a tag', async () => {
 		const repoURL = 'azure/ieedan/std/std/tags/v1.6.0';
 
-		const info = await providers.azure.info(repoURL);
+		const providerState = await registry.getProviderState(repoURL);
 
-		const content = await providers.azure.fetchRaw(info, 'jsrepo-manifest.json');
+		assert(providerState.isOk());
+
+		// this way we just get the text and skip the schema validation
+		const content = await registry.fetchRaw(providerState.unwrap(), 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{
@@ -806,12 +1138,73 @@ describe('azure', () => {
 });
 
 describe('http', () => {
+	it('correctly parses urls', () => {
+		const cases: ParseTestCase[] = [
+			{
+				url: 'https://example.com/',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'https://example.com',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'https://example.com/new-york',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'https://example.com/new-york',
+					specifier: undefined,
+				},
+			},
+			{
+				url: 'https://example.com/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'https://example.com',
+					specifier: 'utils/math',
+				},
+			},
+			{
+				url: 'https://example.com/new-york/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: 'https://example.com/new-york',
+					specifier: 'utils/math',
+				},
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.http.parse(c.url, c.opts)).toStrictEqual(c.expected);
+		}
+	});
+
+	it('correctly parses base url', () => {
+		const cases: BaseUrlTestCase[] = [
+			{
+				url: 'https://example.com/',
+				expected: 'https://example.com',
+			},
+			{
+				url: 'https://example.com/new-york',
+				expected: 'https://example.com',
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.http.baseUrl(c.url)).toBe(c.expected);
+		}
+	});
+
 	it('Fetches the manifest', async () => {
 		const repoURL = 'https://jsrepo-http.vercel.app';
 
-		const info = await providers.http.info(repoURL);
+		const providerState = await registry.getProviderState(repoURL);
 
-		const content = await providers.http.fetchRaw(info, 'jsrepo-manifest.json');
+		assert(providerState.isOk());
+
+		// this way we just get the text and skip the schema validation
+		const content = await registry.fetchRaw(providerState.unwrap(), 'jsrepo-manifest.json');
 
 		expect(content.unwrap()).toBe(`[
 	{

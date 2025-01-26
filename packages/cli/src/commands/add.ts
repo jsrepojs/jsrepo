@@ -20,7 +20,7 @@ import { context } from '../cli';
 import * as ascii from '../utils/ascii';
 import { getInstalled, resolveTree } from '../utils/blocks';
 import * as url from '../utils/blocks/utils/url';
-import { type Block, isTestFile } from '../utils/build';
+import { isTestFile } from '../utils/build';
 import {
 	type Formatter,
 	type ProjectConfig,
@@ -42,7 +42,7 @@ import {
 	runTasksConcurrently,
 	truncatedList,
 } from '../utils/prompts';
-import * as providers from '../utils/providers';
+import * as registry from '../utils/registry-providers/internal';
 
 const schema = v.object({
 	repo: v.optional(v.string()),
@@ -74,8 +74,6 @@ const add = new Command('add')
 
 		outro(color.green('All done!'));
 	});
-
-type RemoteBlock = Block & { sourceRepo: providers.Info };
 
 const _add = async (blockNames: string[], options: Options) => {
 	const verbose = (msg: string) => {
@@ -142,7 +140,7 @@ const _add = async (blockNames: string[], options: Options) => {
 
 	// resolve repos for blocks
 	for (const blockSpecifier of blockNames) {
-		const provider = providers.providers.find((p) => blockSpecifier.startsWith(p.name()));
+		const provider = registry.selectProvider(blockSpecifier);
 
 		// we are only getting repos for blocks that specified repos
 		if (!provider) {
@@ -151,7 +149,7 @@ const _add = async (blockNames: string[], options: Options) => {
 			continue;
 		}
 
-		const [repo] = provider.parseBlockSpecifier(blockSpecifier);
+		const { url: repo } = provider.parse(blockSpecifier, { fullyQualified: true });
 
 		const alreadyExists =
 			!config.repos.find((repoPath) => repoPath === repo) && !mustResolveRepos.has(repo);
@@ -217,8 +215,8 @@ const _add = async (blockNames: string[], options: Options) => {
 
 	if (!options.verbose) loading.start(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
 
-	const resolvedRepos: providers.ResolvedRepo[] = (
-		await providers.resolvePaths(...repoPaths)
+	const resolvedRepos: registry.RegistryProviderState[] = (
+		await registry.forEachPathGetProviderState(...repoPaths)
 	).match(
 		(val) => val,
 		({ repo, message }) => {
@@ -231,8 +229,8 @@ const _add = async (blockNames: string[], options: Options) => {
 
 	verbose(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
 
-	const blocksMap: Map<string, RemoteBlock> = (
-		await providers.fetchBlocks(...resolvedRepos)
+	const blocksMap: Map<string, registry.RemoteBlock> = (
+		await registry.fetchBlocks(...resolvedRepos)
 	).match(
 		(val) => val,
 		({ repo, message }) => {
@@ -265,9 +263,7 @@ const _add = async (blockNames: string[], options: Options) => {
 
 					// show the full repo if there are multiple repos
 					if (repoPaths.length > 1) {
-						label = `${color.cyan(
-							`${value.sourceRepo.name}/${value.sourceRepo.owner}/${value.sourceRepo.repoName}/${value.category}`
-						)}/${value.name}`;
+						label = `${color.cyan(url.join(value.sourceRepo.url, value.category))}/${value.name}`;
 					} else {
 						label = `${color.cyan(value.category)}/${value.name}`;
 					}
@@ -488,7 +484,7 @@ const _add = async (blockNames: string[], options: Options) => {
 				const files: { content: string; destPath: string }[] = [];
 
 				const getSourceFile = async (filePath: string) => {
-					const content = await providerInfo.provider.fetchRaw(providerInfo, filePath, {
+					const content = await registry.fetchRaw(providerInfo, filePath, {
 						verbose,
 					});
 

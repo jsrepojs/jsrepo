@@ -12,11 +12,10 @@ import { context } from '../cli';
 import * as ascii from '../utils/ascii';
 import { getInstalled } from '../utils/blocks';
 import * as url from '../utils/blocks/utils/url';
-import { type Block, isTestFile } from '../utils/build';
+import { isTestFile } from '../utils/build';
 import { getPathForBlock, getProjectConfig, resolvePaths } from '../utils/config';
-import { OUTPUT_FILE } from '../utils/context';
 import { intro } from '../utils/prompts';
-import * as providers from '../utils/providers';
+import * as registry from '../utils/registry-providers/internal';
 
 const schema = v.object({
 	repo: v.optional(v.string()),
@@ -46,8 +45,6 @@ const test = new Command('test')
 		outro(color.green('All done!'));
 	});
 
-type RemoteBlock = Block & { sourceRepo: providers.Info };
-
 const _test = async (blockNames: string[], options: Options) => {
 	const verbose = (msg: string) => {
 		if (options.verbose) {
@@ -63,8 +60,6 @@ const _test = async (blockNames: string[], options: Options) => {
 	);
 
 	const loading = spinner();
-
-	const blocksMap: Map<string, RemoteBlock> = new Map();
 
 	let repoPaths = config.repos;
 
@@ -83,44 +78,31 @@ const _test = async (blockNames: string[], options: Options) => {
 		}
 	}
 
-	verbose(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
-
 	if (!options.verbose) loading.start(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
 
-	for (const repo of repoPaths) {
-		const providerInfo: providers.Info = (await providers.getProviderInfo(repo)).match(
-			(info) => info,
-			(err) => program.error(color.red(err))
-		);
-
-		const manifest = await providerInfo.provider.fetchManifest(providerInfo);
-
-		verbose(`Got info for provider ${color.cyan(providerInfo.name)}`);
-
-		if (manifest.isErr()) {
-			if (!options.verbose) loading.stop(`Error fetching ${color.cyan(repo)}`);
-
-			program.error(
-				color.red(
-					`There was an error fetching the \`${OUTPUT_FILE}\` from the repository ${color.cyan(
-						repo
-					)} make sure the target repository has a \`${OUTPUT_FILE}\` in its root?`
-				)
-			);
+	const resolvedRepos: registry.RegistryProviderState[] = (
+		await registry.forEachPathGetProviderState(...repoPaths)
+	).match(
+		(val) => val,
+		({ repo, message }) => {
+			loading.stop(`Failed to get info for ${color.cyan(repo)}`);
+			program.error(color.red(message));
 		}
+	);
 
-		const categories = manifest.unwrap();
+	verbose(`Resolved ${color.cyan(repoPaths.join(', '))}`);
 
-		for (const category of categories) {
-			for (const block of category.blocks) {
-				// blocks will override each other
-				blocksMap.set(url.join(providerInfo.url, category.name, block.name), {
-					...block,
-					sourceRepo: providerInfo,
-				});
-			}
+	verbose(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
+
+	const blocksMap: Map<string, registry.RemoteBlock> = (
+		await registry.fetchBlocks(...resolvedRepos)
+	).match(
+		(val) => val,
+		({ repo, message }) => {
+			loading.stop(`Failed fetching blocks from ${color.cyan(repo)}`);
+			program.error(color.red(message));
 		}
-	}
+	);
 
 	verbose(`Retrieved blocks from ${color.cyan(repoPaths.join(', '))}`);
 
@@ -154,24 +136,27 @@ const _test = async (blockNames: string[], options: Options) => {
 		program.error(color.red('There were no blocks found in your project!'));
 	}
 
-	const testingBlocksMapped: { name: string; block: RemoteBlock }[] = [];
+	const testingBlocksMapped: { name: string; block: registry.RemoteBlock }[] = [];
 
 	for (const blockSpecifier of testingBlocks) {
-		let block: RemoteBlock | undefined = undefined;
+		let block: registry.RemoteBlock | undefined = undefined;
 
-		const provider = providers.providers.find((p) => blockSpecifier.startsWith(p.name()));
+		const provider = registry.selectProvider(blockSpecifier);
 
 		// if the block starts with github (or another provider) we know it has been resolved
 		if (!provider) {
 			for (const repo of repoPaths) {
 				// we unwrap because we already checked this
-				const providerInfo = (await providers.getProviderInfo(repo)).unwrap();
+				const provider = registry.selectProvider(repo);
 
-				const [parsedRepo] = providerInfo.provider.parseBlockSpecifier(providerInfo.url);
+				if (!provider) continue;
 
-				const [category, blockName] = blockSpecifier.split('/');
+				const { url: parsedRepo, specifier } = provider.parse(
+					url.join(repo, blockSpecifier),
+					{ fullyQualified: true }
+				);
 
-				const tempBlock = blocksMap.get(url.join(parsedRepo, category, blockName));
+				const tempBlock = blocksMap.get(url.join(parsedRepo, specifier!));
 
 				if (tempBlock === undefined) continue;
 
@@ -180,25 +165,20 @@ const _test = async (blockNames: string[], options: Options) => {
 				break;
 			}
 		} else {
-			const [repo] = provider.parseBlockSpecifier(blockSpecifier);
+			const { url: repo } = provider.parse(blockSpecifier, { fullyQualified: true });
 
-			const providerInfo = (await providers.getProviderInfo(repo)).match(
+			const providerState = (await registry.getProviderState(repo)).match(
 				(val) => val,
 				(err) => program.error(color.red(err))
 			);
 
-			const categories = (await providerInfo.provider.fetchManifest(providerInfo)).match(
+			const map = (await registry.fetchBlocks(providerState)).match(
 				(val) => val,
 				(err) => program.error(color.red(err))
 			);
 
-			for (const category of categories) {
-				for (const block of category.blocks) {
-					blocksMap.set(url.join(repo, block.category, block.name), {
-						...block,
-						sourceRepo: providerInfo,
-					});
-				}
+			for (const [k, v] of map) {
+				blocksMap.set(k, v);
 			}
 
 			block = blocksMap.get(blockSpecifier);
@@ -222,7 +202,7 @@ const _test = async (blockNames: string[], options: Options) => {
 	const resolvedPaths = resolvedPathsResult.unwrap();
 
 	for (const { block } of testingBlocksMapped) {
-		const providerInfo = block.sourceRepo;
+		const providerState = block.sourceRepo;
 
 		const fullSpecifier = url.join(block.sourceRepo.url, block.category, block.name);
 
@@ -240,7 +220,7 @@ const _test = async (blockNames: string[], options: Options) => {
 		directory = path.relative(tempTestDirectory, directory);
 
 		const getSourceFile = async (filePath: string) => {
-			const content = await providerInfo.provider.fetchRaw(providerInfo, filePath);
+			const content = await registry.fetchRaw(providerState, filePath);
 
 			if (content.isErr()) {
 				loading.stop(color.red(`Error fetching ${color.bold(filePath)}`));

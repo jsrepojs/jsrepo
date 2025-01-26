@@ -33,7 +33,8 @@ import { loadFormatterConfig } from '../utils/format';
 import { json } from '../utils/language-support';
 import * as persisted from '../utils/persisted';
 import { type Task, intro, nextSteps, runTasks } from '../utils/prompts';
-import { http, providers } from '../utils/providers';
+import { http, providers } from '../utils/registry-providers';
+import * as registry from '../utils/registry-providers/internal';
 
 const schema = v.object({
 	repos: v.optional(v.array(v.string())),
@@ -199,7 +200,7 @@ const _initProject = async (registries: string[], options: Options) => {
 				if (val.trim().length === 0) return 'Please provide a value';
 
 				if (!providers.find((provider) => provider.matches(val))) {
-					return `Invalid provider! Valid providers (${providers.map((provider) => provider.name()).join(', ')})`;
+					return `Invalid provider! Valid providers (${providers.map((provider) => provider.name).join(', ')})`;
 				}
 			},
 		});
@@ -294,17 +295,17 @@ const promptForProviderConfig = async (repo: string, paths: Paths): Promise<Path
 	if (!provider) {
 		program.error(
 			color.red(
-				`Invalid provider! Valid providers (${providers.map((provider) => provider.name()).join(', ')})`
+				`Invalid provider! Valid providers (${providers.map((provider) => provider.name).join(', ')})`
 			)
 		);
 	}
 
-	const tokenKey = `${provider.name()}-token`;
+	const tokenKey = `${provider.name}-token`;
 
 	const token = storage.get(tokenKey);
 
 	// don't ask if the provider is a custom domain
-	if (!token && provider.name() !== http.name()) {
+	if (!token && provider.name !== http.name) {
 		const result = await confirm({
 			message: 'Would you like to add an auth token?',
 			initialValue: false,
@@ -334,7 +335,13 @@ const promptForProviderConfig = async (repo: string, paths: Paths): Promise<Path
 
 	loading.start(`Fetching categories from ${color.cyan(repo)}`);
 
-	const manifestResult = await provider.fetchManifest(repo);
+	const providerState = await registry.getProviderState(repo);
+
+	if (providerState.isErr()) {
+		program.error(color.red(providerState.unwrapErr()));
+	}
+
+	const manifestResult = await registry.fetchManifest(providerState.unwrap());
 
 	loading.stop(`Fetched categories from ${color.cyan(repo)}`);
 

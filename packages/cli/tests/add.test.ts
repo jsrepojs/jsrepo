@@ -28,7 +28,7 @@ describe('add', () => {
 
 	beforeAll(async () => {
 		if (fs.existsSync(testDir)) {
-			fs.rmdirSync(testDir, { recursive: true });
+			fs.rmSync(testDir, { recursive: true });
 		}
 
 		fs.mkdirSync(testDir, { recursive: true });
@@ -42,7 +42,7 @@ describe('add', () => {
 	afterAll(() => {
 		process.chdir(__dirname); // unlock directory
 
-		fs.rmdirSync(testDir, { recursive: true });
+		fs.rmSync(testDir, { recursive: true });
 	});
 
 	it('adds from github', async () => {

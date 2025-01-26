@@ -11,7 +11,7 @@ describe('build', () => {
 
 	beforeAll(async () => {
 		if (fs.existsSync(testDir)) {
-			fs.rmdirSync(testDir, { recursive: true });
+			fs.rmSync(testDir, { recursive: true });
 		}
 
 		fs.mkdirSync(testDir, { recursive: true });
@@ -22,7 +22,7 @@ describe('build', () => {
 	afterAll(() => {
 		process.chdir(__dirname); // unlock directory
 
-		fs.rmdirSync(testDir, { recursive: true });
+		fs.rmSync(testDir, { recursive: true });
 	});
 
 	it('builds local and remote dependencies', async () => {

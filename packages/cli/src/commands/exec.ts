@@ -10,11 +10,12 @@ import * as v from 'valibot';
 import { context } from '../cli';
 import * as ascii from '../utils/ascii';
 import { resolveTree } from '../utils/blocks';
+import * as url from '../utils/blocks/utils/url';
 import { isTestFile } from '../utils/build';
 import { type ProjectConfig, getProjectConfig, resolvePaths } from '../utils/config';
 import { installDependencies } from '../utils/dependencies';
 import { type ConcurrentTask, intro, runTasksConcurrently } from '../utils/prompts';
-import * as providers from '../utils/providers';
+import * as registry from '../utils/registry-providers/internal';
 
 const schema = v.objectWithRest(
 	{
@@ -82,17 +83,11 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 	// we just want to override all others if supplied via the CLI
 	if (options.repo) repoPaths = [options.repo];
 
-	// we are only getting repos for blocks that specified repos
-	if (script && providers.providers.find((p) => script?.startsWith(p.name()))) {
-		const [providerName, owner, repoName, ...rest] = script.split('/');
+	const provider = script ? registry.selectProvider(script) : undefined;
 
-		let repo: string;
-		// if rest is greater than 2 it isn't the block specifier so it is part of the path
-		if (rest.length > 2) {
-			repo = `${providerName}/${owner}/${repoName}/${rest.slice(0, rest.length - 2).join('/')}`;
-		} else {
-			repo = `${providerName}/${owner}/${repoName}`;
-		}
+	// we are only getting repos for blocks that specified repos
+	if (script && provider) {
+		const { url: repo } = provider.parse(script, { fullyQualified: true });
 
 		if (!repoPaths.find((repoPath) => repoPath === repo)) {
 			if (!options.allow) {
@@ -145,8 +140,8 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 
 	loading.start(`Fetching scripts from ${color.cyan(repoPaths.join(', '))}`);
 
-	const resolvedRepos: providers.ResolvedRepo[] = (
-		await providers.resolvePaths(...repoPaths)
+	const resolvedRepos: registry.RegistryProviderState[] = (
+		await registry.forEachPathGetProviderState(...repoPaths)
 	).match(
 		(val) => val,
 		({ repo, message }) => {
@@ -155,7 +150,7 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 		}
 	);
 
-	const blocksMap = (await providers.fetchBlocks(...resolvedRepos)).match(
+	const blocksMap = (await registry.fetchBlocks(...resolvedRepos)).match(
 		(val) => val,
 		({ repo, message }) => {
 			loading.stop(`Failed fetching scripts from ${color.cyan(repo)}`);
@@ -176,9 +171,7 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 
 					// show the full repo if there are multiple repos
 					if (repoPaths.length > 1) {
-						label = `${color.cyan(
-							`${value.sourceRepo.name}/${value.sourceRepo.owner}/${value.sourceRepo.repoName}/${value.category}`
-						)}/${value.name}`;
+						label = `${color.cyan(url.join(value.sourceRepo.url, value.category))}/${value.name}`;
 					} else {
 						label = `${color.cyan(value.category)}/${value.name}`;
 					}
@@ -250,7 +243,7 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 				const files: { content: string; destPath: string }[] = [];
 
 				const getSourceFile = async (filePath: string) => {
-					const content = await providerInfo.provider.fetchRaw(providerInfo, filePath);
+					const content = await registry.fetchRaw(providerInfo, filePath);
 
 					if (content.isErr()) {
 						loading.stop(color.red(`Error fetching ${color.bold(filePath)}`));
