@@ -62,6 +62,15 @@
 					>
 						Demos
 					</a>
+					<a
+						href="/registries"
+						class="hover:text-primary text-muted-foreground transition-all data-[active=true]:text-primary"
+						use:active={{
+							activeForSubdirectories: true
+						}}
+					>
+						Registries
+					</a>
 				</nav>
 			{/if}
 		</div>
