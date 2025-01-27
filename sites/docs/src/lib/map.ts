@@ -30,10 +30,6 @@ const categories: Category[] = [
 			{
 				name: 'Demos',
 				href: '/demos'
-			},
-			{
-				name: 'Registries',
-				href: '/registries'
 			}
 		]
 	},

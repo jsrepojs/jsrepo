@@ -1,13 +1,50 @@
 <script lang="ts">
 	import AnimatedGradientText from '$lib/components/animations/animated-gradient-text.svelte';
 	import { Button } from '$lib/components/ui/button';
-	import { cn } from '$lib/utils/utils';
 	import { ArrowUpRight } from 'lucide-svelte';
 	import { onMount } from 'svelte';
+	import { Search } from '$lib/components/ui/search';
+	import { cn } from '$lib/utils/utils';
+	import { untrack } from 'svelte';
+	import { superForm } from 'sveltekit-superforms';
+
+	const featuredRegistries = [
+		'https://reactbits.dev/tailwind',
+		'github/ieedan/std',
+		'github/ieedan/shadcn-svelte-extras'
+	];
+
+	let { data } = $props();
+
+	const { form, submitting, enhance, errors } = superForm(data.form);
+
+	let invalid = $state(false);
+	let invalidTimeout = $state<ReturnType<typeof setTimeout>>();
 
 	let focusedIndex = $state(0);
 	let sightRef = $state<HTMLDivElement>();
 	let headingRef = $state<HTMLHeadingElement>();
+
+	errors.subscribe((v) => {
+		if (invalidTimeout) {
+			clearTimeout(invalidTimeout);
+		}
+
+		// we do this after the below effect runs after submit
+		setTimeout(() => {
+			if (v.search) {
+				invalid = true;
+			}
+		}, 0);
+	});
+
+	// reset invalid once the user types
+	$effect(() => {
+		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+		$form.search;
+
+		untrack(() => (invalid = false));
+	});
 
 	const focusIndex = () => {
 		if (!headingRef || !sightRef) return;
@@ -110,34 +147,79 @@
 					class="border-2 absolute border-primary transition-all duration-1000 data-[visible=false]:opacity-0"
 				></div>
 
-				<div class="flex place-items-center justify-center mt-2 sm:mt-8">
-					<div
-						class="border border-border sm:text-lg rounded-md px-2 py-2 font-mono text-muted-foreground w-[250px] flex place-items-center gap-2"
+				<div class="w-full flex place-items-center justify-center pt-2 md:pt-6">
+					<form
+						method="POST"
+						use:enhance
+						class="w-full flex place-items-center justify-center max-w-2xl"
 					>
-						<div class="select-none">$</div>
-						<code>
-							<span class="text-primary">jsrepo</span>
-							<span class="h-[24px] sm:h-[28px] relative inline-flex flex-col overflow-hidden">
-								<div
-									class={cn('flex flex-col transition-transform duration-1000', {
-										'-translate-y-0': focusedIndex == 0,
-										'-translate-y-[24px] sm:-translate-y-[28px]': focusedIndex == 1,
-										'-translate-y-[48px] sm:-translate-y-[56px]': focusedIndex == 2
-									})}
-								>
-									<span>init</span>
-									<span>build</span>
-									<span>add</span>
-								</div>
-							</span>
-						</code>
-					</div>
+						<Search
+							bind:value={$form.search}
+							disabled={$submitting}
+							name="search"
+							spellcheck="false"
+							autocorrect="off"
+							placeholder="Enter a registry url..."
+							searching={$submitting}
+							searchingText={[
+								'Fetching manifest',
+								'Compiling information',
+								'Doubling efforts',
+								'Just a bit longer',
+								'Getting concerned now',
+								'Asking ChatGPT for help'
+							]}
+							class={cn({ 'border-destructive': invalid })}
+						/>
+					</form>
 				</div>
 
 				<div class="flex place-items-center justify-center py-2 sm:py-5">
 					<div class="flex place-items-center gap-2">
 						<Button href="/docs">Get Started</Button>
 						<Button href="/demos" variant="outline">See Demos</Button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="-mt-40 w-full flex place-items-center justify-center">
+			<div class="w-full max-w-4xl flex flex-col gap-12 place-items-center justify-center">
+				<h2 class="text-4xl font-semibold">Registries</h2>
+				<div class="w-full grid grid-cols-1 lg:grid-cols-2 place-items-center gap-4">
+					<div class="flex flex-col gap-2 w-full">
+						<h3 class="text-xl font-medium">Featured</h3>
+						<div class="border-border border rounded-md w-full overflow-hidden">
+							<ul class="flex flex-col">
+								{#each featuredRegistries as registry}
+									<li class="odd:bg-accent/75">
+										<a
+											href="/registry?url={registry}"
+											class="flex place-items-center border-b hover:underline p-3 hover:bg-accent"
+										>
+											{registry}
+										</a>
+									</li>
+								{/each}
+							</ul>
+						</div>
+					</div>
+					<div class="flex flex-col gap-2 w-full">
+						<h3 class="text-xl font-medium">Trending</h3>
+						<div class="border-border border rounded-md w-full overflow-hidden">
+							<ul class="flex flex-col">
+								{#each data.popular as registry}
+									<li class="odd:bg-accent/75">
+										<a
+											href="/registry?url={registry}"
+											class="flex place-items-center border-b hover:underline p-3 hover:bg-accent"
+										>
+											{registry}
+										</a>
+									</li>
+								{/each}
+							</ul>
+						</div>
 					</div>
 				</div>
 			</div>
