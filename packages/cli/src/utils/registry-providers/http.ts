@@ -75,7 +75,7 @@ const parseUrl = (
 	}
 
 	return {
-		url: u.join(parsedUrl.origin, ...segments),
+		url: u.addTrailingSlash(u.join(parsedUrl.origin, ...segments)),
 		specifier,
 	};
 };

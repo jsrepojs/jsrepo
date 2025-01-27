@@ -70,7 +70,15 @@ export const fetchManifest = async (
 
 	if (manifest.isErr()) return Err(manifest.unwrapErr());
 
-	const categories = v.safeParse(v.array(categorySchema), JSON.parse(manifest.unwrap()));
+	let json: string;
+
+	try {
+		json = JSON.parse(manifest.unwrap());
+	} catch (err) {
+		return Err(`Error parsing categories: ${err}`);
+	}
+
+	const categories = v.safeParse(v.array(categorySchema), json);
 
 	if (!categories.success) {
 		return Err(`Error parsing categories: ${categories.issues}`);
