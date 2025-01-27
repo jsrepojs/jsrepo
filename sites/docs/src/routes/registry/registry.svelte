@@ -76,16 +76,16 @@
 
 <div class="max-w-5xl w-full flex flex-col gap-4 py-4">
 	<div class="w-full">
-		<div class="flex flex-col md:flex-row md:place-items-center gap-2">
+		<div class="flex flex-col flex-wrap md:flex-row md:place-items-center gap-2">
 			{#if provider?.name == 'http'}
 				<a href={provider.baseUrl(registryUrl)} target="_blank">
-					<h1 class="text-xl md:text-3xl font-bold flex place-items-center gap-2">
+					<h1 class="text-xl md:text-3xl font-bold flex place-items-center gap-2 text-nowrap">
 						{prettyUrl}
 						<ArrowUpRightFromSquare class="size-4 md:size-5 text-muted-foreground" />
 					</h1>
 				</a>
 			{:else}
-				<h1 class="text-xl md:text-3xl font-bold">{prettyUrl}</h1>
+				<h1 class="text-xl md:text-3xl font-bold text-nowrap">{prettyUrl}</h1>
 			{/if}
 			{#if provider?.name !== 'http'}
 				<Badge
