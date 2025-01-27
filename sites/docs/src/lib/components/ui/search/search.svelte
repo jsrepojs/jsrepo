@@ -1,12 +1,14 @@
 <script lang="ts">
+	import { Flip } from '$lib/components/animations/flip';
 	import { cn } from '$lib/utils/utils';
 	import { LoaderCircle, Search } from 'lucide-svelte';
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import type { HTMLInputAttributes } from 'svelte/elements';
 
 	interface Props extends HTMLInputAttributes {
 		value?: string;
 		searching?: boolean;
+		searchingText?: string[];
 		placeholder?: string;
 		/** Debounce for the `oninput` event */
 		onDebounce?: (value: string) => void;
@@ -17,6 +19,7 @@
 	let {
 		value = $bindable(''),
 		searching = false,
+		searchingText,
 		placeholder,
 		class: className,
 		onDebounce,
@@ -26,6 +29,37 @@
 	}: Props = $props();
 
 	let debounceTimeout = $state<ReturnType<typeof setTimeout>>();
+	let flipIndex = $state(0);
+
+	const incrementLoop = (index: number, max: number) => {
+		if (index >= max) return 0;
+
+		return index + 1;
+	};
+
+	let loopInterval = $state<ReturnType<typeof setInterval>>();
+
+	$effect(() => {
+		if (searching) {
+			untrack(() => {
+				if (!searchingText) return;
+
+				clearInterval(loopInterval);
+
+				loopInterval = setInterval(() => {
+					if (searchingText) {
+						flipIndex = incrementLoop(flipIndex, searchingText?.length - 1);
+					}
+				}, 5000);
+			});
+		} else {
+			untrack(() => {
+				if (loopInterval) {
+					clearInterval(loopInterval);
+				}
+			});
+		}
+	});
 
 	const debounce = () => {
 		clearTimeout(debounceTimeout);
@@ -36,7 +70,10 @@
 	};
 
 	onMount(() => {
-		return () => clearTimeout(debounceTimeout);
+		return () => {
+			clearTimeout(debounceTimeout);
+			clearInterval(loopInterval);
+		};
 	});
 </script>
 
@@ -57,9 +94,17 @@
 		{disabled}
 		oninput={debounce}
 	/>
-	<div class="absolute size-12 right-0 top-0">
+	<div class="absolute right-0 top-0 h-12 flex place-items-center gap-2">
 		{#if searching}
-			<div class="flex place-items-center justify-center size-full">
+			{#if searchingText}
+				<Flip
+					class="text-muted-foreground text-xs text-right hidden sm:block"
+					height={16}
+					index={flipIndex}
+					items={searchingText}
+				/>
+			{/if}
+			<div class="flex place-items-center justify-center size-full w-12">
 				<LoaderCircle class="size-5 shrink-0 text-muted-foreground animate-spin" />
 			</div>
 		{/if}

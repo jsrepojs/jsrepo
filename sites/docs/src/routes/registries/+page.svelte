@@ -38,7 +38,7 @@
 	<title>jsrepo ~ Registries</title>
 </svelte:head>
 
-<div class="h-svh w-full flex flex-col place-items-center justify-center gap-4">
+<div class="h-svh w-full flex flex-col place-items-center justify-center gap-4 px-4">
 	<form method="POST" use:enhance class="w-full flex place-items-center justify-center max-w-2xl">
 		<Search
 			bind:value={$form.search}
@@ -48,6 +48,14 @@
 			autocorrect="off"
 			placeholder="Enter a registry url..."
 			searching={$submitting}
+			searchingText={[
+				'Fetching manifest',
+				'Compiling information',
+				'Doubling efforts',
+				'Just a bit longer',
+				'Getting concerned now',
+				'Asking ChatGPT for help'
+			]}
 			class={cn({ 'border-destructive': invalid })}
 		/>
 	</form>
