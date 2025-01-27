@@ -180,7 +180,7 @@
 
 			<div class="flex flex-col gap-2 py-4">
 				{#each manifest as category}
-					{#each category.blocks as block}
+					{#each category.blocks.filter((b) => b.list) as block}
 						<Collapsible.Root>
 							<Collapsible.Trigger>
 								{#snippet child({ props })}
