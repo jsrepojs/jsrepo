@@ -3,14 +3,7 @@
 	import { JsrepoSnippet } from '$lib/components/ui/snippet';
 	import { selectProvider, type Manifest } from 'jsrepo';
 	import * as Icons from '$lib/components/icons';
-	import {
-		ArrowUpRightFromSquare,
-		Braces,
-		ChevronRight,
-		File,
-		FlaskRound,
-		TestTubeDiagonal
-	} from 'lucide-svelte';
+	import { ArrowUpRightFromSquare, Braces, ChevronRight, File, FlaskRound } from 'lucide-svelte';
 	import { active, checkIsActive } from '$lib/actions/active.svelte';
 	import { page } from '$app/state';
 	import * as Collapsible from '$lib/components/ui/collapsible';

@@ -1,7 +1,13 @@
 import { GITHUB_TOKEN } from '$env/static/private';
 import { markdownIt } from '$lib/ts/markdown.js';
 import { redirect } from '@sveltejs/kit';
-import { fetchManifest, github, selectProvider, type RegistryProvider, type RegistryProviderState } from 'jsrepo';
+import {
+	fetchManifest,
+	github,
+	selectProvider,
+	type RegistryProvider,
+	type RegistryProviderState
+} from 'jsrepo';
 
 export const load = async ({ url }) => {
 	const registryUrl = url.searchParams.get('url');
@@ -66,11 +72,11 @@ const fetchReadme = async (state: RegistryProviderState): Promise<string | undef
 			return undefined;
 		}
 
-		return await response.text()
+		return await response.text();
 	} catch {
-		return undefined
+		return undefined;
 	}
-}
+};
 
 const getProviderToken = (provider: RegistryProvider): string | undefined => {
 	switch (provider.name) {

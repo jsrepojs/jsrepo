@@ -34,8 +34,8 @@ export const active = (node: HTMLAnchorElement, opts: Omit<Options, 'url'>) => {
 				'data-active',
 				checkIsActive(node.href, { ...opts, url: page.url }).toString()
 			);
-		})
-	})
+		});
+	});
 };
 
 export const checkIsActive = (
