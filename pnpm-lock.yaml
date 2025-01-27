@@ -132,12 +132,12 @@ importers:
 
   sites/docs:
     devDependencies:
+      '@fontsource-variable/inter':
+        specifier: ^5.1.1
+        version: 5.1.1
       '@fontsource-variable/jetbrains-mono':
         specifier: ^5.1.2
         version: 5.1.2
-      '@fontsource/inter':
-        specifier: ^5.1.1
-        version: 5.1.1
       '@shikijs/markdown-it':
         specifier: ^2.1.0
         version: 2.1.0
@@ -159,12 +159,15 @@ importers:
       '@types/markdown-it':
         specifier: ^14.1.2
         version: 14.1.2
+      '@types/npm-package-arg':
+        specifier: ^6.1.4
+        version: 6.1.4
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.5.1)
       bits-ui:
-        specifier: 1.0.0-next.77
-        version: 1.0.0-next.77(svelte@5.19.2)
+        specifier: 1.0.0-next.78
+        version: 1.0.0-next.78(svelte@5.19.2)
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -602,11 +605,11 @@ packages:
   '@floating-ui/utils@0.2.9':
     resolution: {integrity: sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==}
 
+  '@fontsource-variable/inter@5.1.1':
+    resolution: {integrity: sha512-OpXFTmiH6tHkYijMvQTycFKBLK4X+SRV6tet1m4YOUH7SzIIlMqDja+ocDtiCA72UthBH/vF+3ZtlMr2rN/wIw==}
+
   '@fontsource-variable/jetbrains-mono@5.1.2':
     resolution: {integrity: sha512-syGEJ/N4FFisAXegxtbe1etYpo2T630dqCbYufPf7Dli/hMKSoSUIm3wK4q5RsGFRxWno1WecfnsgZA1jRK0EQ==}
-
-  '@fontsource/inter@5.1.1':
-    resolution: {integrity: sha512-weN3E+rq0Xb3Z93VHJ+Rc7WOQX9ETJPTAJ+gDcaMHtjft67L58sfS65rAjC5tZUXQ2FdZ/V1/sSzCwZ6v05kJw==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -1079,6 +1082,9 @@ packages:
   '@types/node@22.10.10':
     resolution: {integrity: sha512-X47y/mPNzxviAGY5TcYPtYL8JsY3kAq2n8fMmKoRCxq/c4v4pyGNCzM2R6+M5/umG4ZfHuT+sgqDYqWc9rJ6ww==}
 
+  '@types/npm-package-arg@6.1.4':
+    resolution: {integrity: sha512-vDgdbMy2QXHnAruzlv68pUtXCjmqUk3WrBAsRboRovsOmxbfn/WiYCjmecyKjGztnMps5dWp4Uq2prp+Ilo17Q==}
+
   '@types/semver@7.5.8':
     resolution: {integrity: sha512-I8EUhyrgfLrcTkzV3TSsGyl1tSuPrEDzr0yd5m90UgNxQkyDXULk3b6MlQqTCpZpNtWe1K0hzclnZkTcLBe2UQ==}
 
@@ -1342,8 +1348,8 @@ packages:
   bindings@1.5.0:
     resolution: {integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==}
 
-  bits-ui@1.0.0-next.77:
-    resolution: {integrity: sha512-IV0AyVEvsRkXv4s/fl4iea5E9W2b9EBf98s9mRMKMc1xHxM9MmtM2r6MZMqftHQ/c+gHTIt3A9EKuTlh7uay8w==}
+  bits-ui@1.0.0-next.78:
+    resolution: {integrity: sha512-jZjG2ObZ/CNyCNaXecpItC7hRXqJAgEfMhr06/eNrf3wHiiPyhdcy4OkzLcJyxeOrDyj+xma8cZTd3JRWqJdAw==}
     engines: {node: '>=18', pnpm: '>=8.7.0'}
     peerDependencies:
       svelte: ^5.11.0
@@ -3580,9 +3586,9 @@ snapshots:
 
   '@floating-ui/utils@0.2.9': {}
 
-  '@fontsource-variable/jetbrains-mono@5.1.2': {}
+  '@fontsource-variable/inter@5.1.1': {}
 
-  '@fontsource/inter@5.1.1': {}
+  '@fontsource-variable/jetbrains-mono@5.1.2': {}
 
   '@humanfs/core@0.19.1': {}
 
@@ -4126,6 +4132,8 @@ snapshots:
     dependencies:
       undici-types: 6.20.0
 
+  '@types/npm-package-arg@6.1.4': {}
+
   '@types/semver@7.5.8': {}
 
   '@types/unist@3.0.3': {}
@@ -4442,7 +4450,7 @@ snapshots:
     dependencies:
       file-uri-to-path: 1.0.0
 
-  bits-ui@1.0.0-next.77(svelte@5.19.2):
+  bits-ui@1.0.0-next.78(svelte@5.19.2):
     dependencies:
       '@floating-ui/core': 1.6.9
       '@floating-ui/dom': 1.6.13
@@ -6085,7 +6093,7 @@ snapshots:
 
   vaul-svelte@1.0.0-next.3(svelte@5.19.2):
     dependencies:
-      bits-ui: 1.0.0-next.77(svelte@5.19.2)
+      bits-ui: 1.0.0-next.78(svelte@5.19.2)
       svelte: 5.19.2
       svelte-toolbelt: 0.4.6(svelte@5.19.2)
 

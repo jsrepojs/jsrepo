@@ -35,6 +35,10 @@
 	};
 </script>
 
+<svelte:head>
+	<title>jsrepo ~ Registries</title>
+</svelte:head>
+
 <div class="h-svh w-full flex place-items-center justify-center">
 	<form
 		onsubmit={(e) => {
@@ -46,7 +50,10 @@
 	>
 		<Search
 			bind:value={search}
+			disabled={searching}
 			name="search"
+			spellcheck="false"
+			autocorrect="off"
 			placeholder="Enter a registry url..."
 			{searching}
 			class={cn({ 'border-destructive': invalid })}

@@ -18,7 +18,7 @@
 		<Separator orientation="vertical" />
 		<span>
 			<Star class="inline-flex size-3 text-primary -mt-0.5" />
-			<span class="text-sm text-muted-foreground font-serif">{stars}</span>
+			<span class="text-sm text-muted-foreground font-mono">{stars}</span>
 		</span>
 	</div>
 </Button>

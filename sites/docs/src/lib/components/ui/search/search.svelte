@@ -21,6 +21,7 @@
 		class: className,
 		onDebounce,
 		debounceMs = 250,
+		disabled,
 		...rest
 	}: Props = $props();
 
@@ -40,8 +41,9 @@
 </script>
 
 <search
+	aria-disabled={disabled}
 	class={cn(
-		'relative border border-border rounded-xl flex place-items-center gap-2 pl-2 h-12 w-full max-w-2xl focus-within:ring-2 ring-offset-2 ring-offset-background focus-within:ring-primary transition-all',
+		'relative aria-disabled:cursor-not-allowed aria-disabled:opacity-90 border border-border rounded-xl flex place-items-center gap-2 pl-2 h-12 w-full max-w-2xl focus-within:ring-2 ring-offset-2 ring-offset-background focus-within:ring-primary transition-all',
 		className
 	)}
 >
@@ -50,8 +52,9 @@
 		{...rest}
 		type="text"
 		bind:value
-		class="grow w-full bg-transparent outline-none focus:outline-none h-full placeholder:text-muted-foreground"
+		class="grow w-full disabled:cursor-not-allowed bg-transparent outline-none focus:outline-none h-full placeholder:text-muted-foreground"
 		{placeholder}
+		{disabled}
 		oninput={debounce}
 	/>
 	<div class="absolute size-12 right-0 top-0">
