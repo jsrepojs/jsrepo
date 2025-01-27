@@ -33,7 +33,6 @@ import { loadFormatterConfig } from '../utils/format';
 import { json } from '../utils/language-support';
 import * as persisted from '../utils/persisted';
 import { type Task, intro, nextSteps, runTasks } from '../utils/prompts';
-import { http, providers } from '../utils/registry-providers';
 import * as registry from '../utils/registry-providers/internal';
 
 const schema = v.object({
@@ -199,8 +198,8 @@ const _initProject = async (registries: string[], options: Options) => {
 			validate: (val) => {
 				if (val.trim().length === 0) return 'Please provide a value';
 
-				if (!providers.find((provider) => provider.matches(val))) {
-					return `Invalid provider! Valid providers (${providers.map((provider) => provider.name).join(', ')})`;
+				if (!registry.selectProvider(val)) {
+					return `Invalid provider! Valid providers (${registry.providers.map((provider) => provider.name).join(', ')})`;
 				}
 			},
 		});
@@ -290,12 +289,12 @@ const promptForProviderConfig = async (repo: string, paths: Paths): Promise<Path
 
 	const storage = persisted.get();
 
-	const provider = providers.find((p) => p.matches(repo));
+	const provider = registry.selectProvider(repo);
 
 	if (!provider) {
 		program.error(
 			color.red(
-				`Invalid provider! Valid providers (${providers.map((provider) => provider.name).join(', ')})`
+				`Invalid provider! Valid providers (${registry.providers.map((provider) => provider.name).join(', ')})`
 			)
 		);
 	}
@@ -305,7 +304,7 @@ const promptForProviderConfig = async (repo: string, paths: Paths): Promise<Path
 	const token = storage.get(tokenKey);
 
 	// don't ask if the provider is a custom domain
-	if (!token && provider.name !== http.name) {
+	if (!token && provider.name !== registry.http.name) {
 		const result = await confirm({
 			message: 'Would you like to add an auth token?',
 			initialValue: false,
