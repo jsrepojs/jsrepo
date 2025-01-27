@@ -1,5 +1,12 @@
 # jsrepo
 
+## 1.29.1
+
+### Patch Changes
+
+- d4e42fd: Ensure parsed urls from http provider end with a trailing slash.
+- d4e42fd: Catch `JSON.parse` errors when fetching the manifest to provide a more clear error to the user.
+
 ## 1.29.0
 
 ### Minor Changes
