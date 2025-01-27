@@ -43,7 +43,7 @@
 <search
 	aria-disabled={disabled}
 	class={cn(
-		'relative aria-disabled:cursor-not-allowed aria-disabled:opacity-90 border border-border rounded-xl flex place-items-center gap-2 pl-2 h-12 w-full max-w-2xl focus-within:ring-2 ring-offset-2 ring-offset-background focus-within:ring-primary transition-all',
+		'relative aria-disabled:cursor-not-allowed aria-disabled:opacity-90 border border-border rounded-xl flex place-items-center gap-2 pl-2 h-12 w-full focus-within:ring-2 ring-offset-2 ring-offset-background focus-within:ring-primary transition-all',
 		className
 	)}
 >

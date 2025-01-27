@@ -1,62 +1,61 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { Search } from '$lib/components/ui/search';
 	import { cn } from '$lib/utils/utils';
-	import { selectProvider } from 'jsrepo';
 	import { untrack } from 'svelte';
+	import { superForm } from 'sveltekit-superforms';
 
-	let search = $state('');
-	let searching = $state(false);
+	let { data } = $props();
+
+	const { form, submitting, enhance, errors } = superForm(data.form);
+
 	let invalid = $state(false);
 
-	const provider = $derived(selectProvider(search));
+	let invalidTimeout: ReturnType<typeof setTimeout> | undefined = undefined;
 
-	// reset invalid whenever the user types
-	$effect(() => {
-		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-		search;
-
-		untrack(() => {
-			invalid = false;
-		});
-	});
-
-	const submit = async () => {
-		if (!provider) {
-			invalid = true;
-			return;
+	errors.subscribe((v) => {
+		if (invalidTimeout) {
+			clearTimeout(invalidTimeout);
 		}
 
-		searching = true;
+		// we do this after the below effect runs after submit
+		setTimeout(() => {
+			if (v.search) {
+				invalid = true;
+			}
+		}, 0);
+	});
 
-		await goto(`/registry?url=${search}`);
+	// reset invalid once the user types
+	$effect(() => {
+		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+		$form.search;
 
-		searching = false;
-	};
+		untrack(() => (invalid = false));
+	});
 </script>
 
 <svelte:head>
 	<title>jsrepo ~ Registries</title>
 </svelte:head>
 
-<div class="h-svh w-full flex place-items-center justify-center">
-	<form
-		onsubmit={(e) => {
-			e.preventDefault();
-
-			submit();
-		}}
-		class="w-full flex place-items-center justify-center"
-	>
+<div class="h-svh w-full flex flex-col place-items-center justify-center gap-4">
+	<form method="POST" use:enhance class="w-full flex place-items-center justify-center max-w-2xl">
 		<Search
-			bind:value={search}
-			disabled={searching}
+			bind:value={$form.search}
+			disabled={$submitting}
 			name="search"
 			spellcheck="false"
 			autocorrect="off"
 			placeholder="Enter a registry url..."
-			{searching}
+			searching={$submitting}
 			class={cn({ 'border-destructive': invalid })}
 		/>
 	</form>
+	<div class="grid grid-cols-3 w-full max-w-2xl">
+		<div class="flex flex-col gap-2">
+			<!-- {#each data.searchedRegistries as reg}
+				<a href="/registry?url={reg.slice(9)}">{reg.slice(9)}</a>
+			{/each} -->
+		</div>
+	</div>
 </div>
