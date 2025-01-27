@@ -1,4 +1,5 @@
 import { assert, describe, expect, it } from 'vitest';
+import { MANIFEST_FILE } from '../src/constants';
 import * as registry from '../src/utils/registry-providers/internal';
 import type { ParseOptions, ParseResult } from '../src/utils/registry-providers/types';
 
@@ -8,7 +9,7 @@ type ParseTestCase = {
 	expected: ParseResult;
 };
 
-type BaseUrlTestCase = {
+type StringTestCase = {
 	url: string;
 	expected: string;
 };
@@ -72,7 +73,7 @@ describe('github', () => {
 	});
 
 	it('correctly parses base url', () => {
-		const cases: BaseUrlTestCase[] = [
+		const cases: StringTestCase[] = [
 			{
 				url: 'github/ieedan/std',
 				expected: 'https://github.com/ieedan/std',
@@ -372,7 +373,7 @@ describe('gitlab', () => {
 	});
 
 	it('correctly parses base url', () => {
-		const cases: BaseUrlTestCase[] = [
+		const cases: StringTestCase[] = [
 			{
 				url: 'gitlab/ieedan/std',
 				expected: 'https://gitlab.com/ieedan/std',
@@ -648,7 +649,7 @@ describe('bitbucket', () => {
 	});
 
 	it('correctly parses base url', () => {
-		const cases: BaseUrlTestCase[] = [
+		const cases: StringTestCase[] = [
 			{
 				url: 'bitbucket/ieedan/std',
 				expected: 'https://bitbucket.org/ieedan/std',
@@ -916,7 +917,7 @@ describe('azure', () => {
 	});
 
 	it('correctly parses base url', () => {
-		const cases: BaseUrlTestCase[] = [
+		const cases: StringTestCase[] = [
 			{
 				url: 'azure/ieedan/std/std',
 				expected: 'https://dev.azure.com/ieedan/_git/std',
@@ -1144,7 +1145,7 @@ describe('http', () => {
 				url: 'https://example.com/',
 				opts: { fullyQualified: false },
 				expected: {
-					url: 'https://example.com',
+					url: 'https://example.com/',
 					specifier: undefined,
 				},
 			},
@@ -1152,7 +1153,7 @@ describe('http', () => {
 				url: 'https://example.com/new-york',
 				opts: { fullyQualified: false },
 				expected: {
-					url: 'https://example.com/new-york',
+					url: 'https://example.com/new-york/',
 					specifier: undefined,
 				},
 			},
@@ -1160,7 +1161,7 @@ describe('http', () => {
 				url: 'https://example.com/utils/math',
 				opts: { fullyQualified: true },
 				expected: {
-					url: 'https://example.com',
+					url: 'https://example.com/',
 					specifier: 'utils/math',
 				},
 			},
@@ -1168,7 +1169,7 @@ describe('http', () => {
 				url: 'https://example.com/new-york/utils/math',
 				opts: { fullyQualified: true },
 				expected: {
-					url: 'https://example.com/new-york',
+					url: 'https://example.com/new-york/',
 					specifier: 'utils/math',
 				},
 			},
@@ -1179,8 +1180,31 @@ describe('http', () => {
 		}
 	});
 
+	it('correctly resolves url', async () => {
+		const cases: StringTestCase[] = [
+			{
+				url: 'https://example.com',
+				expected: 'https://example.com/jsrepo-manifest.json',
+			},
+			{
+				url: 'https://example.com/new-york',
+				expected: 'https://example.com/new-york/jsrepo-manifest.json',
+			},
+		];
+
+		for (const c of cases) {
+			const state = await registry.getProviderState(c.url);
+
+			assert(!state.isErr());
+
+			expect(
+				await state.unwrap().provider.resolveRaw(state.unwrap(), MANIFEST_FILE)
+			).toStrictEqual(new URL(c.expected));
+		}
+	});
+
 	it('correctly parses base url', () => {
-		const cases: BaseUrlTestCase[] = [
+		const cases: StringTestCase[] = [
 			{
 				url: 'https://example.com/',
 				expected: 'https://example.com',
