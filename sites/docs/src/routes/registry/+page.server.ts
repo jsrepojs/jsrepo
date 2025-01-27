@@ -8,6 +8,7 @@ import {
 	type RegistryProvider,
 	type RegistryProviderState
 } from 'jsrepo';
+import DOMPurify from "isomorphic-dompurify";
 
 export const load = async ({ url }) => {
 	const registryUrl = url.searchParams.get('url');
@@ -37,7 +38,7 @@ export const load = async ({ url }) => {
 	if (readme != undefined) {
 		const md = await markdownIt();
 
-		readme = md.render(readme);
+		readme = DOMPurify.sanitize(md.render(readme));
 	}
 
 	return {
