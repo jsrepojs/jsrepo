@@ -1,13 +1,17 @@
 import {
 	fetchManifest,
 	github,
+	gitlab,
 	type Manifest,
 	type RegistryProvider,
 	type RegistryProviderState
 } from 'jsrepo';
 import { markdownIt } from '../markdown';
 import DOMPurify from 'isomorphic-dompurify';
-import { GITHUB_TOKEN } from '$env/static/private';
+import { GITHUB_TOKEN, GITLAB_TOKEN } from '$env/static/private';
+import { redis } from '../redis-client';
+
+const REGISTRY_STATE_CACHE_PREFIX = 'registry:state';
 
 export type RegistryPageData = {
 	registryUrl: string;
@@ -17,14 +21,62 @@ export type RegistryPageData = {
 
 export type RegistryInfo = Omit<RegistryPageData, 'registryUrl'>;
 
-export const getRegistryData = async (
+/** Gets the provider state either locally or from the cache then caches the state
+ *
+ * @param registryUrl
+ * @param provider
+ * @param param2
+ * @returns
+ */
+export const getProviderState = async (
+	registryUrl: string,
 	provider: RegistryProvider,
-	registryUrl: string
-): Promise<RegistryInfo | undefined> => {
-	const providerState = await provider.state(registryUrl, { token: getProviderToken(provider) });
+	{ cache = true }: { cache?: boolean } = {}
+): Promise<RegistryProviderState> => {
+	const stateKey = `${REGISTRY_STATE_CACHE_PREFIX}:${registryUrl}`;
 
+	let state: RegistryProviderState | undefined = undefined;
+
+	// http never needs time to get the state
+	if (cache && provider.name !== 'http') {
+		const getCached = async (): Promise<RegistryProviderState | undefined> => {
+			const s = await redis.get(stateKey);
+
+			if (!s) return undefined;
+
+			// s has everything except for the provider
+			return {
+				...s,
+				provider
+			} as RegistryProviderState;
+		};
+
+		const getLocal = async () =>
+			await provider.state(registryUrl, { token: getProviderToken(provider) });
+
+		// whichever is faster we use they should say the same thing
+		const result = await Promise.race([getLocal(), getCached()]);
+
+		state = result;
+	}
+
+	if (!state) {
+		state = await provider.state(registryUrl, { token: getProviderToken(provider) });
+	}
+
+	// never cache http
+	if (provider.name !== 'http') {
+		await redis.set(stateKey, state);
+	}
+
+	return state;
+};
+
+export const getRegistryData = async (
+	providerState: RegistryProviderState
+): Promise<RegistryInfo | undefined> => {
 	const [manifestResult, readmeResult] = await Promise.all([
-		fetchManifest(providerState, { token: getProviderToken(provider) }),
+		fetchManifest(providerState, { token: getProviderToken(providerState.provider) }),
 		fetchReadme(providerState)
 	]);
 
@@ -82,6 +134,8 @@ const getProviderToken = (provider: RegistryProvider): string | undefined => {
 	switch (provider.name) {
 		case github.name:
 			return GITHUB_TOKEN;
+		case gitlab.name:
+			return GITLAB_TOKEN;
 		// add the rest of the tokens here
 	}
 

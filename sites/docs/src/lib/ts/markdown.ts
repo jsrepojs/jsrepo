@@ -1,9 +1,12 @@
 import MarkdownIt from 'markdown-it';
-import Shiki from '@shikijs/markdown-it';
 import { markdownItTable } from 'markdown-it-table';
 
+let md: MarkdownIt | null = null;
+
 const markdownIt = async () => {
-	const md = MarkdownIt();
+	if (md != null) return md;
+
+	const newMd = MarkdownIt({ html: true });
 
 	const stripComments = (md: MarkdownIt) => {
 		md.core.ruler.before('normalize', 'strip_comments', function (state) {
@@ -12,16 +15,10 @@ const markdownIt = async () => {
 	};
 
 	// plugins
-	md.use(stripComments);
-	md.use(markdownItTable);
-	md.use(
-		await Shiki({
-			themes: {
-				light: 'github-light-default',
-				dark: 'github-dark-default'
-			}
-		})
-	);
+	newMd.use(stripComments);
+	newMd.use(markdownItTable);
+
+	md = newMd;
 
 	return md;
 };
