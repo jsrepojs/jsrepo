@@ -186,7 +186,7 @@
 		<div class="-mt-40 w-full flex place-items-center justify-center">
 			<div class="w-full max-w-4xl flex flex-col gap-12 place-items-center justify-center">
 				<h2 class="text-4xl font-semibold">Registries</h2>
-				<div class="w-full grid grid-cols-1 lg:grid-cols-2 place-items-center gap-4">
+				<div class="w-full grid grid-cols-1 lg:grid-cols-2 gap-4">
 					<div class="flex flex-col gap-2 w-full">
 						<h3 class="text-xl font-medium">Featured</h3>
 						<div class="border-border border rounded-md w-full overflow-hidden">
@@ -195,7 +195,7 @@
 									<li class="odd:bg-accent/75">
 										<a
 											href="/registry?url={registry}"
-											class="flex place-items-center border-b hover:underline p-3 hover:bg-accent"
+											class="flex place-items-center last:border-b-0 border-b hover:underline p-3 hover:bg-accent"
 										>
 											{registry}
 										</a>
@@ -212,7 +212,7 @@
 									<li class="odd:bg-accent/75">
 										<a
 											href="/registry?url={registry}"
-											class="flex place-items-center border-b hover:underline p-3 hover:bg-accent"
+											class="flex place-items-center last:border-b-0 border-b hover:underline p-3 hover:bg-accent"
 										>
 											{registry}
 										</a>

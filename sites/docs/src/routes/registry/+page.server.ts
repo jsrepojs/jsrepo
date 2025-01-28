@@ -1,12 +1,13 @@
 import { error, redirect } from '@sveltejs/kit';
 import { selectProvider } from 'jsrepo';
-import { getRegistryData, type RegistryPageData } from '$lib/ts/registry/index.js';
+import { getRegistryData } from '$lib/ts/registry/index.js';
 import { checkCache, updateCache } from '$lib/ts/registry/cache';
 import { redis, VIEW_PREFIX } from '$lib/ts/redis-client.js';
+import { action } from '$lib/ts/server-actions/search-registries/server.js';
 
-export const load = async ({ url }) => {
+export const load = async ({ url, cookies }) => {
 	const registryUrl = url.searchParams.get('url');
-	const noCache = url.searchParams.get('noCache') === 'true';
+	const noCache = cookies.get('no-cache') === 'true';
 
 	if (registryUrl == null) throw redirect(303, '/registries');
 
@@ -20,9 +21,19 @@ export const load = async ({ url }) => {
 		if (cache) {
 			return {
 				...cache,
+				cacheAge: Date.now() - cache.timestamp,
 				registryUrl
-			} satisfies RegistryPageData;
+			};
 		}
+	}
+
+	if (noCache) {
+		cookies.delete('no-cache', {
+			path: '/',
+			httpOnly: false,
+			secure: true,
+			maxAge: 1 * 24 * 60 * 60
+		});
 	}
 
 	const pageData = await getRegistryData(provider, registryUrl);
@@ -39,4 +50,8 @@ export const load = async ({ url }) => {
 		...pageData,
 		registryUrl
 	};
+};
+
+export const actions = {
+	default: action
 };

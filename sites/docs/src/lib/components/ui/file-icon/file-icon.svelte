@@ -17,7 +17,9 @@
 	<Icons.TypeScript class="size-3" />
 {:else if extension === '.js'}
 	<Icons.JavaScript class="size-3" />
-{:else if extension === '.jsx' || extension === 'tsx'}
+{:else if extension === '.jsx'}
+	<Icons.React class="size-4 text-[#f7df1e]" />
+{:else if extension === '.tsx'}
 	<Icons.React class="size-4" />
 {:else if extension === '.vue'}
 	<Icons.Vue class="size-3" />

@@ -1,12 +1,9 @@
 // import { redis, REGISTRY_CACHE_PREFIX } from '$lib/ts/redis-client';
-import { setError, superValidate } from 'sveltekit-superforms';
+import { superValidate } from 'sveltekit-superforms';
 import { valibot } from 'sveltekit-superforms/adapters';
-import { schema } from './schema';
-import { fail, redirect } from '@sveltejs/kit';
-import { selectProvider } from 'jsrepo';
-import { checkCache, updateCache } from '$lib/ts/registry/cache';
-import { getRegistryData } from '$lib/ts/registry';
+import { schema } from '$lib/ts/server-actions/search-registries/client';
 import { redis, VIEW_PREFIX } from '$lib/ts/redis-client';
+import { action } from '$lib/ts/server-actions/search-registries/server';
 
 export const load = async () => {
 	let cursor = '0';
@@ -49,36 +46,5 @@ export const load = async () => {
 };
 
 export const actions = {
-	default: async (event) => {
-		const form = await superValidate(event, valibot(schema));
-		if (!form.valid) {
-			return fail(400, {
-				form
-			});
-		}
-
-		const provider = selectProvider(form.data.search);
-
-		if (!provider) {
-			return setError(form, 'search', 'Invalid registry url');
-		}
-
-		const registryUrl = form.data.search;
-
-		const cache = await checkCache(registryUrl);
-
-		if (cache) {
-			throw redirect(303, `/registry?url=${registryUrl}`);
-		}
-
-		const pageData = await getRegistryData(provider, registryUrl);
-
-		if (!pageData) {
-			return setError(form, 'search', 'Invalid registry url');
-		}
-
-		updateCache(registryUrl, pageData);
-
-		throw redirect(303, `/registry?url=${registryUrl}`);
-	}
+	default: action
 };

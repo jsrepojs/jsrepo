@@ -11,7 +11,9 @@ export const cacheSchema = v.object({
 
 const getCacheKey = (registryUrl: string) => `${REGISTRY_CACHE_PREFIX}:${registryUrl}`;
 
-export const checkCache = async (registryUrl: string): Promise<RegistryInfo | undefined> => {
+export const checkCache = async (
+	registryUrl: string
+): Promise<(RegistryInfo & { timestamp: number }) | undefined> => {
 	const cacheKey = getCacheKey(registryUrl);
 
 	const entry = await redis.get(cacheKey);
@@ -21,7 +23,8 @@ export const checkCache = async (registryUrl: string): Promise<RegistryInfo | un
 
 			return {
 				manifest: cache.manifest,
-				readme: cache.readme
+				readme: cache.readme,
+				timestamp: cache.timestamp
 			};
 		} catch {
 			// if data was malformed just delete cache
@@ -40,7 +43,7 @@ export const updateCache = async (registryUrl: string, info: RegistryInfo) => {
 		timestamp: Date.now()
 	};
 
-	const TTL = 1000 * 60 * 15; // 15 minutes
+	const ttl = 1000 * 60 * 60 * 24; // 24 hours
 
-	await redis.set(cacheKey, JSON.stringify(cache), { pxat: Date.now() + TTL });
+	await redis.set(cacheKey, JSON.stringify(cache), { pxat: Date.now() + ttl });
 };
