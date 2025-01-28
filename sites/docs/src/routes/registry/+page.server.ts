@@ -6,6 +6,7 @@ import { redis, VIEW_PREFIX } from '$lib/ts/redis-client.js';
 
 export const load = async ({ url }) => {
 	const registryUrl = url.searchParams.get('url');
+	const noCache = url.searchParams.get('noCache') === 'true';
 
 	if (registryUrl == null) throw redirect(303, '/registries');
 
@@ -13,13 +14,15 @@ export const load = async ({ url }) => {
 
 	if (!provider) throw redirect(303, '/registries');
 
-	const cache = await checkCache(registryUrl);
+	if (!noCache) {
+		const cache = await checkCache(registryUrl);
 
-	if (cache) {
-		return {
-			...cache,
-			registryUrl
-		} satisfies RegistryPageData;
+		if (cache) {
+			return {
+				...cache,
+				registryUrl
+			} satisfies RegistryPageData;
+		}
 	}
 
 	const pageData = await getRegistryData(provider, registryUrl);

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { Badge } from '$lib/components/ui/badge';
 	import { JsrepoSnippet } from '$lib/components/ui/snippet';
-	import { selectProvider, type Manifest } from 'jsrepo';
+	import { selectProvider, type Block, type Manifest } from 'jsrepo';
 	import * as Icons from '$lib/components/icons';
-	import { ArrowUpRightFromSquare, Braces, ChevronRight, File, FlaskRound } from 'lucide-svelte';
+	import { ArrowUpRightFromSquare, ChevronRight, File, FlaskRound } from 'lucide-svelte';
 	import { active, checkIsActive } from '$lib/actions/active.svelte';
 	import { page } from '$app/state';
 	import * as Collapsible from '$lib/components/ui/collapsible';
@@ -14,6 +14,8 @@
 	import { goto } from '$app/navigation';
 	import * as Table from '$lib/components/ui/table';
 	import * as Tooltip from '$lib/components/ui/tooltip';
+	import { mapToArray } from '$lib/utils/map-to-array';
+	import { FileIcon } from '$lib/components/ui/file-icon';
 
 	type Props = {
 		registryUrl: string;
@@ -57,15 +59,58 @@
 		return file.slice(index);
 	};
 
+	const determinePrimaryLanguage = (...blocks: Block[]) => {
+		const langMap = new Map<string, number>();
+
+		const ifExistsIncrement = (key: string) => {
+			const val = langMap.get(key) ?? 0;
+
+			langMap.set(key, val + 1);
+		};
+
+		for (const block of blocks) {
+			for (const file of block.files) {
+				const ext = parseFileExtension(file);
+
+				if (ext === 'yaml' || ext === 'yml') {
+					ifExistsIncrement('yml');
+					continue;
+				}
+
+				if (ext === 'json' || ext === 'jsonc') {
+					ifExistsIncrement('json');
+					continue;
+				}
+
+				if (ext === 'sass' || ext === 'scss') {
+					ifExistsIncrement('sass');
+					continue;
+				}
+
+				if (blocks.length === 1) {
+					if (ext === '.svelte' || ext === 'tsx' || ext === 'jsx' || ext === 'vue') return ext;
+				}
+
+				ifExistsIncrement(ext);
+			}
+		}
+
+		const arr = mapToArray(langMap, (key, value) => ({ key, value })).toSorted(
+			(a, b) => b.value - a.value
+		);
+
+		return arr[0].key;
+	};
+
+	const registryPrimaryLanguage = $derived(
+		determinePrimaryLanguage(...manifest.flatMap((c) => c.blocks))
+	);
+
 	const registryInfo = $derived(getRegistryInfo(manifest));
 
 	onMount(() => {
 		if (page.url.hash === '') {
-			if (readme) {
-				goto('#/');
-			} else {
-				goto('#blocks');
-			}
+			goto('#/');
 		}
 	});
 </script>
@@ -76,51 +121,52 @@
 
 <div class="max-w-5xl w-full flex flex-col gap-4 py-4">
 	<div class="w-full">
-		<div class="flex flex-col flex-wrap md:flex-row md:place-items-center gap-2">
+		<div class="flex flex-wrap md:place-items-center gap-2">
 			{#if provider?.name == 'http'}
 				<a href={provider.baseUrl(registryUrl)} target="_blank">
-					<h1 class="text-xl md:text-3xl font-bold flex place-items-center gap-2 text-nowrap">
+					<h1 class="text-lg font-bold flex place-items-center gap-2 text-nowrap">
 						{prettyUrl}
 						<ArrowUpRightFromSquare class="size-4 md:size-5 text-muted-foreground" />
 					</h1>
 				</a>
 			{:else}
-				<h1 class="text-xl md:text-3xl font-bold text-nowrap">{prettyUrl}</h1>
+				<h1 class="text-lg font-bold text-nowrap">{prettyUrl}</h1>
 			{/if}
-			{#if provider?.name !== 'http'}
-				<Badge
-					variant="secondary"
-					class="flex text-sm font-medium place-items-center gap-1 w-fit"
-					target="_blank"
-					href={provider?.baseUrl(registryUrl)}
-				>
-					{#if provider?.name === 'github'}
-						<Icons.GitHub class="size-3" />
-					{:else if provider?.name === 'gitlab'}
-						<Icons.GitLab class="size-3" />
-					{:else if provider?.name === 'bitbucket'}
-						<Icons.BitBucket class="size-3" />
-					{:else if provider?.name === 'azure'}
-						<Icons.AzureDevops class="size-3" />
-					{/if}
-					{prettyUrl}
-					<ArrowUpRightFromSquare class="size-3 text-muted-foreground" />
-				</Badge>
-			{/if}
+			<div class="flex place-items-center gap-2">
+				<FileIcon extension={registryPrimaryLanguage} />
+				{#if provider?.name !== 'http'}
+					<Badge
+						variant="secondary"
+						class="flex text-sm font-medium place-items-center gap-1 w-fit"
+						target="_blank"
+						href={provider?.baseUrl(registryUrl)}
+					>
+						{#if provider?.name === 'github'}
+							<Icons.GitHub class="size-3" />
+						{:else if provider?.name === 'gitlab'}
+							<Icons.GitLab class="size-3" />
+						{:else if provider?.name === 'bitbucket'}
+							<Icons.BitBucket class="size-3" />
+						{:else if provider?.name === 'azure'}
+							<Icons.AzureDevops class="size-3" />
+						{/if}
+						{prettyUrl}
+						<ArrowUpRightFromSquare class="size-3 text-muted-foreground" />
+					</Badge>
+				{/if}
+			</div>
 		</div>
 	</div>
 	<div class="flex flex-col">
 		<!-- tabs -->
 		<div class="flex place-items-center border-b gap-2 py-1">
-			{#if readme}
-				<a
-					href="#/"
-					use:active={{ isHash: true }}
-					class="font-medium p-2 data-[active=true]:text-foreground data-[active=true]:bg-accent hover:bg-accent transition-all text-muted-foreground hover:text-foreground rounded-md"
-				>
-					Readme
-				</a>
-			{/if}
+			<a
+				href="#/"
+				use:active={{ isHash: true }}
+				class="font-medium p-2 data-[active=true]:text-foreground data-[active=true]:bg-accent hover:bg-accent transition-all text-muted-foreground hover:text-foreground rounded-md"
+			>
+				Overview
+			</a>
 			<a
 				href="#blocks"
 				use:active={{ isHash: true }}
@@ -136,7 +182,7 @@
 				Dependencies
 			</a>
 		</div>
-		{#if readme && checkIsActive( new URL('#/', page.url.href).toString(), { url: page.url, isHash: true } )}
+		{#if checkIsActive(new URL('#/', page.url.href).toString(), { url: page.url, isHash: true })}
 			<!-- overview -->
 
 			<div class="flex flex-col md:flex-row place-items-start w-full py-4 gap-4">
@@ -144,7 +190,18 @@
 					<div
 						class="w-full prose prose-td:border-r prose-td:last:border-r-0 prose-th:p-2 prose-th:border-r prose-th:last:border-r-0 dark:prose-invert prose-tr:border-b prose-tr:border-border prose-table:border-x prose-thead:border-border prose-thead:border-y prose-td:p-2 prose-img:m-0"
 					>
-						{@html readme}
+						{#if readme}
+							{@html readme}
+						{:else}
+							<div class="flex place-items-center flex-col gap-2 justify-center h-96">
+								<span class="text-muted-foreground text-lg">
+									This registry doesn't have a README.
+								</span>
+								<span class="text-xs text-muted-foreground">
+									Add a README.md to the root of the registry for it to be displayed here.
+								</span>
+							</div>
+						{/if}
 					</div>
 				</div>
 				<div class="w-full md:w-96 shrink-0">
@@ -179,23 +236,25 @@
 					</div>
 				</div>
 			</div>
-		{:else if checkIsActive( new URL('#blocks', page.url.href).toString(), { url: page.url, isHash: true } ) || (page.url.hash === '' && !readme)}
+		{:else if checkIsActive( new URL('#blocks', page.url.href).toString(), { url: page.url, isHash: true } )}
 			<!-- blocks -->
 
 			<div class="flex flex-col gap-2 py-4">
 				{#each manifest as category}
 					{#each category.blocks.filter((b) => b.list) as block}
+						{@const primaryLanguage = determinePrimaryLanguage(block)}
 						<Collapsible.Root>
 							<Collapsible.Trigger>
 								{#snippet child({ props })}
 									<button
 										{...props}
-										class="flex place-items-center justify-between w-full hover:bg-accent p-4 rounded-lg"
+										class="flex place-items-center justify-between border w-full hover:bg-accent p-4 rounded-lg"
 									>
 										<div class="flex place-items-center gap-2">
 											<span class="font-medium">
 												{block.category}/{block.name}
 											</span>
+											<FileIcon extension={primaryLanguage} />
 											{#if block.tests}
 												<Tooltip.Provider delayDuration={50}>
 													<Tooltip.Root>
@@ -226,31 +285,11 @@
 												{@const ext = parseFileExtension(file)}
 												<li class="flex place-items-center gap-1">
 													<div class="size-4 flex place-items-center justify-center">
-														{#if ext === '.svelte'}
-															<Icons.Svelte class="size-4" />
-														{:else if ext === '.ts'}
-															<Icons.TypeScript class="size-3" />
-														{:else if ext === '.js'}
-															<Icons.JavaScript class="size-3" />
-														{:else if ext === '.jsx' || ext === 'tsx'}
-															<Icons.React class="size-4" />
-														{:else if ext === '.vue'}
-															<Icons.Vue class="size-3" />
-														{:else if ext === '.html'}
-															<Icons.HTML class="size-3" />
-														{:else if ext === '.json' || ext === '.jsonc'}
-															<Braces class="size-4 text-primary" />
-														{:else if ext === '.yml' || ext === '.yaml'}
-															<Icons.Yaml class="size-4" />
-														{:else if ext === '.css'}
-															<Icons.CSS class="size-3" />
-														{:else if ext === '.sass' || ext === 'scss'}
-															<Icons.SASS class="size-4" />
-														{:else if ext === '.svg'}
-															<Icons.Svg class="size-4" />
-														{:else}
-															<File class="size-4 text-muted-foreground" />
-														{/if}
+														<FileIcon extension={ext}>
+															{#snippet fallback()}
+																<File class="size-4 text-muted-foreground" />
+															{/snippet}
+														</FileIcon>
 													</div>
 													{file}
 												</li>

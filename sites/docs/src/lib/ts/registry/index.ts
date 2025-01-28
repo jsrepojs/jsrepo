@@ -68,7 +68,7 @@ export const fetchReadme = async (state: RegistryProviderState): Promise<string 
 		}
 
 		// this is because instead of returning 404 in some cases a webpage will be returned
-		if (!response.headers.get('Content-Type')?.startsWith('text/plain')) {
+		if (response.headers.get('Content-Type')?.startsWith('text/html')) {
 			return undefined;
 		}
 
