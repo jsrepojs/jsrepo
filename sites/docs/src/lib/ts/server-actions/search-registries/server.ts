@@ -1,5 +1,4 @@
-import { getRegistryData } from '$lib/ts/registry';
-import { checkCache, updateCache } from '$lib/ts/registry/cache';
+import { getProviderState } from '$lib/ts/registry';
 import { fail, redirect, type RequestEvent } from '@sveltejs/kit';
 import { selectProvider } from 'jsrepo';
 import { message, setError, superValidate } from 'sveltekit-superforms';
@@ -27,19 +26,8 @@ export const action = async (event: RequestEvent) => {
 		return message(form, 'You are already there!');
 	}
 
-	const cache = await checkCache(registryUrl);
-
-	if (cache) {
-		throw redirect(303, `/registry?url=${registryUrl}`);
-	}
-
-	const pageData = await getRegistryData(provider, registryUrl);
-
-	if (!pageData) {
-		return setError(form, 'search', 'Invalid registry url');
-	}
-
-	updateCache(registryUrl, pageData);
+	// just gets the state and sets the cache
+	await getProviderState(registryUrl, provider, { cache: true });
 
 	throw redirect(303, `/registry?url=${registryUrl}`);
 };

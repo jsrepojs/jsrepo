@@ -3,7 +3,7 @@
 	import { JsrepoSnippet } from '$lib/components/ui/snippet';
 	import { selectProvider, type Block, type Manifest } from 'jsrepo';
 	import * as Icons from '$lib/components/icons';
-	import { ArrowUpRightFromSquare, ChevronRight, File, FlaskRound, RefreshCw } from 'lucide-svelte';
+	import { ArrowUpRightFromSquare, ChevronRight, File, FlaskRound } from 'lucide-svelte';
 	import { active, checkIsActive } from '$lib/actions/active.svelte';
 	import { page } from '$app/state';
 	import * as Collapsible from '$lib/components/ui/collapsible';
@@ -11,22 +11,19 @@
 	import { parsePackageName } from '$lib/ts/parse-package-name';
 	import { Separator } from '$lib/components/ui/separator';
 	import { onMount } from 'svelte';
-	import { goto, invalidateAll } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import * as Table from '$lib/components/ui/table';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { mapToArray } from '$lib/utils/map-to-array';
 	import { FileIcon } from '$lib/components/ui/file-icon';
-	import Cookie from 'js-cookie';
-	import { Button } from '$lib/components/ui/button';
 
 	type Props = {
 		registryUrl: string;
 		manifest: Manifest;
 		readme?: string;
-		cacheAge?: number;
 	};
 
-	let { registryUrl, manifest, readme, cacheAge }: Props = $props();
+	let { registryUrl, manifest, readme }: Props = $props();
 
 	const provider = $derived(selectProvider(registryUrl));
 
@@ -109,18 +106,6 @@
 		determinePrimaryLanguage(...manifest.flatMap((c) => c.blocks))
 	);
 
-	let invalidatingCache = $state(false);
-
-	const bustCache = async () => {
-		Cookie.set('no-cache', 'true');
-
-		invalidatingCache = true;
-
-		await invalidateAll();
-
-		invalidatingCache = false;
-	};
-
 	const registryInfo = $derived(getRegistryInfo(manifest));
 
 	onMount(() => {
@@ -169,26 +154,6 @@
 						{prettyUrl}
 						<ArrowUpRightFromSquare class="size-3 text-muted-foreground" />
 					</Badge>
-				{/if}
-				{#if cacheAge}
-					<Tooltip.Provider>
-						<Tooltip.Root>
-							<Tooltip.Trigger>
-								<Button
-									class="size-6 rounded-full"
-									size="icon"
-									variant="outline"
-									loading={invalidatingCache}
-									onclick={bustCache}
-								>
-									<RefreshCw />
-								</Button>
-							</Tooltip.Trigger>
-							<Tooltip.Content>
-								<p>Refresh cached content</p>
-							</Tooltip.Content>
-						</Tooltip.Root>
-					</Tooltip.Provider>
 				{/if}
 			</div>
 		</div>
