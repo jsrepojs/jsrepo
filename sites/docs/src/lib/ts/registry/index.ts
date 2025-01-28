@@ -1,13 +1,14 @@
 import {
 	fetchManifest,
 	github,
+	gitlab,
 	type Manifest,
 	type RegistryProvider,
 	type RegistryProviderState
 } from 'jsrepo';
 import { markdownIt } from '../markdown';
 import DOMPurify from 'isomorphic-dompurify';
-import { GITHUB_TOKEN } from '$env/static/private';
+import { GITHUB_TOKEN, GITLAB_TOKEN } from '$env/static/private';
 
 export type RegistryPageData = {
 	registryUrl: string;
@@ -82,6 +83,8 @@ const getProviderToken = (provider: RegistryProvider): string | undefined => {
 	switch (provider.name) {
 		case github.name:
 			return GITHUB_TOKEN;
+		case gitlab.name:
+			return GITLAB_TOKEN;
 		// add the rest of the tokens here
 	}
 

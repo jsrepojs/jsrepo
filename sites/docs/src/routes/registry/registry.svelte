@@ -386,8 +386,13 @@
 	/* Shiki see: https://shiki.matsu.io/guide/dual-themes#class-based-dark-mode */
 	:global(html.dark .shiki, html.dark .shiki span) {
 		color: var(--shiki-dark) !important;
+		background-color: var(--bg-background) !important;
 		font-style: var(--shiki-dark-font-style) !important;
 		font-weight: var(--shiki-dark-font-weight) !important;
 		text-decoration: var(--shiki-dark-text-decoration) !important;
+	}
+
+	:global(pre.shiki) {
+		@apply border border-border;
 	}
 </style>

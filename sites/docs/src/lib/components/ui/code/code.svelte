@@ -1,7 +1,7 @@
 <!--
-	jsrepo 1.22.1
+	jsrepo 1.29.1
 	Installed from github/ieedan/shadcn-svelte-extras
-	12-23-2024
+	1-28-2025
 -->
 
 <script lang="ts">
@@ -119,13 +119,59 @@
 	/* Shiki see: https://shiki.matsu.io/guide/dual-themes#class-based-dark-mode */
 	:global(html.dark .shiki, html.dark .shiki span) {
 		color: var(--shiki-dark) !important;
-		background-color: var(--bg-background) !important;
 		font-style: var(--shiki-dark-font-style) !important;
 		font-weight: var(--shiki-dark-font-weight) !important;
 		text-decoration: var(--shiki-dark-text-decoration) !important;
 	}
 
 	:global(pre.shiki) {
-		@apply border border-border;
+		@apply overflow-auto rounded-lg bg-inherit py-4 text-sm;
+		max-height: min(100%, 650px);
+		-ms-overflow-style: none; /* IE and Edge */
+		scrollbar-width: none; /* Firefox */
+	}
+
+	:global(pre.shiki::-webkit-scrollbar) {
+		display: none;
+	}
+
+	:global(pre.shiki code) {
+		@apply grid min-w-full break-words rounded-none border-0 bg-transparent p-0;
+		counter-reset: line;
+		box-decoration-break: clone;
+	}
+
+	:global(pre.line-numbers) {
+		counter-reset: step;
+		counter-increment: step 0;
+	}
+
+	:global(pre.line-numbers .line::before) {
+		content: counter(step);
+		counter-increment: step;
+		display: inline-block;
+		width: 1.8rem;
+		margin-right: 1.4rem;
+		text-align: right;
+	}
+
+	:global(pre.line-numbers .line::before) {
+		@apply text-muted-foreground;
+	}
+
+	:global(pre .line.line--highlighted) {
+		@apply bg-secondary;
+	}
+
+	:global(pre .line.line--highlighted span) {
+		@apply relative;
+	}
+
+	:global(pre .line) {
+		@apply inline-block min-h-4 w-full px-4 py-0.5;
+	}
+
+	:global(pre.line-numbers .line) {
+		@apply px-2;
 	}
 </style>
