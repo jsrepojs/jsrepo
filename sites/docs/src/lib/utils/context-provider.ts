@@ -1,7 +1,7 @@
 /*
-	jsrepo 1.22.1
+	jsrepo 1.29.1
 	Installed from github/ieedan/shadcn-svelte-extras
-	12-23-2024
+	1-28-2025
 */
 
 import { getContext, setContext } from 'svelte';
