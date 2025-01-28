@@ -1,4 +1,3 @@
-// import { redis, REGISTRY_CACHE_PREFIX } from '$lib/ts/redis-client';
 import { superValidate } from 'sveltekit-superforms';
 import { valibot } from 'sveltekit-superforms/adapters';
 import { schema } from '$lib/ts/server-actions/search-registries/client';
