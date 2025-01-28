@@ -189,7 +189,7 @@
 			<div class="flex flex-col md:flex-row place-items-start w-full py-4 gap-4">
 				<div class="w-full flex-grow">
 					<div
-						class="w-full prose prose-pre:border prose-td:border-r prose-td:last:border-r-0 prose-th:p-2 prose-th:border-r prose-th:last:border-r-0 dark:prose-invert prose-tr:border-b prose-tr:border-border prose-table:border-x prose-thead:border-border prose-thead:border-y prose-td:p-2 prose-img:m-0"
+						class="w-full prose prose-td:border-r prose-td:last:border-r-0 prose-th:p-2 prose-th:border-r prose-th:last:border-r-0 dark:prose-invert prose-tr:border-b prose-tr:border-border prose-table:border-x prose-thead:border-border prose-thead:border-y prose-td:p-2 prose-img:m-0"
 					>
 						{#if readme}
 							{@html readme}
@@ -346,3 +346,17 @@
 		{/if}
 	</div>
 </div>
+
+<style lang="postcss">
+	/* Shiki see: https://shiki.matsu.io/guide/dual-themes#class-based-dark-mode */
+	:global(html.dark .shiki, html.dark .shiki span) {
+		color: var(--shiki-dark) !important;
+		background-color: var(--bg-background) !important;
+		font-style: var(--shiki-dark-font-style) !important;
+		font-weight: var(--shiki-dark-font-weight) !important;
+		text-decoration: var(--shiki-dark-text-decoration) !important;
+	}
+	:global(pre.shiki) {
+		@apply border border-border;
+	}
+</style>
