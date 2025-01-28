@@ -20,7 +20,7 @@ export const load = async ({ url, cookies }) => {
 
 		if (cache) {
 			await redis.incr(`${VIEW_PREFIX}:${registryUrl}`);
-			
+
 			return {
 				...cache,
 				cacheAge: Date.now() - cache.timestamp,
