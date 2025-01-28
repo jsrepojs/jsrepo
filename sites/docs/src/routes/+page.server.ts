@@ -34,7 +34,7 @@ export const load = async () => {
 			.map((key, index) => ({ key, value: parseInt(values[index] as string, 10) }))
 			.filter((pair) => !isNaN(pair.value)); // Ensure values are valid numbers
 
-		sortedPairs = keyValuePairs.sort((a, b) => b.value - a.value).slice(0, 3);
+		sortedPairs = keyValuePairs.sort((a, b) => b.value - a.value).slice(0, 4);
 	}
 
 	const form = await superValidate(valibot(schema));

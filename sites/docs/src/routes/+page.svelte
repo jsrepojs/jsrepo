@@ -10,6 +10,7 @@
 
 	const featuredRegistries = [
 		'https://reactbits.dev/tailwind',
+		'https://reactbits.dev/ts/tailwind',
 		'github/ieedan/std',
 		'github/ieedan/shadcn-svelte-extras'
 	];
