@@ -3,7 +3,7 @@ import Shiki from '@shikijs/markdown-it';
 import { markdownItTable } from 'markdown-it-table';
 
 const markdownIt = async () => {
-	const md = MarkdownIt({ html: true });
+	const md = MarkdownIt();
 
 	const stripComments = (md: MarkdownIt) => {
 		md.core.ruler.before('normalize', 'strip_comments', function (state) {
