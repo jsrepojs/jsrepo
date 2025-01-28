@@ -29,10 +29,10 @@
 				<div id="sidebar-trigger-portal-target"></div>
 			{:else}
 				<a href="/" class="flex place-items-center gap-2">
-					<h1 class="bg-primary text-primary-foreground text-lg font-serif font-bold p-1 w-fit">
+					<h1 class="bg-primary text-primary-foreground text-lg font-mono font-bold p-1 w-fit">
 						jsrepo
 					</h1>
-					<span class="text-base font-serif text-muted-foreground">v{version}</span>
+					<span class="text-base font-mono text-muted-foreground">v{version}</span>
 				</a>
 				<nav class="place-items-center gap-4 flex">
 					<a

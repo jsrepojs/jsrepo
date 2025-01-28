@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ModeWatcher } from 'mode-watcher';
 	import '@fontsource-variable/jetbrains-mono';
-	import '@fontsource/inter';
+	import '@fontsource-variable/inter';
 	import '../app.css';
 	import Header from '$lib/components/site/header.svelte';
 	import { commandContext, pmContext } from '$lib/ts/context';

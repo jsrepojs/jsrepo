@@ -146,7 +146,7 @@
 <SubHeading>Dependencies</SubHeading>
 <p>Your blocks can depend on npm packages as well as other blocks in your project.</p>
 <p>
-	<span class="font-serif text-sm">blocks/utils/math/add.ts</span>
+	<span class="font-mono text-sm">blocks/utils/math/add.ts</span>
 </p>
 <Code
 	lang="ts"

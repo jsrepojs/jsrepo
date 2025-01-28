@@ -4,8 +4,8 @@
 	12-12-2024
 */
 
-import { get } from 'svelte/store';
-import { page } from '$app/stores';
+import { page } from '$app/state';
+import { untrack } from 'svelte';
 
 export type Options = {
 	/** Determines if the route should be active for subdirectories.
@@ -23,13 +23,18 @@ export type Options = {
 
 /** Sets the `data-active` attribute on an `<a/>` tag based on its 'active' state. */
 export const active = (node: HTMLAnchorElement, opts: Omit<Options, 'url'>) => {
-	checkIsActive(node.href, { ...opts, url: get(page).url }).toString();
+	checkIsActive(node.href, { ...opts, url: page.url }).toString();
 
-	page.subscribe((val) => {
-		node.setAttribute(
-			'data-active',
-			checkIsActive(node.href, { ...opts, url: val.url }).toString()
-		);
+	$effect(() => {
+		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+		page.url;
+
+		untrack(() => {
+			node.setAttribute(
+				'data-active',
+				checkIsActive(node.href, { ...opts, url: page.url }).toString()
+			);
+		});
 	});
 };
 

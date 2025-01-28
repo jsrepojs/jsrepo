@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Command } from 'package-manager-detector';
 	import { resolveCommand } from 'package-manager-detector/commands';
-	import CopyButton from './copy-button.svelte';
+	import CopyButton from './pm-copy-button.svelte';
 	import { cn } from '$lib/utils';
 	import { pmContext } from '$lib/ts/context';
 
@@ -22,7 +22,7 @@
 
 <div
 	class={cn(
-		'border border-border relative bg-card rounded-md px-4 py-3 w-full text-sm font-serif text-muted-foreground flex justify-between place-items-center',
+		'border border-border relative bg-card rounded-md px-4 py-3 w-full text-sm font-mono text-muted-foreground flex justify-between place-items-center',
 		className
 	)}
 >
