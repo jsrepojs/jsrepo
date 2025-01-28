@@ -138,9 +138,6 @@ importers:
       '@fontsource-variable/jetbrains-mono':
         specifier: ^5.1.2
         version: 5.1.2
-      '@shikijs/markdown-it':
-        specifier: ^2.1.0
-        version: 2.1.0
       '@sveltejs/adapter-vercel':
         specifier: ^5.5.3
         version: 5.5.3(@sveltejs/kit@2.16.1(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.19.2)(vite@6.0.11(@types/node@22.10.10)(jiti@1.21.7)(yaml@2.7.0)))(svelte@5.19.2)(vite@6.0.11(@types/node@22.10.10)(jiti@1.21.7)(yaml@2.7.0)))(rollup@4.31.0)
@@ -1044,14 +1041,6 @@ packages:
 
   '@shikijs/langs@2.1.0':
     resolution: {integrity: sha512-Jn0gS4rPgerMDPj1ydjgFzZr5fAIoMYz4k7ZT3LJxWWBWA6lokK0pumUwVtb+MzXtlpjxOaQejLprmLbvMZyww==}
-
-  '@shikijs/markdown-it@2.1.0':
-    resolution: {integrity: sha512-Z+OIx0XOfpsETAgNoBjoUlZehSkO+K31GW5RE8l9cc8WxcQdRldXLD+3oavfcA4zoetZJaVUzl60X4kf53bvdA==}
-    peerDependencies:
-      markdown-it-async: ^1.1.1
-    peerDependenciesMeta:
-      markdown-it-async:
-        optional: true
 
   '@shikijs/themes@2.1.0':
     resolution: {integrity: sha512-oS2mU6+bz+8TKutsjBxBA7Z3vrQk21RCmADLpnu8cy3tZD6Rw0FKqDyXNtwX52BuIDKHxZNmRlTdG3vtcYv3NQ==}
@@ -4400,11 +4389,6 @@ snapshots:
   '@shikijs/langs@2.1.0':
     dependencies:
       '@shikijs/types': 2.1.0
-
-  '@shikijs/markdown-it@2.1.0':
-    dependencies:
-      markdown-it: 14.1.0
-      shiki: 2.1.0
 
   '@shikijs/themes@2.1.0':
     dependencies:

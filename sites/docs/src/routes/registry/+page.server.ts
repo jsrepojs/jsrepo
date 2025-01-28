@@ -3,6 +3,7 @@ import { selectProvider } from 'jsrepo';
 import { getProviderState, getRegistryData } from '$lib/ts/registry/index.js';
 import { redis, VIEW_PREFIX } from '$lib/ts/redis-client.js';
 import { action } from '$lib/ts/server-actions/search-registries/server.js';
+import { dev } from '$app/environment';
 
 export const load = async ({ url }) => {
 	const registryUrl = url.searchParams.get('url');
@@ -21,7 +22,9 @@ export const load = async ({ url }) => {
 		throw error(404, { message: 'registry-search: Could not find the requested registry' });
 	}
 
-	await redis.incr(`${VIEW_PREFIX}:${registryUrl}`);
+	if (dev) {
+		await redis.incr(`${VIEW_PREFIX}:${registryUrl}`);
+	}
 
 	return {
 		...pageData,
