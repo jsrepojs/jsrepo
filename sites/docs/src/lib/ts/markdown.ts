@@ -1,5 +1,4 @@
 import MarkdownIt from 'markdown-it';
-import Shiki from '@shikijs/markdown-it';
 import { markdownItTable } from 'markdown-it-table';
 
 let md: MarkdownIt | null = null;
@@ -18,14 +17,6 @@ const markdownIt = async () => {
 	// plugins
 	newMd.use(stripComments);
 	newMd.use(markdownItTable);
-	newMd.use(
-		await Shiki({
-			themes: {
-				light: 'github-light-default',
-				dark: 'github-dark-default'
-			}
-		})
-	);
 
 	md = newMd;
 
