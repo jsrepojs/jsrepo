@@ -34,7 +34,7 @@
 		"globals": "^15.14.0",
 		"isomorphic-dompurify": "^2.20.0",
 		"js-cookie": "^3.0.5",
-		"jsrepo": "workspace:^",
+		"jsrepo": "^1.29.1",
 		"lucide-svelte": "^0.473.0",
 		"markdown-it": "^14.1.0",
 		"markdown-it-table": "^4.1.1",

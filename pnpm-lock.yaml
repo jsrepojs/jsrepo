@@ -199,8 +199,8 @@ importers:
         specifier: ^3.0.5
         version: 3.0.5
       jsrepo:
-        specifier: workspace:^
-        version: link:../../packages/cli
+        specifier: ^
+        version: 1.29.1(typescript@5.7.3)(ws@8.18.0)(zod@3.24.1)
       lucide-svelte:
         specifier: ^0.473.0
         version: 0.473.0(svelte@5.19.2)
@@ -2260,6 +2260,10 @@ packages:
 
   jsonfile@4.0.0:
     resolution: {integrity: sha512-m6F1R3z8jjlf2imQHS2Qez5sjKWQzbuuhuJ/FKYFRZvPE3PuHcSMVZzfsLhGVOkfd20obL5SWEBew5ShlquNxg==}
+
+  jsrepo@1.29.1:
+    resolution: {integrity: sha512-guyFrZY7tmQxj4vtj/9n3KEu4EaEYDZiZ1qimAIUpYyDaUWssqhDEgWWdMn6HLthYVGm1c0iEnp/AeQz/iEMiA==}
+    hasBin: true
 
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
@@ -5753,6 +5757,45 @@ snapshots:
   jsonfile@4.0.0:
     optionalDependencies:
       graceful-fs: 4.2.11
+
+  jsrepo@1.29.1(typescript@5.7.3)(ws@8.18.0)(zod@3.24.1):
+    dependencies:
+      '@anthropic-ai/sdk': 0.36.2
+      '@biomejs/js-api': 0.7.1(@biomejs/wasm-nodejs@1.9.4)
+      '@biomejs/wasm-nodejs': 1.9.4
+      '@clack/prompts': 0.9.1
+      ansi-regex: 6.1.0
+      boxen: 8.0.1
+      chalk: 5.4.1
+      commander: 13.1.0
+      conf: 13.1.0
+      diff: 7.0.0
+      escape-string-regexp: 5.0.0
+      estree-walker: 3.0.3
+      execa: 9.5.2
+      get-tsconfig: 4.10.0
+      ignore: 7.0.3
+      node-fetch: 3.3.2
+      octokit: 4.1.0
+      ollama: 0.5.12
+      openai: 4.80.1(ws@8.18.0)(zod@3.24.1)
+      package-manager-detector: 0.2.8
+      parse5: 7.2.1
+      pathe: 2.0.2
+      prettier: 3.4.2
+      semver: 7.6.3
+      svelte: 5.19.2
+      ts-morph: 25.0.0
+      valibot: 1.0.0-beta.14(typescript@5.7.3)
+      validate-npm-package-name: 6.0.0
+      vue: 3.5.13(typescript@5.7.3)
+    transitivePeerDependencies:
+      - '@biomejs/wasm-bundler'
+      - '@biomejs/wasm-web'
+      - encoding
+      - typescript
+      - ws
+      - zod
 
   keyv@4.5.4:
     dependencies:
