@@ -19,6 +19,8 @@ export const load = async ({ url, cookies }) => {
 		const cache = await checkCache(registryUrl);
 
 		if (cache) {
+			await redis.incr(`${VIEW_PREFIX}:${registryUrl}`);
+			
 			return {
 				...cache,
 				cacheAge: Date.now() - cache.timestamp,
