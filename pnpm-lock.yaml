@@ -199,7 +199,7 @@ importers:
         specifier: ^3.0.5
         version: 3.0.5
       jsrepo:
-        specifier: ^
+        specifier: ^1.29.1
         version: 1.29.1(typescript@5.7.3)(ws@8.18.0)(zod@3.24.1)
       lucide-svelte:
         specifier: ^0.473.0
