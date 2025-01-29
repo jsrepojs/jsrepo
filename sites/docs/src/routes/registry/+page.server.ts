@@ -22,7 +22,7 @@ export const load = async ({ url }) => {
 		throw error(404, { message: 'registry-search: Could not find the requested registry' });
 	}
 
-	if (dev) {
+	if (!dev) {
 		await redis.incr(`${VIEW_PREFIX}:${registryUrl}`);
 	}
 
