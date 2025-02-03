@@ -1,9 +1,10 @@
 import fs from 'node:fs';
 import path from 'pathe';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { assert, afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { cli } from '../src/cli';
-import type { Category } from '../src/utils/build';
+import type { Category } from '../src/types';
 import type { RegistryConfig } from '../src/utils/config';
+import { parseManifest } from '../src/utils/manifest';
 import { assertFilesExist } from './utils';
 
 describe('build', () => {
@@ -38,6 +39,9 @@ describe('build', () => {
 
 		const buildConfig: RegistryConfig = {
 			$schema: '',
+			meta: {
+				authors: ['Aidan Bleser'],
+			},
 			dirs: ['./src', './'],
 			includeBlocks: [],
 			includeCategories: [],
@@ -124,11 +128,15 @@ export const createPoint = (x: number, y: number): Point => { x, y };`
 			'./registry',
 		]);
 
-		const manifest = JSON.parse(
+		const manifest = parseManifest(
 			fs.readFileSync('./registry/jsrepo-manifest.json').toString()
-		) as Category[];
+		);
 
-		expect(manifest).toStrictEqual([
+		assert(manifest.isOk());
+
+		expect(manifest.unwrap().meta).toHaveProperty('authors', ['Aidan Bleser']);
+
+		expect(manifest.unwrap().categories).toStrictEqual([
 			{
 				name: 'types',
 				blocks: [
