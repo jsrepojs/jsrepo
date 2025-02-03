@@ -38,7 +38,7 @@
 	const getRegistryInfo = (manifest: Manifest): RegistryInfo => {
 		const dependencies = new Set<string>();
 
-		for (const category of manifest) {
+		for (const category of manifest.categories) {
 			for (const block of category.blocks) {
 				for (const dep of [...block.dependencies, ...block.devDependencies]) {
 					dependencies.add(dep);
@@ -47,8 +47,8 @@
 		}
 
 		return {
-			categories: manifest.length,
-			blocks: manifest.flatMap((c) => c.blocks).length,
+			categories: manifest.categories.length,
+			blocks: manifest.categories.flatMap((c) => c.blocks).length,
 			dependencies: Array.from(dependencies)
 		};
 	};
@@ -103,7 +103,7 @@
 	};
 
 	const registryPrimaryLanguage = $derived(
-		determinePrimaryLanguage(...manifest.flatMap((c) => c.blocks))
+		determinePrimaryLanguage(...manifest.categories.flatMap((c) => c.blocks))
 	);
 
 	const registryInfo = $derived(getRegistryInfo(manifest));
@@ -241,7 +241,7 @@
 			<!-- blocks -->
 
 			<div class="flex flex-col gap-2 py-4">
-				{#each manifest as category}
+				{#each manifest.categories as category}
 					{#each category.blocks.filter((b) => b.list) as block}
 						{@const primaryLanguage = determinePrimaryLanguage(block)}
 						<Collapsible.Root>
