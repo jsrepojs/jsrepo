@@ -146,7 +146,8 @@ const buildBlocksDirectory = (blocksPath: string, { cwd, ignore, config }: Optio
 				const walkFiles = (base: string, files: string[]) => {
 					for (const f of files) {
 						const filePath = path.join(base, f);
-						const relativeFilePath = path.relative(path.join(cwd, blockDir), filePath);
+						// relative to the block root
+						const relativeFilePath = filePath.slice(blockDir.length + 1);
 
 						if (isTestFile(f)) {
 							hasTests = true;

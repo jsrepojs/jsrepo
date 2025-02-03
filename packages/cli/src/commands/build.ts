@@ -265,11 +265,13 @@ const _build = async (options: Options) => {
 					const originalPath = path.join(options.cwd, block.directory);
 					const newDirPath = path.join(outDir, block.directory);
 
-					if (!fs.existsSync(newDirPath)) {
-						fs.mkdirSync(newDirPath, { recursive: true });
-					}
-
 					for (const file of block.files) {
+						const containing = path.join(newDirPath, file, '../');
+
+						if (!fs.existsSync(containing)) {
+							fs.mkdirSync(containing, { recursive: true });
+						}
+
 						fs.copyFileSync(path.join(originalPath, file), path.join(newDirPath, file));
 					}
 				}
