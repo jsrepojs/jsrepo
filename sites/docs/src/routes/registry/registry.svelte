@@ -303,8 +303,8 @@
 							<span>{registryInfo.dependencies.length}</span>
 						</div>
 					</div>
-					<Separator />
 					{#if manifest.meta?.authors}
+						<Separator />
 						<div class="p-2 flex flex-col">
 							<span class="text-muted-foreground font-medium">Authors</span>
 							<span>{manifest.meta?.authors?.join(' ,')}</span>
