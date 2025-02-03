@@ -2,6 +2,44 @@
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"type": "object",
 	"properties": {
+		"meta": {
+			"description": "Optional metadata to include in the manifest file.",
+			"type": "object",
+			"properties": {
+				"authors": {
+					"description": "The names of the authors of this registry.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"bugs": {
+					"description": "Where users should report bugs.",
+					"type": "string"
+				},
+				"description": {
+					"description": "A description of the registry.",
+					"type": "string"
+				},
+				"homepage": {
+					"description": "The URL to the registry homepage.",
+					"type": "string",
+					"format": "uri"
+				},
+				"repository": {
+					"description": "The source repository for the registry. (Omit this if you are distributing from a git repository)",
+					"type": "string",
+					"format": "uri"
+				},
+				"tags": {
+					"description": "Keywords that describe your registry.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			}
+		},
 		"dirs": {
 			"description": "Directories that contain the categories you want to build into the manifest.",
 			"type": "array",

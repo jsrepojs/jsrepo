@@ -7,11 +7,12 @@ import path from 'pathe';
 import * as v from 'valibot';
 import { context } from '../cli';
 import { MANIFEST_FILE } from '../constants';
-import type { Category } from '../types';
+import type { Category, Manifest } from '../types';
 import * as ascii from '../utils/ascii';
 import { buildBlocksDirectory, pruneUnused } from '../utils/build';
 import { DEFAULT_CONFIG, runRules } from '../utils/build/check';
 import { type RegistryConfig, getRegistryConfig } from '../utils/config';
+import { parseManifest } from '../utils/manifest';
 import { intro } from '../utils/prompts';
 
 // sensible defaults for ignored directories
@@ -141,15 +142,17 @@ const _build = async (options: Options) => {
 		if (config.outputDir) {
 			// read old manifest to determine where the unwanted files are
 			// we can't just rm -rf because other static files could be hosted out of the same directory
-			const oldCategories = JSON.parse(fs.readFileSync(manifestOut).toString()) as Category[];
+			const oldManifest = parseManifest(fs.readFileSync(manifestOut).toString());
 
-			// first just remove all the files
-			for (const category of oldCategories) {
-				for (const block of category.blocks) {
-					const newDirPath = path.join(outDir, block.directory);
+			if (oldManifest.isOk()) {
+				// first just remove all the files
+				for (const category of oldManifest.unwrap().categories) {
+					for (const block of category.blocks) {
+						const newDirPath = path.join(outDir, block.directory);
 
-					if (fs.existsSync(newDirPath)) {
-						fs.rmSync(newDirPath, { recursive: true });
+						if (fs.existsSync(newDirPath)) {
+							fs.rmSync(newDirPath, { recursive: true });
+						}
 					}
 				}
 			}
@@ -197,9 +200,11 @@ const _build = async (options: Options) => {
 		loading.stop(`Built ${color.cyan(dirPath)}`);
 	}
 
+	const manifest = createManifest(categories, config);
+
 	loading.start('Checking manifest');
 
-	const { warnings, errors } = runRules(categories, config, config.rules);
+	const { warnings, errors } = runRules(manifest, config, config.rules);
 
 	loading.stop('Completed checking manifest.');
 
@@ -270,11 +275,25 @@ const _build = async (options: Options) => {
 
 		loading.start(`Writing output to \`${color.cyan(manifestOut)}\``);
 
-		// write the manifest
-		fs.writeFileSync(manifestOut, JSON.stringify(categories, null, '\t'));
+		// write manifest
+		fs.writeFileSync(manifestOut, JSON.stringify(manifest, null, '\t'));
 
 		loading.stop(`Wrote output to \`${color.cyan(manifestOut)}\``);
 	}
+};
+
+export const createManifest = (categories: Category[], config: RegistryConfig) => {
+	const meta = config.meta ?? {};
+
+	const manifest: Manifest = {
+		meta: {
+			builtAt: Date.now(),
+			...meta,
+		},
+		categories,
+	};
+
+	return manifest;
 };
 
 export { build };

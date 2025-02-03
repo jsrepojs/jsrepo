@@ -15,7 +15,6 @@
 		"vitest": "^2.1.5"
 	},
 	"dependencies": {
-		"chalk": "^5.3.0",
-		"radix-vue": "^1.9.12"
+		"chalk": "^5.3.0"
 	}
 }

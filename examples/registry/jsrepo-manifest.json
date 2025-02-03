@@ -1,317 +1,297 @@
-[
-	{
-		"name": "components",
-		"blocks": [
-			{
-				"name": "button",
-				"directory": "src/components",
-				"category": "components",
-				"tests": false,
-				"subdirectory": false,
-				"list": true,
-				"files": [
-					"button.svelte"
-				],
-				"localDependencies": [
-					"types/point"
-				],
-				"_imports_": {
-					"../types/point": "{{types/point}}"
+{
+	"meta": {
+		"builtAt": 1738589208370,
+		"authors": [
+			"Aidan Bleser"
+		],
+		"bugs": "https://github.com/ieedan/jsrepo/issues",
+		"description": "An example registry",
+		"homepage": "https://jsrepo.dev",
+		"repository": "https://github.com/ieedan/jsrepo",
+		"tags": [
+			"svelte",
+			"typescript",
+			"react"
+		]
+	},
+	"categories": [
+		{
+			"name": "components",
+			"blocks": [
+				{
+					"name": "button",
+					"directory": "src/components",
+					"category": "components",
+					"tests": false,
+					"subdirectory": false,
+					"list": true,
+					"files": [
+						"button.svelte"
+					],
+					"localDependencies": [
+						"types/point"
+					],
+					"_imports_": {
+						"../types/point": "{{types/point}}"
+					},
+					"dependencies": [],
+					"devDependencies": []
+				}
+			]
+		},
+		{
+			"name": "types",
+			"blocks": [
+				{
+					"name": "index",
+					"directory": "src/types",
+					"category": "types",
+					"tests": false,
+					"subdirectory": false,
+					"list": true,
+					"files": [
+						"index.ts"
+					],
+					"localDependencies": [
+						"types/point"
+					],
+					"_imports_": {
+						"./point": "{{types/point}}"
+					},
+					"dependencies": [],
+					"devDependencies": []
 				},
-				"dependencies": [],
-				"devDependencies": []
-			}
-		]
-	},
-	{
-		"name": "types",
-		"blocks": [
-			{
-				"name": "index",
-				"directory": "src/types",
-				"category": "types",
-				"tests": false,
-				"subdirectory": false,
-				"list": true,
-				"files": [
-					"index.ts"
-				],
-				"localDependencies": [
-					"types/point"
-				],
-				"_imports_": {
-					"./point": "{{types/point}}"
+				{
+					"name": "point",
+					"directory": "src/types",
+					"category": "types",
+					"tests": false,
+					"subdirectory": false,
+					"list": true,
+					"files": [
+						"point.ts"
+					],
+					"localDependencies": [],
+					"_imports_": {},
+					"dependencies": [],
+					"devDependencies": []
+				}
+			]
+		},
+		{
+			"name": "utils",
+			"blocks": [
+				{
+					"name": "math",
+					"directory": "src/utils/math",
+					"category": "utils",
+					"tests": true,
+					"subdirectory": true,
+					"list": true,
+					"files": [
+						"add.test.ts",
+						"add.ts",
+						"create-point.ts",
+						"format-answer.ts",
+						"index.ts",
+						"subtract.test.ts",
+						"subtract.ts"
+					],
+					"localDependencies": [
+						"types/point",
+						"utils/pretty-print"
+					],
+					"dependencies": [],
+					"devDependencies": [],
+					"_imports_": {
+						"../../types/point": "{{types/point}}",
+						"../pretty-print": "{{utils/pretty-print}}"
+					}
 				},
-				"dependencies": [],
-				"devDependencies": []
-			},
-			{
-				"name": "point",
-				"directory": "src/types",
-				"category": "types",
-				"tests": false,
-				"subdirectory": false,
-				"list": true,
-				"files": [
-					"point.ts"
-				],
-				"localDependencies": [],
-				"_imports_": {},
-				"dependencies": [],
-				"devDependencies": []
-			}
-		]
-	},
-	{
-		"name": "utils",
-		"blocks": [
-			{
-				"name": "math",
-				"directory": "src/utils/math",
-				"category": "utils",
-				"tests": true,
-				"subdirectory": true,
-				"list": true,
-				"files": [
-					"add.test.ts",
-					"add.ts",
-					"create-point.ts",
-					"format-answer.ts",
-					"index.ts",
-					"subtract.test.ts",
-					"subtract.ts"
-				],
-				"localDependencies": [
-					"types/point",
-					"utils/pretty-print"
-				],
-				"dependencies": [],
-				"devDependencies": [],
-				"_imports_": {
-					"../../types/point": "{{types/point}}",
-					"../pretty-print": "{{utils/pretty-print}}"
-				}
-			},
-			{
-				"name": "math-user",
-				"directory": "src/utils/math-user",
-				"category": "utils",
-				"tests": false,
-				"subdirectory": true,
-				"list": true,
-				"files": [
-					"use.ts"
-				],
-				"localDependencies": [
-					"utils/math"
-				],
-				"dependencies": [],
-				"devDependencies": [],
-				"_imports_": {
-					"$utils/math/add": "{{utils/math}}/add"
-				}
-			},
-			{
-				"name": "pretty-print",
-				"directory": "src/utils/pretty-print",
-				"category": "utils",
-				"tests": false,
-				"subdirectory": true,
-				"list": true,
-				"files": [
-					"index.ts",
-					"print.ts"
-				],
-				"localDependencies": [
-					"logging/logger"
-				],
-				"dependencies": [
-					"chalk@^5.3.0"
-				],
-				"devDependencies": [],
-				"_imports_": {
-					"$logging/logger": "{{logging/logger}}"
-				}
-			}
-		]
-	},
-	{
-		"name": "angular",
-		"blocks": [
-			{
-				"name": "button",
-				"directory": "blocks/angular/button",
-				"category": "angular",
-				"tests": false,
-				"subdirectory": true,
-				"list": true,
-				"files": [
-					"button.html"
-				],
-				"localDependencies": [
-					"styles/test",
-					"scripts/test"
-				],
-				"dependencies": [],
-				"devDependencies": [],
-				"_imports_": {
-					"../../styles/test.scss": "{{styles/test}}.scss",
-					"../../scripts/test.js": "{{scripts/test}}.js"
-				}
-			}
-		]
-	},
-	{
-		"name": "logging",
-		"blocks": [
-			{
-				"name": "logger",
-				"directory": "blocks/logging",
-				"category": "logging",
-				"tests": false,
-				"subdirectory": false,
-				"list": true,
-				"files": [
-					"logger.ts"
-				],
-				"localDependencies": [],
-				"_imports_": {},
-				"dependencies": [],
-				"devDependencies": []
-			}
-		]
-	},
-	{
-		"name": "scripts",
-		"blocks": [
-			{
-				"name": "test",
-				"directory": "blocks/scripts",
-				"category": "scripts",
-				"tests": false,
-				"subdirectory": false,
-				"list": true,
-				"files": [
-					"test.js"
-				],
-				"localDependencies": [],
-				"_imports_": {},
-				"dependencies": [],
-				"devDependencies": []
-			}
-		]
-	},
-	{
-		"name": "styles",
-		"blocks": [
-			{
-				"name": "test",
-				"directory": "blocks/styles",
-				"category": "styles",
-				"tests": false,
-				"subdirectory": false,
-				"list": true,
-				"files": [
-					"test.scss"
-				],
-				"localDependencies": [],
-				"_imports_": {},
-				"dependencies": [],
-				"devDependencies": []
-			}
-		]
-	},
-	{
-		"name": "svelte",
-		"blocks": [
-			{
-				"name": "component",
-				"directory": "blocks/svelte",
-				"category": "svelte",
-				"tests": false,
-				"subdirectory": false,
-				"list": true,
-				"files": [
-					"component.svelte"
-				],
-				"localDependencies": [
-					"svelte/test.svelte",
-					"svelte/test"
-				],
-				"_imports_": {
-					"$svelte/test.svelte": "{{svelte/test.svelte}}",
-					"$svelte/test.js": "{{svelte/test}}.js"
+				{
+					"name": "math-user",
+					"directory": "src/utils/math-user",
+					"category": "utils",
+					"tests": false,
+					"subdirectory": true,
+					"list": true,
+					"files": [
+						"use.ts"
+					],
+					"localDependencies": [
+						"utils/math"
+					],
+					"dependencies": [],
+					"devDependencies": [],
+					"_imports_": {
+						"$utils/math/add": "{{utils/math}}/add"
+					}
 				},
-				"dependencies": [],
-				"devDependencies": []
-			},
-			{
-				"name": "test",
-				"directory": "blocks/svelte",
-				"category": "svelte",
-				"tests": false,
-				"subdirectory": false,
-				"list": true,
-				"files": [
-					"test.js"
-				],
-				"localDependencies": [],
-				"_imports_": {},
-				"dependencies": [],
-				"devDependencies": []
-			},
-			{
-				"name": "test.svelte",
-				"directory": "blocks/svelte",
-				"category": "svelte",
-				"tests": false,
-				"subdirectory": false,
-				"list": true,
-				"files": [
-					"test.svelte.ts"
-				],
-				"localDependencies": [],
-				"_imports_": {},
-				"dependencies": [],
-				"devDependencies": []
-			}
-		]
-	},
-	{
-		"name": "vue",
-		"blocks": [
-			{
-				"name": "Test",
-				"directory": "blocks/vue",
-				"category": "vue",
-				"tests": false,
-				"subdirectory": false,
-				"list": true,
-				"files": [
-					"Test.vue"
-				],
-				"localDependencies": [],
-				"_imports_": {},
-				"dependencies": [
-					"radix-vue@^1.9.12"
-				],
-				"devDependencies": []
-			},
-			{
-				"name": "type",
-				"directory": "blocks/vue",
-				"category": "vue",
-				"tests": false,
-				"subdirectory": false,
-				"list": true,
-				"files": [
-					"type.ts"
-				],
-				"localDependencies": [],
-				"_imports_": {},
-				"dependencies": [],
-				"devDependencies": []
-			}
-		]
-	}
-]
+				{
+					"name": "pretty-print",
+					"directory": "src/utils/pretty-print",
+					"category": "utils",
+					"tests": false,
+					"subdirectory": true,
+					"list": true,
+					"files": [
+						"index.ts",
+						"print.ts"
+					],
+					"localDependencies": [
+						"logging/logger"
+					],
+					"dependencies": [
+						"chalk@^5.3.0"
+					],
+					"devDependencies": [],
+					"_imports_": {
+						"$logging/logger": "{{logging/logger}}"
+					}
+				}
+			]
+		},
+		{
+			"name": "angular",
+			"blocks": [
+				{
+					"name": "button",
+					"directory": "blocks/angular/button",
+					"category": "angular",
+					"tests": false,
+					"subdirectory": true,
+					"list": true,
+					"files": [
+						"button.html"
+					],
+					"localDependencies": [
+						"styles/test",
+						"scripts/test"
+					],
+					"dependencies": [],
+					"devDependencies": [],
+					"_imports_": {
+						"../../styles/test.scss": "{{styles/test}}.scss",
+						"../../scripts/test.js": "{{scripts/test}}.js"
+					}
+				}
+			]
+		},
+		{
+			"name": "logging",
+			"blocks": [
+				{
+					"name": "logger",
+					"directory": "blocks/logging",
+					"category": "logging",
+					"tests": false,
+					"subdirectory": false,
+					"list": true,
+					"files": [
+						"logger.ts"
+					],
+					"localDependencies": [],
+					"_imports_": {},
+					"dependencies": [],
+					"devDependencies": []
+				}
+			]
+		},
+		{
+			"name": "scripts",
+			"blocks": [
+				{
+					"name": "test",
+					"directory": "blocks/scripts",
+					"category": "scripts",
+					"tests": false,
+					"subdirectory": false,
+					"list": true,
+					"files": [
+						"test.js"
+					],
+					"localDependencies": [],
+					"_imports_": {},
+					"dependencies": [],
+					"devDependencies": []
+				}
+			]
+		},
+		{
+			"name": "styles",
+			"blocks": [
+				{
+					"name": "test",
+					"directory": "blocks/styles",
+					"category": "styles",
+					"tests": false,
+					"subdirectory": false,
+					"list": true,
+					"files": [
+						"test.scss"
+					],
+					"localDependencies": [],
+					"_imports_": {},
+					"dependencies": [],
+					"devDependencies": []
+				}
+			]
+		},
+		{
+			"name": "svelte",
+			"blocks": [
+				{
+					"name": "component",
+					"directory": "blocks/svelte",
+					"category": "svelte",
+					"tests": false,
+					"subdirectory": false,
+					"list": true,
+					"files": [
+						"component.svelte"
+					],
+					"localDependencies": [
+						"svelte/test.svelte",
+						"svelte/test"
+					],
+					"_imports_": {
+						"$svelte/test.svelte": "{{svelte/test.svelte}}",
+						"$svelte/test.js": "{{svelte/test}}.js"
+					},
+					"dependencies": [],
+					"devDependencies": []
+				},
+				{
+					"name": "test",
+					"directory": "blocks/svelte",
+					"category": "svelte",
+					"tests": false,
+					"subdirectory": false,
+					"list": true,
+					"files": [
+						"test.js"
+					],
+					"localDependencies": [],
+					"_imports_": {},
+					"dependencies": [],
+					"devDependencies": []
+				},
+				{
+					"name": "test.svelte",
+					"directory": "blocks/svelte",
+					"category": "svelte",
+					"tests": false,
+					"subdirectory": false,
+					"list": true,
+					"files": [
+						"test.svelte.ts"
+					],
+					"localDependencies": [],
+					"_imports_": {},
+					"dependencies": [],
+					"devDependencies": []
+				}
+			]
+		}
+	]
+}

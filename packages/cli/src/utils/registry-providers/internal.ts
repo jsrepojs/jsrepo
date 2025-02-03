@@ -133,9 +133,9 @@ export const fetchBlocks = async (
 				return Err({ message: getManifestResult.unwrapErr(), repo: state.url });
 			}
 
-			const categories = getManifestResult.unwrap();
+			const manifest = getManifestResult.unwrap();
 
-			for (const category of categories) {
+			for (const category of manifest.categories) {
 				for (const block of category.blocks) {
 					blocksMap.set(u.join(state.url, `${block.category}/${block.name}`), {
 						...block,
