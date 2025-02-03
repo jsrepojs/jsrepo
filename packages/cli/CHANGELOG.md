@@ -1,5 +1,12 @@
 # jsrepo
 
+## 1.30.0
+
+### Minor Changes
+
+- d72a2e9: feat: Optional metadata for the manifest file provided from the `jsrepo-build-config.json`.
+- d72a2e9: feat: Object based manifest
+
 ## 1.29.1
 
 ### Patch Changes
