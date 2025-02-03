@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.30.1
+
+### Patch Changes
+
+- f7e3220: Remove `meta.builtAt` key from `jsrepo-manifest.json`
+
 ## 1.30.0
 
 ### Minor Changes
