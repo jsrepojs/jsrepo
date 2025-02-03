@@ -1,5 +1,13 @@
 {
-	"$schema": "https://unpkg.com/jsrepo@1.17.0/schemas/registry-config.json",
+	"$schema": "../../packages/cli/schemas/registry-config.json",
+	"meta": {
+		"authors": ["Aidan Bleser"],
+		"description": "An example registry",
+		"tags": ["svelte", "typescript", "react"],
+		"repository": "https://github.com/ieedan/jsrepo",
+		"homepage": "https://jsrepo.dev",
+		"bugs": "https://github.com/ieedan/jsrepo/issues"
+	},
 	"dirs": ["./src", "./blocks"],
 	"doNotListBlocks": [],
 	"doNotListCategories": [],

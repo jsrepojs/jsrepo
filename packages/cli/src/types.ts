@@ -20,8 +20,25 @@ export const categorySchema = v.object({
 	blocks: v.array(blockSchema),
 });
 
+export const manifestMeta = v.object({
+	builtAt: v.number(),
+	authors: v.optional(v.array(v.string())),
+	bugs: v.optional(v.string()),
+	description: v.optional(v.string()),
+	homepage: v.optional(v.string()),
+	repository: v.optional(v.string()),
+	tags: v.optional(v.array(v.string())),
+});
+
+export const manifestSchema = v.object({
+	meta: v.optional(manifestMeta),
+	categories: v.array(categorySchema),
+});
+
+export type Meta = v.InferOutput<typeof manifestMeta>;
+
 export type Category = v.InferOutput<typeof categorySchema>;
 
 export type Block = v.InferOutput<typeof blockSchema>;
 
-export type Manifest = Category[];
+export type Manifest = v.InferOutput<typeof manifestSchema>;

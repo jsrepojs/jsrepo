@@ -1,6 +1,6 @@
 import color from 'chalk';
 import * as v from 'valibot';
-import type { Block, Category } from '../../types';
+import type { Block, Category, Manifest } from '../../types';
 import * as ascii from '../ascii';
 import type { RegistryConfig } from '../config';
 import { parsePackageName } from '../parse-package-name';
@@ -10,14 +10,14 @@ const ruleLevelSchema = v.union([v.literal('off'), v.literal('warn'), v.literal(
 export type RuleLevel = v.InferInput<typeof ruleLevelSchema>;
 
 export type CheckOptions = {
-	categories: Category[];
+	manifest: Manifest;
 	options: (string | number)[];
 	config: RegistryConfig;
 };
 
 export type Rule = {
 	description: string;
-	check: (block: Block, { categories }: CheckOptions) => string[] | undefined;
+	check: (block: Block, opts: CheckOptions) => string[] | undefined;
 };
 
 const rules = {
@@ -37,13 +37,13 @@ const rules = {
 	} satisfies Rule,
 	'require-local-dependency-exists': {
 		description: 'Require all local dependencies to exist.',
-		check: (block, { categories }) => {
+		check: (block, { manifest }) => {
 			const errors: string[] = [];
 
 			for (const dep of block.localDependencies) {
 				const [depCategoryName, depBlockName] = dep.split('/');
 
-				const depCategory = categories.find(
+				const depCategory = manifest.categories.find(
 					(cat) => cat.name.trim() === depCategoryName.trim()
 				);
 
@@ -64,7 +64,7 @@ const rules = {
 	} satisfies Rule,
 	'no-category-index-file-dependency': {
 		description: 'Disallow depending on the index file of a category.',
-		check: (block, { categories }) => {
+		check: (block, { manifest }) => {
 			const errors: string[] = [];
 
 			for (const dep of block.localDependencies) {
@@ -72,7 +72,7 @@ const rules = {
 
 				if (name !== 'index') continue;
 
-				const category = categories.find((cat) => cat.name === categoryName);
+				const category = manifest.categories.find((cat) => cat.name === categoryName);
 
 				if (!category) continue;
 
@@ -112,12 +112,12 @@ const rules = {
 	} satisfies Rule,
 	'no-circular-dependency': {
 		description: 'Disallow circular dependencies.',
-		check: (block, { categories }) => {
+		check: (block, { manifest }) => {
 			const errors: string[] = [];
 
 			const specifier = `${block.category}/${block.name}`;
 
-			const chain = searchForDep(specifier, block, categories);
+			const chain = searchForDep(specifier, block, manifest.categories);
 
 			if (chain) {
 				errors.push(
@@ -130,15 +130,17 @@ const rules = {
 	} satisfies Rule,
 	'no-unused-block': {
 		description: 'Disallow unused blocks. (Not listed and not a dependency of another block)',
-		check: (block, { categories }) => {
+		check: (block, { manifest }) => {
 			if (block.list) return;
 
 			const specifier = `${block.category}/${block.name}`;
 
-			const listedBlocks = categories.flatMap((cat) => cat.blocks).filter((b) => b.list);
+			const listedBlocks = manifest.categories
+				.flatMap((cat) => cat.blocks)
+				.filter((b) => b.list);
 
 			for (const block of listedBlocks) {
-				const chain = searchForDep(specifier, block, categories);
+				const chain = searchForDep(specifier, block, manifest.categories);
 
 				if (chain) return;
 			}
@@ -234,15 +236,22 @@ const DEFAULT_CONFIG: RuleConfig = {
 	'no-framework-dependency': 'warn',
 } as const;
 
+/** Runs checks on the manifest file.
+ *
+ * @param manifest
+ * @param config
+ * @param ruleConfig
+ * @returns
+ */
 const runRules = (
-	categories: Category[],
+	manifest: Manifest,
 	config: RegistryConfig,
 	ruleConfig: RuleConfig = DEFAULT_CONFIG
 ): { warnings: string[]; errors: string[] } => {
 	const warnings: string[] = [];
 	const errors: string[] = [];
 
-	for (const category of categories) {
+	for (const category of manifest.categories) {
 		for (const block of category.blocks) {
 			for (const [name, rule] of Object.entries(rules)) {
 				const conf = ruleConfig[name as RuleKey]!;
@@ -258,7 +267,7 @@ const runRules = (
 
 				if (level === 'off') continue;
 
-				const ruleErrors = rule.check(block, { categories, options, config });
+				const ruleErrors = rule.check(block, { manifest, options, config });
 
 				if (!ruleErrors) continue;
 

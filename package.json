@@ -20,7 +20,7 @@
   "author": "Aidan Bleser",
   "license": "MIT",
   "devDependencies": {
-    "@changesets/cli": "^2.27.11",
+    "@changesets/cli": "^2.27.12",
     "pkg-pr-new": "^0.0.39"
   }
 }

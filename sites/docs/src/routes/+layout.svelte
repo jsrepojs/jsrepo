@@ -4,6 +4,7 @@
 	import '@fontsource-variable/inter';
 	import '../app.css';
 	import Header from '$lib/components/site/header.svelte';
+	import { UmamiAnalytics } from '@lukulent/svelte-umami';
 	import { commandContext, pmContext } from '$lib/ts/context';
 	import Footer from '$lib/components/site/footer.svelte';
 	import { ShikiProvider } from '$lib/components/ui/code';
@@ -14,6 +15,7 @@
 	import { page } from '$app/state';
 	import { Portal } from 'bits-ui';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte';
+	import { dev } from '$app/environment';
 
 	pmContext.init('npm');
 
@@ -34,6 +36,13 @@
 	}}
 />
 
+<!-- only inject analytics in production -->
+{#if !dev}
+	<UmamiAnalytics
+		srcURL="https://cloud.umami.is/script.js"
+		websiteID="ffe1e15d-153b-47ab-99c7-9defc1302c9f"
+	/>
+{/if}
 <ModeWatcher />
 <Command />
 <ShikiProvider>

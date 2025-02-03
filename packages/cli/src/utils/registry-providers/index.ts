@@ -1,7 +1,7 @@
-import * as v from 'valibot';
 import { MANIFEST_FILE } from '../../constants';
-import { type Manifest, categorySchema } from '../../types';
+import type { Manifest } from '../../types';
 import { Err, Ok, type Result } from '../blocks/types/result';
+import { parseManifest } from '../manifest';
 import { azure } from './azure';
 import { bitbucket } from './bitbucket';
 import { github } from './github';
@@ -70,21 +70,7 @@ export const fetchManifest = async (
 
 	if (manifest.isErr()) return Err(manifest.unwrapErr());
 
-	let json: string;
-
-	try {
-		json = JSON.parse(manifest.unwrap());
-	} catch (err) {
-		return Err(`Error parsing categories: ${err}`);
-	}
-
-	const categories = v.safeParse(v.array(categorySchema), json);
-
-	if (!categories.success) {
-		return Err(`Error parsing categories: ${categories.issues}`);
-	}
-
-	return Ok(categories.output);
+	return parseManifest(manifest.unwrap());
 };
 
 export * from './types';

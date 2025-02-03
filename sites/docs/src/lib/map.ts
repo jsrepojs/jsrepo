@@ -93,8 +93,7 @@ const categories: Category[] = [
 					},
 					{
 						name: 'update',
-						href: '/docs/cli/update',
-						badge: 'Updated'
+						href: '/docs/cli/update'
 					}
 				]
 			},

@@ -348,11 +348,11 @@ const promptForProviderConfig = async (repo: string, paths: Paths): Promise<Path
 		program.error(color.red(manifestResult.unwrapErr()));
 	}
 
-	const categories = manifestResult.unwrap();
+	const manifest = manifestResult.unwrap();
 
 	const configurePaths = await multiselect({
 		message: 'Which category paths would you like to configure?',
-		options: categories.map((cat) => ({ label: cat.name, value: cat.name })),
+		options: manifest.categories.map((cat) => ({ label: cat.name, value: cat.name })),
 		required: false,
 	});
 
