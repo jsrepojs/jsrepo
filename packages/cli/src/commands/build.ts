@@ -283,13 +283,8 @@ const _build = async (options: Options) => {
 };
 
 export const createManifest = (categories: Category[], config: RegistryConfig) => {
-	const meta = config.meta ?? {};
-
 	const manifest: Manifest = {
-		meta: {
-			builtAt: Date.now(),
-			...meta,
-		},
+		meta: config.meta,
 		categories,
 	};
 
