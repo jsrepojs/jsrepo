@@ -26,6 +26,51 @@
     "$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/registry-config.json"
 }`}
 />
+<SubHeading>meta</SubHeading>
+<p>
+	<CodeSpan>meta</CodeSpan> allows you to provide optional information about the registry that can be
+	displayed to users for better documentation.
+</p>
+<Code
+	lang="json"
+	code={`{
+	"meta": {
+		"authors": ["Aidan Bleser"],
+		"bugs": "https://github.com/ieedan/std/issues",
+		"description": "Fully tested and documented TypeScript utilities brokered by jsrepo.",
+		"homepage": "https://ieedan.github.io/std/",
+		"repository": "https://github.com/ieedan/std",
+		"tags": ["typescript", "std"]
+	}	
+}`}
+/>
+<div class="flex flex-col gap-2">
+	<CodeSpan class="w-fit">authors</CodeSpan>
+	<p>The names of the authors of this registry.</p>
+</div>
+<div class="flex flex-col gap-2">
+	<CodeSpan class="w-fit">bugs</CodeSpan>
+	<p>Where users should report bugs.</p>
+</div>
+<div class="flex flex-col gap-2">
+	<CodeSpan class="w-fit">description</CodeSpan>
+	<p>A description of the registry.</p>
+</div>
+<div class="flex flex-col gap-2">
+	<CodeSpan class="w-fit">homepage</CodeSpan>
+	<p>The URL to the registry homepage.</p>
+</div>
+<div class="flex flex-col gap-2">
+	<CodeSpan class="w-fit">repository</CodeSpan>
+	<p>
+		The source repository for the registry. (Omit this if you are distributing from a git
+		repository)
+	</p>
+</div>
+<div class="flex flex-col gap-2">
+	<CodeSpan class="w-fit">tags</CodeSpan>
+	<p>Keywords that describe your registry.</p>
+</div>
 <SubHeading>dirs</SubHeading>
 <p>
 	<CodeSpan>dirs</CodeSpan> is a list of the directories that contain your block categories.
