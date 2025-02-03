@@ -138,6 +138,9 @@ importers:
       '@fontsource-variable/jetbrains-mono':
         specifier: ^5.1.2
         version: 5.1.2
+      '@lukulent/svelte-umami':
+        specifier: ^0.0.3
+        version: 0.0.3(svelte@5.19.2)
       '@shikijs/langs':
         specifier: ^2.1.0
         version: 2.1.0
@@ -737,6 +740,11 @@ packages:
   '@jsdevtools/ez-spawn@3.0.4':
     resolution: {integrity: sha512-f5DRIOZf7wxogefH03RjMPMdBF7ADTWUMoOs9kaJo06EfwF+aFhMZMDZxHg/Xe12hptN9xoZjGso2fdjapBRIA==}
     engines: {node: '>=10'}
+
+  '@lukulent/svelte-umami@0.0.3':
+    resolution: {integrity: sha512-4pL0sJapfy14yDj6CyZgewbRDadRoBJtk/dLqCJh7/tQuX7HO4hviBzhrVa4Osxaq2kcGEKdpkhAKAoaNdlNSA==}
+    peerDependencies:
+      svelte: ^4.0.0
 
   '@manypkg/find-root@1.1.0':
     resolution: {integrity: sha512-mki5uBvhHzO8kYYix/WRy2WX8S3B5wdVSc9D6KcU5lQNglP2yt58/VfLuAK49glRXChosY8ap2oJ1qgma3GUVA==}
@@ -4086,6 +4094,10 @@ snapshots:
       cross-spawn: 7.0.6
       string-argv: 0.3.2
       type-detect: 4.1.0
+
+  '@lukulent/svelte-umami@0.0.3(svelte@5.19.2)':
+    dependencies:
+      svelte: 5.19.2
 
   '@manypkg/find-root@1.1.0':
     dependencies:

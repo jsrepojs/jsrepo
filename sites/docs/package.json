@@ -14,6 +14,7 @@
 	"devDependencies": {
 		"@fontsource-variable/inter": "^5.1.1",
 		"@fontsource-variable/jetbrains-mono": "^5.1.2",
+		"@lukulent/svelte-umami": "^0.0.3",
 		"@shikijs/langs": "^2.1.0",
 		"@shikijs/markdown-it": "^2.1.0",
 		"@shikijs/themes": "^2.1.0",
