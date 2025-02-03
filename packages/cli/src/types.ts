@@ -21,7 +21,6 @@ export const categorySchema = v.object({
 });
 
 export const manifestMeta = v.object({
-	builtAt: v.number(),
 	authors: v.optional(v.array(v.string())),
 	bugs: v.optional(v.string()),
 	description: v.optional(v.string()),
