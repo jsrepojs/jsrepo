@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Badge } from '$lib/components/ui/badge';
 	import { JsrepoSnippet } from '$lib/components/ui/snippet';
-	import { selectProvider, type Block, type Manifest } from 'jsrepo';
+	import { http, selectProvider, type Block, type Manifest } from 'jsrepo';
 	import * as Icons from '$lib/components/icons';
 	import { ArrowUpRightFromSquare, ChevronRight, File, FlaskRound } from 'lucide-svelte';
 	import { active, checkIsActive } from '$lib/actions/active.svelte';
@@ -135,7 +135,27 @@
 			{/if}
 			<div class="flex place-items-center gap-2">
 				<FileIcon extension={registryPrimaryLanguage} />
-				{#if provider?.name !== 'http'}
+				{#if manifest.meta?.repository}
+					{@const repoProvider = selectProvider(manifest.meta.repository)}
+					<Badge
+						variant="secondary"
+						class="flex text-sm font-medium place-items-center gap-1 w-fit"
+						target="_blank"
+						href={repoProvider?.baseUrl(manifest.meta.repository)}
+					>
+						{#if repoProvider?.name === 'github'}
+							<Icons.GitHub class="size-3" />
+						{:else if repoProvider?.name === 'gitlab'}
+							<Icons.GitLab class="size-3" />
+						{:else if repoProvider?.name === 'bitbucket'}
+							<Icons.BitBucket class="size-3" />
+						{:else if repoProvider?.name === 'azure'}
+							<Icons.AzureDevops class="size-3" />
+						{/if}
+						{repoProvider?.parse(manifest.meta.repository, { fullyQualified: false }).url}
+						<ArrowUpRightFromSquare class="size-3 text-muted-foreground" />
+					</Badge>
+				{:else if provider?.name !== 'http'}
 					<Badge
 						variant="secondary"
 						class="flex text-sm font-medium place-items-center gap-1 w-fit"
@@ -206,16 +226,64 @@
 					</div>
 				</div>
 				<div class="w-full md:w-96 shrink-0">
-					<JsrepoSnippet args={['init', prettyUrl ?? '']} />
+					<JsrepoSnippet args={['init', prettyUrl ?? '']} class="mb-2" />
+					{#if manifest.meta?.description}
+						<div class="p-2 flex flex-col">
+							<span>{manifest.meta.description}</span>
+						</div>
+					{/if}
+					{#if manifest.meta?.tags}
+						<div class="flex flex-wrap place-items-center gap-2 pb-2">
+							{#each manifest.meta.tags as tag}
+								<Badge variant="secondary">{tag}</Badge>
+							{/each}
+						</div>
+					{/if}
+					{#if manifest.meta?.repository}
+						<div class="p-2 flex flex-col">
+							<span class="text-muted-foreground font-medium">Repository</span>
+							<a
+								href={manifest.meta?.repository}
+								target="_blank"
+								class="flex place-items-center gap-1 underline"
+							>
+								{manifest.meta?.repository}
+							</a>
+						</div>
+						<Separator />
+					{:else if provider?.name !== http.name}
+						<div class="p-2 flex flex-col">
+							<span class="text-muted-foreground font-medium">Repository</span>
+							<a
+								href={provider?.baseUrl(registryUrl)}
+								target="_blank"
+								class="flex place-items-center gap-1 underline"
+							>
+								{provider?.baseUrl(registryUrl)}
+							</a>
+						</div>
+						<Separator />
+					{/if}
 					<div class="p-2 flex flex-col">
-						<span class="text-muted-foreground font-medium">Source</span>
-						<a
-							href={provider?.baseUrl(registryUrl)}
-							target="_blank"
-							class="flex place-items-center gap-1 underline"
-						>
-							{provider?.baseUrl(registryUrl)}
-						</a>
+						{#if manifest.meta?.homepage}
+							<span class="text-muted-foreground font-medium">Homepage</span>
+							<a
+								href={manifest.meta?.homepage}
+								target="_blank"
+								class="flex place-items-center gap-1 underline"
+							>
+								{manifest.meta?.homepage}
+							</a>
+						{:else}
+							<span class="text-muted-foreground font-medium">Homepage</span>
+							<a
+								href={provider?.baseUrl(registryUrl)}
+								target="_blank"
+								class="flex place-items-center gap-1 underline"
+							>
+								{provider?.baseUrl(registryUrl)}
+							</a>
+						{/if}
 					</div>
 					<Separator />
 					<div class="grid grid-cols-2 gap-2 py-2">
@@ -235,6 +303,13 @@
 							<span>{registryInfo.dependencies.length}</span>
 						</div>
 					</div>
+					<Separator />
+					{#if manifest.meta?.authors}
+						<div class="p-2 flex flex-col">
+							<span class="text-muted-foreground font-medium">Authors</span>
+							<span>{manifest.meta?.authors?.join(' ,')}</span>
+						</div>
+					{/if}
 				</div>
 			</div>
 		{:else if checkIsActive( new URL('#blocks', page.url.href).toString(), { url: page.url, isHash: true } )}
