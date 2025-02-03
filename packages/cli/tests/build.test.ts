@@ -45,7 +45,7 @@ describe('build', () => {
 			dirs: ['./src', './'],
 			includeBlocks: [],
 			includeCategories: [],
-			excludeBlocks: ["subtract"],
+			excludeBlocks: [],
 			excludeCategories: ['src'],
 			doNotListBlocks: [],
 			doNotListCategories: [],
@@ -98,11 +98,6 @@ describe('build', () => {
 export const add = (a: number, b: number) => a + b;
 
 export const logAnswer = (a: number, b: number) => log(\`Answer is: \${add(a, b)}\`);`
-		);
-
-		fs.writeFileSync(
-			'./src/utils/subtract.ts',
-			'export const subtract = (a: number, b: number) => a - b;'
 		);
 
 		fs.writeFileSync(
