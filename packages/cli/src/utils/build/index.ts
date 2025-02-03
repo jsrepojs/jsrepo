@@ -40,15 +40,13 @@ const buildBlocksDirectory = (blocksPath: string, { cwd, ignore, config }: Optio
 	for (const categoryPath of paths) {
 		const categoryDir = path.join(blocksPath, categoryPath);
 
-		const stat = fs.statSync(categoryDir);
-
 		// we only check folders
-		if (stat.isFile()) continue;
+		if (fs.statSync(categoryDir).isFile()) continue;
 
 		// we append a '/' to tell ignore that this is a directory not a file
-		const ignorable = `${path.relative(cwd, categoryDir)}/`;
+		const dirName = `${path.relative(cwd, categoryDir)}/`;
 
-		if (ignore.ignores(ignorable)) continue;
+		if (ignore.ignores(dirName)) continue;
 
 		const categoryName = path.basename(categoryPath);
 
@@ -77,13 +75,12 @@ const buildBlocksDirectory = (blocksPath: string, { cwd, ignore, config }: Optio
 
 				const lang = languages.find((resolver) => resolver.matches(file));
 
+				// warn for unsupported language
 				if (!lang) {
-					const error = 'files are not currently supported!';
-
 					console.warn(
 						`${ascii.VERTICAL_LINE}  ${ascii.WARN} Skipped \`${color.bold(blockDir)}\` \`*${color.bold(
 							path.parse(file).ext
-						)}\` ${error}`
+						)}\` files are not currently supported!`
 					);
 
 					continue;
@@ -123,6 +120,7 @@ const buildBlocksDirectory = (blocksPath: string, { cwd, ignore, config }: Optio
 					devDependencies,
 				};
 
+				// if test file exists add the file
 				if (testsPath !== undefined) {
 					block.files.push(testsPath);
 				}
@@ -135,80 +133,99 @@ const buildBlocksDirectory = (blocksPath: string, { cwd, ignore, config }: Optio
 
 				if (!shouldIncludeBlock(blockName, config)) continue;
 
-				const blockFiles = fs.readdirSync(blockDir);
-
-				const hasTests = blockFiles.findIndex((f) => isTestFile(f)) !== -1;
-
 				const localDepsSet = new Set<string>();
 				const depsSet = new Set<string>();
 				const devDepsSet = new Set<string>();
 				const imports: Record<string, string> = {};
 
-				// if it is a directory
-				for (const f of blockFiles) {
-					if (isTestFile(f)) continue;
+				let hasTests = false;
 
-					if (fs.statSync(path.join(blockDir, f)).isDirectory()) {
-						const error = 'subdirectories are not currently supported!';
+				const blockFiles: string[] = [];
 
-						console.warn(
-							`${ascii.VERTICAL_LINE}  ${ascii.WARN} Skipped \`${color.bold(path.join(blockDir, f))}\` ${error}`
-						);
-						continue;
-					}
+				// if the user has enabled allow subdirectories we recursively check each directory and resolve any dependencies
+				const walkFiles = (base: string, files: string[]) => {
+					for (const f of files) {
+						const filePath = path.join(base, f);
+						const relativeFilePath = path.relative(path.join(cwd, blockDir), filePath);
 
-					const lang = languages.find((resolver) => resolver.matches(f));
+						if (isTestFile(f)) {
+							hasTests = true;
 
-					if (!lang) {
-						const error = 'files are not currently supported!';
+							blockFiles.push(relativeFilePath);
+							continue;
+						}
 
-						console.warn(
-							`${ascii.VERTICAL_LINE}  ${ascii.WARN} Skipped \`${path.join(blockDir, f)}\` \`*${color.bold(
-								path.parse(f).ext
-							)}\` ${error}`
-						);
-						continue;
-					}
-
-					const {
-						local,
-						dependencies,
-						devDependencies,
-						imports: imps,
-					} = lang
-						.resolveDependencies({
-							filePath: path.join(blockDir, f),
-							isSubDir: true,
-							excludeDeps: config.excludeDeps,
-							dirs: config.dirs,
-							cwd,
-						})
-						.match(
-							(val) => val,
-							(err) => {
-								program.error(color.red(err));
+						if (fs.statSync(filePath).isDirectory()) {
+							if (!config.allowSubdirectories) {
+								console.warn(
+									`${ascii.VERTICAL_LINE}  ${ascii.WARN} Skipped \`${color.bold(path.join(blockDir, f))}\` subdirectories are not allowed! Allow them with ${color.bold('--allow-subdirectories')}!`
+								);
+								continue;
 							}
-						);
 
-					for (const dep of local) {
-						// don't add self
-						if (dep === `${categoryName}/${blockName}`) continue;
+							const subFiles = fs.readdirSync(filePath);
 
-						localDepsSet.add(dep);
+							walkFiles(filePath, subFiles);
+
+							continue;
+						}
+
+						const lang = languages.find((resolver) => resolver.matches(f));
+
+						if (!lang) {
+							console.warn(
+								`${ascii.VERTICAL_LINE}  ${ascii.WARN} Skipped \`${filePath}\` \`*${color.bold(
+									path.parse(f).ext
+								)}\` files are not currently supported!`
+							);
+							continue;
+						}
+
+						const {
+							local,
+							dependencies,
+							devDependencies,
+							imports: imps,
+						} = lang
+							.resolveDependencies({
+								isSubDir: true,
+								excludeDeps: config.excludeDeps,
+								dirs: config.dirs,
+								containingDir: blockDir,
+								filePath,
+								cwd,
+							})
+							.match(
+								(val) => val,
+								(err) => {
+									program.error(color.red(err));
+								}
+							);
+
+						for (const dep of local) {
+							// don't add self
+							if (dep === `${categoryName}/${blockName}`) continue;
+
+							localDepsSet.add(dep);
+						}
+
+						for (const dep of dependencies) {
+							depsSet.add(dep);
+						}
+
+						for (const dep of devDependencies) {
+							devDepsSet.add(dep);
+						}
+
+						for (const [k, v] of Object.entries(imps)) {
+							imports[k] = v;
+						}
+
+						blockFiles.push(relativeFilePath);
 					}
+				};
 
-					for (const dep of dependencies) {
-						depsSet.add(dep);
-					}
-
-					for (const dep of devDependencies) {
-						devDepsSet.add(dep);
-					}
-
-					for (const [k, v] of Object.entries(imps)) {
-						imports[k] = v;
-					}
-				}
+				walkFiles(blockDir, fs.readdirSync(blockDir));
 
 				const block: Block = {
 					name: blockName,
@@ -217,7 +234,7 @@ const buildBlocksDirectory = (blocksPath: string, { cwd, ignore, config }: Optio
 					tests: hasTests,
 					subdirectory: true,
 					list: listCategory ? listBlock : false,
-					files: [...blockFiles],
+					files: blockFiles,
 					localDependencies: Array.from(localDepsSet.keys()),
 					dependencies: Array.from(depsSet.keys()),
 					devDependencies: Array.from(devDepsSet.keys()),

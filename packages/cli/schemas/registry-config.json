@@ -114,6 +114,11 @@
 				"type": "string"
 			}
 		},
+		"allowSubdirectories": {
+			"description": "Allow subdirectories to be built.",
+			"type": "boolean",
+			"default": false
+		},
 		"preview": {
 			"description": "Display a preview of the blocks list.",
 			"type": "boolean",

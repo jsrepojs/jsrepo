@@ -30,6 +30,7 @@ const schema = v.object({
 	listCategories: v.optional(v.array(v.string())),
 	doNotListBlocks: v.optional(v.array(v.string())),
 	doNotListCategories: v.optional(v.array(v.string())),
+	allowSubdirectories: v.optional(v.boolean()),
 	preview: v.optional(v.boolean()),
 	output: v.boolean(),
 	verbose: v.boolean(),
@@ -63,6 +64,7 @@ const build = new Command('build')
 		'Do not list the categories with these names.'
 	)
 	.option('--exclude-deps [deps...]', 'Dependencies that should not be added.')
+	.option('--allow-subdirectories', 'Allow subdirectories to be built.')
 	.option('--preview', 'Display a preview of the blocks list.')
 	.option('--no-output', `Do not output a \`${MANIFEST_FILE}\` file.`)
 	.option('--verbose', 'Include debug logs.', false)
@@ -98,6 +100,7 @@ const _build = async (options: Options) => {
 					includeCategories: options.includeCategories ?? [],
 					excludeBlocks: options.excludeBlocks ?? [],
 					excludeCategories: options.excludeCategories ?? [],
+					allowSubdirectories: options.allowSubdirectories,
 					preview: options.preview,
 				} satisfies RegistryConfig;
 			}
@@ -118,6 +121,8 @@ const _build = async (options: Options) => {
 			if (options.excludeBlocks) mergedVal.excludeBlocks = options.excludeBlocks;
 			if (options.excludeCategories) mergedVal.excludeCategories = options.excludeCategories;
 			if (options.excludeDeps) mergedVal.excludeDeps = options.excludeDeps;
+			if (options.allowSubdirectories !== undefined)
+				mergedVal.allowSubdirectories = options.allowSubdirectories;
 			if (options.preview !== undefined) mergedVal.preview = options.preview;
 
 			mergedVal.rules = { ...DEFAULT_CONFIG, ...mergedVal.rules };
