@@ -136,19 +136,27 @@
 <OptionDocs name="--exclude-deps">
 	{#snippet description()}
 		Prevent these dependencies from being included in the <CodeSpan>jsrepo-manifest.json</CodeSpan> file.
-		Corresponding config key: <Link href="/docs/jsrepo-build-config-json#excludeDeps"
-			>excludeDeps</Link
-		>
+		Corresponding config key: <Link href="/docs/jsrepo-build-config-json#excludeDeps">
+			excludeDeps
+		</Link>
 	{/snippet}
 	{#snippet usage()}
 		<Snippet command="execute" args={['jsrepo', 'build', '--exclude-deps', 'svelte', 'react']} />
 	{/snippet}
 </OptionDocs>
+<OptionDocs name="--allow-subdirectories">
+	{#snippet description()}
+		Allow subdirectories to be built. Corresponding config key:
+		<Link href="/docs/jsrepo-build-config-json#allowSubdirectories">allowSubdirectories</Link>
+	{/snippet}
+	{#snippet usage()}
+		<Snippet command="execute" args={['jsrepo', 'build', '--allow-subdirectories']} />
+	{/snippet}
+</OptionDocs>
 <OptionDocs name="--preview">
 	{#snippet description()}
-		Display a preview of the blocks list. Corresponding config key: <Link
-			href="/docs/jsrepo-build-config-json#preview">preview</Link
-		>
+		Display a preview of the blocks list. Corresponding config key:
+		<Link href="/docs/jsrepo-build-config-json#preview">preview</Link>
 	{/snippet}
 	{#snippet usage()}
 		<Snippet command="execute" args={['jsrepo', 'build', '--preview']} />
