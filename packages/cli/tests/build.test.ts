@@ -6,6 +6,12 @@ import type { Category } from '../src/types';
 import type { RegistryConfig } from '../src/utils/config';
 import { parseManifest } from '../src/utils/manifest';
 import { assertFilesExist } from './utils';
+import {
+	shouldIncludeBlock,
+	shouldIncludeCategory,
+	shouldListBlock,
+	shouldListCategory,
+} from '../src/utils/build';
 
 describe('build', () => {
 	const testDir = path.join(__dirname, '../temp-test/build');
@@ -208,5 +214,95 @@ export const createPoint = (x: number, y: number): Point => { x, y };`
 		// ensure files were copied correctly
 		assertFilesExist('./registry/src/utils', 'add.ts', 'log.ts', 'math.ts');
 		assertFilesExist('./registry/src/types', 'point.ts');
+	});
+});
+
+const defaultConfig = {
+	$schema: '',
+	dirs: [],
+	doNotListBlocks: [],
+	doNotListCategories: [],
+	listBlocks: [],
+	listCategories: [],
+	excludeDeps: [],
+	includeBlocks: [],
+	includeCategories: [],
+	excludeBlocks: [],
+	excludeCategories: [],
+};
+
+describe('shouldListBlock', () => {
+	it('lists if unspecified', () => {
+		expect(shouldListBlock('a', { ...defaultConfig })).toBe(true);
+	});
+
+	it('lists when should list', () => {
+		expect(shouldListBlock('a', { ...defaultConfig, listBlocks: ['a'] })).toBe(true);
+		expect(shouldListBlock('a', { ...defaultConfig, doNotListBlocks: ['b'] })).toBe(true);
+	});
+
+	it('does not list when should not list', () => {
+		expect(shouldListBlock('a', { ...defaultConfig, listBlocks: ['b'] })).toBe(false);
+		expect(shouldListBlock('a', { ...defaultConfig, doNotListBlocks: ['a'] })).toBe(false);
+	});
+});
+
+describe('shouldListCategory', () => {
+	it('lists if unspecified', () => {
+		expect(shouldListCategory('a', { ...defaultConfig })).toBe(true);
+	});
+
+	it('lists when should list', () => {
+		expect(shouldListCategory('a', { ...defaultConfig, listCategories: ['a'] })).toBe(true);
+		expect(shouldListCategory('a', { ...defaultConfig, doNotListCategories: ['b'] })).toBe(
+			true
+		);
+	});
+
+	it('does not list when should not list', () => {
+		expect(shouldListCategory('a', { ...defaultConfig, listCategories: ['b'] })).toBe(false);
+		expect(shouldListCategory('a', { ...defaultConfig, doNotListCategories: ['a'] })).toBe(
+			false
+		);
+	});
+});
+
+describe('shouldIncludeBlock', () => {
+	it('lists if unspecified', () => {
+		expect(shouldIncludeBlock('a', { ...defaultConfig })).toBe(true);
+	});
+
+	it('lists when should list', () => {
+		expect(shouldIncludeBlock('a', { ...defaultConfig, includeBlocks: ['a'] })).toBe(true);
+		expect(shouldIncludeBlock('a', { ...defaultConfig, excludeBlocks: ['b'] })).toBe(true);
+	});
+
+	it('does not list when should not list', () => {
+		expect(shouldIncludeBlock('a', { ...defaultConfig, includeBlocks: ['b'] })).toBe(false);
+		expect(shouldIncludeBlock('a', { ...defaultConfig, excludeBlocks: ['a'] })).toBe(false);
+	});
+});
+
+describe('shouldIncludeCategory', () => {
+	it('lists if unspecified', () => {
+		expect(shouldIncludeCategory('a', { ...defaultConfig })).toBe(true);
+	});
+
+	it('lists when should list', () => {
+		expect(shouldIncludeCategory('a', { ...defaultConfig, includeCategories: ['a'] })).toBe(
+			true
+		);
+		expect(shouldIncludeCategory('a', { ...defaultConfig, excludeCategories: ['b'] })).toBe(
+			true
+		);
+	});
+
+	it('does not list when should not list', () => {
+		expect(shouldIncludeCategory('a', { ...defaultConfig, includeCategories: ['b'] })).toBe(
+			false
+		);
+		expect(shouldIncludeCategory('a', { ...defaultConfig, excludeCategories: ['a'] })).toBe(
+			false
+		);
 	});
 });

@@ -234,7 +234,7 @@ const buildBlocksDirectory = (blocksPath: string, { cwd, ignore, config }: Optio
 	return categories;
 };
 
-const shouldListBlock = (name: string, config: RegistryConfig) => {
+export const shouldListBlock = (name: string, config: RegistryConfig) => {
 	// the length check is just a short circuit here
 	if (config.doNotListBlocks.length > 0 && config.doNotListBlocks.includes(name)) return false;
 
@@ -247,7 +247,7 @@ const shouldListBlock = (name: string, config: RegistryConfig) => {
 	return true;
 };
 
-const shouldIncludeBlock = (name: string, config: RegistryConfig) => {
+export const shouldIncludeBlock = (name: string, config: RegistryConfig) => {
 	// the length check is just a short circuit here
 	if (config.excludeBlocks.length > 0 && config.excludeBlocks.includes(name)) return false;
 
@@ -260,7 +260,7 @@ const shouldIncludeBlock = (name: string, config: RegistryConfig) => {
 	return true;
 };
 
-const shouldListCategory = (name: string, config: RegistryConfig) => {
+export const shouldListCategory = (name: string, config: RegistryConfig) => {
 	// the length check is just a short circuit here
 	if (config.doNotListCategories.length > 0 && config.doNotListCategories.includes(name))
 		return false;
@@ -274,7 +274,7 @@ const shouldListCategory = (name: string, config: RegistryConfig) => {
 	return true;
 };
 
-const shouldIncludeCategory = (name: string, config: RegistryConfig) => {
+export const shouldIncludeCategory = (name: string, config: RegistryConfig) => {
 	// the length check is just a short circuit here
 	if (config.excludeCategories.length > 0 && config.excludeCategories.includes(name))
 		return false;
