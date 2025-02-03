@@ -84,11 +84,11 @@
 ◇  Created \`jsrepo-build-config.json\`
 │
 ├  Next Steps ────────────────────────────────────────────────┐
-│                                                             │
-│  1. Add categories to \`./src\`.                              │
-│  2. Run \`npm run build:registry\` to build the registry.    │
-│                                                             │
-├─────────────────────────────────────────────────────────────┘
+│                                                         │
+│  1. Add categories to \`./src\`.                          │
+│  2. Run \`npm run build:registry\` to build the registry. │
+│                                                         │
+├──────────────────────────────────────────────────────────────┘
 │
 └  All done!`}
 />
@@ -175,11 +175,11 @@ const add = (a: number, b: number): number => {
 │
 ◇  Installed chalk
 │
-├  Next Steps ────────────────────────────┐
-│                                         │
-│  Import the blocks from \`src/blocks\`    │
-│                                         │
-├─────────────────────────────────────────┘
+├  Next Steps ─────────────────────────────┐
+│                                       │
+│  Import the blocks from \`src/blocks\`  │
+│                                       │
+├───────────────────────────────────────────┘
 │
 └  All done!`}
 />
