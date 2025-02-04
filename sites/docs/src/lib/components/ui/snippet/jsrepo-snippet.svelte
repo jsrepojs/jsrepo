@@ -19,7 +19,7 @@
 	)}
 >
 	<div class="text-nowrap max-w-full overflow-x-auto scrollbar-hide">
-		<span class="text-primary">jsrepo</span>
+		<span class="text-foreground dark:text-primary">jsrepo</span>
 		<span>{args.join(' ')}</span>
 	</div>
 	<SimpleCopyButton {text} class="absolute top-1/2 -translate-y-1/2 right-2" />

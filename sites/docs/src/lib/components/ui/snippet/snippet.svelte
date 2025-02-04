@@ -27,7 +27,7 @@
 	)}
 >
 	<div class="text-nowrap max-w-full overflow-x-auto scrollbar-hide">
-		<span class="text-primary">{cmd?.command}</span>
+		<span class="text-foreground dark:text-primary">{cmd?.command}</span>
 		<span>{cmd?.args.join(' ')}</span>
 	</div>
 	<CopyButton bind:pm={$pm} {text} class="absolute top-1/2 -translate-y-1/2 right-2" />

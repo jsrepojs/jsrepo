@@ -11,6 +11,11 @@
 	let { href, class: className, children, target = '_self', ...rest }: Props = $props();
 </script>
 
-<a {...rest} {href} {target} class={cn('text-primary hover:underline', className)}>
+<a
+	{...rest}
+	{href}
+	{target}
+	class={cn('text-foreground dark:text-primary hover:underline', className)}
+>
 	{@render children?.()}
 </a>
