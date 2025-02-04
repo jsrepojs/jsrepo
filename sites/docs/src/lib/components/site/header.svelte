@@ -37,7 +37,7 @@
 				<nav class="place-items-center gap-4 flex">
 					<a
 						href="/"
-						class="hover:text-primary text-muted-foreground transition-all data-[active=true]:text-primary"
+						class="hover:dark:text-primary hover:text-foreground text-muted-foreground transition-all data-[active=true]:text-foreground data-[active=true]:dark:text-primary"
 						use:active={{
 							activeForSubdirectories: false
 						}}
@@ -46,7 +46,7 @@
 					</a>
 					<a
 						href="/docs"
-						class="hover:text-primary text-muted-foreground transition-all data-[active=true]:text-primary"
+						class="hover:dark:text-primary hover:text-foreground text-muted-foreground transition-all data-[active=true]:text-foreground data-[active=true]:dark:text-primary"
 						use:active={{
 							activeForSubdirectories: true
 						}}
@@ -55,7 +55,7 @@
 					</a>
 					<a
 						href="/demos"
-						class="hover:text-primary text-muted-foreground transition-all data-[active=true]:text-primary"
+						class="hover:dark:text-primary hover:text-foreground text-muted-foreground transition-all data-[active=true]:text-foreground data-[active=true]:dark:text-primary"
 						use:active={{
 							activeForSubdirectories: true
 						}}

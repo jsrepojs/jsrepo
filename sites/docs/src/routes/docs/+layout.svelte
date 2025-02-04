@@ -141,7 +141,7 @@
 				{#each pageHeadings as heading}
 					<a
 						href="#{heading.el.innerText}"
-						class="text-muted-foreground text-sm hover:text-primary transition-all data-[active=true]:text-primary"
+						class="text-muted-foreground text-sm hover:text-foreground hover:dark:text-primary transition-all data-[active=true]:text-foreground data-[active=true]:dark:text-primary"
 						data-active={activeHeading === heading.el.innerText}
 					>
 						{heading.el.innerText}
