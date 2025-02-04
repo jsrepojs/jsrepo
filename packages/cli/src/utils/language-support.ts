@@ -29,6 +29,8 @@ export type ResolvedDependencies = {
 
 export type ResolveDependencyOptions = {
 	filePath: string;
+	/** Only valid for folder based blocks. Helps identify a self dependency */
+	containingDir?: string;
 	isSubDir: boolean;
 	excludeDeps: string[];
 	cwd: string;
@@ -81,7 +83,7 @@ const css: Lang = {
 /** Language support for `*.html` files. */
 const html: Lang = {
 	matches: (fileName) => fileName.endsWith('.html'),
-	resolveDependencies: ({ filePath, isSubDir, excludeDeps, dirs, cwd }) => {
+	resolveDependencies: ({ filePath, isSubDir, excludeDeps, dirs, cwd, containingDir }) => {
 		const sourceCode = fs.readFileSync(filePath).toString();
 
 		const ast = parse5.parse(sourceCode);
@@ -131,6 +133,7 @@ const html: Lang = {
 			isSubDir,
 			dirs,
 			cwd,
+			containingDir,
 			doNotInstall: ['svelte', '@sveltejs/kit', ...excludeDeps],
 		});
 
@@ -233,7 +236,7 @@ const sass: Lang = {
 /** Language support for `*.svelte` files. */
 const svelte: Lang = {
 	matches: (fileName) => fileName.endsWith('.svelte'),
-	resolveDependencies: ({ filePath, isSubDir, excludeDeps, dirs, cwd }) => {
+	resolveDependencies: ({ filePath, isSubDir, excludeDeps, dirs, cwd, containingDir }) => {
 		const sourceCode = fs.readFileSync(filePath).toString();
 
 		const root = sv.parse(sourceCode, { modern: true, filename: filePath });
@@ -272,6 +275,7 @@ const svelte: Lang = {
 			isSubDir,
 			dirs,
 			cwd,
+			containingDir,
 			doNotInstall: ['svelte', '@sveltejs/kit', ...excludeDeps],
 		});
 
@@ -319,7 +323,7 @@ const typescript: Lang = {
 		fileName.endsWith('.js') ||
 		fileName.endsWith('.tsx') ||
 		fileName.endsWith('.jsx'),
-	resolveDependencies: ({ filePath, isSubDir, excludeDeps, dirs, cwd }) => {
+	resolveDependencies: ({ filePath, isSubDir, excludeDeps, dirs, cwd, containingDir }) => {
 		const project = new Project();
 
 		const blockFile = project.addSourceFileAtPath(filePath);
@@ -343,6 +347,7 @@ const typescript: Lang = {
 			isSubDir,
 			dirs,
 			cwd,
+			containingDir,
 			doNotInstall: excludeDeps,
 		});
 
@@ -380,7 +385,7 @@ const typescript: Lang = {
 /** Language support for `*.vue` files. */
 const vue: Lang = {
 	matches: (fileName) => fileName.endsWith('.vue'),
-	resolveDependencies: ({ filePath, isSubDir, excludeDeps, dirs, cwd }) => {
+	resolveDependencies: ({ filePath, isSubDir, excludeDeps, dirs, cwd, containingDir }) => {
 		const sourceCode = fs.readFileSync(filePath).toString();
 
 		const parsed = v.parse(sourceCode, { filename: filePath });
@@ -408,6 +413,7 @@ const vue: Lang = {
 			isSubDir,
 			dirs,
 			cwd,
+			containingDir,
 			doNotInstall: ['vue', 'nuxt', ...excludeDeps],
 		});
 
@@ -456,6 +462,8 @@ export type ResolveImportOptions = {
 	moduleSpecifiers: string[];
 	isSubDir: boolean;
 	filePath: string;
+	/** Only valid for folder based blocks. Helps identify a self dependency */
+	containingDir?: string;
 	doNotInstall?: string[];
 	dirs: string[];
 	cwd: string;
@@ -475,6 +483,7 @@ const resolveImports = ({
 	moduleSpecifiers,
 	isSubDir,
 	filePath,
+	containingDir,
 	doNotInstall,
 	dirs,
 	cwd,
@@ -489,6 +498,7 @@ const resolveImports = ({
 		if (specifier.startsWith('.')) {
 			const localDep = resolveLocalImport(specifier, isSubDir, {
 				filePath,
+				containingDir,
 				dirs,
 				cwd,
 			});
@@ -510,6 +520,7 @@ const resolveImports = ({
 
 		const localDep = tryResolveLocalAlias(specifier, isSubDir, {
 			filePath,
+			containingDir,
 			dirs,
 			cwd,
 		});
@@ -557,12 +568,14 @@ const resolveLocalImport = (
 	isSubDir: boolean,
 	{
 		filePath,
+		containingDir,
 		dropExtension = true,
 		alias,
 		dirs,
 		cwd,
 	}: {
 		filePath: string;
+		containingDir?: string;
 		dirs: string[];
 		alias?: string;
 		modIsFile?: boolean;
@@ -573,13 +586,17 @@ const resolveLocalImport = (
 	if (isSubDir && (mod.startsWith('./') || mod === '.')) return Ok(undefined);
 
 	// get the path to the current category
-	const categoryDir = isSubDir ? path.join(filePath, '../../') : path.join(filePath, '../');
+	// if the block is a subdirectory block then containing dir must exist
+	const categoryDir = isSubDir ? path.join(containingDir!, '../') : path.join(filePath, '../');
 
 	// get the actual path to the module
 	const modPath = path.join(path.join(filePath, '../'), mod);
 
 	// get the full path to the current category containing folder
 	const fullDir = path.join(categoryDir, '../');
+
+	// prevent self reference in subdirectories
+	if (containingDir && modPath.startsWith(containingDir)) return Ok(undefined);
 
 	if (modPath.startsWith(fullDir)) {
 		return Ok(parsePath(modPath.slice(fullDir.length), dropExtension));
@@ -637,7 +654,12 @@ const parsePath = (localPath: string, dropExtension = true): ResolveLocalImportR
 const tryResolveLocalAlias = (
 	mod: string,
 	isSubDir: boolean,
-	{ filePath, dirs, cwd }: { filePath: string; dirs: string[]; cwd: string }
+	{
+		filePath,
+		dirs,
+		cwd,
+		containingDir,
+	}: { filePath: string; containingDir?: string; dirs: string[]; cwd: string }
 ): Result<ResolveLocalImportResult | undefined, string> => {
 	let config: TsConfigResult | null;
 
@@ -681,6 +703,7 @@ const tryResolveLocalAlias = (
 
 			const localDep = resolveLocalImport(pathResolved, isSubDir, {
 				filePath,
+				containingDir,
 				alias: mod,
 				dropExtension: shouldDropExtension,
 				dirs,

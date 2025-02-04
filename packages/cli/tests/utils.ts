@@ -1,14 +1,9 @@
 import fs from 'node:fs';
+import path from 'node:path';
 import { expect } from 'vitest';
 
 export const assertFilesExist = (dir: string, ...files: string[]) => {
-	const fileSet = new Set(files);
-
-	const filesInDir = fs.readdirSync(dir);
-
-	for (const file of filesInDir) {
-		fileSet.delete(file);
+	for (const f of files) {
+		expect(fs.existsSync(path.join(dir, f))).toBe(true);
 	}
-
-	expect(Array.from(fileSet)).toStrictEqual([]);
 };

@@ -222,6 +222,16 @@
     ]
 }`}
 />
+<SubHeading>allowSubdirectories</SubHeading>
+<p>
+	<CodeSpan>allowSubdirectories</CodeSpan> allows subdirectories to be built.
+</p>
+<Code
+	lang="json"
+	code={`{
+    "allowSubdirectories": false
+}`}
+/>
 <SubHeading>preview</SubHeading>
 <p>
 	<CodeSpan>preview</CodeSpan> displays a preview of the blocks list.

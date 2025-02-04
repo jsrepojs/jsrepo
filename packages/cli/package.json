@@ -44,7 +44,7 @@
 		"@types/validate-npm-package-name": "^4.0.2",
 		"tsup": "^8.3.6",
 		"typescript": "^5.7.3",
-		"vitest": "^3.0.4"
+		"vitest": "^3.0.5"
 	},
 	"dependencies": {
 		"@anthropic-ai/sdk": "^0.36.3",
@@ -70,8 +70,8 @@
 		"parse5": "^7.2.1",
 		"pathe": "^2.0.2",
 		"prettier": "^3.4.2",
-		"semver": "^7.7.0",
-		"svelte": "^5.19.6",
+		"semver": "^7.7.1",
+		"svelte": "^5.19.7",
 		"ts-morph": "^25.0.0",
 		"valibot": "1.0.0-beta.14",
 		"validate-npm-package-name": "^6.0.0",

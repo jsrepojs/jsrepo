@@ -2,7 +2,7 @@
 
 > A CLI to add shared code from remote repositories.
  
-Latest Version: 1.29.1
+Latest Version: 1.30.1
 
 ## Commands
 
@@ -57,6 +57,7 @@ jsrepo build [options]
 - --do-not-list-blocks [blockNames...]: Do not list the blocks with these names. 
 - --do-not-list-categories [categoryNames...]: Do not list the categories with these names. 
 - --exclude-deps [deps...]: Dependencies that should not be added. 
+- --allow-subdirectories: Allow subdirectories to be built. 
 - --preview: Display a preview of the blocks list. 
 - --no-output: Do not output a `jsrepo-manifest.json` file. 
 - --verbose: Include debug logs. 
