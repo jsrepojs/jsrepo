@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.31.0
+
+### Minor Changes
+
+- 0424970: feat: Support for subdirectories 🎉
+
 ## 1.30.1
 
 ### Patch Changes
