@@ -3,7 +3,7 @@ import { createPathsMatcher, getTsconfig } from 'get-tsconfig';
 import path from 'pathe';
 import * as v from 'valibot';
 import { type Block, manifestMeta } from '../types';
-import { Err, Ok, type Result } from './blocks/types/result';
+import { Err, Ok, type Result } from './blocks/ts/result';
 import { ruleConfigSchema } from './build/check';
 
 const PROJECT_CONFIG_NAME = 'jsrepo.json';

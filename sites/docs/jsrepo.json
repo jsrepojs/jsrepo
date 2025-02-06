@@ -6,10 +6,12 @@
 	"formatter": "prettier",
 	"paths": {
 		"*": "./src/lib/ts",
+		"ts": "$lib/ts",
 		"components": "$lib/components/ui",
 		"ui": "$lib/components/ui",
 		"utils": "$lib/utils",
 		"actions": "$lib/actions",
-		"types": "$lib/ts/types"
+		"types": "$lib/ts/types",
+		"hooks": "$lib/hooks"
 	}
 }

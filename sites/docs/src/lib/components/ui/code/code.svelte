@@ -1,15 +1,17 @@
 <!--
-	jsrepo 1.29.1
+	jsrepo 1.32.0
 	Installed from github/ieedan/shadcn-svelte-extras
-	1-28-2025
+	2-6-2025
 -->
 
 <script lang="ts">
 	import { cn } from '$lib/utils/utils';
-	import Copy from './copy.svelte';
-	import { shikiContext } from '.';
 	import { tv, type VariantProps } from 'tailwind-variants';
-	import type { SupportedLanguage } from './langs';
+	import { highlighter, type SupportedLanguage } from './shiki';
+	import DOMPurify from 'isomorphic-dompurify';
+	import { onMount } from 'svelte';
+	import type { HighlighterCore } from 'shiki';
+	import { CopyButton } from '$lib/components/ui/copy-button';
 
 	const style = tv({
 		base: 'not-prose relative h-fit max-h-[650px] overflow-auto rounded-lg border',
@@ -68,37 +70,43 @@
 		highlight = []
 	}: Props = $props();
 
-	const highlighter = shikiContext.get();
+	let hl = $state<HighlighterCore>();
 
 	const highlighted = $derived(
-		$highlighter?.codeToHtml(code, {
-			lang: lang,
-			themes: {
-				light: 'github-light-default',
-				dark: 'github-dark-default'
-			},
-			transformers: [
-				{
-					pre: (el) => {
-						el.properties.style = '';
+		DOMPurify.sanitize(
+			hl?.codeToHtml(code, {
+				lang: lang,
+				themes: {
+					light: 'github-light-default',
+					dark: 'github-dark-default'
+				},
+				transformers: [
+					{
+						pre: (el) => {
+							el.properties.style = '';
 
-						if (!hideLines) {
-							el.properties.class += ' line-numbers';
+							if (!hideLines) {
+								el.properties.class += ' line-numbers';
+							}
+
+							return el;
+						},
+						line: (node, line) => {
+							if (within(line, highlight)) {
+								node.properties.class = node.properties.class + ' line--highlighted';
+							}
+
+							return node;
 						}
-
-						return el;
-					},
-					line: (node, line) => {
-						if (within(line, highlight)) {
-							node.properties.class = node.properties.class + ' line--highlighted';
-						}
-
-						return node;
 					}
-				}
-			]
-		}) ?? code
+				]
+			}) ?? code
+		)
 	);
+
+	onMount(() => {
+		highlighter.then((highlighter) => (hl = highlighter));
+	});
 </script>
 
 <div class={cn(style({ variant }), className)}>
@@ -110,7 +118,7 @@
 				copyButtonContainerClass
 			)}
 		>
-			<Copy {code} />
+			<CopyButton text={code} />
 		</div>
 	{/if}
 </div>

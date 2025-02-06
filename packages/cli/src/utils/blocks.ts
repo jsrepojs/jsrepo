@@ -3,8 +3,8 @@ import color from 'chalk';
 import { program } from 'commander';
 import path from 'pathe';
 import type { Block } from '../types';
-import { Err, Ok, type Result } from './blocks/types/result';
-import { mapToArray } from './blocks/ts/map-to-array';
+import * as array from './blocks/ts/array';
+import { Err, Ok, type Result } from './blocks/ts/result';
 import * as url from './blocks/ts/url';
 import { type ProjectConfig, getPathForBlock, resolvePaths } from './config';
 import * as registry from './registry-providers/internal';
@@ -89,7 +89,7 @@ const resolveTree = async (
 		}
 	}
 
-	return Ok(mapToArray(blocks, (_, val) => val));
+	return Ok(array.fromMap(blocks, (_, val) => val));
 };
 
 type InstalledBlock = {

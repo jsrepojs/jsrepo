@@ -14,7 +14,7 @@
 	import { goto } from '$app/navigation';
 	import * as Table from '$lib/components/ui/table';
 	import * as Tooltip from '$lib/components/ui/tooltip';
-	import { mapToArray } from '$lib/utils/map-to-array';
+	import * as array from '$lib/ts/array';
 	import { FileIcon } from '$lib/components/ui/file-icon';
 
 	type Props = {
@@ -95,9 +95,9 @@
 			}
 		}
 
-		const arr = mapToArray(langMap, (key, value) => ({ key, value })).toSorted(
-			(a, b) => b.value - a.value
-		);
+		const arr = array
+			.fromMap(langMap, (key, value) => ({ key, value }))
+			.toSorted((a, b) => b.value - a.value);
 
 		return arr[0].key;
 	};

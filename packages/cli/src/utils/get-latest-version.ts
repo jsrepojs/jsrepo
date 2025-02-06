@@ -1,5 +1,5 @@
 import nodeFetch from 'node-fetch';
-import { Err, Ok, type Result } from './blocks/types/result';
+import { Err, Ok, type Result } from './blocks/ts/result';
 import type { Package } from './parse-package-name';
 import * as persisted from './persisted';
 

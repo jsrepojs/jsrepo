@@ -4,7 +4,7 @@
 	import { Clapperboard, Pause, Play } from 'lucide-svelte';
 	import { scale } from 'svelte/transition';
 	import { dev } from '$app/environment';
-	import * as math from '$lib/utils/math';
+	import * as math from '$lib/ts/math';
 
 	interface Props extends HTMLVideoAttributes {
 		hideSkeleton?: boolean;

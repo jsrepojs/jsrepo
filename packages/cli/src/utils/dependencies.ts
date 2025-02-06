@@ -3,7 +3,7 @@ import { execa } from 'execa';
 import { type Agent, resolveCommand } from 'package-manager-detector';
 import path from 'pathe';
 import { flags } from './blocks/package-managers/flags';
-import { Err, Ok, type Result } from './blocks/types/result';
+import { Err, Ok, type Result } from './blocks/ts/result';
 import type { ProjectConfig } from './config';
 
 export type Options = {

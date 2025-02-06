@@ -2,7 +2,7 @@ import type { PartialConfiguration } from '@biomejs/wasm-nodejs';
 import color from 'chalk';
 import escapeStringRegexp from 'escape-string-regexp';
 import type * as prettier from 'prettier';
-import { Err, Ok, type Result } from './blocks/types/result';
+import { Err, Ok, type Result } from './blocks/ts/result';
 import type { ProjectConfig } from './config';
 import { resolveLocalDependencyTemplate } from './dependencies';
 import { languages } from './language-support';
