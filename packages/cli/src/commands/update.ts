@@ -20,7 +20,7 @@ import { context } from '../cli';
 import { type ModelName, models } from '../utils/ai';
 import * as ascii from '../utils/ascii';
 import { getInstalled, resolveTree } from '../utils/blocks';
-import * as url from '../utils/blocks/utils/url';
+import * as url from '../utils/blocks/ts/url';
 import { isTestFile } from '../utils/build';
 import { getPathForBlock, getProjectConfig, resolvePaths } from '../utils/config';
 import { installDependencies } from '../utils/dependencies';

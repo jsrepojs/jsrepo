@@ -4,8 +4,8 @@ import { program } from 'commander';
 import path from 'pathe';
 import type { Block } from '../types';
 import { Err, Ok, type Result } from './blocks/types/result';
-import { mapToArray } from './blocks/utils/map-to-array';
-import * as url from './blocks/utils/url';
+import { mapToArray } from './blocks/ts/map-to-array';
+import * as url from './blocks/ts/url';
 import { type ProjectConfig, getPathForBlock, resolvePaths } from './config';
 import * as registry from './registry-providers/internal';
 

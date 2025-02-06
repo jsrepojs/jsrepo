@@ -1,8 +1,8 @@
 import color from 'chalk';
 import { type Change, diffChars } from 'diff';
-import { arraySum } from './blocks/utils/array-sum';
-import * as lines from './blocks/utils/lines';
-import { leftPadMin } from './blocks/utils/pad';
+import * as array from './blocks/ts/array';
+import * as lines from './blocks/ts/lines';
+import { leftPadMin } from './blocks/ts/pad';
 
 type Options = {
 	/** The source file */
@@ -75,7 +75,7 @@ const formatDiff = ({
 }: Options): string => {
 	let result = '';
 
-	const length = arraySum(changes, (change) => change.count ?? 0).toString().length + 1;
+	const length = array.sum(changes, (change) => change.count ?? 0).toString().length + 1;
 
 	let lineOffset = 0;
 

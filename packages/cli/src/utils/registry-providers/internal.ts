@@ -13,7 +13,7 @@ import {
 } from '.';
 import type { Block } from '../../types';
 import { Err, Ok, type Result } from '../blocks/types/result';
-import * as u from '../blocks/utils/url';
+import * as u from '../blocks/ts/url';
 import * as persisted from '../persisted';
 import type { RegistryProvider, RegistryProviderState } from './types';
 

@@ -14,7 +14,7 @@ import validatePackageName from 'validate-npm-package-name';
 import * as v from 'vue/compiler-sfc';
 import * as ascii from './ascii';
 import { Err, Ok, type Result } from './blocks/types/result';
-import * as lines from './blocks/utils/lines';
+import * as lines from './blocks/ts/lines';
 import type { Formatter } from './config';
 import { findNearestPackageJson } from './package';
 import { parsePackageName } from './parse-package-name';
