@@ -257,6 +257,13 @@ const svelte: Lang = {
 					modules.push(node.source.value);
 				}
 			}
+
+			if (node.type === 'ImportExpression') {
+				if (node.source.type === 'Literal' && typeof node.source.value === 'string') {
+					modules.push(node.source.value);
+				}
+			}
+
 		};
 
 		if (root.instance) {
@@ -338,7 +345,7 @@ const typescript: Lang = {
 		for (const func of functions) {
 			const expr = func.getExpression();
 
-			if (expr.getKind() === SyntaxKind.ImportKeyword || expr.getKind() === SyntaxKind.RequireKeyword) {
+			if (expr.getKind() === SyntaxKind.ImportKeyword) {
 				const specifier = func.getArguments()[0];
 
 				if (specifier.getKind() === SyntaxKind.StringLiteral) {
