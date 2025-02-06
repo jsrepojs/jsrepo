@@ -9,7 +9,7 @@ import * as parse5 from 'parse5';
 import path from 'pathe';
 import * as prettier from 'prettier';
 import * as sv from 'svelte/compiler';
-import { Project } from 'ts-morph';
+import { Project, type StringLiteral, SyntaxKind } from 'ts-morph';
 import validatePackageName from 'validate-npm-package-name';
 import * as v from 'vue/compiler-sfc';
 import * as ascii from './ascii';
@@ -257,6 +257,12 @@ const svelte: Lang = {
 					modules.push(node.source.value);
 				}
 			}
+
+			if (node.type === 'ImportExpression') {
+				if (node.source.type === 'Literal' && typeof node.source.value === 'string') {
+					modules.push(node.source.value);
+				}
+			}
 		};
 
 		if (root.instance) {
@@ -332,6 +338,20 @@ const typescript: Lang = {
 		const modules = blockFile
 			.getImportDeclarations()
 			.map((imp) => imp.getModuleSpecifierValue());
+
+		// get dynamic imports
+		const functions = blockFile.getDescendantsOfKind(SyntaxKind.CallExpression);
+		for (const func of functions) {
+			const expr = func.getExpression();
+
+			if (expr.getKind() === SyntaxKind.ImportKeyword) {
+				const specifier = func.getArguments()[0];
+
+				if (specifier.getKind() === SyntaxKind.StringLiteral) {
+					modules.push((specifier as StringLiteral).getLiteralValue());
+				}
+			}
+		}
 
 		// get `export x from` specifiers
 		const exps = blockFile

@@ -10,7 +10,7 @@
 		"attributePosition": "auto"
 	},
 	"files": {
-		"ignore": ["dist", "node_modules", "docs"]
+		"ignore": ["dist", "node_modules", "docs", "temp-test"]
 	},
 	"organizeImports": { "enabled": true },
 	"linter": {

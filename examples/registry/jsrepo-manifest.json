@@ -177,6 +177,49 @@
 			]
 		},
 		{
+			"name": "dynamic-imports",
+			"blocks": [
+				{
+					"name": "test",
+					"directory": "blocks/dynamic-imports",
+					"category": "dynamic-imports",
+					"tests": false,
+					"subdirectory": false,
+					"list": true,
+					"files": [
+						"test.svelte"
+					],
+					"localDependencies": [],
+					"_imports_": {},
+					"dependencies": [
+						"shiki",
+						"@shikijs/langs",
+						"@shikijs/themes"
+					],
+					"devDependencies": []
+				},
+				{
+					"name": "test",
+					"directory": "blocks/dynamic-imports",
+					"category": "dynamic-imports",
+					"tests": false,
+					"subdirectory": false,
+					"list": true,
+					"files": [
+						"test.ts"
+					],
+					"localDependencies": [],
+					"_imports_": {},
+					"dependencies": [
+						"shiki",
+						"@shikijs/langs",
+						"@shikijs/themes"
+					],
+					"devDependencies": []
+				}
+			]
+		},
+		{
 			"name": "logging",
 			"blocks": [
 				{
