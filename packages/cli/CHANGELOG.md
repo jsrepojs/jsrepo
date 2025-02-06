@@ -1,5 +1,12 @@
 # jsrepo
 
+## 1.32.1
+
+### Patch Changes
+
+- 63a1ccb: chore: Bump deps
+- 2f5cff4: fix: Fix regression where unused blocks were not removed from the manifest.
+
 ## 1.32.0
 
 ### Minor Changes
