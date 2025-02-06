@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'pathe';
 import semver from 'semver';
-import { Err, Ok, type Result } from './blocks/types/result';
+import { Err, Ok, type Result } from './blocks/ts/result';
 import { parsePackageName } from './parse-package-name';
 
 const findNearestPackageJson = (startDir: string, until: string): string | undefined => {

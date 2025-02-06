@@ -1,6 +1,6 @@
 import { MANIFEST_FILE } from '../../constants';
 import type { Manifest } from '../../types';
-import { Err, Ok, type Result } from '../blocks/types/result';
+import { Err, Ok, type Result } from '../blocks/ts/result';
 import { parseManifest } from '../manifest';
 import { azure } from './azure';
 import { bitbucket } from './bitbucket';

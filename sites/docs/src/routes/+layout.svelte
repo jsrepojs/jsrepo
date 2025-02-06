@@ -7,7 +7,6 @@
 	import { UmamiAnalytics } from '@lukulent/svelte-umami';
 	import { commandContext, pmContext } from '$lib/ts/context';
 	import Footer from '$lib/components/site/footer.svelte';
-	import { ShikiProvider } from '$lib/components/ui/code';
 	import Command from '$lib/components/site/command.svelte';
 	import { shortcut } from '$lib/actions/shortcut.svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
@@ -45,21 +44,19 @@
 {/if}
 <ModeWatcher />
 <Command />
-<ShikiProvider>
-	<Header {...data} />
-	<Sidebar.Provider open={page.url.pathname.startsWith('/docs')}>
-		<AppSidebar {...data} />
+<Header {...data} />
+<Sidebar.Provider open={page.url.pathname.startsWith('/docs')}>
+	<AppSidebar {...data} />
 
-		{#if isMobile.current}
-			<!-- Moves the trigger with context to the header -->
-			<Portal to="#sidebar-trigger-portal-target">
-				<Sidebar.Trigger />
-			</Portal>
-		{/if}
+	{#if isMobile.current}
+		<!-- Moves the trigger with context to the header -->
+		<Portal to="#sidebar-trigger-portal-target">
+			<Sidebar.Trigger />
+		</Portal>
+	{/if}
 
-		<main class="min-h-svh w-full flex place-items-center justify-center flex-col">
-			{@render children()}
-			<Footer {...data} />
-		</main>
-	</Sidebar.Provider>
-</ShikiProvider>
+	<main class="min-h-svh w-full flex place-items-center justify-center flex-col">
+		{@render children()}
+		<Footer {...data} />
+	</main>
+</Sidebar.Provider>

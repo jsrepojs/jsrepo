@@ -1,6 +1,6 @@
 import * as v from 'valibot';
 import { type Manifest, categorySchema, manifestSchema } from '../types';
-import { Err, Ok, type Result } from './blocks/types/result';
+import { Err, Ok, type Result } from './blocks/ts/result';
 
 /** Parses the json string (if it can be) into a manifest.
  *

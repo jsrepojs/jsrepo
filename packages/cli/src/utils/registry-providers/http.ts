@@ -1,5 +1,5 @@
 import color from 'chalk';
-import * as u from '../blocks/utils/url';
+import * as u from '../blocks/ts/url';
 import type { ParseOptions, RegistryProvider, RegistryProviderState } from './types';
 
 export interface HttpProviderState extends RegistryProviderState {}

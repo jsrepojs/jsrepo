@@ -4,6 +4,6 @@
 	2-6-2025
 */
 
-import Code from './code.svelte';
+import CopyButton from './copy-button.svelte';
 
-export { Code };
+export { CopyButton };

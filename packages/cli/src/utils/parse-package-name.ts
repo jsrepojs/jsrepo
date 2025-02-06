@@ -3,7 +3,7 @@
  * @module
  */
 
-import { Err, Ok, type Result } from './blocks/types/result';
+import { Err, Ok, type Result } from './blocks/ts/result';
 
 // Parsed a scoped package name into name, version, and path.
 const RE_SCOPED = /^(@[^\/]+\/[^@\/]+)(?:@([^\/]+))?(\/.*)?$/;

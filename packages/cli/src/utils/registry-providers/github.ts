@@ -1,6 +1,6 @@
 import color from 'chalk';
 import { Octokit } from 'octokit';
-import { startsWithOneOf } from '../blocks/utils/strings';
+import { startsWithOneOf } from '../blocks/ts/strings';
 import type { ParseOptions, RegistryProvider, RegistryProviderState } from './types';
 
 const DEFAULT_BRANCH = 'main';

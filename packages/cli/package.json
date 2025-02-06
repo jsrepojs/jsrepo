@@ -15,16 +15,7 @@
 	"bugs": {
 		"url": "https://github.com/ieedan/jsrepo/issues"
 	},
-	"keywords": [
-		"repo",
-		"cli",
-		"svelte",
-		"vue",
-		"typescript",
-		"javascript",
-		"shadcn",
-		"registry"
-	],
+	"keywords": ["repo", "cli", "svelte", "vue", "typescript", "javascript", "shadcn", "registry"],
 	"type": "module",
 	"exports": {
 		".": {
@@ -34,10 +25,7 @@
 	},
 	"bin": "./dist/index.js",
 	"main": "./dist/index.js",
-	"files": [
-		"./schemas/**/*",
-		"dist/**/*"
-	],
+	"files": ["./schemas/**/*", "dist/**/*"],
 	"scripts": {
 		"start": "tsup --silent && node ./dist/index.js",
 		"build": "tsup",
@@ -51,7 +39,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@types/diff": "^7.0.1",
-		"@types/node": "^22.13.0",
+		"@types/node": "^22.13.1",
 		"@types/semver": "^7.5.8",
 		"@types/validate-npm-package-name": "^4.0.2",
 		"tsup": "^8.3.6",
@@ -62,7 +50,7 @@
 		"@anthropic-ai/sdk": "^0.36.3",
 		"@biomejs/js-api": "^0.7.1",
 		"@biomejs/wasm-nodejs": "^1.9.4",
-		"@clack/prompts": "^0.9.1",
+		"@clack/prompts": "^0.10.0",
 		"ansi-regex": "^6.1.0",
 		"boxen": "^8.0.1",
 		"chalk": "^5.4.1",
@@ -77,15 +65,15 @@
 		"node-fetch": "^3.3.2",
 		"octokit": "^4.1.0",
 		"ollama": "^0.5.12",
-		"openai": "^4.82.0",
+		"openai": "^4.83.0",
 		"package-manager-detector": "^0.2.9",
 		"parse5": "^7.2.1",
 		"pathe": "^2.0.2",
 		"prettier": "^3.4.2",
 		"semver": "^7.7.1",
-		"svelte": "^5.19.7",
-		"ts-morph": "^25.0.0",
-		"valibot": "1.0.0-beta.14",
+		"svelte": "^5.19.8",
+		"ts-morph": "^25.0.1",
+		"valibot": "1.0.0-beta.15",
 		"validate-npm-package-name": "^6.0.0",
 		"vue": "^3.5.13"
 	}

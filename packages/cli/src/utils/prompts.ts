@@ -4,7 +4,7 @@ import color from 'chalk';
 import { detectSync, resolveCommand } from 'package-manager-detector';
 import semver from 'semver';
 import * as ascii from './ascii';
-import { stripAsni } from './blocks/utils/strip-ansi';
+import { stripAsni } from './blocks/ts/strip-ansi';
 import type { CLIContext } from './context';
 
 export type Task = {

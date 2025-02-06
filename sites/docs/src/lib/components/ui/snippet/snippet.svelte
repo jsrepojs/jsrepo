@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { Command } from 'package-manager-detector';
 	import { resolveCommand } from 'package-manager-detector/commands';
-	import CopyButton from './pm-copy-button.svelte';
 	import { cn } from '$lib/utils';
+	import { CopyButton } from '$lib/components/ui/copy-button';
 	import { pmContext } from '$lib/ts/context';
 
 	type Props = {
@@ -30,5 +30,5 @@
 		<span class="text-foreground dark:text-primary">{cmd?.command}</span>
 		<span>{cmd?.args.join(' ')}</span>
 	</div>
-	<CopyButton bind:pm={$pm} {text} class="absolute top-1/2 -translate-y-1/2 right-2" />
+	<CopyButton {text} class="size-6 absolute top-1/2 -translate-y-1/2 right-2" />
 </div>

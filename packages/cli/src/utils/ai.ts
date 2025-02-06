@@ -2,7 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { cancel, isCancel, password, type spinner } from '@clack/prompts';
 import ollama from 'ollama';
 import OpenAI from 'openai';
-import * as lines from './blocks/utils/lines';
+import * as lines from './blocks/ts/lines';
 import * as persisted from './persisted';
 
 type File = {

@@ -82,7 +82,7 @@ const build = new Command('build')
 const _build = async (options: Options) => {
 	const loading = spinner();
 
-	let categories: Category[] = [];
+	const categories: Category[] = [];
 
 	const config: RegistryConfig = getRegistryConfig(options.cwd).match(
 		(val) => {
@@ -235,16 +235,16 @@ const _build = async (options: Options) => {
 	}
 
 	// removes any unused blocks or categories
-	const [prunedCategories, count] = pruneUnused(categories);
+	const [prunedCategories, count] = pruneUnused(manifest.categories);
 
-	categories = prunedCategories;
+	manifest.categories = prunedCategories;
 
 	if (count > 0) {
 		log.step(`Removed ${count} unused block${count > 1 ? 's' : ''}.`);
 	}
 
 	if (config.preview) {
-		const blocks = categories.flatMap((cat) =>
+		const blocks = manifest.categories.flatMap((cat) =>
 			cat.blocks.filter((b) => b.list).map((b) => `${color.cyan(b.category)}/${b.name}`)
 		);
 
@@ -260,7 +260,7 @@ const _build = async (options: Options) => {
 			loading.start(`Copying registry files to \`${color.cyan(outDir)}\``);
 
 			// copy the files for each block in each category
-			for (const category of categories) {
+			for (const category of manifest.categories) {
 				for (const block of category.blocks) {
 					const originalPath = path.join(options.cwd, block.directory);
 					const newDirPath = path.join(outDir, block.directory);

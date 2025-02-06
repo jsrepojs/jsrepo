@@ -8,6 +8,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import type { Agent } from 'package-manager-detector';
 	import { AGENTS } from 'package-manager-detector/constants';
+	import { UseClipboard } from '$lib/hooks/use-clipboard.svelte';
 
 	type Props = {
 		text: string;
@@ -17,17 +18,7 @@
 
 	let { text, class: className, pm = $bindable() }: Props = $props();
 
-	let copied = $state(false);
-
-	const copy = async () => {
-		await navigator.clipboard.writeText(text);
-
-		copied = true;
-
-		setTimeout(() => {
-			copied = false;
-		}, 750);
-	};
+	const clipboard = new UseClipboard();
 </script>
 
 <div class={cn('flex place-items-center gap-1', className)}>
@@ -49,7 +40,7 @@
 				<DropdownMenu.Item
 					onclick={() => {
 						pm = agent;
-						copy();
+						clipboard.copy(text);
 					}}
 				>
 					{agent}
@@ -57,15 +48,16 @@
 			{/each}
 		</DropdownMenu.Content>
 	</DropdownMenu.Root>
-	<Button onclick={copy} variant="ghost" size="icon" class="size-6 text-xs">
-		<span class="sr-only">Copy</span>
-		{#if copied}
+	<Button onclick={() => clipboard.copy(text)} variant="ghost" size="icon" class="size-6 text-xs">
+		{#if clipboard.copied}
 			<div in:scale={{ start: 0.85 }}>
 				<Check class="size-3" tabindex={-1} />
+				<span class="sr-only">Copied</span>
 			</div>
 		{:else}
 			<div in:scale={{ start: 0.85 }}>
 				<Copy class="size-3" tabindex={-1} />
+				<span class="sr-only">Copy</span>
 			</div>
 		{/if}
 	</Button>

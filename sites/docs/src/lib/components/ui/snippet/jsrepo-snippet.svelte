@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import SimpleCopyButton from './copy-button.svelte';
+	import { CopyButton } from '$lib/components/ui/copy-button';
 
 	type Props = {
 		args: string[];
@@ -22,5 +22,5 @@
 		<span class="text-foreground dark:text-primary">jsrepo</span>
 		<span>{args.join(' ')}</span>
 	</div>
-	<SimpleCopyButton {text} class="absolute top-1/2 -translate-y-1/2 right-2" />
+	<CopyButton {text} class="size-6 absolute top-1/2 -translate-y-1/2 right-2" />
 </div>
