@@ -9,7 +9,7 @@ import * as parse5 from 'parse5';
 import path from 'pathe';
 import * as prettier from 'prettier';
 import * as sv from 'svelte/compiler';
-import { Project, StringLiteral, SyntaxKind } from 'ts-morph';
+import { Project, type StringLiteral, SyntaxKind } from 'ts-morph';
 import validatePackageName from 'validate-npm-package-name';
 import * as v from 'vue/compiler-sfc';
 import * as ascii from './ascii';
