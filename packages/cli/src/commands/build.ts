@@ -82,7 +82,7 @@ const build = new Command('build')
 const _build = async (options: Options) => {
 	const loading = spinner();
 
-	let categories: Category[] = [];
+	const categories: Category[] = [];
 
 	const config: RegistryConfig = getRegistryConfig(options.cwd).match(
 		(val) => {
