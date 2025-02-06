@@ -53,7 +53,7 @@ describe('build', () => {
 			includeCategories: [],
 			excludeBlocks: [],
 			excludeCategories: ['src'],
-			doNotListBlocks: [],
+			doNotListBlocks: ['noop'],
 			doNotListCategories: [],
 			listBlocks: [],
 			listCategories: [],
@@ -115,6 +115,8 @@ export const action = () => {}`
 
 export const schema = v.object({});`
 		);
+
+		fs.writeFileSync('./src/utils/noop.ts', '');
 
 		fs.writeFileSync(
 			'./src/utils/add.ts',
