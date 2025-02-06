@@ -263,7 +263,6 @@ const svelte: Lang = {
 					modules.push(node.source.value);
 				}
 			}
-
 		};
 
 		if (root.instance) {
