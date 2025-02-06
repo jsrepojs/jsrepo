@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.32.0
+
+### Minor Changes
+
+- 8168f20: feat: Detect dependencies from dynamic imports in TypeScript and Svelte files. 🎉
+
 ## 1.31.0
 
 ### Minor Changes
