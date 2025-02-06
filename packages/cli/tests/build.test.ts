@@ -89,6 +89,8 @@ describe('build', () => {
 		);
 
 		fs.mkdirSync('./src/utils', { recursive: true });
+		fs.mkdirSync('./src/ts', { recursive: true });
+		fs.mkdirSync('./src/svelte', { recursive: true });
 
 		fs.mkdirSync('./ignored/', { recursive: true });
 		fs.mkdirSync('./.ignored/', { recursive: true });
@@ -118,7 +120,7 @@ export const schema = v.object({});`
 			'./src/utils/add.ts',
 			`import { log } from "./log";
 
-export const add = (a: number, b: number) => a + b;
+export const add = (a: number, b: number) => a b;
 
 export const logAnswer = (a: number, b: number) => log(\`Answer is: \${add(a, b)}\`);`
 		);
@@ -138,6 +140,44 @@ export const createPoint = (x: number, y: number): Point => { x, y };`
 		);
 
 		fs.writeFileSync('./src/types/point.ts', 'export type Point = { x: number; y: number; };');
+
+		fs.writeFileSync(
+			'./src/ts/dynamic-imports.ts',
+			`import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
+import { createHighlighterCore } from 'shiki/core';
+
+/** A preloaded highlighter instance. */
+export const highlighter = createHighlighterCore({
+	themes: [
+		import('@shikijs/themes/github-light-default'),
+		import('@shikijs/themes/github-dark-default')
+	],
+	langs: [
+		import('@shikijs/langs/bash')
+	],
+	engine: createJavaScriptRegexEngine()
+});`
+		);
+
+		fs.writeFileSync(
+			'./src/svelte/dynamic-imports.svelte',
+			`<script lang="ts">
+	import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
+	import { createHighlighterCore } from 'shiki/core';
+
+	/** A preloaded highlighter instance. */
+	export const highlighter = createHighlighterCore({
+		themes: [
+			import('@shikijs/themes/github-light-default'),
+			import('@shikijs/themes/github-dark-default')
+		],
+		langs: [
+			import('@shikijs/langs/bash')
+		],
+		engine: createJavaScriptRegexEngine()
+	});
+</script>`
+		);
 
 		// build
 
@@ -163,20 +203,56 @@ export const createPoint = (x: number, y: number): Point => { x, y };`
 			},
 			categories: [
 				{
+					name: 'svelte',
+					blocks: [
+						{
+							name: 'dynamic-imports',
+							category: 'svelte',
+							localDependencies: [],
+							dependencies: ['shiki', '@shikijs/themes', '@shikijs/langs'],
+							devDependencies: [],
+							tests: false,
+							list: true,
+							directory: 'src/svelte',
+							subdirectory: false,
+							files: ['dynamic-imports.svelte'],
+							_imports_: {},
+						},
+					],
+				},
+				{
+					name: 'ts',
+					blocks: [
+						{
+							name: 'dynamic-imports',
+							category: 'ts',
+							localDependencies: [],
+							dependencies: ['shiki', '@shikijs/themes', '@shikijs/langs'],
+							devDependencies: [],
+							tests: false,
+							list: true,
+							directory: 'src/ts',
+							subdirectory: false,
+							files: ['dynamic-imports.ts'],
+							_imports_: {},
+						},
+					],
+				},
+				{
 					name: 'types',
 					blocks: [
 						{
 							name: 'point',
-							directory: 'src/types',
 							category: 'types',
-							tests: false,
-							subdirectory: false,
-							list: true,
-							files: ['point.ts'],
 							localDependencies: [],
-							_imports_: {},
 							dependencies: [],
 							devDependencies: [],
+							tests: false,
+							list: true,
+							directory: 'src/types',
+							subdirectory: false,
+							files: ['point.ts'],
+							_imports_: {},
 						},
 					],
 				},
@@ -185,59 +261,59 @@ export const createPoint = (x: number, y: number): Point => { x, y };`
 					blocks: [
 						{
 							name: 'add',
-							directory: 'src/utils',
 							category: 'utils',
-							tests: false,
-							subdirectory: false,
-							list: true,
-							files: ['add.ts'],
 							localDependencies: ['utils/log'],
+							dependencies: [],
+							devDependencies: [],
+							tests: false,
+							list: true,
+							directory: 'src/utils',
+							subdirectory: false,
+							files: ['add.ts'],
 							_imports_: {
 								'./log': '{{utils/log}}',
 							},
-							dependencies: [],
-							devDependencies: [],
 						},
 						{
 							name: 'form1',
-							directory: 'src/utils/form1',
 							category: 'utils',
-							tests: false,
-							subdirectory: true,
-							list: true,
-							files: ['client/form.svelte', 'server/index.ts', 'types.ts'],
 							localDependencies: [],
 							dependencies: ['valibot@1.0.0-beta.14'],
 							devDependencies: [],
+							tests: false,
+							list: true,
+							directory: 'src/utils/form1',
+							subdirectory: true,
+							files: ['client/form.svelte', 'server/index.ts', 'types.ts'],
 							_imports_: {},
 						},
 						{
 							name: 'log',
-							directory: 'src/utils',
 							category: 'utils',
-							tests: false,
-							subdirectory: false,
-							list: true,
-							files: ['log.ts'],
 							localDependencies: [],
-							_imports_: {},
 							dependencies: ['chalk@^5.3.0'],
 							devDependencies: [],
+							tests: false,
+							list: true,
+							directory: 'src/utils',
+							subdirectory: false,
+							files: ['log.ts'],
+							_imports_: {},
 						},
 						{
 							name: 'math',
-							directory: 'src/utils',
 							category: 'utils',
-							tests: false,
-							subdirectory: false,
-							list: true,
-							files: ['math.ts'],
 							localDependencies: ['types/point'],
+							dependencies: [],
+							devDependencies: [],
+							tests: false,
+							list: true,
+							directory: 'src/utils',
+							subdirectory: false,
+							files: ['math.ts'],
 							_imports_: {
 								'$types/point.js': '{{types/point}}.js',
 							},
-							dependencies: [],
-							devDependencies: [],
 						},
 					],
 				},
