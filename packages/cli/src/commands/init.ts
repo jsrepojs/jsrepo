@@ -150,7 +150,8 @@ const _initProject = async (registries: string[], options: Options) => {
 			if (value.trim() === '') return 'Please provide a value';
 		},
 		placeholder: './src/blocks',
-		initialValue: initialConfig.isOk() ? initialConfig.unwrap().paths['*'] : undefined,
+		defaultValue: './src/blocks',
+		initialValue: initialConfig.isOk() ? initialConfig.unwrap().paths['*'] : './src/blocks',
 	});
 
 	if (isCancel(defaultPathResult)) {
