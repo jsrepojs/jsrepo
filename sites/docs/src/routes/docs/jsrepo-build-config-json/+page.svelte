@@ -84,6 +84,40 @@
     ]
 }`}
 />
+<SubHeading>configFiles</SubHeading>
+<p>
+	<CodeSpan>configFiles</CodeSpan> allows you to specify files that the user may need in their project
+	for the registry to function properly.
+</p>
+<Code
+	lang="json"
+	code={`{
+	"configFiles": [
+		{
+			"name": "app.css",
+			"path": "./src/app.css",
+			"expectedPath": "./src/app.css",
+			"optional": false
+		}
+	]
+}`}
+/>
+<div class="flex flex-col gap-2">
+	<CodeSpan class="w-fit">name</CodeSpan>
+	<p>The name as it will be displayed in prompts to the user.</p>
+</div>
+<div class="flex flex-col gap-2">
+	<CodeSpan class="w-fit">path</CodeSpan>
+	<p>The path of the file in your registry.</p>
+</div>
+<div class="flex flex-col gap-2">
+	<CodeSpan class="w-fit">expectedPath</CodeSpan>
+	<p>The path where you expect users to have this file (used as a default in prompts).</p>
+</div>
+<div class="flex flex-col gap-2">
+	<CodeSpan class="w-fit">optional</CodeSpan>
+	<p>When true users will be prompted to ask whether or not they want to add the config file.</p>
+</div>
 <SubHeading>outputDir</SubHeading>
 <p>
 	<CodeSpan>outputDir</CodeSpan> is an optional key that allows you to copy the resulting

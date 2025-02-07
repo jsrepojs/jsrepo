@@ -53,6 +53,16 @@
 	  }
 }`}
 />
+<SubHeading>configFiles</SubHeading>
+<p>Where to add specific config files in your project.</p>
+<Code
+	lang="json"
+	code={`{
+	  "configFiles": {
+		  "app.css": "./src/app.css"
+	  }
+}`}
+/>
 <SubHeading>includeTests</SubHeading>
 <p>Whether or not to include test files when installing blocks.</p>
 <Code
