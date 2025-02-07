@@ -2,15 +2,15 @@
  *
  * ## Usage
  * ```ts
- * startsWithOneOf('a', 'a', 'b'); // true
- * startsWithOneOf('c', 'a', 'b'); // false
+ * startsWithOneOf('ab', 'a', 'c'); // true
+ * startsWithOneOf('cc', 'a', 'b'); // false
  * ```
  *
  * @param str
  * @param strings
  * @returns
  */
-const startsWithOneOf = (str: string, strings: string[]): boolean => {
+export const startsWithOneOf = (str: string, strings: string[]): boolean => {
 	for (const s of strings) {
 		if (str.startsWith(s)) return true;
 	}
@@ -18,4 +18,22 @@ const startsWithOneOf = (str: string, strings: string[]): boolean => {
 	return false;
 };
 
-export { startsWithOneOf };
+/** Returns true if `str` starts with one of the provided `strings`.
+ *
+ * ## Usage
+ * ```ts
+ * endsWithOneOf('cb', 'a', 'b'); // true
+ * endsWithOneOf('cc', 'a', 'b'); // false
+ * ```
+ *
+ * @param str
+ * @param strings
+ * @returns
+ */
+export const endsWithOneOf = (str: string, strings: string[]): boolean => {
+	for (const s of strings) {
+		if (str.endsWith(s)) return true;
+	}
+
+	return false;
+};

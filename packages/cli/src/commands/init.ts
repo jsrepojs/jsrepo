@@ -14,6 +14,7 @@ import {
 import color from 'chalk';
 import { Command, Option, program } from 'commander';
 import { diffLines } from 'diff';
+import { createPathsMatcher } from 'get-tsconfig';
 import { detect, resolveCommand } from 'package-manager-detector';
 import path from 'pathe';
 import * as v from 'valibot';
@@ -32,7 +33,7 @@ import {
 } from '../utils/config';
 import { installDependencies } from '../utils/dependencies';
 import { formatDiff } from '../utils/diff';
-import { formatFile } from '../utils/files';
+import { formatFile, matchJSDescendant, tryGetTsconfig } from '../utils/files';
 import { loadFormatterConfig } from '../utils/format';
 import { json } from '../utils/language-support';
 import * as persisted from '../utils/persisted';
@@ -144,10 +145,29 @@ const _initProject = async (registries: string[], options: Options) => {
 	let paths: Paths;
 	let configFiles: Record<string, string> = {};
 
+	const tsconfigResult = tryGetTsconfig(options.cwd).unwrapOr(null);
+
 	const defaultPathResult = await text({
 		message: 'Please enter a default path to install the blocks',
 		validate(value) {
 			if (value.trim() === '') return 'Please provide a value';
+
+			if (!value.startsWith('./')) {
+				const error =
+					'Invalid path alias! If you are intending to use a relative path make sure it starts with `./`';
+
+				if (tsconfigResult === null) {
+					return error;
+				}
+
+				const matcher = createPathsMatcher(tsconfigResult);
+
+				if (matcher) {
+					const found = matcher(value);
+
+					if (found.length === 0) return error;
+				}
+			}
 		},
 		placeholder: './src/blocks',
 		initialValue: initialConfig.isOk() ? initialConfig.unwrap().paths['*'] : undefined,
@@ -200,9 +220,9 @@ const _initProject = async (registries: string[], options: Options) => {
 
 	const repos = Array.from(
 		new Set([
-			...(initialConfig.isOk() ? initialConfig.unwrap().repos : []),
 			...registries,
 			...(options.repos ?? []),
+			...(initialConfig.isOk() ? initialConfig.unwrap().repos : []),
 		])
 	);
 
@@ -444,12 +464,33 @@ const promptForProviderConfig = async ({
 				configFiles[file.name] = result;
 			}
 
-			const fullFilePath = path.join(options.cwd, configFiles[file.name]);
+			let fullFilePath = path.join(options.cwd, configFiles[file.name]);
 
 			let originalFileContents: string | undefined;
 
 			if (fs.existsSync(fullFilePath)) {
 				originalFileContents = fs.readFileSync(fullFilePath).toString();
+			} else {
+				const dir = path.dirname(fullFilePath);
+
+				if (fs.existsSync(dir)) {
+					const matchedPath = matchJSDescendant(fullFilePath);
+
+					if (matchedPath) {
+						originalFileContents = fs.readFileSync(matchedPath).toString();
+
+						const newPath = path.relative(options.cwd, matchedPath);
+
+						log.warn(
+							`Located ${color.bold(configFiles[file.name])} at ${color.bold(newPath)}`
+						);
+
+						// update path
+						configFiles[file.name] = newPath;
+
+						fullFilePath = path.join(options.cwd, newPath);
+					}
+				}
 			}
 
 			loading.start(`Fetching the ${color.cyan(file.name)} from ${color.cyan(repo)}`);
@@ -618,7 +659,9 @@ const promptForProviderConfig = async ({
 			} else {
 				const dir = path.dirname(fullFilePath);
 
-				fs.mkdirSync(dir, { recursive: true });
+				if (!fs.existsSync(dir)) {
+					fs.mkdirSync(dir, { recursive: true });
+				}
 			}
 
 			if (acceptedChanges) {
