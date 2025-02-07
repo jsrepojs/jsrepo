@@ -13,14 +13,6 @@
 			"react"
 		]
 	},
-	"configFiles": [
-		{
-			"name": "app.css",
-			"path": "./src/app.css",
-			"expectedPath": "./src/app.css",
-			"optional": false
-		}
-	],
 	"categories": [
 		{
 			"name": "components",
