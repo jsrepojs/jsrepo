@@ -129,6 +129,7 @@ const _initProject = async (registries: string[], options: Options) => {
 	const loading = spinner();
 
 	let paths: Paths;
+	let configFiles: Record<string, string> = {};
 
 	const defaultPathResult = await text({
 		message: 'Please enter a default path to install the blocks',
@@ -146,6 +147,7 @@ const _initProject = async (registries: string[], options: Options) => {
 
 	if (initialConfig.isOk()) {
 		paths = { ...initialConfig.unwrap().paths, '*': defaultPathResult };
+		configFiles = initialConfig.unwrap().configFiles ?? {};
 	} else {
 		paths = { '*': defaultPathResult };
 	}
@@ -161,7 +163,7 @@ const _initProject = async (registries: string[], options: Options) => {
 			// if already present in config ask if you would like to set it up
 			if (initialConfig.isOk() && initialConfig.unwrap().repos.find((r) => r === repo)) {
 				const confirmResult = await confirm({
-					message: `Configure ${repo}?`,
+					message: `Initialize ${repo}?`,
 					initialValue: options.yes,
 				});
 
@@ -173,9 +175,12 @@ const _initProject = async (registries: string[], options: Options) => {
 				if (!confirmResult) continue;
 			}
 
-			log.info(`Configuring ${color.cyan(repo)}`);
+			log.info(`Initializing ${color.cyan(repo)}`);
 
-			paths = await promptForProviderConfig(repo, paths);
+			const promptResult = await promptForProviderConfig(repo, paths, configFiles, options);
+
+			paths = promptResult.paths;
+			configFiles = promptResult.configFiles;
 		}
 	}
 
@@ -209,7 +214,10 @@ const _initProject = async (registries: string[], options: Options) => {
 			process.exit(0);
 		}
 
-		paths = await promptForProviderConfig(result, paths);
+		const promptResult = await promptForProviderConfig(result, paths, configFiles, options);
+
+		paths = promptResult.paths;
+		configFiles = promptResult.configFiles;
 
 		repos.push(result);
 	}
@@ -256,6 +264,7 @@ const _initProject = async (registries: string[], options: Options) => {
 				: (options.tests ?? false),
 		watermark: options.watermark,
 		formatter: options.formatter,
+		configFiles,
 		paths,
 	};
 
@@ -284,7 +293,12 @@ const _initProject = async (registries: string[], options: Options) => {
 	loading.stop(`Wrote config to \`${PROJECT_CONFIG_NAME}\`.`);
 };
 
-const promptForProviderConfig = async (repo: string, paths: Paths): Promise<Paths> => {
+const promptForProviderConfig = async (
+	repo: string,
+	paths: Paths,
+	configFiles: Record<string, string>,
+	options: Options
+): Promise<{ paths: Paths; configFiles: Record<string, string> }> => {
 	const loading = spinner();
 
 	const storage = persisted.get();
@@ -304,7 +318,7 @@ const promptForProviderConfig = async (repo: string, paths: Paths): Promise<Path
 	const token = storage.get(tokenKey);
 
 	// don't ask if the provider is a custom domain
-	if (!token && provider.name !== registry.http.name) {
+	if (!token && provider.name !== registry.http.name && !options.yes) {
 		const result = await confirm({
 			message: 'Would you like to add an auth token?',
 			initialValue: false,
@@ -332,7 +346,7 @@ const promptForProviderConfig = async (repo: string, paths: Paths): Promise<Path
 		}
 	}
 
-	loading.start(`Fetching categories from ${color.cyan(repo)}`);
+	loading.start(`Fetching manifest from ${color.cyan(repo)}`);
 
 	const providerState = await registry.getProviderState(repo);
 
@@ -342,7 +356,7 @@ const promptForProviderConfig = async (repo: string, paths: Paths): Promise<Path
 
 	const manifestResult = await registry.fetchManifest(providerState.unwrap());
 
-	loading.stop(`Fetched categories from ${color.cyan(repo)}`);
+	loading.stop(`Fetched manifest from ${color.cyan(repo)}`);
 
 	if (manifestResult.isErr()) {
 		program.error(color.red(manifestResult.unwrapErr()));
@@ -350,41 +364,115 @@ const promptForProviderConfig = async (repo: string, paths: Paths): Promise<Path
 
 	const manifest = manifestResult.unwrap();
 
-	const configurePaths = await multiselect({
-		message: 'Which category paths would you like to configure?',
-		options: manifest.categories.map((cat) => ({ label: cat.name, value: cat.name })),
-		required: false,
-	});
+	// setup config files
+	if (manifest.configFiles) {
+		for (const file of manifest.configFiles) {
+			if (file.optional && !options.yes) {
+				const result = await confirm({
+					message: `Would you like to add the ${file.name} file?`,
+					initialValue: true,
+				});
 
-	if (isCancel(configurePaths)) {
-		cancel('Canceled!');
-		process.exit(0);
-	}
+				if (isCancel(result)) {
+					cancel('Canceled!');
+					process.exit(0);
+				}
 
-	if (configurePaths.length > 0) {
-		for (const category of configurePaths) {
-			const configuredValue = paths[category];
-
-			const categoryPath = await text({
-				message: `Where should ${category} be added in your project?`,
-				validate(value) {
-					if (value.trim() === '') return 'Please provide a value';
-				},
-				placeholder: configuredValue ? configuredValue : `./src/${category}`,
-				defaultValue: configuredValue,
-				initialValue: configuredValue,
-			});
-
-			if (isCancel(categoryPath)) {
-				cancel('Canceled!');
-				process.exit(0);
+				if (!result) continue;
 			}
 
-			paths[category] = categoryPath;
+			// get the path to the file from the user
+			if (!configFiles[file.name]) {
+				const result = await text({
+					message: `Where is your ${file.name} file?`,
+					defaultValue: file.expectedPath,
+					initialValue: file.expectedPath,
+					placeholder: file.expectedPath,
+					validate(value) {
+						if (value.trim() === '') return 'Please provide a value';
+					},
+				});
+
+				if (isCancel(result)) {
+					cancel('Canceled!');
+					process.exit(0);
+				}
+
+				configFiles[file.name] = result;
+			}
+
+			const fullFilePath = path.join(options.cwd, configFiles[file.name]);
+
+			let originalFileContents: string | undefined;
+
+			if (fs.existsSync(fullFilePath)) {
+				originalFileContents = fs.readFileSync(fullFilePath).toString();
+			}
+
+			loading.start(`Fetching the ${color.cyan(file.name)} from ${color.cyan(repo)}`);
+
+			const remoteFileContents = await registry.fetchRaw(providerState.unwrap(), file.path);
+
+			if (remoteFileContents.isErr()) {
+				program.error(color.red(remoteFileContents.unwrapErr()));
+			}
+
+			loading.stop(`Fetched the ${color.cyan(file.name)} from ${color.cyan(repo)}`);
+
+			if (originalFileContents) {
+				// TODO give the update options (accept, reject, update w ai) for now we just overwrite
+				// need to solve some problems like formatting first
+			} else {
+				const dir = path.dirname(fullFilePath);
+
+				fs.mkdirSync(dir, { recursive: true });
+			}
+
+			loading.start(`Writing ${color.cyan(file.name)} to ${color.cyan(fullFilePath)}`);
+
+			fs.writeFileSync(fullFilePath, remoteFileContents.unwrap());
+
+			loading.stop(`Wrote ${color.cyan(file.name)} to ${color.cyan(fullFilePath)}`);
 		}
 	}
 
-	return paths;
+	if (!options.yes) {
+		const configurePaths = await multiselect({
+			message: 'Which category paths would you like to configure?',
+			options: manifest.categories.map((cat) => ({ label: cat.name, value: cat.name })),
+			required: false,
+		});
+
+		if (isCancel(configurePaths)) {
+			cancel('Canceled!');
+			process.exit(0);
+		}
+
+		if (configurePaths.length > 0) {
+			for (const category of configurePaths) {
+				const configuredValue = paths[category];
+
+				const categoryPath = await text({
+					message: `Where should ${category} be added in your project?`,
+					validate(value) {
+						if (value.trim() === '') return 'Please provide a value';
+					},
+					placeholder: configuredValue ? configuredValue : `./src/${category}`,
+					defaultValue: configuredValue,
+					initialValue: configuredValue,
+				});
+
+				if (isCancel(categoryPath)) {
+					cancel('Canceled!');
+					process.exit(0);
+				}
+
+				paths[category] = categoryPath;
+			}
+		}
+	}
+
+	return { paths, configFiles };
 };
 
 const _initRegistry = async (options: Options) => {

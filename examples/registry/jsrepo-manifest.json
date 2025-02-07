@@ -15,13 +15,7 @@
 	},
 	"configFiles": [
 		{
-			"name": "Typescript Config File",
-			"path": "./tsconfig.json",
-			"expectedPath": "./tsconfig.json",
-			"optional": false
-		},
-		{
-			"name": "Global CSS File",
+			"name": "app.css",
 			"path": "./src/app.css",
 			"expectedPath": "./src/app.css",
 			"optional": false

@@ -25,6 +25,7 @@ const projectConfigSchema = v.object({
 	repos: v.optional(v.array(v.string()), []),
 	includeTests: v.boolean(),
 	paths: pathsSchema,
+	configFiles: v.optional(v.record(v.string(), v.string())),
 	watermark: v.optional(v.boolean(), true),
 	formatter: v.optional(formatterSchema),
 });

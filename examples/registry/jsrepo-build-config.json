@@ -10,9 +10,9 @@
 	},
 	"configFiles": [
 		{
-			"name": "Typescript Config File",
-			"path": "./tsconfig.json",
-			"expectedPath": "./tsconfig.json",
+			"name": "app.css",
+			"path": "./src/app.css",
+			"expectedPath": "./src/app.css",
 			"optional": false
 		}
 	],

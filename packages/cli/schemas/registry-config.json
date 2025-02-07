@@ -48,17 +48,14 @@
 				"properties": {
 					"name": {
 						"description": "Name of the config file.",
-						"examples": ["Global CSS File"],
 						"type": "string"
 					},
 					"path": {
 						"description": "Path where the config file lives.",
-						"examples": ["./src/app.css"],
 						"type": "string"
 					},
 					"expectedPath": {
 						"description": "Path to default to searching in the users project.",
-						"examples": ["./src/app.css"],
 						"type": "string"
 					},
 					"optional": {
