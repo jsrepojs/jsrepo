@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import type { PartialConfiguration } from '@biomejs/wasm-nodejs';
 import color from 'chalk';
 import escapeStringRegexp from 'escape-string-regexp';
+import { type TsConfigResult, getTsconfig } from 'get-tsconfig';
 import path from 'pathe';
 import type * as prettier from 'prettier';
 import { Err, Ok, type Result } from './blocks/ts/result';
@@ -145,4 +146,30 @@ export const matchJSDescendant = (searchFilePath: string): string | undefined =>
 	}
 
 	return undefined;
+};
+
+/** Attempts to get the js/tsconfig file for the searched path
+ *
+ * @param searchPath
+ * @returns
+ */
+export const tryGetTsconfig = (searchPath?: string): Result<TsConfigResult | null, string> => {
+	let config: TsConfigResult | null;
+
+	try {
+		config = getTsconfig(searchPath, 'tsconfig.json');
+
+		if (!config) {
+			// if we don't find the config at first check for a jsconfig
+			config = getTsconfig(searchPath, 'jsconfig.json');
+
+			if (!config) {
+				return Ok(null);
+			}
+		}
+	} catch (err) {
+		return Err(`Error while trying to get ${color.bold('tsconfig.json')}: ${err}`);
+	}
+
+	return Ok(config);
 };

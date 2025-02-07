@@ -1,17 +1,19 @@
 import fs from 'node:fs';
-import { createPathsMatcher, getTsconfig } from 'get-tsconfig';
+import color from 'chalk';
+import { createPathsMatcher } from 'get-tsconfig';
 import path from 'pathe';
 import * as v from 'valibot';
 import { type Block, configFileSchema, manifestMeta } from '../types';
 import { Err, Ok, type Result } from './blocks/ts/result';
 import { ruleConfigSchema } from './build/check';
+import { tryGetTsconfig } from './files';
 
-const PROJECT_CONFIG_NAME = 'jsrepo.json';
-const REGISTRY_CONFIG_NAME = 'jsrepo-build-config.json';
+export const PROJECT_CONFIG_NAME = 'jsrepo.json';
+export const REGISTRY_CONFIG_NAME = 'jsrepo-build-config.json';
 
-const formatterSchema = v.union([v.literal('prettier'), v.literal('biome')]);
+export const formatterSchema = v.union([v.literal('prettier'), v.literal('biome')]);
 
-const pathsSchema = v.objectWithRest(
+export const pathsSchema = v.objectWithRest(
 	{
 		'*': v.string(),
 	},
@@ -20,7 +22,7 @@ const pathsSchema = v.objectWithRest(
 
 export type Paths = v.InferInput<typeof pathsSchema>;
 
-const projectConfigSchema = v.object({
+export const projectConfigSchema = v.object({
 	$schema: v.string(),
 	repos: v.optional(v.array(v.string()), []),
 	includeTests: v.boolean(),
@@ -30,7 +32,7 @@ const projectConfigSchema = v.object({
 	formatter: v.optional(formatterSchema),
 });
 
-const getProjectConfig = (cwd: string): Result<ProjectConfig, string> => {
+export const getProjectConfig = (cwd: string): Result<ProjectConfig, string> => {
 	if (!fs.existsSync(path.join(cwd, PROJECT_CONFIG_NAME))) {
 		return Err('Could not find your configuration file! Please run `init`.');
 	}
@@ -51,7 +53,7 @@ export type ProjectConfig = v.InferOutput<typeof projectConfigSchema>;
 
 export type Formatter = v.InferOutput<typeof formatterSchema>;
 
-const registryConfigSchema = v.object({
+export const registryConfigSchema = v.object({
 	$schema: v.string(),
 	meta: v.optional(manifestMeta),
 	configFiles: v.optional(v.array(configFileSchema)),
@@ -71,7 +73,7 @@ const registryConfigSchema = v.object({
 	rules: v.optional(ruleConfigSchema),
 });
 
-const getRegistryConfig = (cwd: string): Result<RegistryConfig | null, string> => {
+export const getRegistryConfig = (cwd: string): Result<RegistryConfig | null, string> => {
 	if (!fs.existsSync(path.join(cwd, REGISTRY_CONFIG_NAME))) {
 		return Ok(null);
 	}
@@ -91,61 +93,47 @@ const getRegistryConfig = (cwd: string): Result<RegistryConfig | null, string> =
 export type RegistryConfig = v.InferOutput<typeof registryConfigSchema>;
 
 /** Resolves the paths relative to the cwd */
-const resolvePaths = (paths: Paths, cwd: string): Result<Paths, string> => {
-	let config = getTsconfig(cwd, 'tsconfig.json');
-	let matcher: ((specifier: string) => string[]) | null = null;
+export const resolvePaths = (paths: Paths, cwd: string): Result<Paths, string> => {
+	const config = tryGetTsconfig(cwd).unwrapOr(null);
 
-	if (!config) {
-		// if we don't find the config at first check for a jsconfig
-		config = getTsconfig(cwd, 'jsconfig.json');
-	}
+	const matcher = config ? createPathsMatcher(config) : null;
 
-	if (config) {
-		matcher = createPathsMatcher(config);
-	}
-
-	let newPaths: Paths;
-
-	if (!paths['*'].startsWith('.')) {
-		if (matcher === null) {
-			return Err("Cannot resolve aliases because we couldn't find a tsconfig!");
-		}
-
-		newPaths = {
-			'*': resolvePath(paths['*'], matcher, cwd),
-		};
-	} else {
-		newPaths = {
-			'*': path.relative(cwd, path.join(path.resolve(cwd), paths['*'])),
-		};
-	}
+	const newPaths: Paths = { '*': '' };
 
 	for (const [category, p] of Object.entries(paths)) {
-		if (category === '*') continue; // we already resolved this one
-
-		if (p.startsWith('.')) {
+		if (p.startsWith('./')) {
 			newPaths[category] = path.relative(cwd, path.join(path.resolve(cwd), p));
 			continue;
 		}
 
 		if (matcher === null) {
-			return Err("Cannot resolve aliases because we couldn't find a tsconfig!");
+			return Err(
+				`Cannot resolve ${color.bold(`\`"${category}": "${p}"\``)} from paths because we couldn't find a tsconfig! If you intended to use a relative path ensure that your path starts with ${color.bold('`./`')}.`
+			);
 		}
 
-		newPaths[category] = resolvePath(p, matcher, cwd);
+		const resolved = tryResolvePath(p, matcher, cwd);
+
+		if (!resolved) {
+			return Err(
+				`Cannot resolve ${color.bold(`\`"${category}": "${p}"\``)} from paths because we couldn't find a matching alias in the tsconfig. If you intended to use a relative path ensure that your path starts with ${color.bold('`./`')}.`
+			);
+		}
+
+		newPaths[category] = resolved;
 	}
 
 	return Ok(newPaths);
 };
 
-const resolvePath = (
+const tryResolvePath = (
 	unresolvedPath: string,
 	matcher: (specifier: string) => string[],
 	cwd: string
-): string => {
+): string | undefined => {
 	const paths = matcher(unresolvedPath);
 
-	return path.relative(cwd, paths[0]);
+	return paths.length > 0 ? path.relative(cwd, paths[0]) : undefined;
 };
 
 /** Gets the path where the block should be installed.
@@ -155,7 +143,7 @@ const resolvePath = (
  * @param cwd
  * @returns
  */
-const getPathForBlock = (block: Block, resolvedPaths: Paths, cwd: string): string => {
+export const getPathForBlock = (block: Block, resolvedPaths: Paths, cwd: string): string => {
 	let directory: string;
 
 	if (resolvedPaths[block.category] !== undefined) {
@@ -165,16 +153,4 @@ const getPathForBlock = (block: Block, resolvedPaths: Paths, cwd: string): strin
 	}
 
 	return directory;
-};
-
-export {
-	PROJECT_CONFIG_NAME,
-	REGISTRY_CONFIG_NAME,
-	getProjectConfig,
-	getRegistryConfig,
-	projectConfigSchema,
-	registryConfigSchema,
-	formatterSchema,
-	resolvePaths,
-	getPathForBlock,
 };

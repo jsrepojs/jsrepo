@@ -14,6 +14,7 @@ import {
 import color from 'chalk';
 import { Command, Option, program } from 'commander';
 import { diffLines } from 'diff';
+import { createPathsMatcher } from 'get-tsconfig';
 import { detect, resolveCommand } from 'package-manager-detector';
 import path from 'pathe';
 import * as v from 'valibot';
@@ -32,7 +33,7 @@ import {
 } from '../utils/config';
 import { installDependencies } from '../utils/dependencies';
 import { formatDiff } from '../utils/diff';
-import { formatFile, matchJSDescendant } from '../utils/files';
+import { formatFile, matchJSDescendant, tryGetTsconfig } from '../utils/files';
 import { loadFormatterConfig } from '../utils/format';
 import { json } from '../utils/language-support';
 import * as persisted from '../utils/persisted';
@@ -144,10 +145,23 @@ const _initProject = async (registries: string[], options: Options) => {
 	let paths: Paths;
 	let configFiles: Record<string, string> = {};
 
+	const tsconfigResult = tryGetTsconfig(options.cwd).unwrapOr(null);
+
 	const defaultPathResult = await text({
 		message: 'Please enter a default path to install the blocks',
 		validate(value) {
 			if (value.trim() === '') return 'Please provide a value';
+
+			if (!value.startsWith('./') && tsconfigResult !== null) {
+				const matcher = createPathsMatcher(tsconfigResult);
+
+				if (matcher) {
+					const found = matcher(value);
+
+					if (found.length === 0)
+						return 'Invalid path alias! If you are intending to use a relative path make sure it starts with `./`';
+				}
+			}
 		},
 		placeholder: './src/blocks',
 		initialValue: initialConfig.isOk() ? initialConfig.unwrap().paths['*'] : undefined,

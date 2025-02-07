@@ -4,7 +4,7 @@ import { Biome, Distribution } from '@biomejs/js-api';
 import type { PartialConfiguration } from '@biomejs/wasm-nodejs';
 import color from 'chalk';
 import { type Node, walk } from 'estree-walker';
-import { type TsConfigResult, createPathsMatcher, getTsconfig } from 'get-tsconfig';
+import { createPathsMatcher } from 'get-tsconfig';
 import * as parse5 from 'parse5';
 import path from 'pathe';
 import * as prettier from 'prettier';
@@ -16,6 +16,7 @@ import * as ascii from './ascii';
 import * as lines from './blocks/ts/lines';
 import { Err, Ok, type Result } from './blocks/ts/result';
 import type { Formatter } from './config';
+import { tryGetTsconfig } from './files';
 import { findNearestPackageJson } from './package';
 import { parsePackageName } from './parse-package-name';
 
@@ -681,22 +682,13 @@ const tryResolveLocalAlias = (
 		containingDir,
 	}: { filePath: string; containingDir?: string; dirs: string[]; cwd: string }
 ): Result<ResolveLocalImportResult | undefined, string> => {
-	let config: TsConfigResult | null;
+	const configResult = tryGetTsconfig(filePath);
 
-	try {
-		config = getTsconfig(filePath, 'tsconfig.json');
+	if (configResult.isErr()) return Err(configResult.unwrapErr());
 
-		if (!config) {
-			// if we don't find the config at first check for a jsconfig
-			config = getTsconfig(filePath, 'jsconfig.json');
+	const config = configResult.unwrap();
 
-			if (!config) {
-				return Ok(undefined);
-			}
-		}
-	} catch (err) {
-		return Err(`Error while trying to get ${color.bold('tsconfig.json')}: ${err}`);
-	}
+	if (config === null) return Ok(undefined);
 
 	const matcher = createPathsMatcher(config);
 
