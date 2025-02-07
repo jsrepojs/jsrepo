@@ -1,8 +1,11 @@
+import fs from 'node:fs';
 import type { PartialConfiguration } from '@biomejs/wasm-nodejs';
 import color from 'chalk';
 import escapeStringRegexp from 'escape-string-regexp';
+import path from 'pathe';
 import type * as prettier from 'prettier';
 import { Err, Ok, type Result } from './blocks/ts/result';
+import { endsWithOneOf } from './blocks/ts/strings';
 import type { ProjectConfig } from './config';
 import { resolveLocalDependencyTemplate } from './dependencies';
 import { languages } from './language-support';
@@ -28,7 +31,7 @@ type TransformRemoteContentOptions = {
  * @param param0
  * @returns
  */
-const transformRemoteContent = async ({
+export const transformRemoteContent = async ({
 	file,
 	config,
 	imports,
@@ -98,7 +101,7 @@ type FormatOptions = {
  * @param param0
  * @returns
  */
-const formatFile = async ({
+export const formatFile = async ({
 	file,
 	config,
 	prettierOptions,
@@ -124,4 +127,22 @@ const formatFile = async ({
 	return newContent;
 };
 
-export { transformRemoteContent, formatFile };
+export const matchJSDescendant = (searchFilePath: string): string | undefined => {
+	const MATCH_EXTENSIONS = ['.js', '.ts', '.cjs', '.mjs'];
+
+	if (!endsWithOneOf(searchFilePath, MATCH_EXTENSIONS)) return undefined;
+
+	const dir = path.dirname(searchFilePath);
+
+	const files = fs.readdirSync(dir);
+
+	const parsedSearch = path.parse(searchFilePath);
+
+	for (const file of files) {
+		if (!endsWithOneOf(file, MATCH_EXTENSIONS)) continue;
+
+		if (path.parse(file).name === parsedSearch.name) return path.join(dir, file);
+	}
+
+	return undefined;
+};
