@@ -1,5 +1,18 @@
 # jsrepo
 
+## 1.33.0
+
+### Minor Changes
+
+- 673d300: feat: Use "✨ Update with AI ✨" to update your config files on `init` 🎉
+- 317fdc8: feat: 🎉 Specify config files to add on `init` from `jsrepo-build-config.json` 🎉
+
+### Patch Changes
+
+- 673d300: updated: During project init you will now be prompted to initialize registries after being prompted for the formatter.
+- 34198ac: fix: Fix an issue where the same registry would be duplicated in the config if you ran init multiple times on that registry.
+- 34198ac: fix: Always configure registries provided as args on init.
+
 ## 1.32.1
 
 ### Patch Changes
