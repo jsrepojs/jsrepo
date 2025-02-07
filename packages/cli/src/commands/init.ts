@@ -152,14 +152,20 @@ const _initProject = async (registries: string[], options: Options) => {
 		validate(value) {
 			if (value.trim() === '') return 'Please provide a value';
 
-			if (!value.startsWith('./') && tsconfigResult !== null) {
+			if (!value.startsWith('./')) {
+				const error =
+					'Invalid path alias! If you are intending to use a relative path make sure it starts with `./`';
+
+				if (tsconfigResult === null) {
+					return error;
+				}
+
 				const matcher = createPathsMatcher(tsconfigResult);
 
 				if (matcher) {
 					const found = matcher(value);
 
-					if (found.length === 0)
-						return 'Invalid path alias! If you are intending to use a relative path make sure it starts with `./`';
+					if (found.length === 0) return error;
 				}
 			}
 		},
