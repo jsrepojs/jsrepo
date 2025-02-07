@@ -1,5 +1,14 @@
 # jsrepo
 
+## 1.33.1
+
+### Patch Changes
+
+- cdd2486: feat: Autofix incorrect extension on (.ts|js|mjs|cjs) config files.
+- 3c7eeb4: fix: Ensure registries coming from args are always configured first.
+- 2bf2f5b: feat: Improve error messages when paths are incorrectly named or do not resolve.
+- 2bf2f5b: fix: Do not accept invalid path default blocks path on init.
+
 ## 1.33.0
 
 ### Minor Changes
