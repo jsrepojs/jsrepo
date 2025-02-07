@@ -243,6 +243,10 @@ const formatDiff = ({
 		}
 	}
 
+	if (!result.endsWith('\n')) {
+		result = result += '\n';
+	}
+
 	return result;
 };
 

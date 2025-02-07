@@ -24,6 +24,13 @@
 			"type": "string",
 			"enum": ["prettier", "biome"]
 		},
+		"configFiles": {
+			"description": "Config file names mapped to their respective path.",
+			"type": "object",
+			"additionalProperties": {
+				"type": "string"
+			}
+		},
 		"paths": {
 			"description": "Paths used to map categories to a directory.",
 			"type": "object",

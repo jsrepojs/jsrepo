@@ -191,10 +191,8 @@ const _build = async (options: Options) => {
 
 		for (const category of builtCategories) {
 			if (categories.find((cat) => cat.name === category.name) !== undefined) {
-				const error = 'a category with the same name already exists!';
-
 				console.warn(
-					`${ascii.VERTICAL_LINE}  ${ascii.WARN} Skipped adding \`${color.cyan(`${dir}/${category.name}`)}\` because ${error}`
+					`${ascii.VERTICAL_LINE}  ${ascii.WARN} Skipped adding \`${color.cyan(`${dir}/${category.name}`)}\` because a category with the same name already exists!`
 				);
 				continue;
 			}
@@ -209,7 +207,7 @@ const _build = async (options: Options) => {
 
 	loading.start('Checking manifest');
 
-	const { warnings, errors } = runRules(manifest, config, config.rules);
+	const { warnings, errors } = runRules(manifest, config, options.cwd, config.rules);
 
 	loading.stop('Completed checking manifest.');
 
@@ -259,6 +257,22 @@ const _build = async (options: Options) => {
 		if (config.outputDir) {
 			loading.start(`Copying registry files to \`${color.cyan(outDir)}\``);
 
+			// copy config files to output directory
+			if (manifest.configFiles) {
+				for (const file of manifest.configFiles) {
+					const originalPath = path.join(options.cwd, file.path);
+					const destPath = path.join(outDir, file.path);
+
+					const containing = path.join(destPath, '../');
+
+					if (!fs.existsSync(containing)) {
+						fs.mkdirSync(containing, { recursive: true });
+					}
+
+					fs.copyFileSync(originalPath, destPath);
+				}
+			}
+
 			// copy the files for each block in each category
 			for (const category of manifest.categories) {
 				for (const block of category.blocks) {
@@ -292,6 +306,7 @@ const _build = async (options: Options) => {
 export const createManifest = (categories: Category[], config: RegistryConfig) => {
 	const manifest: Manifest = {
 		meta: config.meta,
+		configFiles: config.configFiles,
 		categories,
 	};
 

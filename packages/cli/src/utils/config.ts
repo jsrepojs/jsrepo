@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import { createPathsMatcher, getTsconfig } from 'get-tsconfig';
 import path from 'pathe';
 import * as v from 'valibot';
-import { type Block, manifestMeta } from '../types';
+import { type Block, configFileSchema, manifestMeta } from '../types';
 import { Err, Ok, type Result } from './blocks/ts/result';
 import { ruleConfigSchema } from './build/check';
 
@@ -25,6 +25,7 @@ const projectConfigSchema = v.object({
 	repos: v.optional(v.array(v.string()), []),
 	includeTests: v.boolean(),
 	paths: pathsSchema,
+	configFiles: v.optional(v.record(v.string(), v.string())),
 	watermark: v.optional(v.boolean(), true),
 	formatter: v.optional(formatterSchema),
 });
@@ -53,6 +54,7 @@ export type Formatter = v.InferOutput<typeof formatterSchema>;
 const registryConfigSchema = v.object({
 	$schema: v.string(),
 	meta: v.optional(manifestMeta),
+	configFiles: v.optional(v.array(configFileSchema)),
 	dirs: v.array(v.string()),
 	outputDir: v.optional(v.string()),
 	includeBlocks: v.optional(v.array(v.string()), []),
