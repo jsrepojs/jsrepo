@@ -8,14 +8,6 @@
 		"homepage": "https://jsrepo.dev",
 		"bugs": "https://github.com/ieedan/jsrepo/issues"
 	},
-	"configFiles": [
-		{
-			"name": "app.css",
-			"path": "./src/app.css",
-			"expectedPath": "./src/app.css",
-			"optional": false
-		}
-	],
 	"dirs": ["./src", "./blocks"],
 	"doNotListBlocks": [],
 	"doNotListCategories": [],
