@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'pathe';
 import { assert, afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { cli } from '../src/cli';
+import type { Manifest } from '../src/types';
 import {
 	shouldIncludeBlock,
 	shouldIncludeCategory,
@@ -48,6 +49,18 @@ describe('build', () => {
 			meta: {
 				authors: ['Aidan Bleser'],
 			},
+			configFiles: [
+				{
+					name: 'Global CSS File',
+					path: './app.css',
+					optional: false,
+				},
+				{
+					name: 'Hooks',
+					path: './src/hooks.ts',
+					optional: true,
+				},
+			],
 			dirs: ['./src', './'],
 			includeBlocks: [],
 			includeCategories: [],
@@ -97,6 +110,9 @@ describe('build', () => {
 
 		fs.writeFileSync('./ignored/b.ts', '');
 		fs.writeFileSync('./.ignored/a.ts', '');
+
+		fs.writeFileSync('./app.css', '');
+		fs.writeFileSync('./src/hooks.ts', '');
 
 		fs.mkdirSync('./src/types', { recursive: true });
 
@@ -203,6 +219,18 @@ export const highlighter = createHighlighterCore({
 			meta: {
 				authors: ['Aidan Bleser'],
 			},
+			configFiles: [
+				{
+					name: 'Global CSS File',
+					path: './app.css',
+					optional: false,
+				},
+				{
+					name: 'Hooks',
+					path: './src/hooks.ts',
+					optional: true,
+				},
+			],
 			categories: [
 				{
 					name: 'svelte',
@@ -320,7 +348,7 @@ export const highlighter = createHighlighterCore({
 					],
 				},
 			],
-		});
+		} satisfies Manifest);
 
 		// ensure files were copied correctly
 		assertFilesExist('./registry/src/utils', 'add.ts', 'log.ts', 'math.ts');
@@ -331,6 +359,8 @@ export const highlighter = createHighlighterCore({
 			'./server/index.ts'
 		);
 		assertFilesExist('./registry/src/types', 'point.ts');
+		assertFilesExist('./registry/', 'app.css');
+		assertFilesExist('./registry/src/', 'hooks.ts');
 	});
 });
 

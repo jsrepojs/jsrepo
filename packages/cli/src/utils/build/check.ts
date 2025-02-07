@@ -1,4 +1,6 @@
+import fs from 'node:fs';
 import color from 'chalk';
+import path from 'pathe';
 import * as v from 'valibot';
 import type { Block, Category, Manifest } from '../../types';
 import * as ascii from '../ascii';
@@ -12,17 +14,38 @@ export type RuleLevel = v.InferInput<typeof ruleLevelSchema>;
 export type CheckOptions = {
 	manifest: Manifest;
 	options: (string | number)[];
+	cwd: string;
 	config: RegistryConfig;
 };
 
-export type Rule = {
-	description: string;
-	check: (block: Block, opts: CheckOptions) => string[] | undefined;
-};
+export type Rule = { description: string } & (
+	| {
+			scope: 'block';
+			check: (block: Block, opts: CheckOptions) => string[] | undefined;
+	  }
+	| {
+			scope: 'global';
+			check: (opts: CheckOptions) => string[] | undefined;
+	  }
+);
 
-const rules = {
+const ruleKeySchema = v.union([
+	v.literal('no-category-index-file-dependency'),
+	v.literal('no-unpinned-dependency'),
+	v.literal('require-local-dependency-exists'),
+	v.literal('max-local-dependencies'),
+	v.literal('no-circular-dependency'),
+	v.literal('no-unused-block'),
+	v.literal('no-framework-dependency'),
+	v.literal('require-config-file-exists'),
+]);
+
+export type RuleKey = v.InferInput<typeof ruleKeySchema>;
+
+const rules: Record<RuleKey, Rule> = {
 	'no-unpinned-dependency': {
 		description: 'Require all dependencies to have a pinned version.',
+		scope: 'block',
 		check: (block) => {
 			const errors: string[] = [];
 
@@ -34,9 +57,10 @@ const rules = {
 
 			return errors.length > 0 ? errors : undefined;
 		},
-	} satisfies Rule,
+	},
 	'require-local-dependency-exists': {
 		description: 'Require all local dependencies to exist.',
+		scope: 'block',
 		check: (block, { manifest }) => {
 			const errors: string[] = [];
 
@@ -61,9 +85,10 @@ const rules = {
 
 			return errors.length > 0 ? errors : undefined;
 		},
-	} satisfies Rule,
+	},
 	'no-category-index-file-dependency': {
 		description: 'Disallow depending on the index file of a category.',
+		scope: 'block',
 		check: (block, { manifest }) => {
 			const errors: string[] = [];
 
@@ -87,9 +112,10 @@ const rules = {
 
 			return errors.length > 0 ? errors : undefined;
 		},
-	} satisfies Rule,
+	},
 	'max-local-dependencies': {
 		description: 'Enforces a limit on the amount of local dependencies a block can have.',
+		scope: 'block',
 		check: (block, { options }) => {
 			const errors: string[] = [];
 
@@ -109,9 +135,10 @@ const rules = {
 
 			return errors.length > 0 ? errors : undefined;
 		},
-	} satisfies Rule,
+	},
 	'no-circular-dependency': {
 		description: 'Disallow circular dependencies.',
+		scope: 'block',
 		check: (block, { manifest }) => {
 			const errors: string[] = [];
 
@@ -127,9 +154,10 @@ const rules = {
 
 			return errors.length > 0 ? errors : undefined;
 		},
-	} satisfies Rule,
+	},
 	'no-unused-block': {
 		description: 'Disallow unused blocks. (Not listed and not a dependency of another block)',
+		scope: 'block',
 		check: (block, { manifest }) => {
 			if (block.list) return;
 
@@ -147,9 +175,10 @@ const rules = {
 
 			return [`${color.bold(specifier)} is unused and will be ${color.bold.red('removed')}`];
 		},
-	} satisfies Rule,
+	},
 	'no-framework-dependency': {
 		description: 'Disallow frameworks (Svelte, Vue, React) as dependencies.',
+		scope: 'block',
 		check: (block) => {
 			const errors: string[] = [];
 
@@ -198,20 +227,27 @@ const rules = {
 
 			return errors.length > 0 ? errors : undefined;
 		},
-	} satisfies Rule,
+	},
+	'require-config-file-exists': {
+		description: 'Require all of the paths listed in `configFiles` to exist.',
+		scope: 'global',
+		check: ({ manifest, cwd }) => {
+			const errors: string[] = [];
+
+			if (manifest.configFiles === undefined) return undefined;
+
+			for (const file of manifest.configFiles) {
+				if (fs.existsSync(path.join(cwd, file.path))) continue;
+
+				errors.push(
+					`The ${color.bold(file.name)} config file doesn't exist at ${color.bold(path.join(cwd, file.path))}`
+				);
+			}
+
+			return errors.length > 0 ? errors : undefined;
+		},
+	},
 } as const;
-
-const ruleKeySchema = v.union([
-	v.literal('no-category-index-file-dependency'),
-	v.literal('no-unpinned-dependency'),
-	v.literal('require-local-dependency-exists'),
-	v.literal('max-local-dependencies'),
-	v.literal('no-circular-dependency'),
-	v.literal('no-unused-block'),
-	v.literal('no-framework-dependency'),
-]);
-
-export type RuleKey = v.InferInput<typeof ruleKeySchema>;
 
 const ruleConfigSchema = v.record(
 	ruleKeySchema,
@@ -234,6 +270,7 @@ const DEFAULT_CONFIG: RuleConfig = {
 	'no-circular-dependency': 'error',
 	'no-unused-block': 'warn',
 	'no-framework-dependency': 'warn',
+	'require-config-file-exists': 'error',
 } as const;
 
 /** Runs checks on the manifest file.
@@ -246,14 +283,56 @@ const DEFAULT_CONFIG: RuleConfig = {
 const runRules = (
 	manifest: Manifest,
 	config: RegistryConfig,
+	cwd: string,
 	ruleConfig: RuleConfig = DEFAULT_CONFIG
 ): { warnings: string[]; errors: string[] } => {
 	const warnings: string[] = [];
 	const errors: string[] = [];
 
+	// run global rules
+	for (const [name, rule] of Object.entries(rules)) {
+		if (rule.scope === 'block') continue;
+
+		const conf = ruleConfig[name as RuleKey]!;
+
+		let level: RuleLevel;
+		const options: (string | number)[] = [];
+		if (Array.isArray(conf)) {
+			level = conf[0];
+			options.push(...conf.slice(1));
+		} else {
+			level = conf;
+		}
+
+		if (level === 'off') continue;
+
+		const ruleErrors = rule.check({ manifest, options, cwd, config });
+
+		if (!ruleErrors) continue;
+
+		if (level === 'error') {
+			errors.push(
+				...ruleErrors.map(
+					(err) =>
+						`${ascii.VERTICAL_LINE}  ${ascii.ERROR} ${color.red(err)} ${color.gray(name)}`
+				)
+			);
+			continue;
+		}
+
+		warnings.push(
+			...ruleErrors.map(
+				(err) => `${ascii.VERTICAL_LINE}  ${ascii.WARN} ${err} ${color.gray(name)}`
+			)
+		);
+	}
+
+	// run block rules
 	for (const category of manifest.categories) {
 		for (const block of category.blocks) {
 			for (const [name, rule] of Object.entries(rules)) {
+				if (rule.scope === 'global') continue;
+
 				const conf = ruleConfig[name as RuleKey]!;
 
 				let level: RuleLevel;
@@ -267,7 +346,7 @@ const runRules = (
 
 				if (level === 'off') continue;
 
-				const ruleErrors = rule.check(block, { manifest, options, config });
+				const ruleErrors = rule.check(block, { manifest, options, cwd, config });
 
 				if (!ruleErrors) continue;
 

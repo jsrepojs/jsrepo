@@ -29,8 +29,16 @@ export const manifestMeta = v.object({
 	tags: v.optional(v.array(v.string())),
 });
 
+export const configFileSchema = v.object({
+	name: v.string(),
+	path: v.string(),
+	expectedPath: v.optional(v.string()),
+	optional: v.optional(v.boolean(), false),
+});
+
 export const manifestSchema = v.object({
 	meta: v.optional(manifestMeta),
+	configFiles: v.optional(v.array(configFileSchema)),
 	categories: v.array(categorySchema),
 });
 

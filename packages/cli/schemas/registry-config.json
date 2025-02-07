@@ -40,6 +40,36 @@
 				}
 			}
 		},
+		"configFiles": {
+			"description": "Any config files that should be included when initializing the registry.",
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"description": "Name of the config file.",
+						"examples": ["Global CSS File"],
+						"type": "string"
+					},
+					"path": {
+						"description": "Path where the config file lives.",
+						"examples": ["./src/app.css"],
+						"type": "string"
+					},
+					"expectedPath": {
+						"description": "Path to default to searching in the users project.",
+						"examples": ["./src/app.css"],
+						"type": "string"
+					},
+					"optional": {
+						"description": "Config file is optional and the user will be prompted accordingly.",
+						"type": "boolean",
+						"default": false
+					}
+				},
+				"required": ["name", "path"]
+			}
+		},
 		"dirs": {
 			"description": "Directories that contain the categories you want to build into the manifest.",
 			"type": "array",
@@ -180,6 +210,12 @@
 					"type": "string",
 					"enum": ["error", "warn", "off"],
 					"default": "warn"
+				},
+				"require-config-file-exists": {
+					"description": "Require all of the paths listed in `configFiles` to exist.",
+					"type": "string",
+					"enum": ["error", "warn", "off"],
+					"default": "error"
 				}
 			},
 			"default": {
@@ -189,7 +225,8 @@
 				"max-local-dependencies": ["warn", 10],
 				"no-circular-dependency": "error",
 				"no-unused-block": "warn",
-				"no-framework-dependency": "warn"
+				"no-framework-dependency": "warn",
+				"require-config-file-exists": "error"
 			}
 		}
 	},
