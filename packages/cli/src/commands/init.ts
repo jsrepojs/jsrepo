@@ -13,10 +13,12 @@ import {
 } from '@clack/prompts';
 import color from 'chalk';
 import { Command, Option, program } from 'commander';
+import { diffLines } from 'diff';
 import { detect, resolveCommand } from 'package-manager-detector';
 import path from 'pathe';
 import * as v from 'valibot';
 import { context } from '../cli';
+import { type ModelName, models } from '../utils/ai';
 import * as ascii from '../utils/ascii';
 import {
 	type Formatter,
@@ -29,6 +31,8 @@ import {
 	getRegistryConfig,
 } from '../utils/config';
 import { installDependencies } from '../utils/dependencies';
+import { formatDiff } from '../utils/diff';
+import { formatFile } from '../utils/files';
 import { loadFormatterConfig } from '../utils/format';
 import { json } from '../utils/language-support';
 import * as persisted from '../utils/persisted';
@@ -43,6 +47,8 @@ const schema = v.object({
 	project: v.optional(v.boolean()),
 	registry: v.optional(v.boolean()),
 	script: v.string(),
+	expand: v.boolean(),
+	maxUnchanged: v.number(),
 	yes: v.boolean(),
 	cwd: v.string(),
 });
@@ -70,6 +76,13 @@ const init = new Command('init')
 		'--script <name>',
 		'The name of the build script. (For Registry setup)',
 		'build:registry'
+	)
+	.option('-E, --expand', 'Expands the diff so you see everything.', false)
+	.option(
+		'--max-unchanged <number>',
+		'Maximum unchanged lines that will show without being collapsed.',
+		(val) => Number.parseInt(val), // this is such a dumb api thing
+		3
 	)
 	.option('-y, --yes', 'Skip confirmation prompt.', false)
 	.option('--cwd <path>', 'The current working directory.', process.cwd())
@@ -152,16 +165,55 @@ const _initProject = async (registries: string[], options: Options) => {
 		paths = { '*': defaultPathResult };
 	}
 
-	const repos = [
-		...(initialConfig.isOk() ? initialConfig.unwrap().repos : []),
-		...registries,
-		...(options.repos ?? []),
-	];
+	// configure formatter
+	if (!options.formatter) {
+		let defaultFormatter = initialConfig.isErr()
+			? 'none'
+			: (initialConfig.unwrap().formatter ?? 'none');
+
+		if (fs.existsSync(path.join(options.cwd, '.prettierrc'))) {
+			defaultFormatter = 'prettier';
+		}
+
+		if (fs.existsSync(path.join(options.cwd, 'biome.json'))) {
+			defaultFormatter = 'biome';
+		}
+
+		const response = await select({
+			message: 'Which formatter would you like to use?',
+			options: ['Prettier', 'Biome', 'None'].map((val) => ({
+				value: val.toLowerCase(),
+				label: val,
+			})),
+			initialValue: defaultFormatter,
+		});
+
+		if (isCancel(response)) {
+			cancel('Canceled!');
+			process.exit(0);
+		}
+
+		if (response !== 'none') {
+			options.formatter = response as Formatter;
+		}
+	}
+
+	const repos = Array.from(
+		new Set([
+			...(initialConfig.isOk() ? initialConfig.unwrap().repos : []),
+			...registries,
+			...(options.repos ?? []),
+		])
+	);
 
 	if (repos.length > 0) {
 		for (const repo of repos) {
 			// if already present in config ask if you would like to set it up
-			if (initialConfig.isOk() && initialConfig.unwrap().repos.find((r) => r === repo)) {
+			if (
+				!registries.find((r) => r === repo) &&
+				initialConfig.isOk() &&
+				initialConfig.unwrap().repos.find((r) => r === repo)
+			) {
 				const confirmResult = await confirm({
 					message: `Initialize ${repo}?`,
 					initialValue: options.yes,
@@ -177,7 +229,13 @@ const _initProject = async (registries: string[], options: Options) => {
 
 			log.info(`Initializing ${color.cyan(repo)}`);
 
-			const promptResult = await promptForProviderConfig(repo, paths, configFiles, options);
+			const promptResult = await promptForProviderConfig({
+				repo,
+				paths,
+				configFiles,
+				options,
+				formatter: options.formatter,
+			});
 
 			paths = promptResult.paths;
 			configFiles = promptResult.configFiles;
@@ -214,45 +272,18 @@ const _initProject = async (registries: string[], options: Options) => {
 			process.exit(0);
 		}
 
-		const promptResult = await promptForProviderConfig(result, paths, configFiles, options);
+		const promptResult = await promptForProviderConfig({
+			repo: result,
+			paths,
+			configFiles,
+			options,
+			formatter: options.formatter,
+		});
 
 		paths = promptResult.paths;
 		configFiles = promptResult.configFiles;
 
 		repos.push(result);
-	}
-
-	// configure formatter
-	if (!options.formatter) {
-		let defaultFormatter = initialConfig.isErr()
-			? 'none'
-			: (initialConfig.unwrap().formatter ?? 'none');
-
-		if (fs.existsSync(path.join(options.cwd, '.prettierrc'))) {
-			defaultFormatter = 'prettier';
-		}
-
-		if (fs.existsSync(path.join(options.cwd, 'biome.json'))) {
-			defaultFormatter = 'biome';
-		}
-
-		const response = await select({
-			message: 'What formatter would you like to use?',
-			options: ['Prettier', 'Biome', 'None'].map((val) => ({
-				value: val.toLowerCase(),
-				label: val,
-			})),
-			initialValue: defaultFormatter,
-		});
-
-		if (isCancel(response)) {
-			cancel('Canceled!');
-			process.exit(0);
-		}
-
-		if (response !== 'none') {
-			options.formatter = response as Formatter;
-		}
 	}
 
 	const config: ProjectConfig = {
@@ -293,12 +324,19 @@ const _initProject = async (registries: string[], options: Options) => {
 	loading.stop(`Wrote config to \`${PROJECT_CONFIG_NAME}\`.`);
 };
 
-const promptForProviderConfig = async (
-	repo: string,
-	paths: Paths,
-	configFiles: Record<string, string>,
-	options: Options
-): Promise<{ paths: Paths; configFiles: Record<string, string> }> => {
+const promptForProviderConfig = async ({
+	repo,
+	paths,
+	configFiles,
+	formatter,
+	options,
+}: {
+	repo: string;
+	paths: Paths;
+	configFiles: Record<string, string>;
+	formatter: ProjectConfig['formatter'];
+	options: Options;
+}): Promise<{ paths: Paths; configFiles: Record<string, string> }> => {
 	const loading = spinner();
 
 	const storage = persisted.get();
@@ -366,6 +404,11 @@ const promptForProviderConfig = async (
 
 	// setup config files
 	if (manifest.configFiles) {
+		const { prettierOptions, biomeOptions } = await loadFormatterConfig({
+			formatter: formatter,
+			cwd: options.cwd,
+		});
+
 		for (const file of manifest.configFiles) {
 			if (file.optional && !options.yes) {
 				const result = await confirm({
@@ -411,31 +454,184 @@ const promptForProviderConfig = async (
 
 			loading.start(`Fetching the ${color.cyan(file.name)} from ${color.cyan(repo)}`);
 
-			const remoteFileContents = await registry.fetchRaw(providerState.unwrap(), file.path);
+			const remoteContentResult = await registry.fetchRaw(providerState.unwrap(), file.path);
 
-			if (remoteFileContents.isErr()) {
-				program.error(color.red(remoteFileContents.unwrapErr()));
+			if (remoteContentResult.isErr()) {
+				program.error(color.red(remoteContentResult.unwrapErr()));
 			}
+
+			const originalRemoteContent = await formatFile({
+				file: {
+					content: remoteContentResult.unwrap(),
+					destPath: fullFilePath,
+				},
+				biomeOptions,
+				prettierOptions,
+				config: {
+					$schema: '',
+					includeTests: false,
+					paths: {
+						'*': '',
+					},
+					repos: [],
+					watermark: false,
+					configFiles: {},
+					formatter,
+				},
+			});
+
+			let remoteContent = originalRemoteContent;
 
 			loading.stop(`Fetched the ${color.cyan(file.name)} from ${color.cyan(repo)}`);
 
+			let acceptedChanges = options.yes || originalFileContents === undefined;
+
 			if (originalFileContents) {
-				// TODO give the update options (accept, reject, update w ai) for now we just overwrite
-				// need to solve some problems like formatting first
+				if (!options.yes) {
+					process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
+
+					while (true) {
+						const changes = diffLines(originalFileContents, remoteContent);
+
+						// print diff
+						const formattedDiff = formatDiff({
+							from: file.name,
+							to: fullFilePath,
+							changes,
+							expand: options.expand,
+							maxUnchanged: options.maxUnchanged,
+							prefix: () => `${ascii.VERTICAL_LINE}  `,
+							onUnchanged: ({ from, to, prefix }) =>
+								`${prefix?.() ?? ''}${color.cyan(from)} → ${color.gray(to)} ${color.gray('(unchanged)')}\n`,
+							intro: ({ from, to, changes, prefix }) => {
+								const totalChanges = changes.filter(
+									(a) => a.added || a.removed
+								).length;
+
+								return `${prefix?.() ?? ''}${color.cyan(from)} → ${color.gray(to)} (${totalChanges} change${
+									totalChanges === 1 ? '' : 's'
+								})\n${prefix?.() ?? ''}\n`;
+							},
+						});
+
+						process.stdout.write(formattedDiff);
+
+						// if there are no changes then don't ask
+						if (changes.length > 1 || originalFileContents === '') {
+							acceptedChanges = options.yes;
+
+							if (!options.yes) {
+								// prompt the user
+								const confirmResult = await select({
+									message: 'Accept changes?',
+									options: [
+										{
+											label: 'Accept',
+											value: 'accept',
+										},
+										{
+											label: 'Reject',
+											value: 'reject',
+										},
+										{
+											label: `✨ ${color.yellow('Update with AI')} ✨`,
+											value: 'update',
+										},
+									],
+								});
+
+								if (isCancel(confirmResult)) {
+									cancel('Canceled!');
+									process.exit(0);
+								}
+
+								if (confirmResult === 'update') {
+									// prompt for model
+									const modelResult = await select({
+										message: 'Select a model',
+										options: Object.keys(models).map((key) => ({
+											label: key,
+											value: key,
+										})),
+									});
+
+									if (isCancel(modelResult)) {
+										cancel('Canceled!');
+										process.exit(0);
+									}
+
+									const model = modelResult as ModelName;
+
+									try {
+										remoteContent = await models[model].updateFile({
+											originalFile: {
+												content: originalFileContents,
+												path: fullFilePath,
+											},
+											newFile: {
+												content: originalRemoteContent,
+												path: file.name,
+											},
+											loading,
+										});
+									} catch (err) {
+										loading.stop();
+										log.error(color.red(`Error getting completions: ${err}`));
+										process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
+										continue;
+									}
+
+									remoteContent = await formatFile({
+										file: {
+											content: remoteContent,
+											destPath: fullFilePath,
+										},
+										biomeOptions,
+										prettierOptions,
+										config: {
+											$schema: '',
+											includeTests: false,
+											paths: {
+												'*': '',
+											},
+											repos: [],
+											watermark: false,
+											configFiles: {},
+											formatter,
+										},
+									});
+
+									process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
+
+									continue;
+								}
+
+								acceptedChanges = confirmResult === 'accept';
+
+								break;
+							}
+						}
+
+						break; // there were no changes or changes were automatically accepted
+					}
+				}
 			} else {
 				const dir = path.dirname(fullFilePath);
 
 				fs.mkdirSync(dir, { recursive: true });
 			}
 
-			loading.start(`Writing ${color.cyan(file.name)} to ${color.cyan(fullFilePath)}`);
+			if (acceptedChanges) {
+				loading.start(`Writing ${color.cyan(file.name)} to ${color.cyan(fullFilePath)}`);
 
-			fs.writeFileSync(fullFilePath, remoteFileContents.unwrap());
+				fs.writeFileSync(fullFilePath, remoteContentResult.unwrap());
 
-			loading.stop(`Wrote ${color.cyan(file.name)} to ${color.cyan(fullFilePath)}`);
+				loading.stop(`Wrote ${color.cyan(file.name)} to ${color.cyan(fullFilePath)}`);
+			}
 		}
 	}
 
+	// configure category paths
 	if (!options.yes) {
 		const configurePaths = await multiselect({
 			message: 'Which category paths would you like to configure?',
