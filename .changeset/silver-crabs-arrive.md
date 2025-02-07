@@ -2,4 +2,4 @@
 "jsrepo": minor
 ---
 
-feat: Config files 🎉
+feat: 🎉 Specify config files to add on `init` from `jsrepo-build-config.json` 🎉
