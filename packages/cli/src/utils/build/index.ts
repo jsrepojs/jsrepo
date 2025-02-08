@@ -4,7 +4,7 @@ import { program } from 'commander';
 import type { Ignore } from 'ignore';
 import path from 'pathe';
 import * as v from 'valibot';
-import { type Block, type Category, categorySchema } from '../../types';
+import { type Block, type Category, type Manifest, categorySchema } from '../../types';
 import * as ascii from '../ascii';
 import type { RegistryConfig } from '../config';
 import { languages } from '../language-support';
@@ -12,7 +12,7 @@ import { isDependedOn } from './check';
 
 const TEST_SUFFIXES = ['.test.ts', '_test.ts', '.test.js', '_test.js'] as const;
 
-const isTestFile = (file: string): boolean =>
+export const isTestFile = (file: string): boolean =>
 	TEST_SUFFIXES.find((suffix) => file.endsWith(suffix)) !== undefined;
 
 type Options = {
@@ -26,7 +26,10 @@ type Options = {
  * @param blocksPath
  * @returns
  */
-const buildBlocksDirectory = (blocksPath: string, { cwd, ignore, config }: Options): Category[] => {
+export const buildBlocksDirectory = (
+	blocksPath: string,
+	{ cwd, ignore, config }: Options
+): Category[] => {
 	let paths: string[];
 
 	try {
@@ -252,6 +255,53 @@ const buildBlocksDirectory = (blocksPath: string, { cwd, ignore, config }: Optio
 	return categories;
 };
 
+export const buildConfigFiles = (
+	config: RegistryConfig,
+	{ cwd }: { cwd: string }
+): Manifest['configFiles'] => {
+	if (!config.configFiles) return undefined;
+
+	const configFiles: Manifest['configFiles'] = [];
+
+	for (const file of config.configFiles) {
+		const lang = languages.find((lang) => lang.matches(file.path));
+
+		if (!lang) {
+			// go ahead and add the file with no dependencies
+			configFiles.push(file);
+
+			continue;
+		}
+
+		const { dependencies, devDependencies, local } = lang
+			.resolveDependencies({
+				filePath: path.join(cwd, file.path),
+				isSubDir: false,
+				excludeDeps: config.excludeDeps,
+				dirs: config.dirs,
+				cwd,
+			})
+			.match(
+				(val) => val,
+				(err) => {
+					program.error(color.red(err));
+				}
+			);
+
+		if (local.length > 0) {
+			program.error(
+				color.red(
+					`${color.bold(file.name)} ${color.bold(file.path)} Config files cannot have local dependencies!`
+				)
+			);
+		}
+
+		configFiles.push({ ...file, dependencies, devDependencies });
+	}
+
+	return configFiles;
+};
+
 export const shouldListBlock = (name: string, config: RegistryConfig) => {
 	// the length check is just a short circuit here
 	if (config.doNotListBlocks.length > 0 && config.doNotListBlocks.includes(name)) return false;
@@ -311,7 +361,7 @@ const transformBlockName = (file: string) => {
 	return path.parse(path.basename(file)).name;
 };
 
-const pruneUnused = (categories: Category[]): [Category[], number] => {
+export const pruneUnused = (categories: Category[]): [Category[], number] => {
 	const pruned: Category[] = [];
 	const prunedCount = 0;
 
@@ -336,7 +386,5 @@ const pruneUnused = (categories: Category[]): [Category[], number] => {
 	return [pruned, prunedCount];
 };
 
-const readCategories = (outputFilePath: string): Category[] =>
+export const readCategories = (outputFilePath: string): Category[] =>
 	v.parse(v.array(categorySchema), JSON.parse(fs.readFileSync(outputFilePath).toString()));
-
-export { buildBlocksDirectory, readCategories, isTestFile, pruneUnused };

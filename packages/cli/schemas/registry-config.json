@@ -213,6 +213,18 @@
 					"type": "string",
 					"enum": ["error", "warn", "off"],
 					"default": "error"
+				},
+				"no-config-file-framework-dependency": {
+					"description": "Disallow frameworks (Svelte, Vue, React, etc.) as dependencies of config files.",
+					"type": "string",
+					"enum": ["error", "warn", "off"],
+					"default": "warn"
+				},
+				"no-config-file-unpinned-dependency": {
+					"description": "Require all dependencies of config files to have a pinned version.",
+					"type": "string",
+					"enum": ["error", "warn", "off"],
+					"default": "warn"
 				}
 			},
 			"default": {
@@ -223,7 +235,9 @@
 				"no-circular-dependency": "error",
 				"no-unused-block": "warn",
 				"no-framework-dependency": "warn",
-				"require-config-file-exists": "error"
+				"require-config-file-exists": "error",
+				"no-config-file-framework-dependency": "warn",
+				"no-config-file-unpinned-dependency": "warn"
 			}
 		}
 	},

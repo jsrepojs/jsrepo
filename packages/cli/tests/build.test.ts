@@ -112,7 +112,7 @@ describe('build', () => {
 		fs.writeFileSync('./.ignored/a.ts', '');
 
 		fs.writeFileSync('./app.css', '');
-		fs.writeFileSync('./src/hooks.ts', '');
+		fs.writeFileSync('./src/hooks.ts', 'import { x } from "lodash"');
 
 		fs.mkdirSync('./src/types', { recursive: true });
 
@@ -224,11 +224,15 @@ export const highlighter = createHighlighterCore({
 					name: 'Global CSS File',
 					path: './app.css',
 					optional: false,
+					dependencies: [],
+					devDependencies: [],
 				},
 				{
 					name: 'Hooks',
 					path: './src/hooks.ts',
 					optional: true,
+					dependencies: ['lodash'],
+					devDependencies: [],
 				},
 			],
 			categories: [

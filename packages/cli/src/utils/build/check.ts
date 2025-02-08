@@ -7,6 +7,37 @@ import * as ascii from '../ascii';
 import type { RegistryConfig } from '../config';
 import { parsePackageName } from '../parse-package-name';
 
+// Update this list as needed
+// Use the name of the package not the framework
+const FRAMEWORKS = new Set([
+	// svelte
+	'svelte',
+	'@sveltejs/kit',
+
+	// vue
+	'vue',
+	'nuxt',
+
+	// react
+	'react',
+	'react-dom',
+	'next',
+	'@remix-run/react',
+
+	// angular
+	'@angular/core',
+	'@angular/common',
+	'@angular/forms',
+	'@angular/platform-browser',
+	'@angular/platform-browser-dynamic',
+	'@angular/router',
+
+	// misc
+	'@builder.io/qwik',
+	'astro',
+	'solid-js',
+]);
+
 const ruleLevelSchema = v.union([v.literal('off'), v.literal('warn'), v.literal('error')]);
 
 export type RuleLevel = v.InferInput<typeof ruleLevelSchema>;
@@ -38,6 +69,8 @@ const ruleKeySchema = v.union([
 	v.literal('no-unused-block'),
 	v.literal('no-framework-dependency'),
 	v.literal('require-config-file-exists'),
+	v.literal('no-config-file-framework-dependency'),
+	v.literal('no-config-file-unpinned-dependency'),
 ]);
 
 export type RuleKey = v.InferInput<typeof ruleKeySchema>;
@@ -182,37 +215,6 @@ const rules: Record<RuleKey, Rule> = {
 		check: (block) => {
 			const errors: string[] = [];
 
-			// Update this list as needed
-			// Use the name of the package not the framework
-			const FRAMEWORKS = new Set([
-				// svelte
-				'svelte',
-				'@sveltejs/kit',
-
-				// vue
-				'vue',
-				'nuxt',
-
-				// react
-				'react',
-				'react-dom',
-				'next',
-				'@remix-run/react',
-
-				// angular
-				'@angular/core',
-				'@angular/common',
-				'@angular/forms',
-				'@angular/platform-browser',
-				'@angular/platform-browser-dynamic',
-				'@angular/router',
-
-				// misc
-				'@builder.io/qwik',
-				'astro',
-				'solid-js',
-			]);
-
 			const frameworkDeps = [...block.devDependencies, ...block.dependencies]
 				.map((d) => parsePackageName(d).unwrap().name)
 				.filter((d) => FRAMEWORKS.has(d));
@@ -247,6 +249,56 @@ const rules: Record<RuleKey, Rule> = {
 			return errors.length > 0 ? errors : undefined;
 		},
 	},
+	'no-config-file-framework-dependency': {
+		description: 'Disallow frameworks (Svelte, Vue, React) as dependencies of config files.',
+		scope: 'global',
+		check: ({ manifest }) => {
+			const errors: string[] = [];
+
+			if (manifest.configFiles === undefined) return undefined;
+
+			for (const configFile of manifest.configFiles) {
+				const frameworkDeps = [
+					...(configFile.devDependencies ?? []),
+					...(configFile.dependencies ?? []),
+				]
+					.map((d) => parsePackageName(d).unwrap().name)
+					.filter((d) => FRAMEWORKS.has(d));
+
+				if (frameworkDeps.length > 0) {
+					for (const frameworkDep of frameworkDeps) {
+						errors.push(
+							`${color.bold(configFile.name)} depends on ${color.bold(frameworkDep)} causing it to be installed when added`
+						);
+					}
+				}
+			}
+
+			return errors.length > 0 ? errors : undefined;
+		},
+	},
+	'no-config-file-unpinned-dependency': {
+		description: 'Require all dependencies of config files to have a pinned version.',
+		scope: 'global',
+		check: ({ manifest }) => {
+			const errors: string[] = [];
+
+			if (!manifest.configFiles) return undefined;
+
+			for (const configFile of manifest.configFiles) {
+				for (const dep of [
+					...(configFile.dependencies ?? []),
+					...(configFile.devDependencies ?? []),
+				]) {
+					if (!dep.includes('@')) {
+						errors.push(`Couldn't find a version to use for ${color.bold(dep)}`);
+					}
+				}
+			}
+
+			return errors.length > 0 ? errors : undefined;
+		},
+	},
 } as const;
 
 const ruleConfigSchema = v.record(
@@ -271,6 +323,8 @@ const DEFAULT_CONFIG: RuleConfig = {
 	'no-unused-block': 'warn',
 	'no-framework-dependency': 'warn',
 	'require-config-file-exists': 'error',
+	'no-config-file-framework-dependency': 'warn',
+	'no-config-file-unpinned-dependency': 'warn',
 } as const;
 
 /** Runs checks on the manifest file.
