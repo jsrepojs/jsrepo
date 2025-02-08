@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.34.0
+
+### Minor Changes
+
+- 511c288: feat: Resolve remote dependencies for config files 🎉
+
 ## 1.33.1
 
 ### Patch Changes
