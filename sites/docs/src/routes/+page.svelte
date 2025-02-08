@@ -9,10 +9,11 @@
 	import { superForm } from 'sveltekit-superforms';
 
 	const featuredRegistries = [
-		'https://reactbits.dev/tailwind',
-		'https://reactbits.dev/ts/tailwind',
+		'github/ieedan/shadcn-svelte-extras',
 		'github/ieedan/std',
-		'github/ieedan/shadcn-svelte-extras'
+		'github/shyakadavis/geist',
+		'https://reactbits.dev/tailwind',
+		'https://reactbits.dev/ts/tailwind'
 	];
 
 	let { data } = $props();
