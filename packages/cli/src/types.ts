@@ -36,9 +36,17 @@ export const configFileSchema = v.object({
 	optional: v.optional(v.boolean(), false),
 });
 
+export type ConfigFile = v.InferOutput<typeof configFileSchema>;
+
+export const manifestConfigFileSchema = v.object({
+	...configFileSchema.entries,
+	dependencies: v.optional(v.array(v.string())),
+	devDependencies: v.optional(v.array(v.string())),
+});
+
 export const manifestSchema = v.object({
 	meta: v.optional(manifestMeta),
-	configFiles: v.optional(v.array(configFileSchema)),
+	configFiles: v.optional(v.array(manifestConfigFileSchema)),
 	categories: v.array(categorySchema),
 });
 

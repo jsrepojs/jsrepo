@@ -36,6 +36,7 @@ import { formatDiff } from '../utils/diff';
 import { formatFile, matchJSDescendant, tryGetTsconfig } from '../utils/files';
 import { loadFormatterConfig } from '../utils/format';
 import { json } from '../utils/language-support';
+import { returnShouldInstall } from '../utils/package';
 import * as persisted from '../utils/persisted';
 import { type Task, intro, nextSteps, runTasks } from '../utils/prompts';
 import * as registry from '../utils/registry-providers/internal';
@@ -226,6 +227,9 @@ const _initProject = async (registries: string[], options: Options) => {
 		])
 	);
 
+	const dependencies: string[] = [];
+	const devDependencies: string[] = [];
+
 	if (repos.length > 0) {
 		for (const repo of repos) {
 			// if already present in config ask if you would like to set it up
@@ -257,6 +261,8 @@ const _initProject = async (registries: string[], options: Options) => {
 				formatter: options.formatter,
 			});
 
+			dependencies.push(...promptResult.dependencies);
+			devDependencies.push(...promptResult.devDependencies);
 			paths = promptResult.paths;
 			configFiles = promptResult.configFiles;
 		}
@@ -300,6 +306,8 @@ const _initProject = async (registries: string[], options: Options) => {
 			formatter: options.formatter,
 		});
 
+		dependencies.push(...promptResult.dependencies);
+		devDependencies.push(...promptResult.devDependencies);
 		paths = promptResult.paths;
 		configFiles = promptResult.configFiles;
 
@@ -342,6 +350,114 @@ const _initProject = async (registries: string[], options: Options) => {
 	fs.writeFileSync(configPath, configContent);
 
 	loading.stop(`Wrote config to \`${PROJECT_CONFIG_NAME}\`.`);
+
+	// check if dependencies are already installed
+	const { dependencies: deps, devDependencies: devDeps } = returnShouldInstall(
+		new Set(dependencies),
+		new Set(devDependencies),
+		{ cwd: options.cwd }
+	);
+
+	const hasDependencies = deps.size > 0 || devDeps.size > 0;
+
+	const pm = (await detect({ cwd: options.cwd }))?.agent ?? 'npm';
+
+	if (hasDependencies) {
+		let install = options.yes;
+		if (!options.yes) {
+			const result = await confirm({
+				message: 'Would you like to install dependencies?',
+				initialValue: true,
+			});
+
+			if (isCancel(result)) {
+				cancel('Canceled!');
+				process.exit(0);
+			}
+
+			install = result;
+		}
+
+		if (install) {
+			if (deps.size > 0) {
+				loading.start(`Installing dependencies with ${color.cyan(pm)}`);
+
+				(
+					await installDependencies({
+						pm,
+						deps: Array.from(deps),
+						dev: false,
+						cwd: options.cwd,
+					})
+				).match(
+					(installed) => {
+						loading.stop(`Installed ${color.cyan(installed.join(', '))}`);
+					},
+					(err) => {
+						loading.stop('Failed to install dependencies');
+
+						program.error(err);
+					}
+				);
+			}
+
+			if (devDeps.size > 0) {
+				loading.start(`Installing dependencies with ${color.cyan(pm)}`);
+
+				(
+					await installDependencies({
+						pm,
+						deps: Array.from(devDeps),
+						dev: true,
+						cwd: options.cwd,
+					})
+				).match(
+					(installed) => {
+						loading.stop(`Installed ${color.cyan(installed.join(', '))}`);
+					},
+					(err) => {
+						loading.stop('Failed to install dev dependencies');
+
+						program.error(err);
+					}
+				);
+			}
+		}
+
+		// next steps if they didn't install dependencies
+		let steps = [];
+
+		if (!install) {
+			if (deps.size > 0) {
+				const cmd = resolveCommand(pm, 'add', [...deps]);
+
+				steps.push(
+					`Install dependencies \`${color.cyan(`${cmd?.command} ${cmd?.args.join(' ')}`)}\``
+				);
+			}
+
+			if (devDeps.size > 0) {
+				const cmd = resolveCommand(pm, 'add', [...devDeps, '-D']);
+
+				steps.push(
+					`Install dev dependencies \`${color.cyan(`${cmd?.command} ${cmd?.args.join(' ')}`)}\``
+				);
+			}
+		}
+
+		// put steps with numbers above here
+		steps = steps.map((step, i) => `${i + 1}. ${step}`);
+
+		if (!install) {
+			steps.push('');
+		}
+
+		steps.push('Import and use the blocks!');
+
+		const next = nextSteps(steps);
+
+		process.stdout.write(next);
+	}
 };
 
 const promptForProviderConfig = async ({
@@ -356,7 +472,12 @@ const promptForProviderConfig = async ({
 	configFiles: Record<string, string>;
 	formatter: ProjectConfig['formatter'];
 	options: Options;
-}): Promise<{ paths: Paths; configFiles: Record<string, string> }> => {
+}): Promise<{
+	paths: Paths;
+	configFiles: Record<string, string>;
+	dependencies: string[];
+	devDependencies: string[];
+}> => {
 	const loading = spinner();
 
 	const storage = persisted.get();
@@ -422,6 +543,9 @@ const promptForProviderConfig = async ({
 
 	const manifest = manifestResult.unwrap();
 
+	const dependencies: string[] = [];
+	const devDependencies: string[] = [];
+
 	// setup config files
 	if (manifest.configFiles) {
 		const { prettierOptions, biomeOptions } = await loadFormatterConfig({
@@ -443,6 +567,9 @@ const promptForProviderConfig = async ({
 
 				if (!result) continue;
 			}
+
+			dependencies.push(...(file.dependencies ?? []));
+			devDependencies.push(...(file.devDependencies ?? []));
 
 			// get the path to the file from the user
 			if (!configFiles[file.name]) {
@@ -711,7 +838,7 @@ const promptForProviderConfig = async ({
 		}
 	}
 
-	return { paths, configFiles };
+	return { paths, configFiles, dependencies, devDependencies };
 };
 
 const _initRegistry = async (options: Options) => {

@@ -9,7 +9,7 @@ import { context } from '../cli';
 import { MANIFEST_FILE } from '../constants';
 import type { Category, Manifest } from '../types';
 import * as ascii from '../utils/ascii';
-import { buildBlocksDirectory, pruneUnused } from '../utils/build';
+import { buildBlocksDirectory, buildConfigFiles, pruneUnused } from '../utils/build';
 import { DEFAULT_CONFIG, runRules } from '../utils/build/check';
 import { type RegistryConfig, getRegistryConfig } from '../utils/config';
 import { parseManifest } from '../utils/manifest';
@@ -203,7 +203,9 @@ const _build = async (options: Options) => {
 		loading.stop(`Built ${color.cyan(dirPath)}`);
 	}
 
-	const manifest = createManifest(categories, config);
+	const configFiles = buildConfigFiles(config, { cwd: options.cwd });
+
+	const manifest = createManifest(categories, configFiles, config);
 
 	loading.start('Checking manifest');
 
@@ -303,10 +305,14 @@ const _build = async (options: Options) => {
 	}
 };
 
-export const createManifest = (categories: Category[], config: RegistryConfig) => {
+export const createManifest = (
+	categories: Category[],
+	configFiles: Manifest['configFiles'],
+	config: RegistryConfig
+) => {
 	const manifest: Manifest = {
 		meta: config.meta,
-		configFiles: config.configFiles,
+		configFiles,
 		categories,
 	};
 

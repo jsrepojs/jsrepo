@@ -32,7 +32,7 @@
 			}
 		},
 		"paths": {
-			"description": "Paths used to map categories to a directory.",
+			"description": "Paths used to map categories to a directory. TypeScript path aliases are allowed, any relative paths must start with `./`",
 			"type": "object",
 			"required": ["*"],
 			"properties": {
