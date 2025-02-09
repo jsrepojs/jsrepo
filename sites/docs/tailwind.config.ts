@@ -87,13 +87,23 @@ const config: Config = {
 					to: {
 						'background-position': '200% center'
 					}
+				},
+				marquee: {
+					from: { transform: 'translateX(0)' },
+					to: { transform: 'translateX(calc(-100% - var(--gap)))' }
+				},
+				'marquee-vertical': {
+					from: { transform: 'translateY(0)' },
+					to: { transform: 'translateY(calc(-100% - var(--gap)))' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'caret-blink': 'caret-blink 1.25s ease-out infinite',
-				gradient: 'gradient 8s linear infinite'
+				gradient: 'gradient 8s linear infinite',
+				marquee: 'marquee var(--duration) linear infinite',
+				'marquee-vertical': 'marquee-vertical var(--duration) linear infinite'
 			}
 		}
 	},
