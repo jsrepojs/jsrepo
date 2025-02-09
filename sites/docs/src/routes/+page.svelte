@@ -7,6 +7,9 @@
 	import { cn } from '$lib/utils/utils';
 	import { untrack } from 'svelte';
 	import { superForm } from 'sveltekit-superforms';
+	import { Window } from '$lib/components/ui/window/index.js';
+	import Marquee from '$lib/components/animations/marquee/marquee.svelte';
+	import * as Icons from '$lib/components/icons';
 
 	const featuredRegistries = [
 		'github/ieedan/shadcn-svelte-extras',
@@ -142,6 +145,25 @@
 						Distribute.
 					</span>
 				</h1>
+				<p class="text-muted-foreground text-lg text-center mt-4">
+					<span
+						class={{ 'text-primary': focusedIndex === 0, 'transition-colors duration-1000': true }}
+					>
+						Write
+					</span>
+					your code,
+					<span
+						class={{ 'text-primary': focusedIndex === 1, 'transition-colors duration-1000': true }}
+					>
+						Build
+					</span>
+					it into a registry, and
+					<span
+						class={{ 'text-primary': focusedIndex === 2, 'transition-colors duration-1000': true }}
+					>
+						Distribute
+					</span> it through the CLI.
+				</p>
 
 				<div
 					bind:this={sightRef}
@@ -207,7 +229,7 @@
 						</div>
 					</div>
 					<div class="flex flex-col gap-2 w-full">
-						<h3 class="text-xl font-medium">Trending</h3>
+						<h3 class="text-xl font-medium">Most Popular</h3>
 						<div class="border-border border rounded-md w-full overflow-hidden">
 							<ul class="flex flex-col">
 								{#each data.popular as registry}
@@ -224,6 +246,82 @@
 						</div>
 					</div>
 				</div>
+			</div>
+		</div>
+
+		<div class="mt-20 w-full flex flex-col place-items-center justify-center">
+			<div class="flex flex-col lg:flex-row place-items-center w-full justify-center gap-6">
+				<div class="lg:max-w-sm text-center lg:text-left">
+					<h3 class="text-4xl font-bold">Move quickly</h3>
+					<p class="text-muted-foreground">
+						With unified build tooling theres no need to write any scripts.
+					</p>
+				</div>
+				<Window class="max-w-lg overflow-hidden bg-[#0c0a09] border-[#292524]">
+					<img loading="lazy" src="/demos/build.gif" alt="jsrepo build" width="100%" />
+				</Window>
+			</div>
+		</div>
+
+		<div class="mt-20 w-full flex flex-col place-items-center justify-center">
+			<div class="flex flex-col lg:flex-row place-items-center w-full justify-center gap-6">
+				<Window class="order-2 lg:order-1 max-w-lg overflow-hidden bg-[#0c0a09] border-[#292524]">
+					<img loading="lazy" src="/demos/add.gif" alt="jsrepo add" width="100%" />
+				</Window>
+				<div class="lg:max-w-sm text-center lg:text-left order-1 lg:order-2">
+					<h3 class="text-4xl font-bold">Add from anywhere</h3>
+					<p class="text-muted-foreground">
+						Github, GitLab, BitBucket, Azure, or even custom urls!
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="mt-20 w-full flex flex-col place-items-center justify-center">
+			<div class="flex flex-col lg:flex-row place-items-center w-full justify-center gap-6">
+				<div class="lg:max-w-sm text-center lg:text-left">
+					<h3 class="text-4xl font-bold">Update with confidence</h3>
+					<p class="text-muted-foreground">View changes before they're part of your codebase.</p>
+				</div>
+				<Window class="max-w-lg overflow-hidden bg-[#0c0a09] border-[#292524]">
+					<img loading="lazy" src="/demos/update.gif" alt="jsrepo update" width="100%" />
+				</Window>
+			</div>
+		</div>
+
+		<div class="w-full flex flex-col place-items-center justify-center mt-20">
+			<div class="py-4 text-center">
+				<h3 class="text-4xl font-bold">Use what YOU use</h3>
+				<p class="text-muted-foreground">And let jsrepo do the rest.</p>
+			</div>
+			<div
+				class="relative flex h-full w-full max-w-lg flex-col items-center justify-center overflow-hidden"
+			>
+				<Marquee class="w-full [--duration:16s]" repeat={10}>
+					<Icons.TypeScript class="size-11 mx-2" />
+					<Icons.Svelte class="size-11 mx-2" />
+					<Icons.React class="size-11 mx-2" />
+					<Icons.Vue class="size-11 mx-2" />
+					<Icons.CSS class="size-11 mx-2" />
+					<Icons.HTML class="size-11 mx-2" />
+					<Icons.JavaScript class="size-11 mx-2" />
+					<Icons.SASS class="size-11 mx-2" />
+					<Icons.Yaml class="size-11 mx-2" />
+					<Icons.Svg class="size-11 mx-2" />
+				</Marquee>
+				<div
+					class="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-white dark:from-background"
+				></div>
+				<div
+					class="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-white dark:from-background"
+				></div>
+			</div>
+		</div>
+
+		<div class="mt-20 flex place-items-center justify-center">
+			<div class="flex flex-col gap-4 justify-center place-items-center">
+				<h3 class="text-4xl font-bold">Convinced yet?</h3>
+				<Button href="/docs" size="sm" class="w-fit">Yeah let's go!</Button>
 			</div>
 		</div>
 	</div>
