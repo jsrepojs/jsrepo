@@ -198,8 +198,6 @@ const _update = async (blockNames: string[], options: Options) => {
 
 	const pm = (await detect({ cwd: options.cwd }))?.agent ?? 'npm';
 
-	const tasks: Task[] = [];
-
 	let devDeps: Set<string> = new Set<string>();
 	let deps: Set<string> = new Set<string>();
 
@@ -454,8 +452,6 @@ const _update = async (blockNames: string[], options: Options) => {
 			deps.add(dep);
 		}
 	}
-
-	await runTasks(tasks, { verbose: options.verbose ? verbose : undefined });
 
 	// check if dependencies are already installed
 	const requiredDependencies = returnShouldInstall(deps, devDeps, { cwd: options.cwd });
