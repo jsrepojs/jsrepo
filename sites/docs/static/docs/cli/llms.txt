@@ -2,7 +2,7 @@
 
 > A CLI to add shared code from remote repositories.
  
-Latest Version: 1.31.0
+Latest Version: 1.34.0
 
 ## Commands
 
@@ -19,6 +19,7 @@ jsrepo add [options] [blocks...]
 - --repo <repo>: Repository to download the blocks from. 
 - -A, --allow: Allow jsrepo to download code from the provided repo. 
 - -y, --yes: Skip confirmation prompt. 
+- --no-cache: Disable caching of resolved git urls. 
 - --verbose: Include debug logs. 
 - --cwd <path>: The current working directory. (default: ./)
 
@@ -75,6 +76,7 @@ jsrepo exec [options] [script]
 #### Options
 - --repo <repo>: Repository to download and run the script from. 
 - -A, --allow: Allow jsrepo to download code from the provided repo. 
+- --no-cache: Disable caching of resolved git urls. 
 - --cwd <path>: The current working directory. (default: ./)
 
 ### init
@@ -94,7 +96,10 @@ jsrepo init [options] [registries...]
 - -P, --project: Takes you through the steps to initialize a project. 
 - -R, --registry: Takes you through the steps to initialize a registry. 
 - --script <name>: The name of the build script. (For Registry setup) (default: build:registry)
+- -E, --expand: Expands the diff so you see everything. 
+- --max-unchanged <number>: Maximum unchanged lines that will show without being collapsed. (default: 3)
 - -y, --yes: Skip confirmation prompt. 
+- --no-cache: Disable caching of resolved git urls. 
 - --cwd <path>: The current working directory. (default: ./)
 
 ### test
@@ -110,6 +115,7 @@ jsrepo test [options] [blocks...]
 - --repo <repo>: Repository to download the blocks from. 
 - -A, --allow: Allow jsrepo to download code from the provided repo. 
 - --debug: Leaves the temp test file around for debugging upon failure. 
+- --no-cache: Disable caching of resolved git urls. 
 - --verbose: Include debug logs. 
 - --cwd <path>: The current working directory. (default: ./)
 
@@ -130,6 +136,7 @@ jsrepo update [options] [blocks...]
 - --repo <repo>: Repository to download the blocks from. 
 - -A, --allow: Allow jsrepo to download code from the provided repo. 
 - -y, --yes: Skip confirmation prompt. 
+- --no-cache: Disable caching of resolved git urls. 
 - --verbose: Include debug logs. 
 - --cwd <path>: The current working directory. (default: ./)
 
