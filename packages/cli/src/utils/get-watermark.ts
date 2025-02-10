@@ -1,5 +1,7 @@
-const getWatermark = (version: string, repoUrl: string): string => {
-	return `jsrepo ${version}\nInstalled from ${repoUrl}\n${new Date()
+import { packageJson } from './context';
+
+const getWatermark = (repoUrl: string): string => {
+	return `jsrepo ${packageJson.version}\nInstalled from ${repoUrl}\n${new Date()
 		.toLocaleDateString()
 		.replaceAll('/', '-')}`;
 };

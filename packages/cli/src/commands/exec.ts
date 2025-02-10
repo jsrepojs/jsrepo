@@ -7,7 +7,6 @@ import { resolveCommand } from 'package-manager-detector/commands';
 import { detect } from 'package-manager-detector/detect';
 import path from 'pathe';
 import * as v from 'valibot';
-import { context } from '../cli';
 import * as ascii from '../utils/ascii';
 import { resolveTree } from '../utils/blocks';
 import * as url from '../utils/blocks/ts/url';
@@ -21,6 +20,7 @@ const schema = v.objectWithRest(
 	{
 		repo: v.optional(v.string()),
 		allow: v.boolean(),
+		cache: v.boolean(),
 		cwd: v.string(),
 	},
 	v.unknown()
@@ -39,13 +39,14 @@ const exec = new Command('exec')
 	)
 	.option('--repo <repo>', 'Repository to download and run the script from.')
 	.option('-A, --allow', 'Allow jsrepo to download code from the provided repo.', false)
+	.option('--no-cache', 'Disable caching of resolved git urls.')
 	.option('--cwd <path>', 'The current working directory.', process.cwd())
 	.allowExcessArguments()
 	.allowUnknownOption()
 	.action(async (script, opts, command) => {
 		const options = v.parse(schema, opts);
 
-		intro(context);
+		await intro();
 
 		await _exec(script, options, command);
 	});
@@ -141,7 +142,7 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 	loading.start(`Fetching scripts from ${color.cyan(repoPaths.join(', '))}`);
 
 	const resolvedRepos: registry.RegistryProviderState[] = (
-		await registry.forEachPathGetProviderState(...repoPaths)
+		await registry.forEachPathGetProviderState(repoPaths, { noCache: !options.cache })
 	).match(
 		(val) => val,
 		({ repo, message }) => {

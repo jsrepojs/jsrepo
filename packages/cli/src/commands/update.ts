@@ -16,7 +16,6 @@ import { resolveCommand } from 'package-manager-detector/commands';
 import { detect } from 'package-manager-detector/detect';
 import path from 'pathe';
 import * as v from 'valibot';
-import { context } from '../cli';
 import { type ModelName, models } from '../utils/ai';
 import * as ascii from '../utils/ascii';
 import { getInstalled, resolveTree } from '../utils/blocks';
@@ -40,6 +39,7 @@ const schema = v.object({
 	repo: v.optional(v.string()),
 	allow: v.boolean(),
 	yes: v.boolean(),
+	cache: v.boolean(),
 	verbose: v.boolean(),
 	cwd: v.string(),
 });
@@ -61,12 +61,13 @@ const update = new Command('update')
 	.option('--repo <repo>', 'Repository to download the blocks from.')
 	.option('-A, --allow', 'Allow jsrepo to download code from the provided repo.', false)
 	.option('-y, --yes', 'Skip confirmation prompt.', false)
+	.option('--no-cache', 'Disable caching of resolved git urls.')
 	.option('--verbose', 'Include debug logs.', false)
 	.option('--cwd <path>', 'The current working directory.', process.cwd())
 	.action(async (blockNames, opts) => {
 		const options = v.parse(schema, opts);
 
-		intro(context);
+		await intro();
 
 		await _update(blockNames, options);
 
@@ -122,7 +123,7 @@ const _update = async (blockNames: string[], options: Options) => {
 	if (!options.verbose) loading.start(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
 
 	const resolvedRepos: registry.RegistryProviderState[] = (
-		await registry.forEachPathGetProviderState(...repoPaths)
+		await registry.forEachPathGetProviderState(repoPaths, { noCache: !options.cache })
 	).match(
 		(val) => val,
 		({ repo, message }) => {
@@ -220,7 +221,7 @@ const _update = async (blockNames: string[], options: Options) => {
 	for (const { block } of updatingBlocks) {
 		const fullSpecifier = url.join(block.sourceRepo.url, block.category, block.name);
 
-		const watermark = getWatermark(context.package.version, block.sourceRepo.url);
+		const watermark = getWatermark(block.sourceRepo.url);
 
 		const providerState = block.sourceRepo;
 

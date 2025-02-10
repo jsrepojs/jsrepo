@@ -5,7 +5,8 @@ import { detectSync, resolveCommand } from 'package-manager-detector';
 import semver from 'semver';
 import * as ascii from './ascii';
 import { stripAsni } from './blocks/ts/strip-ansi';
-import type { CLIContext } from './context';
+import { packageJson } from './context';
+import { getLatestVersion } from './get-latest-version';
 
 export type Task = {
 	loadingMessage: string;
@@ -140,16 +141,22 @@ const newerVersionAvailable = (name: string, oldVersion: string, newVersion: str
 	return box;
 };
 
-const _intro = ({ package: pkg }: CLIContext) => {
+const _intro = async () => {
 	console.clear();
 
-	if (pkg.latestVersion) {
-		if (semver.lt(pkg.version, pkg.latestVersion)) {
-			console.info(newerVersionAvailable(pkg.name, pkg.version, pkg.latestVersion));
+	const latestVersion = await getLatestVersion();
+
+	if (latestVersion.isOk()) {
+		if (semver.lt(packageJson.version, latestVersion.unwrap())) {
+			console.info(
+				newerVersionAvailable(packageJson.name, packageJson.version, latestVersion.unwrap())
+			);
 		}
 	}
 
-	intro(`${color.bgHex('#f7df1e').black(` ${pkg.name} `)}${color.gray(` v${pkg.version} `)}`);
+	intro(
+		`${color.bgHex('#f7df1e').black(` ${packageJson.name} `)}${color.gray(` v${packageJson.version} `)}`
+	);
 };
 
 export { runTasks, nextSteps, _intro as intro, runTasksConcurrently, truncatedList };

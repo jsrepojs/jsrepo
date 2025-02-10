@@ -12,23 +12,27 @@ type LatestVersion = {
 };
 
 /** Checks for the latest version from the github repository. Will cache results for up to 1 hour. */
-export const getLatestVersion = async (): Promise<Result<string, string>> => {
+export const getLatestVersion = async ({
+	noCache = false,
+}: { noCache?: boolean } = {}): Promise<Result<string, string>> => {
 	try {
 		// handle caching
 		const storage = persisted.get();
 
 		let version: string;
 
-		const latestVersion = storage.get(LATEST_VERSION_KEY) as LatestVersion | null;
+		if (!noCache) {
+			const latestVersion = storage.get(LATEST_VERSION_KEY) as LatestVersion | null;
 
-		if (latestVersion) {
-			if (latestVersion.expiration > Date.now()) {
-				version = latestVersion.version;
+			if (latestVersion) {
+				if (latestVersion.expiration > Date.now()) {
+					version = latestVersion.version;
 
-				return Ok(version);
+					return Ok(version);
+				}
+
+				storage.delete(LATEST_VERSION_KEY);
 			}
-
-			storage.delete(LATEST_VERSION_KEY);
 		}
 
 		// we abort the request after a second

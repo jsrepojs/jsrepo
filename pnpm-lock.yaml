@@ -84,8 +84,8 @@ importers:
         specifier: ^2.0.2
         version: 2.0.2
       prettier:
-        specifier: ^3.4.2
-        version: 3.4.2
+        specifier: ^3.5.0
+        version: 3.5.0
       semver:
         specifier: ^7.7.1
         version: 7.7.1
@@ -96,8 +96,8 @@ importers:
         specifier: ^25.0.1
         version: 25.0.1
       valibot:
-        specifier: 1.0.0-beta.15
-        version: 1.0.0-beta.15(typescript@5.7.3)
+        specifier: 1.0.0-rc.0
+        version: 1.0.0-rc.0(typescript@5.7.3)
       validate-npm-package-name:
         specifier: ^6.0.0
         version: 6.0.0
@@ -2743,11 +2743,6 @@ packages:
     engines: {node: '>=10.13.0'}
     hasBin: true
 
-  prettier@3.4.2:
-    resolution: {integrity: sha512-e9MewbtFo+Fevyuxn/4rrcDAaq0IYxPGLvObpQjiZBMAzB9IGmzlnG9RZy3FFas+eBMu2vA0CszMeduow5dIuQ==}
-    engines: {node: '>=14'}
-    hasBin: true
-
   prettier@3.5.0:
     resolution: {integrity: sha512-quyMrVt6svPS7CjQ9gKb3GLEX/rl3BCL2oa/QkNcXv4YNVBC9olt3s+H7ukto06q7B1Qz46PbrKLO34PR6vXcA==}
     engines: {node: '>=14'}
@@ -3319,6 +3314,14 @@ packages:
 
   valibot@1.0.0-beta.15:
     resolution: {integrity: sha512-BKy8XosZkDHWmYC+cJG74LBzP++Gfntwi33pP3D3RKztz2XV9jmFWnkOi21GoqARP8wAWARwhV6eTr1JcWzjGw==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  valibot@1.0.0-rc.0:
+    resolution: {integrity: sha512-9ZUrOXOejY/WaIn8p0Z469R1qBAwNJeqq8jzOIDsl1qR8gqtObHQmyHLFli0UCkcGiTco5kH6/KPLWsTWE9b2g==}
     peerDependencies:
       typescript: '>=5'
     peerDependenciesMeta:
@@ -6250,8 +6253,6 @@ snapshots:
 
   prettier@2.8.8: {}
 
-  prettier@3.4.2: {}
-
   prettier@3.5.0: {}
 
   pretty-ms@9.2.0:
@@ -6855,6 +6856,10 @@ snapshots:
     optional: true
 
   valibot@1.0.0-beta.15(typescript@5.7.3):
+    optionalDependencies:
+      typescript: 5.7.3
+
+  valibot@1.0.0-rc.0(typescript@5.7.3):
     optionalDependencies:
       typescript: 5.7.3
 

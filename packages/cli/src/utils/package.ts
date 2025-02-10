@@ -16,7 +16,7 @@ const findNearestPackageJson = (startDir: string, until: string): string | undef
 	return findNearestPackageJson(segments.slice(0, segments.length - 1).join('/'), until);
 };
 
-type PackageJson = {
+export type PackageJson = {
 	name: string;
 	version: string;
 	description: string;
