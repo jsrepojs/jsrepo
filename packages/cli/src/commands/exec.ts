@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { cancel, confirm, isCancel, select, spinner } from '@clack/prompts';
+import { cancel, confirm, isCancel, select } from '@clack/prompts';
 import color from 'chalk';
 import { Argument, Command, program } from 'commander';
 import { execa } from 'execa';
@@ -13,7 +13,7 @@ import * as url from '../utils/blocks/ts/url';
 import { isTestFile } from '../utils/build';
 import { type ProjectConfig, getProjectConfig, resolvePaths } from '../utils/config';
 import { installDependencies } from '../utils/dependencies';
-import { type ConcurrentTask, intro, runTasksConcurrently } from '../utils/prompts';
+import { type ConcurrentTask, intro, runTasksConcurrently, spinner } from '../utils/prompts';
 import * as registry from '../utils/registry-providers/internal';
 
 const schema = v.objectWithRest(
@@ -21,6 +21,7 @@ const schema = v.objectWithRest(
 		repo: v.optional(v.string()),
 		allow: v.boolean(),
 		cache: v.boolean(),
+		verbose: v.boolean(),
 		cwd: v.string(),
 	},
 	v.unknown()
@@ -40,6 +41,7 @@ const exec = new Command('exec')
 	.option('--repo <repo>', 'Repository to download and run the script from.')
 	.option('-A, --allow', 'Allow jsrepo to download code from the provided repo.', false)
 	.option('--no-cache', 'Disable caching of resolved git urls.')
+	.option('--verbose', 'Include debug logs.', false)
 	.option('--cwd <path>', 'The current working directory.', process.cwd())
 	.allowExcessArguments()
 	.allowUnknownOption()
@@ -53,9 +55,15 @@ const exec = new Command('exec')
 
 // biome-ignore lint/suspicious/noExplicitAny: we don't have a type for command
 const _exec = async (s: string | undefined, options: Options, command: any) => {
+	const verbose = (msg: string) => {
+		if (options.verbose) {
+			console.info(`${ascii.INFO} ${msg}`);
+		}
+	};
+
 	let script = s;
 
-	const loading = spinner();
+	const loading = spinner({ verbose: options.verbose ? verbose : undefined });
 
 	const configResult = getProjectConfig(options.cwd);
 
@@ -307,6 +315,7 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 	await runTasksConcurrently({
 		startMessage: 'Adding blocks',
 		stopMessage: `Added ${color.cyan(addedBlocks.join(', '))}`,
+		loading,
 		tasks,
 	});
 
@@ -380,6 +389,8 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 	if (startIndex !== -1) {
 		passthroughArgs = command.parent.rawArgs.slice(startIndex + 1);
 	}
+
+	verbose(`Passing args ${color.cyan(passthroughArgs.join(' '))}`);
 
 	// run the cli
 
