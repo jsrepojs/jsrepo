@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.35.1
+
+### Patch Changes
+
+- d96f481: Improve verbose logging.
+
 ## 1.35.0
 
 ### Minor Changes
