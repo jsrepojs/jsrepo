@@ -16,7 +16,6 @@ import { resolveCommand } from 'package-manager-detector/commands';
 import { detect } from 'package-manager-detector/detect';
 import path from 'pathe';
 import * as v from 'valibot';
-import { context } from '../cli';
 import * as ascii from '../utils/ascii';
 import { getInstalled, resolveTree } from '../utils/blocks';
 import * as url from '../utils/blocks/ts/url';
@@ -70,7 +69,7 @@ const add = new Command('add')
 	.action(async (blockNames, opts) => {
 		const options = v.parse(schema, opts);
 
-		intro(context);
+		await intro();
 
 		await _add(blockNames, options);
 
@@ -419,7 +418,7 @@ const _add = async (blockNames: string[], options: Options) => {
 	for (const { block } of installingBlocks) {
 		const fullSpecifier = url.join(block.sourceRepo.url, block.category, block.name);
 		const shortSpecifier = `${block.category}/${block.name}`;
-		const watermark = getWatermark(context.package.version, block.sourceRepo.url);
+		const watermark = getWatermark(block.sourceRepo.url);
 
 		const providerInfo = block.sourceRepo;
 

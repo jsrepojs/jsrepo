@@ -2,7 +2,6 @@ import { cancel, confirm, isCancel, outro, password, select } from '@clack/promp
 import color from 'chalk';
 import { Command, Option } from 'commander';
 import * as v from 'valibot';
-import { context } from '../cli';
 import * as ascii from '../utils/ascii';
 import * as persisted from '../utils/persisted';
 import { intro } from '../utils/prompts';
@@ -30,7 +29,7 @@ const auth = new Command('auth')
 	.action(async (opts) => {
 		const options = v.parse(schema, opts);
 
-		intro(context);
+		await intro();
 
 		await _auth(options);
 

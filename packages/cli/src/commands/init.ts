@@ -18,7 +18,6 @@ import { createPathsMatcher } from 'get-tsconfig';
 import { detect, resolveCommand } from 'package-manager-detector';
 import path from 'pathe';
 import * as v from 'valibot';
-import { context } from '../cli';
 import { type ModelName, models } from '../utils/ai';
 import * as ascii from '../utils/ascii';
 import {
@@ -31,6 +30,7 @@ import {
 	getProjectConfig,
 	getRegistryConfig,
 } from '../utils/config';
+import { packageJson } from '../utils/context';
 import { installDependencies } from '../utils/dependencies';
 import { formatDiff } from '../utils/diff';
 import { formatFile, matchJSDescendant, tryGetTsconfig } from '../utils/files';
@@ -93,7 +93,7 @@ const init = new Command('init')
 	.action(async (registries, opts) => {
 		const options = v.parse(schema, opts);
 
-		intro(context);
+		await intro();
 
 		if (options.registry !== undefined && options.project !== undefined) {
 			program.error(
@@ -317,7 +317,7 @@ const _initProject = async (registries: string[], options: Options) => {
 	}
 
 	const config: ProjectConfig = {
-		$schema: `https://unpkg.com/jsrepo@${context.package.version}/schemas/project-config.json`,
+		$schema: `https://unpkg.com/jsrepo@${packageJson.version}/schemas/project-config.json`,
 		repos,
 		includeTests:
 			initialConfig.isOk() && options.tests === undefined
@@ -876,7 +876,7 @@ const _initRegistry = async (options: Options) => {
 		};
 	}
 
-	config.$schema = `https://unpkg.com/jsrepo@${context.package.version}/schemas/registry-config.json`;
+	config.$schema = `https://unpkg.com/jsrepo@${packageJson.version}/schemas/registry-config.json`;
 
 	while (true) {
 		if (config.dirs.length > 0) {

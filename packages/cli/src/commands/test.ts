@@ -8,7 +8,6 @@ import { detect } from 'package-manager-detector/detect';
 import path from 'pathe';
 import { Project } from 'ts-morph';
 import * as v from 'valibot';
-import { context } from '../cli';
 import * as ascii from '../utils/ascii';
 import { getInstalled } from '../utils/blocks';
 import * as url from '../utils/blocks/ts/url';
@@ -40,7 +39,7 @@ const test = new Command('test')
 	.action(async (blockNames, opts) => {
 		const options = v.parse(schema, opts);
 
-		intro(context);
+		await intro();
 
 		await _test(blockNames, options);
 

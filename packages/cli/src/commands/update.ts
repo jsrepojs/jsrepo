@@ -16,7 +16,6 @@ import { resolveCommand } from 'package-manager-detector/commands';
 import { detect } from 'package-manager-detector/detect';
 import path from 'pathe';
 import * as v from 'valibot';
-import { context } from '../cli';
 import { type ModelName, models } from '../utils/ai';
 import * as ascii from '../utils/ascii';
 import { getInstalled, resolveTree } from '../utils/blocks';
@@ -68,7 +67,7 @@ const update = new Command('update')
 	.action(async (blockNames, opts) => {
 		const options = v.parse(schema, opts);
 
-		intro(context);
+		await intro();
 
 		await _update(blockNames, options);
 
@@ -222,7 +221,7 @@ const _update = async (blockNames: string[], options: Options) => {
 	for (const { block } of updatingBlocks) {
 		const fullSpecifier = url.join(block.sourceRepo.url, block.category, block.name);
 
-		const watermark = getWatermark(context.package.version, block.sourceRepo.url);
+		const watermark = getWatermark(block.sourceRepo.url);
 
 		const providerState = block.sourceRepo;
 

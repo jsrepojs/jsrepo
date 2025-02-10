@@ -5,7 +5,6 @@ import { Command, program } from 'commander';
 import ignore from 'ignore';
 import path from 'pathe';
 import * as v from 'valibot';
-import { context } from '../cli';
 import { MANIFEST_FILE } from '../constants';
 import type { Category, Manifest } from '../types';
 import * as ascii from '../utils/ascii';
@@ -72,7 +71,7 @@ const build = new Command('build')
 	.action(async (opts) => {
 		const options = v.parse(schema, opts);
 
-		intro(context);
+		await intro();
 
 		await _build(options);
 
