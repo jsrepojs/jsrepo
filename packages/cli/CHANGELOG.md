@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.35.0
+
+### Minor Changes
+
+- 2260f3d: perf: Cache git provider state to improve time it takes to fetch the manifest. (This behavior can be disabled with the `--no-cache` flag)
+
 ## 1.34.0
 
 ### Minor Changes
