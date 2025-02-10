@@ -1039,7 +1039,7 @@ const _initRegistry = async (options: Options) => {
 		});
 	}
 
-	await runTasks(tasks, {});
+	await runTasks(tasks, { loading });
 
 	let installed = alreadyInstalled;
 

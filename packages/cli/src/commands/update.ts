@@ -1,14 +1,5 @@
 import fs from 'node:fs';
-import {
-	cancel,
-	confirm,
-	isCancel,
-	log,
-	multiselect,
-	outro,
-	select,
-	spinner,
-} from '@clack/prompts';
+import { cancel, confirm, isCancel, log, multiselect, outro, select } from '@clack/prompts';
 import color from 'chalk';
 import { Command, program } from 'commander';
 import { diffLines } from 'diff';
@@ -28,7 +19,7 @@ import { formatFile, transformRemoteContent } from '../utils/files';
 import { loadFormatterConfig } from '../utils/format';
 import { getWatermark } from '../utils/get-watermark';
 import { returnShouldInstall } from '../utils/package';
-import { type Task, intro, nextSteps, runTasks } from '../utils/prompts';
+import { intro, nextSteps, spinner } from '../utils/prompts';
 import * as registry from '../utils/registry-providers/internal';
 
 const schema = v.object({
@@ -83,7 +74,7 @@ const _update = async (blockNames: string[], options: Options) => {
 
 	verbose(`Attempting to update ${JSON.stringify(blockNames)}`);
 
-	const loading = spinner();
+	const loading = spinner({ verbose: options.verbose ? verbose : undefined });
 
 	const config = getProjectConfig(options.cwd).match(
 		(val) => val,
@@ -197,8 +188,6 @@ const _update = async (blockNames: string[], options: Options) => {
 	);
 
 	const pm = (await detect({ cwd: options.cwd }))?.agent ?? 'npm';
-
-	const tasks: Task[] = [];
 
 	let devDeps: Set<string> = new Set<string>();
 	let deps: Set<string> = new Set<string>();
@@ -419,18 +408,11 @@ const _update = async (blockNames: string[], options: Options) => {
 			}
 
 			if (acceptedChanges) {
-				await runTasks(
-					[
-						{
-							loadingMessage: `Writing changes to ${color.cyan(file.destPath)}`,
-							completedMessage: `Wrote changes to ${color.cyan(file.destPath)}.`,
-							run: async () => fs.writeFileSync(file.destPath, remoteContent),
-						},
-					],
-					{
-						verbose: options.verbose ? verbose : undefined,
-					}
-				);
+				loading.start(`Writing changes to ${color.cyan(file.destPath)}`);
+
+				fs.writeFileSync(file.destPath, remoteContent);
+
+				loading.stop(`Wrote changes to ${color.cyan(file.destPath)}.`);
 			}
 		}
 
@@ -454,8 +436,6 @@ const _update = async (blockNames: string[], options: Options) => {
 			deps.add(dep);
 		}
 	}
-
-	await runTasks(tasks, { verbose: options.verbose ? verbose : undefined });
 
 	// check if dependencies are already installed
 	const requiredDependencies = returnShouldInstall(deps, devDeps, { cwd: options.cwd });

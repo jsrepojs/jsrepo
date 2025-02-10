@@ -1,15 +1,5 @@
 import fs from 'node:fs';
-import {
-	cancel,
-	confirm,
-	isCancel,
-	log,
-	multiselect,
-	outro,
-	select,
-	spinner,
-	text,
-} from '@clack/prompts';
+import { cancel, confirm, isCancel, log, multiselect, outro, select, text } from '@clack/prompts';
 import color from 'chalk';
 import { Command, program } from 'commander';
 import { resolveCommand } from 'package-manager-detector/commands';
@@ -39,6 +29,7 @@ import {
 	intro,
 	nextSteps,
 	runTasksConcurrently,
+	spinner,
 	truncatedList,
 } from '../utils/prompts';
 import * as registry from '../utils/registry-providers/internal';
@@ -85,7 +76,7 @@ const _add = async (blockNames: string[], options: Options) => {
 
 	verbose(`Attempting to add ${JSON.stringify(blockNames)}`);
 
-	const loading = spinner();
+	const loading = spinner({ verbose: options.verbose ? verbose : undefined });
 
 	const configResult = getProjectConfig(options.cwd);
 
@@ -578,7 +569,7 @@ const _add = async (blockNames: string[], options: Options) => {
 		startMessage: 'Adding blocks',
 		stopMessage: `Added ${color.cyan(addedBlocks.join(', '))}`,
 		tasks,
-		verbose: options.verbose ? verbose : undefined,
+		loading,
 	});
 
 	// check if dependencies are already installed

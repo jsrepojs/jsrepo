@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { cancel, confirm, isCancel, outro, spinner } from '@clack/prompts';
+import { cancel, confirm, isCancel, outro } from '@clack/prompts';
 import color from 'chalk';
 import { Argument, Command, program } from 'commander';
 import { execa } from 'execa';
@@ -13,7 +13,7 @@ import { getInstalled } from '../utils/blocks';
 import * as url from '../utils/blocks/ts/url';
 import { isTestFile } from '../utils/build';
 import { getPathForBlock, getProjectConfig, resolvePaths } from '../utils/config';
-import { intro } from '../utils/prompts';
+import { intro, spinner } from '../utils/prompts';
 import * as registry from '../utils/registry-providers/internal';
 
 const schema = v.object({
@@ -60,7 +60,7 @@ const _test = async (blockNames: string[], options: Options) => {
 		(err) => program.error(color.red(err))
 	);
 
-	const loading = spinner();
+	const loading = spinner({ verbose: options.verbose ? verbose : undefined });
 
 	let repoPaths = config.repos;
 

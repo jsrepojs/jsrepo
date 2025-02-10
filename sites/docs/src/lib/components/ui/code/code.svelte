@@ -14,11 +14,11 @@
 	import { CopyButton } from '$lib/components/ui/copy-button';
 
 	const style = tv({
-		base: 'not-prose relative h-fit max-h-[650px] overflow-auto rounded-lg border',
+		base: 'not-prose relative h-fit max-h-[650px] overflow-auto rounded-lg',
 		variants: {
 			variant: {
-				default: 'border-border bg-transparent',
-				secondary: 'border-transparent bg-secondary/50'
+				default: 'bg-transparent',
+				secondary: 'bg-secondary/50'
 			}
 		}
 	});

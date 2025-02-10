@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { log, outro, spinner } from '@clack/prompts';
+import { log, outro } from '@clack/prompts';
 import color from 'chalk';
 import { Command, program } from 'commander';
 import ignore from 'ignore';
@@ -12,7 +12,7 @@ import { buildBlocksDirectory, buildConfigFiles, pruneUnused } from '../utils/bu
 import { DEFAULT_CONFIG, runRules } from '../utils/build/check';
 import { type RegistryConfig, getRegistryConfig } from '../utils/config';
 import { parseManifest } from '../utils/manifest';
-import { intro } from '../utils/prompts';
+import { intro, spinner } from '../utils/prompts';
 
 // sensible defaults for ignored directories
 const IGNORED_DIRS = ['.git', 'node_modules'] as const;
@@ -79,7 +79,13 @@ const build = new Command('build')
 	});
 
 const _build = async (options: Options) => {
-	const loading = spinner();
+	const verbose = (msg: string) => {
+		if (options.verbose) {
+			console.info(`${ascii.INFO} ${msg}`);
+		}
+	};
+
+	const loading = spinner({ verbose: options.verbose ? verbose : undefined });
 
 	const categories: Category[] = [];
 

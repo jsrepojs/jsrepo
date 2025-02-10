@@ -1,5 +1,5 @@
 import { intro, spinner } from '@clack/prompts';
-import boxen, { type Options as BoxenOptions } from 'boxen';
+import boxen from 'boxen';
 import color from 'chalk';
 import { detectSync, resolveCommand } from 'package-manager-detector';
 import semver from 'semver';
@@ -15,18 +15,12 @@ export type Task = {
 };
 
 type TaskOptions = {
-	verbose?: (msg: string) => void;
+	loading: ReturnType<typeof spinner>;
 };
 
-const runTasks = async (tasks: Task[], { verbose = undefined }: TaskOptions) => {
-	const loading = spinner();
-
+const runTasks = async (tasks: Task[], { loading }: TaskOptions) => {
 	for (const task of tasks) {
-		if (verbose) {
-			verbose(task.loadingMessage);
-		} else {
-			loading.start(task.loadingMessage);
-		}
+		loading.start(task.loadingMessage);
 
 		try {
 			await task.run();
@@ -35,11 +29,7 @@ const runTasks = async (tasks: Task[], { verbose = undefined }: TaskOptions) => 
 			console.error(err);
 		}
 
-		if (verbose) {
-			verbose(task.completedMessage);
-		} else {
-			loading.stop(task.completedMessage);
-		}
+		loading.stop(task.completedMessage);
 	}
 };
 
@@ -48,63 +38,76 @@ export type ConcurrentTask = {
 };
 
 export type ConcurrentOptions = {
+	loading: ReturnType<typeof spinner>;
 	startMessage: string;
 	stopMessage: string;
 	tasks: ConcurrentTask[];
-	verbose?: (msg: string) => void;
 };
 
 const runTasksConcurrently = async ({
 	tasks,
 	startMessage,
 	stopMessage,
-	verbose,
+	loading,
 }: ConcurrentOptions) => {
-	const loading = spinner();
+	loading.start(startMessage);
 
-	const message = (msg: string) => {
-		if (verbose) {
-			verbose(msg);
-		} else {
-			loading.message(msg);
-		}
-	};
+	await Promise.all([...tasks.map((t) => t.run({ message: loading.message }))]);
 
-	if (verbose) {
-		verbose(startMessage);
-	} else {
-		loading.start(startMessage);
-	}
-
-	await Promise.all([...tasks.map((t) => t.run({ message }))]);
-
-	if (verbose) {
-		verbose(stopMessage);
-	} else {
-		loading.stop(stopMessage);
-	}
+	loading.stop(stopMessage);
 };
 
-export const boxenDefaultOptions: BoxenOptions = {
-	padding: 1,
-	borderColor: 'gray',
-	borderStyle: {
-		topLeft: stripAsni(ascii.JUNCTION_RIGHT),
-		bottomLeft: stripAsni(ascii.JUNCTION_RIGHT),
-		topRight: stripAsni(ascii.TOP_RIGHT_CORNER),
-		top: stripAsni(ascii.HORIZONTAL_LINE),
-		bottom: stripAsni(ascii.HORIZONTAL_LINE),
-		bottomRight: stripAsni(ascii.BOTTOM_RIGHT_CORNER),
-		left: stripAsni(ascii.VERTICAL_LINE),
-		right: stripAsni(ascii.VERTICAL_LINE),
-	},
+/** A spinner compatible with verbose logging
+ *
+ * @param param0
+ * @returns
+ */
+const _spinner = ({
+	verbose,
+}: { verbose?: (msg: string) => void } = {}): ReturnType<typeof spinner> => {
+	const loading = spinner();
+
+	return {
+		message: (msg) => {
+			if (verbose) {
+				verbose(msg ?? '');
+			} else {
+				loading.message(msg);
+			}
+		},
+		stop: (msg) => {
+			if (verbose) {
+				verbose(msg ?? '');
+			} else {
+				loading.stop(msg);
+			}
+		},
+		start: (msg) => {
+			if (verbose) {
+				verbose(msg ?? '');
+			} else {
+				loading.start(msg);
+			}
+		},
+	};
 };
 
 const nextSteps = (steps: string[]): string => {
 	const box = boxen(steps.join('\n'), {
-		...boxenDefaultOptions,
 		title: 'Next Steps',
 		textAlignment: 'left',
+		padding: 1,
+		borderColor: 'gray',
+		borderStyle: {
+			topLeft: stripAsni(ascii.JUNCTION_RIGHT),
+			bottomLeft: stripAsni(ascii.JUNCTION_RIGHT),
+			topRight: stripAsni(ascii.TOP_RIGHT_CORNER),
+			top: stripAsni(ascii.HORIZONTAL_LINE),
+			bottom: stripAsni(ascii.HORIZONTAL_LINE),
+			bottomRight: stripAsni(ascii.BOTTOM_RIGHT_CORNER),
+			left: stripAsni(ascii.VERTICAL_LINE),
+			right: stripAsni(ascii.VERTICAL_LINE),
+		},
 	});
 
 	return `${ascii.VERTICAL_LINE}\n${box}\n`;
@@ -159,4 +162,11 @@ const _intro = async () => {
 	);
 };
 
-export { runTasks, nextSteps, _intro as intro, runTasksConcurrently, truncatedList };
+export {
+	runTasks,
+	nextSteps,
+	_intro as intro,
+	_spinner as spinner,
+	runTasksConcurrently,
+	truncatedList,
+};

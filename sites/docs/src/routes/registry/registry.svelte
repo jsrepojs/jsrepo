@@ -16,6 +16,7 @@
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import * as array from '$lib/ts/array';
 	import { FileIcon } from '$lib/components/ui/file-icon';
+	import { Code } from '$lib/components/ui/code';
 
 	type Props = {
 		registryUrl: string;
@@ -202,6 +203,13 @@
 			>
 				Dependencies
 			</a>
+			<a
+				href="#manifest"
+				use:active={{ isHash: true }}
+				class="font-medium p-2 data-[active=true]:text-foreground data-[active=true]:bg-accent hover:bg-accent transition-all text-muted-foreground hover:text-foreground rounded-md"
+			>
+				Manifest
+			</a>
 		</div>
 		{#if checkIsActive(new URL('#/', page.url.href).toString(), { url: page.url, isHash: true })}
 			<!-- overview -->
@@ -302,6 +310,10 @@
 							<span class="text-muted-foreground font-medium">Dependencies</span>
 							<span>{registryInfo.dependencies.length}</span>
 						</div>
+						<div class="flex flex-col p-2">
+							<span class="text-muted-foreground font-medium">Config Files</span>
+							<span>{(manifest.configFiles ?? []).length}</span>
+						</div>
 					</div>
 					{#if manifest.meta?.authors}
 						<Separator />
@@ -393,6 +405,10 @@
 						</Collapsible.Root>
 					{/each}
 				{/each}
+			</div>
+		{:else if checkIsActive( new URL('#manifest', page.url.href).toString(), { url: page.url, isHash: true } )}
+			<div class="py-4">
+				<Code lang="json" code={JSON.stringify(manifest, null, '\t')} class="max-h-none" />
 			</div>
 		{:else if checkIsActive( new URL('#dependencies', page.url.href).toString(), { url: page.url, isHash: true } )}
 			<div class="py-4">
