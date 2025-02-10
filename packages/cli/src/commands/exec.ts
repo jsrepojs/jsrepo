@@ -21,6 +21,7 @@ const schema = v.objectWithRest(
 	{
 		repo: v.optional(v.string()),
 		allow: v.boolean(),
+		cache: v.boolean(),
 		cwd: v.string(),
 	},
 	v.unknown()
@@ -39,6 +40,7 @@ const exec = new Command('exec')
 	)
 	.option('--repo <repo>', 'Repository to download and run the script from.')
 	.option('-A, --allow', 'Allow jsrepo to download code from the provided repo.', false)
+	.option('--no-cache', 'Disable caching of resolved git urls.')
 	.option('--cwd <path>', 'The current working directory.', process.cwd())
 	.allowExcessArguments()
 	.allowUnknownOption()
@@ -141,7 +143,7 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 	loading.start(`Fetching scripts from ${color.cyan(repoPaths.join(', '))}`);
 
 	const resolvedRepos: registry.RegistryProviderState[] = (
-		await registry.forEachPathGetProviderState(...repoPaths)
+		await registry.forEachPathGetProviderState(repoPaths, { noCache: !options.cache })
 	).match(
 		(val) => val,
 		({ repo, message }) => {

@@ -52,6 +52,7 @@ const schema = v.object({
 	expand: v.boolean(),
 	maxUnchanged: v.number(),
 	yes: v.boolean(),
+	cache: v.boolean(),
 	cwd: v.string(),
 });
 
@@ -87,6 +88,7 @@ const init = new Command('init')
 		3
 	)
 	.option('-y, --yes', 'Skip confirmation prompt.', false)
+	.option('--no-cache', 'Disable caching of resolved git urls.')
 	.option('--cwd <path>', 'The current working directory.', process.cwd())
 	.action(async (registries, opts) => {
 		const options = v.parse(schema, opts);
@@ -527,7 +529,7 @@ const promptForProviderConfig = async ({
 
 	loading.start(`Fetching manifest from ${color.cyan(repo)}`);
 
-	const providerState = await registry.getProviderState(repo);
+	const providerState = await registry.getProviderState(repo, { noCache: !options.cache });
 
 	if (providerState.isErr()) {
 		program.error(color.red(providerState.unwrapErr()));

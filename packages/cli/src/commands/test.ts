@@ -21,6 +21,7 @@ const schema = v.object({
 	repo: v.optional(v.string()),
 	allow: v.boolean(),
 	debug: v.boolean(),
+	cache: v.boolean(),
 	verbose: v.boolean(),
 	cwd: v.string(),
 });
@@ -33,6 +34,7 @@ const test = new Command('test')
 	.option('--repo <repo>', 'Repository to download the blocks from.')
 	.option('-A, --allow', 'Allow jsrepo to download code from the provided repo.', false)
 	.option('--debug', 'Leaves the temp test file around for debugging upon failure.', false)
+	.option('--no-cache', 'Disable caching of resolved git urls.')
 	.option('--verbose', 'Include debug logs.', false)
 	.option('--cwd <path>', 'The current working directory.', process.cwd())
 	.action(async (blockNames, opts) => {
@@ -81,7 +83,7 @@ const _test = async (blockNames: string[], options: Options) => {
 	if (!options.verbose) loading.start(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
 
 	const resolvedRepos: registry.RegistryProviderState[] = (
-		await registry.forEachPathGetProviderState(...repoPaths)
+		await registry.forEachPathGetProviderState(repoPaths, { noCache: !options.cache })
 	).match(
 		(val) => val,
 		({ repo, message }) => {

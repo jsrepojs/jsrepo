@@ -110,6 +110,7 @@ ${color.bold('This may be for one of the following reasons:')}
 1. Either \`${color.bold(filePath)}\` or the containing repository doesn't exist
 2. Your repository path is incorrect (wrong branch, wrong tag)
 3. You are using an expired access token or a token that doesn't have access to this repository
+4. The cached state for this git provider is incorrect (try using ${color.bold('--no-cache')})
 `;
 	},
 };

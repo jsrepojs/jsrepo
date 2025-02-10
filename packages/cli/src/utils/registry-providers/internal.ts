@@ -64,15 +64,31 @@ export const getProviderToken = (provider: RegistryProvider): string | undefined
  * @returns
  */
 export const getProviderState = async (
-	repo: string
+	repo: string,
+	{ noCache = false }: { noCache?: boolean } = {}
 ): Promise<Result<RegistryProviderState, string>> => {
 	const provider = selectProvider(repo);
+
 	if (provider) {
+		const storage = persisted.get();
+
+		// only git providers are cached
+		if (provider.name !== http.name && !noCache) {
+			const cached = storage.get(`${repo}-state`);
+
+			if (cached) return Ok({ ...(cached as RegistryProviderState), provider });
+		}
+
 		const state = await provider.state(repo, {
 			token: getProviderToken(provider),
 			// @ts-expect-error but it does work
 			fetch: nodeFetch,
 		});
+
+		// only cache git providers
+		if (provider.name !== http.name && !noCache) {
+			storage.set(`${repo}-state`, state);
+		}
 
 		return Ok(state);
 	}
@@ -88,13 +104,14 @@ export const getProviderState = async (
  * @returns
  */
 export const forEachPathGetProviderState = async (
-	...repos: string[]
+	repos: string[],
+	{ noCache = false }: { noCache?: boolean } = {}
 ): Promise<Result<RegistryProviderState[], { message: string; repo: string }>> => {
 	const resolvedPaths: RegistryProviderState[] = [];
 
 	const errors = await Promise.all(
 		repos.map(async (repo) => {
-			const getProviderResult = await getProviderState(repo);
+			const getProviderResult = await getProviderState(repo, { noCache });
 
 			if (getProviderResult.isErr())
 				return Err({ message: getProviderResult.unwrapErr(), repo });
