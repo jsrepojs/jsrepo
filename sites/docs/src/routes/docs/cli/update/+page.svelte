@@ -124,6 +124,15 @@
 		<Snippet command="execute" args={['jsrepo', 'update', '--yes']} />
 	{/snippet}
 </OptionDocs>
+<OptionDocs name="--no-cache">
+	{#snippet description()}
+		Prevents caching the git provider state. Useful if the cache is incorrect due to changing the
+		default branch for a repository or changing a tag into a head or vise versa.
+	{/snippet}
+	{#snippet usage()}
+		<Snippet command="execute" args={['jsrepo', 'add', '--no-cache']} />
+	{/snippet}
+</OptionDocs>
 <OptionDocs name="--verbose">
 	{#snippet description()}
 		More verbose logging. (May be used to troubleshoot issues)

@@ -199,8 +199,8 @@ importers:
         specifier: ^2.21.0
         version: 2.21.0
       jsrepo:
-        specifier: ^1.34.0
-        version: 1.34.0(typescript@5.7.3)(ws@8.18.0)(zod@3.24.1)
+        specifier: ^1.35.0
+        version: 1.35.0(typescript@5.7.3)(ws@8.18.0)(zod@3.24.1)
       lucide-svelte:
         specifier: ^0.475.0
         version: 0.475.0(svelte@5.19.9)
@@ -241,8 +241,8 @@ importers:
         specifier: ^2.23.1
         version: 2.23.1(@sveltejs/kit@2.17.1(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.19.9)(vite@6.1.0(@types/node@22.13.1)(jiti@1.21.7)(yaml@2.7.0)))(svelte@5.19.9)(vite@6.1.0(@types/node@22.13.1)(jiti@1.21.7)(yaml@2.7.0)))(@types/json-schema@7.0.15)(svelte@5.19.9)(typescript@5.7.3)
       tailwind-merge:
-        specifier: ^3.0.1
-        version: 3.0.1
+        specifier: ^2.6.0
+        version: 2.6.0
       tailwind-variants:
         specifier: ^0.3.1
         version: 0.3.1(tailwindcss@3.4.17)
@@ -259,8 +259,8 @@ importers:
         specifier: ^8.23.0
         version: 8.23.0(eslint@9.20.0(jiti@1.21.7))(typescript@5.7.3)
       valibot:
-        specifier: 1.0.0-beta.15
-        version: 1.0.0-beta.15(typescript@5.7.3)
+        specifier: 1.0.0-rc.0
+        version: 1.0.0-rc.0(typescript@5.7.3)
       vaul-svelte:
         specifier: 1.0.0-next.3
         version: 1.0.0-next.3(svelte@5.19.9)
@@ -2253,8 +2253,8 @@ packages:
   jsonfile@4.0.0:
     resolution: {integrity: sha512-m6F1R3z8jjlf2imQHS2Qez5sjKWQzbuuhuJ/FKYFRZvPE3PuHcSMVZzfsLhGVOkfd20obL5SWEBew5ShlquNxg==}
 
-  jsrepo@1.34.0:
-    resolution: {integrity: sha512-BGIrOQKkl+cr7EDCEFqsHg1i83EO1Q8zfS+oa7eJkgDJw1SmVGdOx4hI0SDUac3RWPDneWi4FrjIcmWcK4YO7A==}
+  jsrepo@1.35.0:
+    resolution: {integrity: sha512-EdiU+5I1JS5yfwuffdCKFGIccBevRypaOWdQUF+enNubNxOxYKA3P79EKRZWb8fiFwDLu0hwRM/hqZELQ8cgGQ==}
     hasBin: true
 
   keyv@4.5.4:
@@ -3055,8 +3055,8 @@ packages:
   tailwind-merge@2.5.4:
     resolution: {integrity: sha512-0q8cfZHMu9nuYP/b5Shb7Y7Sh1B7Nnl5GqNr1U+n2p6+mybvRtayrQ+0042Z5byvTA8ihjlP8Odo8/VnHbZu4Q==}
 
-  tailwind-merge@3.0.1:
-    resolution: {integrity: sha512-AvzE8FmSoXC7nC+oU5GlQJbip2UO7tmOhOfQyOmPhrStOGXHU08j8mZEHZ4BmCqY5dWTCo4ClWkNyRNx1wpT0g==}
+  tailwind-merge@2.6.0:
+    resolution: {integrity: sha512-P+Vu1qXfzediirmHOC3xKGAYeZtPcV9g76X+xg2FD4tYgR71ewMA35Y3sCz3zhiN/dwefRpJX0yBcgwi1fXNQA==}
 
   tailwind-variants@0.3.1:
     resolution: {integrity: sha512-krn67M3FpPwElg4FsZrOQd0U26o7UDH/QOkK8RNaiCCrr052f6YJPBUfNKnPo/s/xRzNPtv1Mldlxsg8Tb46BQ==}
@@ -3306,14 +3306,6 @@ packages:
 
   valibot@1.0.0-beta.11:
     resolution: {integrity: sha512-Ztl5Iks1Ql7Z6CwkS5oyqguN3G8tmUiNlsHpqbDt6DLMpm+eu+n8Q7f921gI3uHvNZ8xDVkd4cEJP5t+lELOfw==}
-    peerDependencies:
-      typescript: '>=5'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
-  valibot@1.0.0-beta.15:
-    resolution: {integrity: sha512-BKy8XosZkDHWmYC+cJG74LBzP++Gfntwi33pP3D3RKztz2XV9jmFWnkOi21GoqARP8wAWARwhV6eTr1JcWzjGw==}
     peerDependencies:
       typescript: '>=5'
     peerDependenciesMeta:
@@ -5793,7 +5785,7 @@ snapshots:
     optionalDependencies:
       graceful-fs: 4.2.11
 
-  jsrepo@1.34.0(typescript@5.7.3)(ws@8.18.0)(zod@3.24.1):
+  jsrepo@1.35.0(typescript@5.7.3)(ws@8.18.0)(zod@3.24.1):
     dependencies:
       '@anthropic-ai/sdk': 0.36.3
       '@biomejs/js-api': 0.7.1(@biomejs/wasm-nodejs@1.9.4)
@@ -5821,7 +5813,7 @@ snapshots:
       semver: 7.7.1
       svelte: 5.19.9
       ts-morph: 25.0.1
-      valibot: 1.0.0-beta.15(typescript@5.7.3)
+      valibot: 1.0.0-rc.0(typescript@5.7.3)
       validate-npm-package-name: 6.0.0
       vue: 3.5.13(typescript@5.7.3)
     transitivePeerDependencies:
@@ -6603,7 +6595,7 @@ snapshots:
 
   tailwind-merge@2.5.4: {}
 
-  tailwind-merge@3.0.1: {}
+  tailwind-merge@2.6.0: {}
 
   tailwind-variants@0.3.1(tailwindcss@3.4.17):
     dependencies:
@@ -6854,10 +6846,6 @@ snapshots:
     optionalDependencies:
       typescript: 5.7.3
     optional: true
-
-  valibot@1.0.0-beta.15(typescript@5.7.3):
-    optionalDependencies:
-      typescript: 5.7.3
 
   valibot@1.0.0-rc.0(typescript@5.7.3):
     optionalDependencies:
