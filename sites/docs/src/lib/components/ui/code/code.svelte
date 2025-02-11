@@ -14,7 +14,7 @@
 	import { CopyButton } from '$lib/components/ui/copy-button';
 
 	const style = tv({
-		base: 'not-prose relative h-fit max-h-[650px] overflow-auto rounded-lg',
+		base: 'not-prose relative border h-fit max-h-[650px] overflow-auto rounded-lg',
 		variants: {
 			variant: {
 				default: 'bg-transparent',
