@@ -14,7 +14,7 @@
 	import { CopyButton } from '$lib/components/ui/copy-button';
 
 	const style = tv({
-		base: 'not-prose relative border h-fit max-h-[650px] overflow-auto rounded-lg',
+		base: 'not-prose relative h-fit max-h-[650px] overflow-auto rounded-lg',
 		variants: {
 			variant: {
 				default: 'bg-transparent',
@@ -133,7 +133,7 @@
 	}
 
 	:global(pre.shiki) {
-		@apply overflow-auto rounded-lg bg-inherit py-4 text-sm;
+		@apply overflow-auto rounded-lg border border-border bg-inherit py-4 text-sm;
 		max-height: min(100%, 650px);
 		-ms-overflow-style: none; /* IE and Edge */
 		scrollbar-width: none; /* Firefox */
