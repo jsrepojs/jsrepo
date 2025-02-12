@@ -15,6 +15,7 @@ export interface Model {
 		originalFile: File;
 		newFile: File;
 		loading: ReturnType<typeof spinner>;
+		additionalInstructions?: string;
 		verbose?: (msg: string) => void;
 	}) => Promise<string>;
 }
@@ -28,12 +29,12 @@ type Prompt = {
 
 const models: Record<ModelName, Model> = {
 	'Claude 3.5 Sonnet': {
-		updateFile: async ({ originalFile, newFile, loading, verbose }) => {
+		updateFile: async ({ originalFile, newFile, loading, verbose, additionalInstructions }) => {
 			const apiKey = await getApiKey('Anthropic');
 
 			if (!verbose) loading.start(`Asking ${'Claude 3.5 Sonnet'}`);
 
-			const prompt = createUpdatePrompt({ originalFile, newFile });
+			const prompt = createUpdatePrompt({ originalFile, newFile, additionalInstructions });
 
 			verbose?.(
 				`Prompting ${'Claude 3.5 Sonnet'} with:\n${JSON.stringify(prompt, null, '\t')}`
@@ -54,12 +55,12 @@ const models: Record<ModelName, Model> = {
 		},
 	},
 	'ChatGPT 4o': {
-		updateFile: async ({ originalFile, newFile, loading, verbose }) => {
+		updateFile: async ({ originalFile, newFile, loading, verbose, additionalInstructions }) => {
 			const apiKey = await getApiKey('OpenAI');
 
 			if (!verbose) loading.start(`Asking ${'ChatGPT 4o'}`);
 
-			const prompt = createUpdatePrompt({ originalFile, newFile });
+			const prompt = createUpdatePrompt({ originalFile, newFile, additionalInstructions });
 
 			verbose?.(`Prompting ${'ChatGPT 4o'} with:\n${JSON.stringify(prompt, null, '\t')}`);
 
@@ -78,12 +79,12 @@ const models: Record<ModelName, Model> = {
 		},
 	},
 	'ChatGPT 4o-mini': {
-		updateFile: async ({ originalFile, newFile, loading, verbose }) => {
+		updateFile: async ({ originalFile, newFile, loading, verbose, additionalInstructions }) => {
 			const apiKey = await getApiKey('OpenAI');
 
 			if (!verbose) loading.start(`Asking ${'ChatGPT 4o-mini'}`);
 
-			const prompt = createUpdatePrompt({ originalFile, newFile });
+			const prompt = createUpdatePrompt({ originalFile, newFile, additionalInstructions });
 
 			verbose?.(`Prompting ${'ChatGPT 4o'} with:\n${JSON.stringify(prompt, null, '\t')}`);
 
@@ -102,10 +103,10 @@ const models: Record<ModelName, Model> = {
 		},
 	},
 	Phi4: {
-		updateFile: async ({ originalFile, newFile, loading, verbose }) => {
+		updateFile: async ({ originalFile, newFile, loading, verbose, additionalInstructions }) => {
 			if (!verbose) loading.start(`Asking ${'Phi4'}`);
 
-			const prompt = createUpdatePrompt({ originalFile, newFile });
+			const prompt = createUpdatePrompt({ originalFile, newFile, additionalInstructions });
 
 			verbose?.(`Prompting ${'Phi4'} with:\n${JSON.stringify(prompt, null, '\t')}`);
 
@@ -221,21 +222,24 @@ const getNextCompletionOllama = async ({
 const createUpdatePrompt = ({
 	originalFile,
 	newFile,
-}: { originalFile: File; newFile: File }): Prompt => {
+	additionalInstructions,
+}: {
+	originalFile: File;
+	newFile: File;
+	additionalInstructions?: string;
+}): Prompt => {
 	return {
-		system: 'You will respond only with the resulting code. DO NOT format the code with markdown, DO NOT put the code inside of triple quotes, only return the code as a raw string.',
-		message: `Help me merge these two files. DO NOT make unnecessary changes. 
-I expect the original code to maintain the same behavior as it currently has while including any added functionality from the new file.
-This means stuff like defaults or configuration should normally stay intact unless the new behaviors in the new file depend on those defaults or configuration.
+		system: 'You will merge two files provided by the user. You will respond only with the resulting code. DO NOT format the code with markdown, DO NOT put the code inside of triple quotes, only return the code as a raw string. DO NOT make unnecessary changes.',
+		message: `
 This is my current file ${originalFile.path}:
-\`\`\`
+<code>
 ${originalFile.content}
-\`\`\`
+</code>
 	
 This is the file that has changes I want to update with ${newFile.path}:
-\`\`\`
+<code>
 ${newFile.content}
-\`\`\`
+</code>${additionalInstructions ? `<additional-instructions>${additionalInstructions}</additional-instructions>` : ''}
 	`,
 	};
 };

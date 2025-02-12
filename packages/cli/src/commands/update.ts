@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { cancel, confirm, isCancel, log, multiselect, outro, select } from '@clack/prompts';
+import { cancel, confirm, isCancel, log, multiselect, outro, select, text } from '@clack/prompts';
 import color from 'chalk';
 import { Command, program } from 'commander';
 import { diffLines } from 'diff';
@@ -292,6 +292,8 @@ const _update = async (blockNames: string[], options: Options) => {
 
 				const to = path.relative(options.cwd, file.destPath);
 
+				let hasUpdatedWithAI = false;
+
 				while (true) {
 					const changes = diffLines(localContent, remoteContent);
 
@@ -321,23 +323,39 @@ const _update = async (blockNames: string[], options: Options) => {
 						acceptedChanges = options.yes;
 
 						if (!options.yes && !options.no) {
+							const confirmOptions = [
+								{
+									label: 'Accept',
+									value: 'accept',
+								},
+								{
+									label: 'Reject',
+									value: 'reject',
+								},
+							];
+
+							if (hasUpdatedWithAI) {
+								confirmOptions.push(
+									{
+										label: `✨ ${color.yellow('Update with AI')} ✨ ${color.gray('(Iterate)')}`,
+										value: 'update-iterate',
+									},
+									{
+										label: `✨ ${color.yellow('Update with AI')} ✨ ${color.gray('(Retry)')}`,
+										value: 'update',
+									}
+								);
+							} else {
+								confirmOptions.push({
+									label: `✨ ${color.yellow('Update with AI')} ✨`,
+									value: 'update',
+								});
+							}
+
 							// prompt the user
 							const confirmResult = await select({
 								message: 'Accept changes?',
-								options: [
-									{
-										label: 'Accept',
-										value: 'accept',
-									},
-									{
-										label: 'Reject',
-										value: 'reject',
-									},
-									{
-										label: `✨ ${color.yellow('Update with AI')} ✨`,
-										value: 'update',
-									},
-								],
+								options: confirmOptions,
 							});
 
 							if (isCancel(confirmResult)) {
@@ -345,7 +363,7 @@ const _update = async (blockNames: string[], options: Options) => {
 								process.exit(0);
 							}
 
-							if (confirmResult === 'update') {
+							if (confirmResult === 'update' || confirmResult === 'update-iterate') {
 								// prompt for model
 								const modelResult = await select({
 									message: 'Select a model',
@@ -353,6 +371,7 @@ const _update = async (blockNames: string[], options: Options) => {
 										label: key,
 										value: key,
 									})),
+									initialValue: model,
 								});
 
 								if (isCancel(modelResult)) {
@@ -362,16 +381,32 @@ const _update = async (blockNames: string[], options: Options) => {
 
 								model = modelResult as ModelName;
 
+								const additionalInstructions = await text({
+									message: 'Any additional instructions?',
+								});
+
+								if (isCancel(additionalInstructions)) {
+									cancel('Canceled!');
+									process.exit(0);
+								}
+
 								try {
 									remoteContent = await models[model].updateFile({
 										originalFile: {
-											content: localContent,
+											content:
+												confirmResult === 'update-iterate'
+													? remoteContent
+													: localContent,
 											path: to,
 										},
 										newFile: {
 											content: originalRemoteContent,
 											path: from,
 										},
+										additionalInstructions:
+											additionalInstructions.trim().length > 0
+												? additionalInstructions
+												: undefined,
 										loading,
 										verbose: options.verbose ? verbose : undefined,
 									});
@@ -393,6 +428,8 @@ const _update = async (blockNames: string[], options: Options) => {
 								});
 
 								process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
+
+								hasUpdatedWithAI = true;
 
 								continue;
 							}
