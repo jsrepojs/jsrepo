@@ -2,18 +2,18 @@ import type { PartialConfiguration } from '@biomejs/wasm-nodejs';
 import { cancel, intro, isCancel, log, select, spinner, text } from '@clack/prompts';
 import boxen from 'boxen';
 import color from 'chalk';
+import { diffLines } from 'diff';
 import { detectSync, resolveCommand } from 'package-manager-detector';
 import type * as prettier from 'prettier';
 import semver from 'semver';
+import { type Message, type ModelName, models } from './ai';
 import * as ascii from './ascii';
 import { stripAsni } from './blocks/ts/strip-ansi';
-import { packageJson } from './context';
-import { getLatestVersion } from './get-latest-version';
-import { diffLines } from 'diff';
-import { formatDiff } from './diff';
-import { type ModelName, models } from './ai';
-import { formatFile } from './files';
 import type { ProjectConfig } from './config';
+import { packageJson } from './context';
+import { formatDiff } from './diff';
+import { formatFile } from './files';
+import { getLatestVersion } from './get-latest-version';
 
 export type Task = {
 	loadingMessage: string;
@@ -212,10 +212,11 @@ export const promptUpdateFile = async ({
 
 	let acceptedChanges = false;
 
-	let hasUpdatedWithAI = false;
 	let updatedContent = incoming.content;
 
 	let model: ModelName = 'Claude 3.5 Sonnet';
+
+	let messageHistory: Message[] = [];
 
 	while (true) {
 		const changes = diffLines(current.content, updatedContent);
@@ -257,14 +258,14 @@ export const promptUpdateFile = async ({
 					},
 				];
 
-				if (hasUpdatedWithAI) {
+				if (messageHistory.length > 0) {
 					confirmOptions.push(
 						{
 							label: `✨ ${color.yellow('Update with AI')} ✨ ${color.gray('(Iterate)')}`,
 							value: 'update-iterate',
 						},
 						{
-							label: `✨ ${color.yellow('Update with AI')} ✨ ${color.gray('(Retry)')}`,
+							label: `✨ ${color.yellow('Update with AI')} ✨ ${color.gray('(Start over)')}`,
 							value: 'update',
 						}
 					);
@@ -287,6 +288,11 @@ export const promptUpdateFile = async ({
 				}
 
 				if (confirmResult === 'update' || confirmResult === 'update-iterate') {
+					// clear chat context
+					if (confirmResult === 'update') {
+						messageHistory = [];
+					}
+
 					// prompt for model
 					const modelResult = await select({
 						message: 'Select a model',
@@ -307,6 +313,14 @@ export const promptUpdateFile = async ({
 					const additionalInstructions = await text({
 						message: 'Any additional instructions?',
 						defaultValue: 'None',
+						validate: (val) => {
+							// don't care if no messages have been sent
+							if (messageHistory.length === 0) return undefined;
+
+							if (val.trim() === '') {
+								return 'Please provide additional context so that I know how I can improve.';
+							}
+						},
 					});
 
 					if (isCancel(additionalInstructions)) {
@@ -315,7 +329,7 @@ export const promptUpdateFile = async ({
 					}
 
 					try {
-						updatedContent = await models[model].updateFile({
+						const { content, prompt } = await models[model].updateFile({
 							originalFile: current,
 							newFile: {
 								content:
@@ -330,7 +344,14 @@ export const promptUpdateFile = async ({
 									: undefined,
 							loading: options.loading,
 							verbose: options.verbose,
+							messages: messageHistory,
 						});
+
+						updatedContent = content;
+
+						// add messages to history
+						messageHistory.push({ role: 'user', content: prompt });
+						messageHistory.push({ role: 'assistant', content: content });
 					} catch (err) {
 						options.loading.stop();
 						log.error(color.red(`Error getting completions: ${err}`));
@@ -349,8 +370,6 @@ export const promptUpdateFile = async ({
 					});
 
 					process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
-
-					hasUpdatedWithAI = true;
 
 					continue;
 				}

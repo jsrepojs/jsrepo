@@ -13,13 +13,12 @@ import {
 } from '@clack/prompts';
 import color from 'chalk';
 import { Command, Option, program } from 'commander';
-import { diffLines } from 'diff';
 import { createPathsMatcher } from 'get-tsconfig';
 import { detect, resolveCommand } from 'package-manager-detector';
 import path from 'pathe';
 import * as v from 'valibot';
-import { type ModelName, models } from '../utils/ai';
 import * as ascii from '../utils/ascii';
+import * as url from '../utils/blocks/ts/url';
 import {
 	type Formatter,
 	PROJECT_CONFIG_NAME,
@@ -32,13 +31,12 @@ import {
 } from '../utils/config';
 import { packageJson } from '../utils/context';
 import { installDependencies } from '../utils/dependencies';
-import { formatDiff } from '../utils/diff';
 import { formatFile, matchJSDescendant, tryGetTsconfig } from '../utils/files';
 import { loadFormatterConfig } from '../utils/format';
 import { json } from '../utils/language-support';
 import { returnShouldInstall } from '../utils/package';
 import * as persisted from '../utils/persisted';
-import { type Task, intro, nextSteps, runTasks } from '../utils/prompts';
+import { type Task, intro, nextSteps, promptUpdateFile, runTasks } from '../utils/prompts';
 import * as registry from '../utils/registry-providers/internal';
 
 const schema = v.object({
@@ -595,10 +593,10 @@ const promptForProviderConfig = async ({
 
 			let fullFilePath = path.join(options.cwd, configFiles[file.name]);
 
-			let originalFileContents: string | undefined;
+			let fileContents: string | undefined;
 
 			if (fs.existsSync(fullFilePath)) {
-				originalFileContents = fs.readFileSync(fullFilePath).toString();
+				fileContents = fs.readFileSync(fullFilePath).toString();
 			} else {
 				const dir = path.dirname(fullFilePath);
 
@@ -606,7 +604,7 @@ const promptForProviderConfig = async ({
 					const matchedPath = matchJSDescendant(fullFilePath);
 
 					if (matchedPath) {
-						originalFileContents = fs.readFileSync(matchedPath).toString();
+						fileContents = fs.readFileSync(matchedPath).toString();
 
 						const newPath = path.relative(options.cwd, matchedPath);
 
@@ -637,152 +635,37 @@ const promptForProviderConfig = async ({
 				},
 				biomeOptions,
 				prettierOptions,
-				config: {
-					$schema: '',
-					includeTests: false,
-					paths: {
-						'*': '',
-					},
-					repos: [],
-					watermark: false,
-					configFiles: {},
-					formatter,
-				},
+				formatter,
 			});
-
-			let remoteContent = originalRemoteContent;
 
 			loading.stop(`Fetched the ${color.cyan(file.name)} from ${color.cyan(repo)}`);
 
-			let acceptedChanges = options.yes || originalFileContents === undefined;
+			let acceptedChanges = options.yes || fileContents === undefined;
 
-			if (originalFileContents) {
+			if (fileContents) {
 				if (!options.yes) {
-					process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
+					const from = url.join(providerState.unwrap().url, file.name);
 
-					while (true) {
-						const changes = diffLines(originalFileContents, remoteContent);
+					const updateResult = await promptUpdateFile({
+						config: { biomeOptions, prettierOptions, formatter },
+						current: {
+							content: fileContents,
+							path: fullFilePath,
+						},
+						incoming: {
+							content: originalRemoteContent,
+							path: from,
+						},
+						options: {
+							...options,
+							loading,
+							no: false,
+						},
+					});
 
-						// print diff
-						const formattedDiff = formatDiff({
-							from: file.name,
-							to: fullFilePath,
-							changes,
-							expand: options.expand,
-							maxUnchanged: options.maxUnchanged,
-							prefix: () => `${ascii.VERTICAL_LINE}  `,
-							onUnchanged: ({ from, to, prefix }) =>
-								`${prefix?.() ?? ''}${color.cyan(from)} → ${color.gray(to)} ${color.gray('(unchanged)')}\n`,
-							intro: ({ from, to, changes, prefix }) => {
-								const totalChanges = changes.filter(
-									(a) => a.added || a.removed
-								).length;
-
-								return `${prefix?.() ?? ''}${color.cyan(from)} → ${color.gray(to)} (${totalChanges} change${
-									totalChanges === 1 ? '' : 's'
-								})\n${prefix?.() ?? ''}\n`;
-							},
-						});
-
-						process.stdout.write(formattedDiff);
-
-						// if there are no changes then don't ask
-						if (changes.length > 1 || originalFileContents === '') {
-							acceptedChanges = options.yes;
-
-							if (!options.yes) {
-								// prompt the user
-								const confirmResult = await select({
-									message: 'Accept changes?',
-									options: [
-										{
-											label: 'Accept',
-											value: 'accept',
-										},
-										{
-											label: 'Reject',
-											value: 'reject',
-										},
-										{
-											label: `✨ ${color.yellow('Update with AI')} ✨`,
-											value: 'update',
-										},
-									],
-								});
-
-								if (isCancel(confirmResult)) {
-									cancel('Canceled!');
-									process.exit(0);
-								}
-
-								if (confirmResult === 'update') {
-									// prompt for model
-									const modelResult = await select({
-										message: 'Select a model',
-										options: Object.keys(models).map((key) => ({
-											label: key,
-											value: key,
-										})),
-									});
-
-									if (isCancel(modelResult)) {
-										cancel('Canceled!');
-										process.exit(0);
-									}
-
-									const model = modelResult as ModelName;
-
-									try {
-										remoteContent = await models[model].updateFile({
-											originalFile: {
-												content: originalFileContents,
-												path: fullFilePath,
-											},
-											newFile: {
-												content: originalRemoteContent,
-												path: file.name,
-											},
-											loading,
-										});
-									} catch (err) {
-										loading.stop();
-										log.error(color.red(`Error getting completions: ${err}`));
-										process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
-										continue;
-									}
-
-									remoteContent = await formatFile({
-										file: {
-											content: remoteContent,
-											destPath: fullFilePath,
-										},
-										biomeOptions,
-										prettierOptions,
-										config: {
-											$schema: '',
-											includeTests: false,
-											paths: {
-												'*': '',
-											},
-											repos: [],
-											watermark: false,
-											configFiles: {},
-											formatter,
-										},
-									});
-
-									process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
-
-									continue;
-								}
-
-								acceptedChanges = confirmResult === 'accept';
-
-								break;
-							}
-						}
-
-						break; // there were no changes or changes were automatically accepted
+					if (updateResult.applyChanges) {
+						acceptedChanges = true;
+						fileContents = updateResult.updatedContent;
 					}
 				}
 			} else {
@@ -791,12 +674,14 @@ const promptForProviderConfig = async ({
 				if (!fs.existsSync(dir)) {
 					fs.mkdirSync(dir, { recursive: true });
 				}
+
+				fileContents = originalRemoteContent;
 			}
 
-			if (acceptedChanges) {
+			if (acceptedChanges && fileContents) {
 				loading.start(`Writing ${color.cyan(file.name)} to ${color.cyan(fullFilePath)}`);
 
-				fs.writeFileSync(fullFilePath, remoteContentResult.unwrap());
+				fs.writeFileSync(fullFilePath, fileContents);
 
 				loading.stop(`Wrote ${color.cyan(file.name)} to ${color.cyan(fullFilePath)}`);
 			}
