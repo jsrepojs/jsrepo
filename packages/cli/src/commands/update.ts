@@ -383,6 +383,7 @@ const _update = async (blockNames: string[], options: Options) => {
 
 								const additionalInstructions = await text({
 									message: 'Any additional instructions?',
+									defaultValue: 'None',
 								});
 
 								if (isCancel(additionalInstructions)) {
@@ -404,7 +405,7 @@ const _update = async (blockNames: string[], options: Options) => {
 											path: from,
 										},
 										additionalInstructions:
-											additionalInstructions.trim().length > 0
+											additionalInstructions !== 'None'
 												? additionalInstructions
 												: undefined,
 										loading,
