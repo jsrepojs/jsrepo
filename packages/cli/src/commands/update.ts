@@ -19,7 +19,7 @@ import { formatFile, transformRemoteContent } from '../utils/files';
 import { loadFormatterConfig } from '../utils/format';
 import { getWatermark } from '../utils/get-watermark';
 import { returnShouldInstall } from '../utils/package';
-import { intro, nextSteps, spinner } from '../utils/prompts';
+import { intro, nextSteps, promptUpdateFile, spinner } from '../utils/prompts';
 import * as registry from '../utils/registry-providers/internal';
 
 const schema = v.object({
@@ -205,8 +205,6 @@ const _update = async (blockNames: string[], options: Options) => {
 
 	const resolvedPaths = resolvedPathsResult.unwrap();
 
-	let model: ModelName = 'Claude 3.5 Sonnet';
-
 	for (const { block } of updatingBlocks) {
 		const fullSpecifier = url.join(block.sourceRepo.url, block.category, block.name);
 
@@ -274,181 +272,38 @@ const _update = async (blockNames: string[], options: Options) => {
 				program.error(color.red(remoteContentResult.unwrapErr()));
 			}
 
-			const originalRemoteContent = remoteContentResult.unwrap();
+			const remoteContent = remoteContentResult.unwrap();
 
-			let remoteContent = remoteContentResult.unwrap();
-
-			let acceptedChanges = options.yes;
-
-			if (!options.yes) {
-				process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
-
-				let localContent = '';
-				if (fs.existsSync(file.destPath)) {
-					localContent = fs.readFileSync(file.destPath).toString();
-				}
-
-				const from = url.join(providerState.url, file.fileName);
-
-				const to = path.relative(options.cwd, file.destPath);
-
-				let hasUpdatedWithAI = false;
-
-				while (true) {
-					const changes = diffLines(localContent, remoteContent);
-
-					// print diff
-					const formattedDiff = formatDiff({
-						from,
-						to,
-						changes,
-						expand: options.expand,
-						maxUnchanged: options.maxUnchanged,
-						prefix: () => `${ascii.VERTICAL_LINE}  `,
-						onUnchanged: ({ from, to, prefix }) =>
-							`${prefix?.() ?? ''}${color.cyan(from)} → ${color.gray(to)} ${color.gray('(unchanged)')}\n`,
-						intro: ({ from, to, changes, prefix }) => {
-							const totalChanges = changes.filter((a) => a.added || a.removed).length;
-
-							return `${prefix?.() ?? ''}${color.cyan(from)} → ${color.gray(to)} (${totalChanges} change${
-								totalChanges === 1 ? '' : 's'
-							})\n${prefix?.() ?? ''}\n`;
-						},
-					});
-
-					process.stdout.write(formattedDiff);
-
-					// if there are no changes then don't ask
-					if (changes.length > 1 || localContent === '') {
-						acceptedChanges = options.yes;
-
-						if (!options.yes && !options.no) {
-							const confirmOptions = [
-								{
-									label: 'Accept',
-									value: 'accept',
-								},
-								{
-									label: 'Reject',
-									value: 'reject',
-								},
-							];
-
-							if (hasUpdatedWithAI) {
-								confirmOptions.push(
-									{
-										label: `✨ ${color.yellow('Update with AI')} ✨ ${color.gray('(Iterate)')}`,
-										value: 'update-iterate',
-									},
-									{
-										label: `✨ ${color.yellow('Update with AI')} ✨ ${color.gray('(Retry)')}`,
-										value: 'update',
-									}
-								);
-							} else {
-								confirmOptions.push({
-									label: `✨ ${color.yellow('Update with AI')} ✨`,
-									value: 'update',
-								});
-							}
-
-							// prompt the user
-							const confirmResult = await select({
-								message: 'Accept changes?',
-								options: confirmOptions,
-							});
-
-							if (isCancel(confirmResult)) {
-								cancel('Canceled!');
-								process.exit(0);
-							}
-
-							if (confirmResult === 'update' || confirmResult === 'update-iterate') {
-								// prompt for model
-								const modelResult = await select({
-									message: 'Select a model',
-									options: Object.keys(models).map((key) => ({
-										label: key,
-										value: key,
-									})),
-									initialValue: model,
-								});
-
-								if (isCancel(modelResult)) {
-									cancel('Canceled!');
-									process.exit(0);
-								}
-
-								model = modelResult as ModelName;
-
-								const additionalInstructions = await text({
-									message: 'Any additional instructions?',
-									defaultValue: 'None',
-								});
-
-								if (isCancel(additionalInstructions)) {
-									cancel('Canceled!');
-									process.exit(0);
-								}
-
-								try {
-									remoteContent = await models[model].updateFile({
-										originalFile: {
-											content:
-												confirmResult === 'update-iterate'
-													? remoteContent
-													: localContent,
-											path: to,
-										},
-										newFile: {
-											content: originalRemoteContent,
-											path: from,
-										},
-										additionalInstructions:
-											additionalInstructions !== 'None'
-												? additionalInstructions
-												: undefined,
-										loading,
-										verbose: options.verbose ? verbose : undefined,
-									});
-								} catch (err) {
-									loading.stop();
-									log.error(color.red(`Error getting completions: ${err}`));
-									process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
-									continue;
-								}
-
-								remoteContent = await formatFile({
-									file: {
-										content: remoteContent,
-										destPath: file.destPath,
-									},
-									biomeOptions,
-									prettierOptions,
-									config,
-								});
-
-								process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
-
-								hasUpdatedWithAI = true;
-
-								continue;
-							}
-
-							acceptedChanges = confirmResult === 'accept';
-
-							break;
-						}
-					}
-
-					break; // there were no changes or changes were automatically accepted
-				}
+			let localContent = '';
+			if (fs.existsSync(file.destPath)) {
+				localContent = fs.readFileSync(file.destPath).toString();
 			}
 
-			if (acceptedChanges) {
+			const from = url.join(providerState.url, file.fileName);
+
+			const to = path.relative(options.cwd, file.destPath);
+
+			const updateResult = await promptUpdateFile({
+				config: { biomeOptions, prettierOptions, formatter: config.formatter },
+				current: {
+					content: localContent,
+					path: to,
+				},
+				incoming: {
+					content: remoteContent,
+					path: from,
+				},
+				options: {
+					...options,
+					loading,
+					verbose: options.verbose ? verbose : undefined,
+				},
+			});
+
+			if (updateResult.applyChanges) {
 				loading.start(`Writing changes to ${color.cyan(file.destPath)}`);
 
-				fs.writeFileSync(file.destPath, remoteContent);
+				fs.writeFileSync(file.destPath, updateResult.updatedContent);
 
 				loading.stop(`Wrote changes to ${color.cyan(file.destPath)}.`);
 			}

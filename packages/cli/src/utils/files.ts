@@ -92,7 +92,7 @@ type FormatOptions = {
 		/** The dest path of the file used to determine the language */
 		destPath: string;
 	};
-	config: ProjectConfig;
+	formatter: ProjectConfig['formatter'];
 	prettierOptions: prettier.Options | null;
 	biomeOptions: PartialConfiguration | null;
 };
@@ -104,7 +104,7 @@ type FormatOptions = {
  */
 export const formatFile = async ({
 	file,
-	config,
+	formatter,
 	prettierOptions,
 	biomeOptions,
 }: FormatOptions): Promise<string> => {
@@ -116,7 +116,7 @@ export const formatFile = async ({
 		try {
 			newContent = await lang.format(file.content, {
 				filePath: file.destPath,
-				formatter: config.formatter,
+				formatter,
 				prettierOptions,
 				biomeOptions,
 			});
