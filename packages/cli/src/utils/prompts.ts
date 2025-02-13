@@ -14,6 +14,7 @@ import { packageJson } from './context';
 import { formatDiff } from './diff';
 import { formatFile } from './files';
 import { getLatestVersion } from './get-latest-version';
+import * as persisted from './persisted';
 
 export type Task = {
 	loadingMessage: string;
@@ -202,19 +203,23 @@ type UpdateBlockResult =
 			applyChanges: false;
 	  };
 
+const MODEL_PREFERENCE_KEY = 'model-preference';
+
 export const promptUpdateFile = async ({
 	incoming,
 	current,
 	config,
 	options,
 }: UpdateBlockOptions): Promise<UpdateBlockResult> => {
+	const storage = persisted.get();
+
 	process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
 
 	let acceptedChanges = false;
 
 	let updatedContent = incoming.content;
 
-	let model: ModelName = 'Claude 3.5 Sonnet';
+	let model: ModelName = storage.get(MODEL_PREFERENCE_KEY, 'Claude 3.5 Sonnet') as ModelName;
 
 	let messageHistory: Message[] = [];
 
@@ -306,6 +311,10 @@ export const promptUpdateFile = async ({
 					if (isCancel(modelResult)) {
 						cancel('Canceled!');
 						process.exit(0);
+					}
+
+					if (modelResult !== model) {
+						storage.set(MODEL_PREFERENCE_KEY, modelResult);
 					}
 
 					model = modelResult as ModelName;
