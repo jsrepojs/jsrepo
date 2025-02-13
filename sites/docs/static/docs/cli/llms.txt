@@ -2,7 +2,7 @@
 
 > A CLI to add shared code from remote repositories.
  
-Latest Version: 1.35.0
+Latest Version: 1.35.1
 
 ## Commands
 
@@ -97,7 +97,7 @@ jsrepo init [options] [registries...]
 - -P, --project: Takes you through the steps to initialize a project. 
 - -R, --registry: Takes you through the steps to initialize a registry. 
 - --script <name>: The name of the build script. (For Registry setup) (default: build:registry)
-- -E, --expand: Expands the diff so you see everything. 
+- -E, --expand: Expands the diff so you see the entire file. 
 - --max-unchanged <number>: Maximum unchanged lines that will show without being collapsed. (default: 3)
 - -y, --yes: Skip confirmation prompt. 
 - --no-cache: Disable caching of resolved git urls. 
@@ -131,7 +131,7 @@ jsrepo update [options] [blocks...]
 
 #### Options
 - --all: Update all installed components. 
-- -E, --expand: Expands the diff so you see everything. 
+- -E, --expand: Expands the diff so you see the entire file. 
 - --max-unchanged <number>: Maximum unchanged lines that will show without being collapsed. (default: 3)
 - -n, --no: Do update any blocks. 
 - --repo <repo>: Repository to download the blocks from. 

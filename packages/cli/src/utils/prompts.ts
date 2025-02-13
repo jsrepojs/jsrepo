@@ -1,12 +1,20 @@
-import { intro, spinner } from '@clack/prompts';
+import type { PartialConfiguration } from '@biomejs/wasm-nodejs';
+import { cancel, intro, isCancel, log, select, spinner, text } from '@clack/prompts';
 import boxen from 'boxen';
 import color from 'chalk';
+import { diffLines } from 'diff';
 import { detectSync, resolveCommand } from 'package-manager-detector';
+import type * as prettier from 'prettier';
 import semver from 'semver';
+import { type Message, type ModelName, models } from './ai';
 import * as ascii from './ascii';
 import { stripAsni } from './blocks/ts/strip-ansi';
+import type { ProjectConfig } from './config';
 import { packageJson } from './context';
+import { formatDiff } from './diff';
+import { formatFile } from './files';
 import { getLatestVersion } from './get-latest-version';
+import * as persisted from './persisted';
 
 export type Task = {
 	loadingMessage: string;
@@ -160,6 +168,235 @@ const _intro = async () => {
 	intro(
 		`${color.bgHex('#f7df1e').black(` ${packageJson.name} `)}${color.gray(` v${packageJson.version} `)}`
 	);
+};
+
+type UpdateBlockOptions = {
+	incoming: {
+		content: string;
+		path: string;
+	};
+	current: {
+		content: string;
+		path: string;
+	};
+	config: {
+		formatter: ProjectConfig['formatter'];
+		prettierOptions: prettier.Options | null;
+		biomeOptions: PartialConfiguration | null;
+	};
+	options: {
+		yes: boolean;
+		no: boolean;
+		expand: boolean;
+		maxUnchanged: number;
+		verbose?: (msg: string) => void;
+		loading: ReturnType<typeof spinner>;
+	};
+};
+
+type UpdateBlockResult =
+	| {
+			applyChanges: true;
+			updatedContent: string;
+	  }
+	| {
+			applyChanges: false;
+	  };
+
+const MODEL_PREFERENCE_KEY = 'model-preference';
+
+export const promptUpdateFile = async ({
+	incoming,
+	current,
+	config,
+	options,
+}: UpdateBlockOptions): Promise<UpdateBlockResult> => {
+	const storage = persisted.get();
+
+	process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
+
+	let acceptedChanges = false;
+
+	let updatedContent = incoming.content;
+
+	let model: ModelName = storage.get(MODEL_PREFERENCE_KEY, 'Claude 3.5 Sonnet') as ModelName;
+
+	let messageHistory: Message[] = [];
+
+	while (true) {
+		const changes = diffLines(current.content, updatedContent);
+
+		// print diff
+		const formattedDiff = formatDiff({
+			from: incoming.path,
+			to: current.path,
+			changes,
+			expand: options.expand,
+			maxUnchanged: options.maxUnchanged,
+			prefix: () => `${ascii.VERTICAL_LINE}  `,
+			onUnchanged: ({ from, to, prefix }) =>
+				`${prefix?.() ?? ''}${color.cyan(from)} → ${color.gray(to)} ${color.gray('(unchanged)')}\n`,
+			intro: ({ from, to, changes, prefix }) => {
+				const totalChanges = changes.filter((a) => a.added || a.removed).length;
+
+				return `${prefix?.() ?? ''}${color.cyan(from)} → ${color.gray(to)} (${totalChanges} change${
+					totalChanges === 1 ? '' : 's'
+				})\n${prefix?.() ?? ''}\n`;
+			},
+		});
+
+		process.stdout.write(formattedDiff);
+
+		// if there are no changes then don't ask
+		if (changes.length > 1 || current.content === '') {
+			acceptedChanges = options.yes;
+
+			if (!options.yes && !options.no) {
+				const confirmOptions = [
+					{
+						label: 'Accept',
+						value: 'accept',
+					},
+					{
+						label: 'Reject',
+						value: 'reject',
+					},
+				];
+
+				if (messageHistory.length > 0) {
+					confirmOptions.push(
+						{
+							label: `✨ ${color.yellow('Update with AI')} ✨ ${color.gray('(Iterate)')}`,
+							value: 'update-iterate',
+						},
+						{
+							label: `✨ ${color.yellow('Update with AI')} ✨ ${color.gray('(Start over)')}`,
+							value: 'update',
+						}
+					);
+				} else {
+					confirmOptions.push({
+						label: `✨ ${color.yellow('Update with AI')} ✨`,
+						value: 'update',
+					});
+				}
+
+				// prompt the user
+				const confirmResult = await select({
+					message: 'Accept changes?',
+					options: confirmOptions,
+				});
+
+				if (isCancel(confirmResult)) {
+					cancel('Canceled!');
+					process.exit(0);
+				}
+
+				if (confirmResult === 'update' || confirmResult === 'update-iterate') {
+					// clear chat context
+					if (confirmResult === 'update') {
+						messageHistory = [];
+					}
+
+					// prompt for model
+					const modelResult = await select({
+						message: 'Select a model',
+						options: Object.keys(models).map((key) => ({
+							label: key,
+							value: key,
+						})),
+						initialValue: model,
+					});
+
+					if (isCancel(modelResult)) {
+						cancel('Canceled!');
+						process.exit(0);
+					}
+
+					if (modelResult !== model) {
+						storage.set(MODEL_PREFERENCE_KEY, modelResult);
+					}
+
+					model = modelResult as ModelName;
+
+					const additionalInstructions = await text({
+						message: 'Additional instructions:',
+						defaultValue: 'None',
+						validate: (val) => {
+							// don't care if no messages have been sent
+							if (messageHistory.length === 0) return undefined;
+
+							if (val.trim() === '') {
+								return 'Please provide additional context so that I know how I can improve.';
+							}
+						},
+					});
+
+					if (isCancel(additionalInstructions)) {
+						cancel('Canceled!');
+						process.exit(0);
+					}
+
+					try {
+						const { content, prompt } = await models[model].updateFile({
+							originalFile: current,
+							newFile: {
+								content:
+									confirmResult === 'update-iterate'
+										? updatedContent
+										: incoming.content,
+								path: incoming.path,
+							},
+							additionalInstructions:
+								additionalInstructions !== 'None'
+									? additionalInstructions
+									: undefined,
+							loading: options.loading,
+							verbose: options.verbose,
+							messages: messageHistory,
+						});
+
+						updatedContent = content;
+
+						// add messages to history
+						messageHistory.push({ role: 'user', content: prompt });
+						messageHistory.push({ role: 'assistant', content: content });
+					} catch (err) {
+						options.loading.stop();
+						log.error(color.red(`Error getting completions: ${err}`));
+						process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
+						continue;
+					}
+
+					updatedContent = await formatFile({
+						file: {
+							content: updatedContent,
+							destPath: current.path,
+						},
+						biomeOptions: config.biomeOptions,
+						prettierOptions: config.prettierOptions,
+						formatter: config.formatter,
+					});
+
+					process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
+
+					continue;
+				}
+
+				acceptedChanges = confirmResult === 'accept';
+
+				break;
+			}
+		}
+
+		break; // there were no changes or changes were automatically accepted
+	}
+
+	if (acceptedChanges) {
+		return { applyChanges: true, updatedContent };
+	}
+
+	return { applyChanges: false };
 };
 
 export {
