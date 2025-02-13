@@ -1,5 +1,16 @@
 # jsrepo
 
+## 1.36.0
+
+### Minor Changes
+
+- 256456f: feat: Add `additional instructions` prompt to `✨ Update with AI ✨` to allow users to give more context to the model on how to update the file
+- 256456f: feat: Add `iterate` option for `✨ Update with AI ✨` so that you can reprompt with the context of past chats and iterate on the generated file.
+
+### Patch Changes
+
+- 256456f: feat: Remember model choice for `✨ Update with AI ✨`
+
 ## 1.35.1
 
 ### Patch Changes
