@@ -320,7 +320,7 @@ export const promptUpdateFile = async ({
 					model = modelResult as ModelName;
 
 					const additionalInstructions = await text({
-						message: 'Any additional instructions?',
+						message: 'Additional instructions:',
 						defaultValue: 'None',
 						validate: (val) => {
 							// don't care if no messages have been sent
