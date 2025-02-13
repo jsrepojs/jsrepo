@@ -41,7 +41,7 @@ const update = new Command('update')
 	.description('Update blocks to the code in the remote repository.')
 	.argument('[blocks...]', 'Names of the blocks you want to update. ex: (utils/math)')
 	.option('--all', 'Update all installed components.', false)
-	.option('-E, --expand', 'Expands the diff so you see everything.', false)
+	.option('-E, --expand', 'Expands the diff so you see the entire file.', false)
 	.option(
 		'--max-unchanged <number>',
 		'Maximum unchanged lines that will show without being collapsed.',

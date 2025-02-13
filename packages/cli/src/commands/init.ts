@@ -78,7 +78,7 @@ const init = new Command('init')
 		'The name of the build script. (For Registry setup)',
 		'build:registry'
 	)
-	.option('-E, --expand', 'Expands the diff so you see everything.', false)
+	.option('-E, --expand', 'Expands the diff so you see the entire file.', false)
 	.option(
 		'--max-unchanged <number>',
 		'Maximum unchanged lines that will show without being collapsed.',
