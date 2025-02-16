@@ -258,7 +258,7 @@
 					</p>
 				</div>
 				<Terminal.Loop delay={750}>
-					<Terminal.Root class="max-w-xl font-mono text-sm">
+					<Terminal.Root class="max-w-xl min-h-[250px] font-mono text-sm">
 						<Terminal.TypingAnimation>&gt; jsrepo build</Terminal.TypingAnimation>
 						<Terminal.Loading
 							delay={1000}
@@ -287,7 +287,7 @@
 		<div class="mt-20 w-full flex flex-col place-items-center justify-center">
 			<div class="flex flex-col lg:flex-row place-items-center w-full justify-center gap-6">
 				<Terminal.Loop delay={750}>
-					<Terminal.Root class="max-w-xl font-mono text-sm order-2 lg:order-1">
+					<Terminal.Root class="max-w-xl min-h-[250px] font-mono text-sm order-2 lg:order-1">
 						<Terminal.TypingAnimation>&gt; jsrepo add ui/button</Terminal.TypingAnimation>
 						<Terminal.Loading
 							delay={1500}
@@ -329,7 +329,7 @@
 				</div>
 				<Terminal.Loop delay={750}>
 					<Terminal.Root
-						class="max-w-xl h-[375px] font-mono text-sm order-2 overflow-hidden lg:order-1"
+						class="max-w-xl h-[400px] font-mono text-sm order-2 overflow-hidden lg:order-1"
 					>
 						<Terminal.TypingAnimation>&gt; jsrepo update ui/button</Terminal.TypingAnimation>
 						<Terminal.Loading
