@@ -1,7 +1,9 @@
 /*
-	jsrepo 1.34.0
-	Installed from github/shyakadavis/geist
-	2-9-2025
+	jsrepo 1.36.0
+	Installed from github/ieedan/shadcn-svelte-extras
+	2-16-2025
 */
 
-export { default as Window } from './window.svelte';
+import Window from './window.svelte';
+
+export { Window };

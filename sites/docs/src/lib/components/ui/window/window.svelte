@@ -1,38 +1,29 @@
 <!--
-	jsrepo 1.34.0
-	Installed from github/shyakadavis/geist
-	2-9-2025
+	jsrepo 1.36.0
+	Installed from github/ieedan/shadcn-svelte-extras
+	2-16-2025
 -->
 
 <script lang="ts">
 	import { cn } from '$lib/utils/utils';
-	import type { Snippet } from 'svelte';
+	import type { WithChildren } from 'bits-ui';
 
-	type Props = {
-		title?: string;
-		class?: string | null;
-		children?: Snippet;
-	};
+	type Props = WithChildren<{
+		class?: string;
+	}>;
 
-	let { class: class_name = undefined, title, children, ...rest }: Props = $props();
+	let { children, class: className }: Props = $props();
 </script>
 
-<div class={cn('flex flex-col rounded-md border bg-background', class_name)} {...rest}>
-	<div class="relative flex h-9 w-full border-b border-inherit px-2">
-		<div class="flex place-items-center gap-2">
-			<span class="size-2 rounded-full bg-[#ff5f56]"></span>
-			<span class="size-2 rounded-full bg-[#ffbd2e]"></span>
-			<span class="size-2 rounded-full bg-[#27c93f]"></span>
+<div class={cn('aspect-video w-full rounded-lg border border-border bg-background', className)}>
+	<div class="border-b border-inherit p-4">
+		<div class="flex items-center gap-2">
+			<div class="size-2 rounded-full bg-[#ef4444]"></div>
+			<div class="size-2 rounded-full bg-[#eab308]"></div>
+			<div class="size-2 rounded-full bg-[#22c55e]"></div>
 		</div>
-		{#if title}
-			<p
-				class="absolute left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] text-xs text-muted-foreground"
-			>
-				{title}
-			</p>
-		{/if}
 	</div>
-	<div class="flex-grow">
+	<div class="p-4">
 		{@render children?.()}
 	</div>
 </div>
