@@ -257,57 +257,61 @@
 						With unified build tooling theres no need to write any scripts.
 					</p>
 				</div>
-				<Terminal.Root class="max-w-xl font-mono text-sm">
-					<Terminal.TypingAnimation>&gt; jsrepo build</Terminal.TypingAnimation>
-					<Terminal.Loading
-						delay={1000}
-						class="text-blue-400 data-[completed]:text-green-500"
-						loadingMessage="Building ./src"
-						completeMessage="Built ./src"
-					/>
-					<Terminal.AnimatedSpan delay={2400} class="text-green-500">
-						✔ Completed checking manifest.
-					</Terminal.AnimatedSpan>
-					<br />
-					<Terminal.AnimatedSpan delay={2750}>
-						<pre><span class="text-yellow-400">Preview</span>:
-◻ utils/array
-◻ utils/string</pre>
-					</Terminal.AnimatedSpan>
-					<br />
-					<Terminal.AnimatedSpan delay={3000} class="text-green-500"
-						>✔ All done.</Terminal.AnimatedSpan
-					>
-				</Terminal.Root>
+				<Terminal.Loop delay={750}>
+					<Terminal.Root class="max-w-xl font-mono text-sm">
+						<Terminal.TypingAnimation>&gt; jsrepo build</Terminal.TypingAnimation>
+						<Terminal.Loading
+							delay={1000}
+							class="text-blue-400 data-[completed]:text-green-500"
+							loadingMessage="Building ./src"
+							completeMessage="Built ./src"
+						/>
+						<Terminal.AnimatedSpan delay={2400} class="text-green-500">
+							✔ Completed checking manifest.
+						</Terminal.AnimatedSpan>
+						<br />
+						<Terminal.AnimatedSpan delay={2750}>
+							<pre><span class="text-yellow-400">Preview</span>:
+	◻ utils/array
+	◻ utils/string</pre>
+						</Terminal.AnimatedSpan>
+						<br />
+						<Terminal.AnimatedSpan delay={3000} class="text-green-500"
+							>✔ All done.</Terminal.AnimatedSpan
+						>
+					</Terminal.Root>
+				</Terminal.Loop>
 			</div>
 		</div>
 
 		<div class="mt-20 w-full flex flex-col place-items-center justify-center">
 			<div class="flex flex-col lg:flex-row place-items-center w-full justify-center gap-6">
-				<Terminal.Root class="max-w-xl font-mono text-sm order-2 lg:order-1">
-					<Terminal.TypingAnimation>&gt; jsrepo add ui/button</Terminal.TypingAnimation>
-					<Terminal.Loading
-						delay={1500}
-						class="text-blue-400 data-[completed]:text-green-500"
-						loadingMessage="Fetching blocks from github/ieedan/shadcn-svelte-extras"
-						completeMessage="Retrieved blocks from github/ieedan/shadcn-svelte-extras"
-					/>
-					<Terminal.Loading
-						delay={2750}
-						class="text-blue-400 data-[completed]:text-green-500"
-						loadingMessage="Adding ui/button"
-						completeMessage="Added ui/button, utils/utils"
-					/>
-					<Terminal.Loading
-						delay={4000}
-						class="text-blue-400 data-[completed]:text-green-500"
-						loadingMessage="Installing dependencies"
-						completeMessage="Installed clsx@^2.1.1 tailwind-merge@^2.6.0 lucide-svelte@^0.475.0 bits-ui@^1.1.0 tailwind-variants@^0.3.1"
-					/>
-					<Terminal.AnimatedSpan delay={5250} class="text-green-500"
-						>✔ All done.</Terminal.AnimatedSpan
-					>
-				</Terminal.Root>
+				<Terminal.Loop delay={750}>
+					<Terminal.Root class="max-w-xl font-mono text-sm order-2 lg:order-1">
+						<Terminal.TypingAnimation>&gt; jsrepo add ui/button</Terminal.TypingAnimation>
+						<Terminal.Loading
+							delay={1500}
+							class="text-blue-400 data-[completed]:text-green-500"
+							loadingMessage="Fetching blocks from github/ieedan/shadcn-svelte-extras"
+							completeMessage="Retrieved blocks from github/ieedan/shadcn-svelte-extras"
+						/>
+						<Terminal.Loading
+							delay={2750}
+							class="text-blue-400 data-[completed]:text-green-500"
+							loadingMessage="Adding ui/button"
+							completeMessage="Added ui/button, utils/utils"
+						/>
+						<Terminal.Loading
+							delay={4000}
+							class="text-blue-400 data-[completed]:text-green-500"
+							loadingMessage="Installing dependencies"
+							completeMessage="Installed clsx@^2.1.1 tailwind-merge@^2.6.0 lucide-svelte@^0.475.0 bits-ui@^1.1.0 tailwind-variants@^0.3.1"
+						/>
+						<Terminal.AnimatedSpan delay={5250} class="text-green-500"
+							>✔ All done.</Terminal.AnimatedSpan
+						>
+					</Terminal.Root>
+				</Terminal.Loop>
 				<div class="lg:max-w-sm text-center lg:text-left order-1 lg:order-2">
 					<h3 class="text-4xl font-bold">Add from anywhere</h3>
 					<p class="text-muted-foreground">
@@ -323,46 +327,48 @@
 					<h3 class="text-4xl font-bold">Update with confidence</h3>
 					<p class="text-muted-foreground">View changes before they're part of your codebase.</p>
 				</div>
-				<Terminal.Root
-					class="max-w-xl h-[375px] font-mono text-sm order-2 overflow-hidden lg:order-1"
-				>
-					<Terminal.TypingAnimation>&gt; jsrepo update ui/button</Terminal.TypingAnimation>
-					<Terminal.Loading
-						delay={1500}
-						class="text-blue-400 data-[completed]:text-green-500"
-						loadingMessage="Fetching blocks from github/ieedan/shadcn-svelte-extras"
-						completeMessage="Retrieved blocks from github/ieedan/shadcn-svelte-extras"
-					/>
-					<Terminal.AnimatedSpan delay={2750}>
-						github/ieedan/shadcn-svelte-extras/ui/button
-					</Terminal.AnimatedSpan>
-					<Terminal.AnimatedSpan delay={3000}>
-						<pre><span class="text-muted-foreground"
-								>{`      + 20 more unchanged (-E to expand)`}</span
-							>{`
+				<Terminal.Loop delay={750}>
+					<Terminal.Root
+						class="max-w-xl h-[375px] font-mono text-sm order-2 overflow-hidden lg:order-1"
+					>
+						<Terminal.TypingAnimation>&gt; jsrepo update ui/button</Terminal.TypingAnimation>
+						<Terminal.Loading
+							delay={1500}
+							class="text-blue-400 data-[completed]:text-green-500"
+							loadingMessage="Fetching blocks from github/ieedan/shadcn-svelte-extras"
+							completeMessage="Retrieved blocks from github/ieedan/shadcn-svelte-extras"
+						/>
+						<Terminal.AnimatedSpan delay={2750}>
+							github/ieedan/shadcn-svelte-extras/ui/button
+						</Terminal.AnimatedSpan>
+						<Terminal.AnimatedSpan delay={3000}>
+							<pre><span class="text-muted-foreground"
+									>{`      + 20 more unchanged (-E to expand)`}</span
+								>{`
   21                           link: 'text-primary underline-offset-4 hover:underline'
   22                   },
   23                   size: {`}
 <span
-								>{`  24                           default: 'h-10 `}px-<span class="bg-green-400"
-									>3</span
-								><span class="bg-red-400">4</span> py-2',</span
-							>
+									>{`  24                           default: 'h-10 `}px-<span class="bg-green-400"
+										>3</span
+									><span class="bg-red-400">4</span> py-2',</span
+								>
 {`  25                           sm: 'h-9 rounded-md px-3',
   26                           lg: 'h-11 rounded-md px-8',
   27                           icon: 'h-10 w-10'`}
 <span class="text-muted-foreground">{`      + 60 more unchanged (-E to expand)`}</span></pre>
-					</Terminal.AnimatedSpan>
-					<Terminal.Loading
-						delay={3250}
-						class="text-blue-400 data-[completed]:text-green-500"
-						loadingMessage="Installing dependencies"
-						completeMessage="Installed bits-ui@^1.1.0"
-					/>
-					<Terminal.AnimatedSpan delay={4500} class="text-green-500">
-						✔ All done.
-					</Terminal.AnimatedSpan>
-				</Terminal.Root>
+						</Terminal.AnimatedSpan>
+						<Terminal.Loading
+							delay={3250}
+							class="text-blue-400 data-[completed]:text-green-500"
+							loadingMessage="Installing dependencies"
+							completeMessage="Installed bits-ui@^1.1.0"
+						/>
+						<Terminal.AnimatedSpan delay={4500} class="text-green-500">
+							✔ All done.
+						</Terminal.AnimatedSpan>
+					</Terminal.Root>
+				</Terminal.Loop>
 			</div>
 		</div>
 

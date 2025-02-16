@@ -7,7 +7,7 @@
 <script lang="ts">
 	import { cn } from '$lib/utils/utils';
 	import { onDestroy } from 'svelte';
-	import { useAnimation } from './state.svelte';
+	import { useAnimation } from './terminal.svelte.js';
 	import type { TerminalAnimationProps } from './types';
 	import { fly } from 'svelte/transition';
 
@@ -38,7 +38,10 @@
 		animationSpeed = speed;
 
 		interval = setInterval(nextFrame, 100 / animationSpeed);
-		timeout = setTimeout(() => (complete = true), duration / animationSpeed);
+		timeout = setTimeout(() => {
+			complete = true;
+			animation.onComplete?.();
+		}, duration / animationSpeed);
 	};
 
 	const nextFrame = () => {
@@ -50,6 +53,8 @@
 		frameIndex++;
 	};
 
+	const flyDuration = $derived(300 / animationSpeed);
+
 	const animation = useAnimation({ delay, play });
 
 	onDestroy(() => {
@@ -60,16 +65,12 @@
 </script>
 
 {#if playAnimation && !complete}
-	<span class={cn('block', className)} in:fly={{ y: -5, duration: 300 / animationSpeed }}>
+	<span class={cn('block', className)} in:fly={{ y: -5, duration: flyDuration }}>
 		<span>{frames[frameIndex]}</span>
 		{loadingMessage}
 	</span>
 {:else if playAnimation}
-	<span
-		class={cn('block', className)}
-		data-completed
-		in:fly={{ y: -5, duration: 300 / animationSpeed }}
-	>
+	<span class={cn('block', className)} data-completed in:fly={{ y: -5, duration: flyDuration }}>
 		{check}
 		{completeMessage}
 	</span>

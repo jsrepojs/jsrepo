@@ -7,7 +7,7 @@
 <script lang="ts">
 	import { cn } from '$lib/utils/utils';
 	import { onDestroy } from 'svelte';
-	import { useAnimation } from './state.svelte';
+	import { useAnimation } from './terminal.svelte.js';
 	import type { TerminalAnimationProps } from './types';
 	import { typewriter } from '$lib/actions/typewriter.svelte';
 
@@ -27,7 +27,13 @@
 </script>
 
 {#if playAnimation}
-	<span class={cn('block', className)} transition:typewriter={{ speed: animationSpeed * 2 }}>
+	<span
+		class={cn('block', className)}
+		transition:typewriter={{
+			speed: animationSpeed * 2,
+			onComplete: () => animation.onComplete?.()
+		}}
+	>
 		{@render children?.()}
 	</span>
 {/if}
