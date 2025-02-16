@@ -225,6 +225,9 @@ importers:
       prettier-plugin-svelte:
         specifier: ^3.3.3
         version: 3.3.3(prettier@3.5.1)(svelte@5.20.1)
+      runed:
+        specifier: ^0.23.4
+        version: 0.23.4(svelte@5.20.1)
       shiki:
         specifier: ^2.4.1
         version: 2.4.1
@@ -2935,8 +2938,8 @@ packages:
   run-parallel@1.2.0:
     resolution: {integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==}
 
-  runed@0.23.2:
-    resolution: {integrity: sha512-AhHCb5/B+YQW6ar1pzhGQOQy+byfjCH63ofuhrexSWwQKhC0EbQ60Z/wMYwETLo3ZubhwlNryxBt0seOMOrVFQ==}
+  runed@0.23.4:
+    resolution: {integrity: sha512-9q8oUiBYeXIDLWNK5DfCWlkL0EW3oGbk845VdKlPeia28l751VpfesaB/+7pI6rnbx1I6rqoZ2fZxptOJLxILA==}
     peerDependencies:
       svelte: ^5.7.0
 
@@ -5189,7 +5192,7 @@ snapshots:
       '@floating-ui/dom': 1.6.13
       '@internationalized/date': 3.7.0
       esm-env: 1.2.2
-      runed: 0.23.2(svelte@5.20.1)
+      runed: 0.23.4(svelte@5.20.1)
       svelte: 5.20.1
       svelte-toolbelt: 0.7.1(svelte@5.20.1)
       tabbable: 6.2.0
@@ -6603,7 +6606,7 @@ snapshots:
     dependencies:
       queue-microtask: 1.2.3
 
-  runed@0.23.2(svelte@5.20.1):
+  runed@0.23.4(svelte@5.20.1):
     dependencies:
       esm-env: 1.2.2
       svelte: 5.20.1
@@ -6784,7 +6787,7 @@ snapshots:
   svelte-toolbelt@0.7.1(svelte@5.20.1):
     dependencies:
       clsx: 2.1.1
-      runed: 0.23.2(svelte@5.20.1)
+      runed: 0.23.4(svelte@5.20.1)
       style-to-object: 1.0.8
       svelte: 5.20.1
 
