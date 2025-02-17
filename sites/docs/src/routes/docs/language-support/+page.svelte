@@ -82,7 +82,7 @@
 		{
 			logo: css,
 			name: '*.css',
-			dependencyResolutionStatus: '🚫',
+			dependencyResolutionStatus: '✅',
 			formattingStatus: '✅',
 			watermarkStatus: '✅'
 		},
@@ -96,7 +96,7 @@
 		{
 			logo: sass,
 			name: '*.(sass|scss)',
-			dependencyResolutionStatus: '🚫',
+			dependencyResolutionStatus: '✅',
 			formattingStatus: '⚠️',
 			watermarkStatus: '✅'
 		},
