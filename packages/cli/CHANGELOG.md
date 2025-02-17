@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.37.0
+
+### Minor Changes
+
+- 3955aaf: feat: Dependency resolution support for css and sass 🎉
+
 ## 1.36.0
 
 ### Minor Changes
