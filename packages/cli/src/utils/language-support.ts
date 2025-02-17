@@ -3,6 +3,7 @@ import { builtinModules } from 'node:module';
 import { Biome, Distribution } from '@biomejs/js-api';
 import type { PartialConfiguration } from '@biomejs/wasm-nodejs';
 import color from 'chalk';
+import * as cssDependency from 'css-dependency';
 import { type Node, walk } from 'estree-walker';
 import { createPathsMatcher } from 'get-tsconfig';
 import * as parse5 from 'parse5';
@@ -59,8 +60,38 @@ export type Lang = {
 /** Language support for `*.css` files. */
 const css: Lang = {
 	matches: (fileName) => fileName.endsWith('.css'),
-	resolveDependencies: () =>
-		Ok({ dependencies: [], local: [], devDependencies: [], imports: {} }),
+	resolveDependencies: ({ filePath, isSubDir, excludeDeps, dirs, cwd, containingDir }) => {
+		const sourceCode = fs.readFileSync(filePath).toString();
+
+		const parseResult = cssDependency.parse(sourceCode, { allowTailwindDirectives: true });
+
+		if (parseResult.isErr()) {
+			return Err(parseResult.unwrapErr().message);
+		}
+
+		const imports = parseResult.unwrap();
+
+		const resolveResult = resolveImports({
+			moduleSpecifiers: imports.map((imp) => imp.module),
+			filePath,
+			isSubDir,
+			dirs,
+			cwd,
+			containingDir,
+			doNotInstall: excludeDeps,
+		});
+
+		if (resolveResult.isErr()) {
+			return Err(
+				resolveResult
+					.unwrapErr()
+					.map((err) => formatError(err))
+					.join('\n')
+			);
+		}
+
+		return Ok(resolveResult.unwrap());
+	},
 	comment: (content) => `/*\n${lines.join(lines.get(content), { prefix: () => '\t' })}\n*/`,
 	format: async (code, { formatter, prettierOptions, biomeOptions, filePath }) => {
 		if (!formatter) return code;
@@ -220,8 +251,38 @@ const jsonc: Lang = {
 /** Language support for `*.(sass|scss)` files. */
 const sass: Lang = {
 	matches: (fileName) => fileName.endsWith('.sass') || fileName.endsWith('.scss'),
-	resolveDependencies: () =>
-		Ok({ dependencies: [], local: [], devDependencies: [], imports: {} }),
+	resolveDependencies: ({ filePath, isSubDir, excludeDeps, dirs, cwd, containingDir }) => {
+		const sourceCode = fs.readFileSync(filePath).toString();
+
+		const parseResult = cssDependency.parse(sourceCode);
+
+		if (parseResult.isErr()) {
+			return Err(parseResult.unwrapErr().message);
+		}
+
+		const imports = parseResult.unwrap();
+
+		const resolveResult = resolveImports({
+			moduleSpecifiers: imports.map((imp) => imp.module),
+			filePath,
+			isSubDir,
+			dirs,
+			cwd,
+			containingDir,
+			doNotInstall: excludeDeps,
+		});
+
+		if (resolveResult.isErr()) {
+			return Err(
+				resolveResult
+					.unwrapErr()
+					.map((err) => formatError(err))
+					.join('\n')
+			);
+		}
+
+		return Ok(resolveResult.unwrap());
+	},
 	comment: (content) => `/*\n${lines.join(lines.get(content), { prefix: () => '\t' })}\n*/`,
 	format: async (code, { formatter, prettierOptions }) => {
 		if (!formatter) return code;
