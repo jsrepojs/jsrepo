@@ -4,6 +4,7 @@ import ollama from 'ollama';
 import OpenAI from 'openai';
 import * as lines from './blocks/ts/lines';
 import * as persisted from './persisted';
+import { TokenManager } from './token-manager';
 
 type File = {
 	path: string;
@@ -362,11 +363,9 @@ export const unwrapCodeFromQuotes = (quoted: string): string => {
  * @returns
  */
 const getApiKey = async (name: 'OpenAI' | 'Anthropic'): Promise<string> => {
-	const KEY = `${name}-api-key`;
+	const storage = new TokenManager();
 
-	const storage = persisted.get();
-
-	let apiKey = storage.get(KEY, null) as string | null;
+	let apiKey = storage.get(name);
 
 	if (!apiKey) {
 		// prompt for api key
@@ -385,7 +384,7 @@ const getApiKey = async (name: 'OpenAI' | 'Anthropic'): Promise<string> => {
 		apiKey = result;
 	}
 
-	storage.set(KEY, apiKey);
+	storage.set(name, apiKey);
 
 	return apiKey;
 };

@@ -1,58 +1,63 @@
-import { cancel, confirm, isCancel, outro, password, select } from '@clack/prompts';
+import { cancel, confirm, isCancel, log, outro, password, select } from '@clack/prompts';
 import color from 'chalk';
-import { Command, Option } from 'commander';
+import { Argument, Command } from 'commander';
 import * as v from 'valibot';
-import * as ascii from '../utils/ascii';
-import * as persisted from '../utils/persisted';
 import { intro } from '../utils/prompts';
 import { http, providers } from '../utils/registry-providers/internal';
+import { TokenManager } from '../utils/token-manager';
 
 const schema = v.object({
 	token: v.optional(v.string()),
-	provider: v.optional(v.string()),
 	logout: v.boolean(),
 });
 
 type Options = v.InferInput<typeof schema>;
 
-const authProviders = providers.filter((p) => p.name !== http.name);
+const services = [
+	...providers.filter((p) => p.name !== http.name).map((p) => p.name),
+	'openai',
+	'anthropic',
+].sort();
 
 const auth = new Command('auth')
 	.description('Provide a token for access to private repositories.')
-	.option('--token <token>', 'The token to use for authenticating to your provider.')
-	.addOption(
-		new Option('--provider <name>', 'The provider this token belongs to.').choices(
-			authProviders.map((provider) => provider.name)
-		)
+	.addArgument(
+		new Argument('service', 'The service you want to authenticate to.')
+			.choices(services)
+			.argOptional()
 	)
-	.option('--logout', 'Erase tokens from each provider from storage.', false)
-	.action(async (opts) => {
+	.option('--logout', 'Execute the logout flow.', false)
+	.option('--token <token>', 'The token to use for authenticating to this service.')
+	.action(async (service, opts) => {
 		const options = v.parse(schema, opts);
 
 		await intro();
 
-		await _auth(options);
+		await _auth(service, options);
 
 		outro(color.green('All done!'));
 	});
 
-const _auth = async (options: Options) => {
-	const storage = persisted.get();
+const _auth = async (service: string | undefined, options: Options) => {
+	let selectedService = service;
+
+	const storage = new TokenManager();
 
 	if (options.logout) {
-		for (const provider of authProviders) {
-			const tokenKey = `${provider.name}-token`;
+		if (selectedService !== undefined) {
+			storage.delete(selectedService);
+			log.success(`Logged out of ${selectedService}.`);
+			return;
+		}
 
-			if (storage.get(tokenKey) === undefined) {
-				process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
-				process.stdout.write(
-					color.gray(`${ascii.VERTICAL_LINE}  Already logged out of ${provider.name}.\n`)
-				);
+		for (const serviceName of services) {
+			if (storage.get(serviceName) === undefined) {
+				log.step(color.gray(`Already logged out of ${serviceName}.`));
 				continue;
 			}
 
 			const response = await confirm({
-				message: `Remove ${provider.name} token?`,
+				message: `Logout of ${serviceName}?`,
 				initialValue: true,
 			});
 
@@ -63,19 +68,19 @@ const _auth = async (options: Options) => {
 
 			if (!response) continue;
 
-			storage.delete(tokenKey);
+			storage.delete(serviceName);
 		}
 		return;
 	}
 
-	if (authProviders.length > 1) {
+	if (services.length > 1) {
 		const response = await select({
-			message: 'Which provider is this token for?',
-			options: authProviders.map((provider) => ({
-				label: provider.name,
-				value: provider.name,
+			message: 'Which service do you want to authenticate to?',
+			options: services.map((serviceName) => ({
+				label: serviceName,
+				value: serviceName,
 			})),
-			initialValue: authProviders[0].name,
+			initialValue: services[0],
 		});
 
 		if (isCancel(response)) {
@@ -83,9 +88,9 @@ const _auth = async (options: Options) => {
 			process.exit(0);
 		}
 
-		options.provider = response;
+		selectedService = response;
 	} else {
-		options.provider = authProviders[0].name;
+		selectedService = services[0];
 	}
 
 	if (options.token === undefined) {
@@ -104,7 +109,7 @@ const _auth = async (options: Options) => {
 		options.token = response;
 	}
 
-	storage.set(`${options.provider}-token`, options.token);
+	storage.set(selectedService, options.token);
 };
 
 export { auth };

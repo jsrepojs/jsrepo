@@ -38,6 +38,7 @@ import { returnShouldInstall } from '../utils/package';
 import * as persisted from '../utils/persisted';
 import { type Task, intro, nextSteps, promptUpdateFile, runTasks } from '../utils/prompts';
 import * as registry from '../utils/registry-providers/internal';
+import { TokenManager } from '../utils/token-manager';
 
 const schema = v.object({
 	repos: v.optional(v.array(v.string())),
@@ -480,7 +481,7 @@ const promptForProviderConfig = async ({
 }> => {
 	const loading = spinner();
 
-	const storage = persisted.get();
+	const storage = new TokenManager();
 
 	const provider = registry.selectProvider(repo);
 
@@ -492,9 +493,7 @@ const promptForProviderConfig = async ({
 		);
 	}
 
-	const tokenKey = `${provider.name}-token`;
-
-	const token = storage.get(tokenKey);
+	const token = storage.get(provider.name);
 
 	// don't ask if the provider is a custom domain
 	if (!token && provider.name !== registry.http.name && !options.yes) {
@@ -521,7 +520,7 @@ const promptForProviderConfig = async ({
 				process.exit(0);
 			}
 
-			storage.set(tokenKey, response);
+			storage.set(provider.name, response);
 		}
 	}
 
