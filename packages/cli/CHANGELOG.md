@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.38.0
+
+### Minor Changes
+
+- 239ff85: Allow for managing API tokens for Anthropic and OpenAI using the `auth` command.
+
 ## 1.37.0
 
 ### Minor Changes
