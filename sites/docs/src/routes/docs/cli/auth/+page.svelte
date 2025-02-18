@@ -13,7 +13,7 @@
 <p>Choose a service and provide a token:</p>
 <Snippet command="execute" args={['jsrepo', 'auth']} />
 <p>Authenticate to a specific service:</p>
-<Snippet command="execute" args={['jsrepo', 'auth']} />
+<Snippet command="execute" args={['jsrepo', 'auth', 'github']} />
 <p>Choose a service to logout from:</p>
 <Snippet command="execute" args={['jsrepo', 'auth', '--logout']} />
 <p>Logout from a specific service:</p>
