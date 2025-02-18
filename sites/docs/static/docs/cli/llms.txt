@@ -2,7 +2,7 @@
 
 > A CLI to add shared code from remote repositories.
  
-Latest Version: 1.35.1
+Latest Version: 1.37.0
 
 ## Commands
 
@@ -29,13 +29,12 @@ Provide a token for access to private repositories.
 
 #### Usage
 ```bash
-jsrepo auth [options]
+jsrepo auth [options] [service]
 ```
 
 #### Options
-- --token <token>: The token to use for authenticating to your provider. 
-- --provider <name>: The provider this token belongs to. 
-- --logout: Erase tokens from each provider from storage. 
+- --logout: Execute the logout flow. 
+- --token <token>: The token to use for authenticating to this service. 
 
 ### build
     

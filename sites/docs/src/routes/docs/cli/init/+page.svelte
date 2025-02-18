@@ -7,13 +7,13 @@
 <DocHeader title="init" description="Initialize a registry or project with jsrepo." />
 <Snippet command="execute" args={['jsrepo', 'init']} />
 <SubHeading>Usage</SubHeading>
-<p>Choose to initialize a registry or project.</p>
+<p>Choose to initialize a registry or project:</p>
 <Snippet command="execute" args={['jsrepo', 'init']} />
-<p>Initialize a project.</p>
+<p>Initialize a project:</p>
 <Snippet command="execute" args={['jsrepo', 'init', '--project']} />
-<p>Initialize a registry.</p>
+<p>Initialize a registry:</p>
 <Snippet command="execute" args={['jsrepo', 'init', '--registry']} />
-<p>Initialize a project with registries.</p>
+<p>Initialize a project with registries:</p>
 <Snippet command="execute" args={['jsrepo', 'init', 'github/ieedan/std']} />
 <SubHeading>Options</SubHeading>
 <OptionDocs name="--repos" deprecated>
