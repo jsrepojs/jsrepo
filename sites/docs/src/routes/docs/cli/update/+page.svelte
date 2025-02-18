@@ -18,9 +18,9 @@
 />
 <Snippet command="execute" args={['jsrepo', 'update']} />
 <SubHeading>Usage</SubHeading>
-<p>Choose which blocks to update.</p>
+<p>Choose which blocks to update:</p>
 <Snippet command="execute" args={['jsrepo', 'update']} />
-<p>Update a specific block.</p>
+<p>Update a specific block:</p>
 <Snippet command="execute" args={['jsrepo', 'update', 'utils/math']} />
 <SubHeading>✨ Update with AI ✨</SubHeading>
 <p>

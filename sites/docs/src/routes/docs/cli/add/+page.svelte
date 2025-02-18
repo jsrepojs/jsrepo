@@ -8,16 +8,16 @@
 <Snippet command="execute" args={['jsrepo', 'add']} />
 <SubHeading>Usage</SubHeading>
 <p>
-	Choose a block to add from the registries in your <CodeSpan>jsrepo.json</CodeSpan> file.
+	Choose a block to add from the registries in your <CodeSpan>jsrepo.json</CodeSpan> file:
 </p>
 <Snippet command="execute" args={['jsrepo', 'add']} />
 <p>
-	Add a partially qualified block using the registries in your <CodeSpan>jsrepo.json</CodeSpan> file.
+	Add a partially qualified block using the registries in your <CodeSpan>jsrepo.json</CodeSpan> file:
 </p>
 <Snippet command="execute" args={['jsrepo', 'add', 'utils/math']} />
-<p>Add a fully qualified block.</p>
+<p>Add a fully qualified block:</p>
 <Snippet command="execute" args={['jsrepo', 'add', 'github/ieedan/std/utils/math']} />
-<p>Include another registry in the blocks list.</p>
+<p>Include another registry in the blocks list:</p>
 <Snippet command="execute" args={['jsrepo', 'add', '--repo', 'github/ieedan/std']} />
 <SubHeading>Options</SubHeading>
 <OptionDocs name="--repo">

@@ -8,21 +8,21 @@
 <Snippet command="execute" args={['jsrepo', 'exec']} />
 <SubHeading>Usage</SubHeading>
 <p>
-	Choose a script to execute from the registries in your <CodeSpan>jsrepo.json</CodeSpan> file.
+	Choose a script to execute from the registries in your <CodeSpan>jsrepo.json</CodeSpan> file:
 </p>
 <Snippet command="execute" args={['jsrepo', 'exec']} />
 <p>
-	<CodeSpan>x</CodeSpan> alias.
+	<CodeSpan>x</CodeSpan> alias:
 </p>
 <Snippet command="execute" args={['jsrepo', 'x']} />
-<p>Execute with args.</p>
+<p>Execute with args:</p>
 <Snippet command="execute" args={['jsrepo', 'exec', '--', 'argument', '--yes']} />
 <p>
 	Execute a partially qualified script using the registries in your <CodeSpan>jsrepo.json</CodeSpan>
-	file.
+	file:
 </p>
 <Snippet command="execute" args={['jsrepo', 'exec', 'github/ieedan/scripts/general/hello']} />
-<p>Include another registry in the scripts list.</p>
+<p>Include another registry in the scripts list:</p>
 <Snippet command="execute" args={['jsrepo', 'exec', '--repo', 'github/ieedan/scripts']} />
 <SubHeading>Options</SubHeading>
 <OptionDocs name="--">

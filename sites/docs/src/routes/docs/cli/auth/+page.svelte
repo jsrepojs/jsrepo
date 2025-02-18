@@ -1,34 +1,35 @@
 <script lang="ts">
-	import { CodeSpan, DocHeader, SubHeading } from '$lib/components/site/docs';
+	import { DocHeader, SubHeading } from '$lib/components/site/docs';
 	import { Snippet } from '$lib/components/ui/snippet';
 	import OptionDocs from '../option-docs.svelte';
 </script>
 
-<DocHeader title="auth" description="Configure access tokens for private repository access." />
+<DocHeader
+	title="auth"
+	description="Configure access tokens for private repository access and update with AI."
+/>
 <Snippet command="execute" args={['jsrepo', 'auth']} />
 <SubHeading>Usage</SubHeading>
+<p>Choose a service and provide a token:</p>
 <Snippet command="execute" args={['jsrepo', 'auth']} />
+<p>Authenticate to a specific service:</p>
+<Snippet command="execute" args={['jsrepo', 'auth', 'github']} />
+<p>Choose a service to logout from:</p>
+<Snippet command="execute" args={['jsrepo', 'auth', '--logout']} />
+<p>Logout from a specific service:</p>
+<Snippet command="execute" args={['jsrepo', 'auth', 'github', '--logout']} />
 <SubHeading>Options</SubHeading>
 <OptionDocs name="--token">
 	{#snippet description()}
-		The token to use for authenticating to your provider.
+		The token to use for authenticating to your service.
 	{/snippet}
 	{#snippet usage()}
 		<Snippet command="execute" args={['jsrepo', 'auth', '--token', 'xxxxxxxxxxx']} />
 	{/snippet}
 </OptionDocs>
-<OptionDocs name="--provider">
-	{#snippet description()}
-		The provider to store the token for. (<CodeSpan>github</CodeSpan>, <CodeSpan>gitlab</CodeSpan>,
-		<CodeSpan>bitbucket</CodeSpan>, <CodeSpan>azure</CodeSpan>).
-	{/snippet}
-	{#snippet usage()}
-		<Snippet command="execute" args={['jsrepo', 'auth', '--provider', 'github']} />
-	{/snippet}
-</OptionDocs>
 <OptionDocs name="--logout">
 	{#snippet description()}
-		Changes to an interactive logout where you choose the provider to remove the token from.
+		Executes the logout flow.
 	{/snippet}
 	{#snippet usage()}
 		<Snippet command="execute" args={['jsrepo', 'auth', '--logout']} />
