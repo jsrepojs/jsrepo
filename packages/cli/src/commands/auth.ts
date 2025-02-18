@@ -3,7 +3,6 @@ import color from 'chalk';
 import { Argument, Command } from 'commander';
 import * as v from 'valibot';
 import { intro } from '../utils/prompts';
-import { http, providers } from '../utils/registry-providers/internal';
 import { TokenManager } from '../utils/token-manager';
 
 const schema = v.object({
@@ -13,17 +12,13 @@ const schema = v.object({
 
 type Options = v.InferInput<typeof schema>;
 
-const services = [
-	...providers.filter((p) => p.name !== http.name).map((p) => p.name),
-	'openai',
-	'anthropic',
-].sort();
+const services = ['Anthropic', 'Azure', 'BitBucket', 'GitHub', 'GitLab', 'OpenAI'].sort();
 
 const auth = new Command('auth')
 	.description('Provide a token for access to private repositories.')
 	.addArgument(
 		new Argument('service', 'The service you want to authenticate to.')
-			.choices(services)
+			.choices(services.map((s) => s.toLowerCase()))
 			.argOptional()
 	)
 	.option('--logout', 'Execute the logout flow.', false)
@@ -39,7 +34,7 @@ const auth = new Command('auth')
 	});
 
 const _auth = async (service: string | undefined, options: Options) => {
-	let selectedService = service;
+	let selectedService = services.find((s) => s.toLowerCase() === service?.toLowerCase());
 
 	const storage = new TokenManager();
 
@@ -73,7 +68,7 @@ const _auth = async (service: string | undefined, options: Options) => {
 		return;
 	}
 
-	if (services.length > 1) {
+	if (selectedService === undefined) {
 		const response = await select({
 			message: 'Which service do you want to authenticate to?',
 			options: services.map((serviceName) => ({
@@ -89,13 +84,11 @@ const _auth = async (service: string | undefined, options: Options) => {
 		}
 
 		selectedService = response;
-	} else {
-		selectedService = services[0];
 	}
 
 	if (options.token === undefined) {
 		const response = await password({
-			message: 'Paste your token',
+			message: `Paste your ${color.bold(selectedService)} token:`,
 			validate(value) {
 				if (value.trim() === '') return 'Please provide a value';
 			},
@@ -110,6 +103,8 @@ const _auth = async (service: string | undefined, options: Options) => {
 	}
 
 	storage.set(selectedService, options.token);
+
+	log.success(`Logged into ${selectedService}.`);
 };
 
 export { auth };

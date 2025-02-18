@@ -9,7 +9,7 @@ export class TokenManager {
 	}
 
 	private getKey(name: string) {
-		return `${name}-token`;
+		return `${name}-token`.toLowerCase();
 	}
 
 	get(name: string): string | undefined {
