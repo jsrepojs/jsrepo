@@ -54,13 +54,18 @@ export const getProviderState = async (
 		const getLocal = async () =>
 			await provider.state(registryUrl, { token: getProviderToken(provider) });
 
+		const resolvedLocal = getLocal();
+
 		// whichever is faster we use they should say the same thing
-		const result = await Promise.race([getLocal(), getCached()]);
+		const result = await Promise.race([resolvedLocal, getCached()]);
 
-		state = result;
-	}
-
-	if (!state) {
+		// if the cache comes back empty just wait the rest of the time for resolvedLocal to resolve
+		if (result === undefined) {
+			state = await resolvedLocal;
+		} else {
+			state = result;
+		}
+	} else {
 		state = await provider.state(registryUrl, { token: getProviderToken(provider) });
 	}
 
