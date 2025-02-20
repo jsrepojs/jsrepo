@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.39.0
+
+### Minor Changes
+
+- 378ba97: feat: Peer dependencies 🎉
+
 ## 1.38.0
 
 ### Minor Changes
