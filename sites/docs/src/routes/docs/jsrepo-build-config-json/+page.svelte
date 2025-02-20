@@ -118,6 +118,31 @@
 	<CodeSpan class="w-fit">optional</CodeSpan>
 	<p>When true users will be prompted to ask whether or not they want to add the config file.</p>
 </div>
+<SubHeading>peerDependencies</SubHeading>
+<p>
+	<CodeSpan>peerDependencies</CodeSpan> allow you to warn users when they are missing dependencies that
+	are required or are using dependency versions that are incompatible.
+</p>
+<Code
+	lang="json"
+	code={`{
+	"peerDependencies": {
+		"svelte": {
+			"version": "5.x.x",
+			"message": "Svelte 5 is the only supported version for this registry see: https://github.com/ieedan/jsrepo" 
+		},
+		"tailwindcss": "3.x.x"
+	}
+}`}
+/>.
+<div class="flex flex-col gap-2">
+	<CodeSpan class="w-fit">message</CodeSpan>
+	<p>A message displayed to users when installing with an incompatible peer dependency.</p>
+</div>
+<div class="flex flex-col gap-2">
+	<CodeSpan class="w-fit">version</CodeSpan>
+	<p>The version or version range that is supported by your registry.</p>
+</div>
 <SubHeading>outputDir</SubHeading>
 <p>
 	<CodeSpan>outputDir</CodeSpan> is an optional key that allows you to copy the resulting
