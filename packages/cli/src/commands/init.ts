@@ -35,7 +35,7 @@ import { formatFile, matchJSDescendant, tryGetTsconfig } from '../utils/files';
 import { loadFormatterConfig } from '../utils/format';
 import { json } from '../utils/language-support';
 import { returnShouldInstall } from '../utils/package';
-import * as persisted from '../utils/persisted';
+import { checkPreconditions } from '../utils/preconditions';
 import { type Task, intro, nextSteps, promptUpdateFile, runTasks } from '../utils/prompts';
 import * as registry from '../utils/registry-providers/internal';
 import { TokenManager } from '../utils/token-manager';
@@ -541,6 +541,8 @@ const promptForProviderConfig = async ({
 	}
 
 	const manifest = manifestResult.unwrap();
+
+	checkPreconditions(providerState.unwrap(), manifest);
 
 	const dependencies: string[] = [];
 	const devDependencies: string[] = [];

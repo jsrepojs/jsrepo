@@ -317,6 +317,7 @@ export const createManifest = (
 ) => {
 	const manifest: Manifest = {
 		meta: config.meta,
+		peerDependencies: config.peerDependencies,
 		configFiles,
 		categories,
 	};

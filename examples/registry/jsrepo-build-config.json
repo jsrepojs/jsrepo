@@ -1,5 +1,5 @@
 {
-	"$schema": "https://unpkg.com/jsrepo@1.30.1/schemas/registry-config.json",
+	"$schema": "https://unpkg.com/jsrepo@1.39.0/schemas/registry-config.json",
 	"meta": {
 		"authors": ["Aidan Bleser"],
 		"description": "An example registry",
@@ -7,6 +7,13 @@
 		"repository": "https://github.com/ieedan/jsrepo",
 		"homepage": "https://jsrepo.dev",
 		"bugs": "https://github.com/ieedan/jsrepo/issues"
+	},
+	"peerDependencies": {
+		"svelte": {
+			"version": "4.x.x",
+			"message": "Svelte 5 is not supported yet see https://github.com/ieedan/jsrepo"
+		},
+		"tailwindcss": "3.x.x"
 	},
 	"dirs": ["./src", "./blocks"],
 	"doNotListBlocks": [],

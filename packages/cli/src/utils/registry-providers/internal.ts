@@ -11,7 +11,7 @@ import {
 	providers,
 	selectProvider,
 } from '.';
-import type { Block } from '../../types';
+import type { Block, Manifest } from '../../types';
 import { Err, Ok, type Result } from '../blocks/ts/result';
 import * as u from '../blocks/ts/url';
 import * as persisted from '../persisted';
@@ -168,6 +168,63 @@ export const fetchBlocks = async (
 	if (err) return err;
 
 	return Ok(blocksMap);
+};
+
+/** Maps the result of fetchManifests into a map of remote blocks
+ *
+ * @param manifests
+ */
+export const getRemoteBlocks = (manifests: FetchManifestResult[]) => {
+	const blocksMap = new Map<string, RemoteBlock>();
+
+	for (const manifest of manifests) {
+		for (const category of manifest.manifest.categories) {
+			for (const block of category.blocks) {
+				blocksMap.set(u.join(manifest.state.url, `${block.category}/${block.name}`), {
+					...block,
+					sourceRepo: manifest.state,
+				});
+			}
+		}
+	}
+
+	return blocksMap;
+};
+
+export type FetchManifestResult = {
+	state: RegistryProviderState;
+	manifest: Manifest;
+};
+
+/** Fetches the manifests for each provider
+ *
+ * @param repos
+ * @returns
+ */
+export const fetchManifests = async (
+	...repos: RegistryProviderState[]
+): Promise<Result<FetchManifestResult[], { message: string; repo: string }>> => {
+	const manifests: FetchManifestResult[] = [];
+
+	const errors = await Promise.all(
+		repos.map(async (state) => {
+			const getManifestResult = await internalFetchManifest(state);
+
+			if (getManifestResult.isErr()) {
+				return Err({ message: getManifestResult.unwrapErr(), repo: state.url });
+			}
+
+			const manifest = getManifestResult.unwrap();
+
+			manifests.push({ state, manifest });
+		})
+	);
+
+	const err = errors.find((err) => err !== undefined);
+
+	if (err) return err;
+
+	return Ok(manifests);
 };
 
 export * from './types';
