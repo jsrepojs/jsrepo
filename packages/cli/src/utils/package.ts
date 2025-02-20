@@ -33,7 +33,7 @@ const getPackage = (path: string): Result<Partial<PackageJson>, string> => {
 	return Ok(JSON.parse(contents));
 };
 
-const cleanVersion = (version: string) => {
+export const cleanVersion = (version: string) => {
 	if (version[0] === '^') {
 		return version.slice(1);
 	}

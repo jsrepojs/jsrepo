@@ -1,24 +1,22 @@
 import fs from 'node:fs';
-import { cancel, confirm, isCancel, log, multiselect, outro, select, text } from '@clack/prompts';
+import { cancel, confirm, isCancel, multiselect, outro } from '@clack/prompts';
 import color from 'chalk';
 import { Command, program } from 'commander';
-import { diffLines } from 'diff';
 import { resolveCommand } from 'package-manager-detector/commands';
 import { detect } from 'package-manager-detector/detect';
 import path from 'pathe';
 import * as v from 'valibot';
-import { type ModelName, models } from '../utils/ai';
 import * as ascii from '../utils/ascii';
 import { getInstalled, resolveTree } from '../utils/blocks';
 import * as url from '../utils/blocks/ts/url';
 import { isTestFile } from '../utils/build';
 import { getPathForBlock, getProjectConfig, resolvePaths } from '../utils/config';
 import { installDependencies } from '../utils/dependencies';
-import { formatDiff } from '../utils/diff';
-import { formatFile, transformRemoteContent } from '../utils/files';
+import { transformRemoteContent } from '../utils/files';
 import { loadFormatterConfig } from '../utils/format';
 import { getWatermark } from '../utils/get-watermark';
 import { returnShouldInstall } from '../utils/package';
+import { checkPreconditions } from '../utils/preconditions';
 import { intro, nextSteps, promptUpdateFile, spinner } from '../utils/prompts';
 import * as registry from '../utils/registry-providers/internal';
 
@@ -127,19 +125,23 @@ const _update = async (blockNames: string[], options: Options) => {
 
 	verbose(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
 
-	const blocksMap: Map<string, registry.RemoteBlock> = (
-		await registry.fetchBlocks(...resolvedRepos)
-	).match(
-		(val) => val,
+	const manifests = (await registry.fetchManifests(...resolvedRepos)).match(
+		(v) => v,
 		({ repo, message }) => {
 			loading.stop(`Failed fetching blocks from ${color.cyan(repo)}`);
 			program.error(color.red(message));
 		}
 	);
 
+	const blocksMap = registry.getRemoteBlocks(manifests);
+
 	if (!options.verbose) loading.stop(`Retrieved blocks from ${color.cyan(repoPaths.join(', '))}`);
 
 	verbose(`Retrieved blocks from ${color.cyan(repoPaths.join(', '))}`);
+
+	for (const manifest of manifests) {
+		checkPreconditions(manifest.state, manifest.manifest);
+	}
 
 	const installedBlocks = getInstalled(blocksMap, config, options.cwd);
 

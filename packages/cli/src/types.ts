@@ -29,6 +29,19 @@ export const manifestMeta = v.object({
 	tags: v.optional(v.array(v.string())),
 });
 
+export const peerDependencySchema = v.record(
+	v.string(),
+	v.union([
+		v.string(),
+		v.object({
+			version: v.string(),
+			message: v.string(),
+		}),
+	])
+);
+
+export type PeerDependency = v.InferOutput<typeof peerDependencySchema>;
+
 export const configFileSchema = v.object({
 	name: v.string(),
 	path: v.string(),
@@ -46,6 +59,7 @@ export const manifestConfigFileSchema = v.object({
 
 export const manifestSchema = v.object({
 	meta: v.optional(manifestMeta),
+	peerDependencies: v.optional(peerDependencySchema),
 	configFiles: v.optional(v.array(manifestConfigFileSchema)),
 	categories: v.array(categorySchema),
 });

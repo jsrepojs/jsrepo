@@ -40,6 +40,33 @@
 				}
 			}
 		},
+		"peerDependencies": {
+			"description": "A list of dependencies that are not installed by blocks or config files but are required for your registry to function in users projects.",
+			"type": "object",
+			"additionalProperties": {
+				"oneOf": [
+					{
+						"type": "string",
+						"description": "The version or version range that is supported by your registry."
+					},
+					{
+						"type": "object",
+						"properties": {
+							"version": {
+								"type": "string",
+								"description": "The version or version range that is supported by your registry."
+							},
+							"message": {
+								"type": "string",
+								"description": "A message displayed to users when installing with an incompatible peer dependency."
+							}
+						},
+						"required": ["version", "message"],
+						"additionalProperties": false
+					}
+				]
+			}
+		},
 		"configFiles": {
 			"description": "Any config files that should be included when initializing the registry.",
 			"type": "array",

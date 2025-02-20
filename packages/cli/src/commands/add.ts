@@ -24,6 +24,7 @@ import { loadFormatterConfig } from '../utils/format';
 import { getWatermark } from '../utils/get-watermark';
 import { returnShouldInstall } from '../utils/package';
 import * as persisted from '../utils/persisted';
+import { checkPreconditions } from '../utils/preconditions';
 import {
 	type ConcurrentTask,
 	intro,
@@ -221,19 +222,23 @@ const _add = async (blockNames: string[], options: Options) => {
 
 	verbose(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
 
-	const blocksMap: Map<string, registry.RemoteBlock> = (
-		await registry.fetchBlocks(...resolvedRepos)
-	).match(
-		(val) => val,
+	const manifests = (await registry.fetchManifests(...resolvedRepos)).match(
+		(v) => v,
 		({ repo, message }) => {
 			loading.stop(`Failed fetching blocks from ${color.cyan(repo)}`);
 			program.error(color.red(message));
 		}
 	);
 
+	const blocksMap = registry.getRemoteBlocks(manifests);
+
 	if (!options.verbose) loading.stop(`Retrieved blocks from ${color.cyan(repoPaths.join(', '))}`);
 
 	verbose(`Retrieved blocks from ${color.cyan(repoPaths.join(', '))}`);
+
+	for (const manifest of manifests) {
+		checkPreconditions(manifest.state, manifest.manifest);
+	}
 
 	let installedBlocks = getInstalled(blocksMap, config, options.cwd).map((val) => val.specifier);
 

@@ -3,7 +3,7 @@ import color from 'chalk';
 import { createPathsMatcher } from 'get-tsconfig';
 import path from 'pathe';
 import * as v from 'valibot';
-import { type Block, configFileSchema, manifestMeta } from '../types';
+import { type Block, configFileSchema, manifestMeta, peerDependencySchema } from '../types';
 import { Err, Ok, type Result } from './blocks/ts/result';
 import { ruleConfigSchema } from './build/check';
 import { tryGetTsconfig } from './files';
@@ -56,6 +56,7 @@ export type Formatter = v.InferOutput<typeof formatterSchema>;
 export const registryConfigSchema = v.object({
 	$schema: v.string(),
 	meta: v.optional(manifestMeta),
+	peerDependencies: v.optional(peerDependencySchema),
 	configFiles: v.optional(v.array(configFileSchema)),
 	dirs: v.array(v.string()),
 	outputDir: v.optional(v.string()),

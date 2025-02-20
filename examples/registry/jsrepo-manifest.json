@@ -13,6 +13,13 @@
 			"react"
 		]
 	},
+	"peerDependencies": {
+		"svelte": {
+			"version": "4.x.x",
+			"message": "Svelte 5 is not supported yet see https://github.com/ieedan/jsrepo"
+		},
+		"tailwindcss": "3.x.x"
+	},
 	"categories": [
 		{
 			"name": "components",

@@ -149,7 +149,7 @@
 	<span class="font-mono text-sm">blocks/utils/math/add.ts</span>
 </p>
 <Code
-	lang="ts"
+	lang="typescript"
 	code={`import { print } from "../print"; // another block
 import color from "chalk"; // npm package
 
@@ -206,6 +206,52 @@ const add = (a: number, b: number): number => {
 	By providing that flag it tells <Jsrepo /> to ignore those dependencies and skip adding them to the
 	manifest file.
 </p>
+<SubHeading>Config Files</SubHeading>
+<p>
+	For some registries you will need the user to have config files such as a
+	<CodeSpan>tailwind.config.ts</CodeSpan> or <CodeSpan>global.css</CodeSpan>.
+</p>
+<p>
+	You can include these files by configuring them in the <CodeSpan
+		>jsrepo-build-config.json</CodeSpan
+	>:
+</p>
+<Code
+	lang="json"
+	code={`{
+	"configFiles": [
+		{
+			"name": "Tailwind Config",
+			"path": "./tailwind.config.ts",
+			"expectedPath": "./tailwind.config.ts",
+			"optional": false
+		}
+	]
+}`}
+/>
+<p>
+	When users initialize your registry they will be prompted to add or update these config files.
+</p>
+<SubHeading>Peer Dependencies</SubHeading>
+<p>
+	Peer dependencies all you to warn your users when they are using unsupported versions of
+	dependencies they need for your registry to function.
+</p>
+<p>
+	An example of this could be your project using TailwindCSS v3 while waiting to migrate to v4. In
+	the mean time you can setup peer dependencies to warn users that v4 is not yet fully supported.
+</p>
+<Code
+	lang="json"
+	code={`{
+	"peerDependencies": {
+	  "tailwindcss": {
+		"version": "3.x.x",
+		"message": "Tailwind@v4 is not yet fully supported see: https://github.com/ieedan/jsrepo"
+	  },
+	}
+}`}
+/>
 <div class="flex flex-col gap-3">
 	<SubHeading>Examples</SubHeading>
 	<ul class="flex flex-col gap-2">
