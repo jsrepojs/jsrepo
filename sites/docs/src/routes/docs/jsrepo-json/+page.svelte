@@ -15,6 +15,7 @@
 	<CodeSpan>--project</CodeSpan> flag:
 </p>
 <Snippet command="execute" args={['jsrepo', 'init', '--project']} />
+
 <SubHeading>$schema</SubHeading>
 <p>
 	<CodeSpan>$schema</CodeSpan> is tracked with the cli so you can use a specific version using
@@ -23,9 +24,58 @@
 <Code
 	lang="json"
 	code={`{
-    "$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/project-config.json"
+	"$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/project-config.json"
 }`}
 />
+
+<SubHeading>configFiles</SubHeading>
+<p>Where to add specific config files in your project.</p>
+<Code
+	lang="json"
+	code={`{
+	"configFiles": {
+	  "app.css": "./src/app.css"
+	}
+}`}
+/>
+
+<SubHeading>formatter</SubHeading>
+<p>The formatter to use when writing files in your project.</p>
+<Code
+	lang="json"
+	code={`{
+	"formatter": "prettier" / "biome" / undefined
+}`}
+/>
+<p>
+	<Jsrepo /> can format your files following your local config before adding them to your repository.
+	Currently the only supported formatters are
+	<Link target="_blank" href="https://prettier.io/">Prettier</Link> and
+	<Link target="_blank" href="https://biomejs.dev/">Biome</Link>.
+</p>
+
+<SubHeading>includeTests</SubHeading>
+<p>Whether or not to include test files when installing blocks.</p>
+<Code
+	lang="json"
+	code={`{
+	"includeTests": false
+}`}
+/>
+
+<SubHeading>paths</SubHeading>
+<p>Where to add specific categories in your project.</p>
+<Code
+	lang="json"
+	code={`{
+	"paths": {
+	  "*": "./src/blocks",
+	  "components": "$lib/components",
+	  "hooks": "$lib/hooks"
+	}
+}`}
+/>
+
 <SubHeading>repos</SubHeading>
 <p>
 	<CodeSpan>repos</CodeSpan> allows you to specify different registries to install blocks from. All of
@@ -34,49 +84,19 @@
 <Code
 	lang="json"
 	code={`{
-    "repos": [
-        "gitlab/ieedan/std",
-        "github/ieedan/shadcn-phone-input-svelte"
-    ]
+	"repos": [
+	  "gitlab/ieedan/std",
+	  "github/ieedan/shadcn-phone-input-svelte"
+	]
 }`}
 />
-<SubHeading>paths</SubHeading>
-<p>Where to add specific categories in your project.</p>
-<Code
-	lang="json"
-	code={`{
-	  "paths": {
-		  // "*" is required as a fallback location if a category isn't mapped
-		  "*": "./src/blocks", 
-		  "components": "$lib/components",
-		  "hooks": "$lib/hooks"
-	  }
-}`}
-/>
-<SubHeading>configFiles</SubHeading>
-<p>Where to add specific config files in your project.</p>
-<Code
-	lang="json"
-	code={`{
-	  "configFiles": {
-		  "app.css": "./src/app.css"
-	  }
-}`}
-/>
-<SubHeading>includeTests</SubHeading>
-<p>Whether or not to include test files when installing blocks.</p>
-<Code
-	lang="json"
-	code={`{
-    "includeTests": false
-}`}
-/>
+
 <SubHeading>watermark</SubHeading>
 <p>Whether or not to add a watermark to installed blocks.</p>
 <Code
 	lang="json"
 	code={`{
-    "watermark": true
+	"watermark": true
 }`}
 />
 <p>
@@ -90,24 +110,9 @@
 	Installed from github/ieedan/std
 	${new Date().toLocaleDateString().replaceAll('/', '-')}
 */
-
+  
 export type Point = {
-		x: number;
-		y: number;
+	x: number;
+	y: number;
 };`}
 />
-
-<SubHeading>formatter</SubHeading>
-<p>The formatter to use when writing files in your project.</p>
-<Code
-	lang="json"
-	code={`{
-    "formatter": "prettier" / "biome" / undefined
-}`}
-/>
-<p>
-	<Jsrepo /> can format your files following your local config before adding them to your repository.
-	Currently the only supported formatters are
-	<Link target="_blank" href="https://prettier.io/">Prettier</Link> and
-	<Link target="_blank" href="https://biomejs.dev/">Biome</Link>.
-</p>

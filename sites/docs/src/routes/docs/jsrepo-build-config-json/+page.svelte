@@ -15,75 +15,31 @@
 	<CodeSpan>--registry</CodeSpan> flag:
 </p>
 <Snippet command="execute" args={['jsrepo', 'init', '--registry']} />
+
 <SubHeading>$schema</SubHeading>
 <p>
-	<CodeSpan>$schema</CodeSpan> is tracked with the cli so you can use a specific version using
-	<CodeSpan>unpkg</CodeSpan>:
+	<CodeSpan>$schema</CodeSpan> is tracked with the cli so you can use a specific version using <CodeSpan
+		>unpkg</CodeSpan
+	>:
 </p>
 <Code
 	lang="json"
 	code={`{
-    "$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/registry-config.json"
+	"$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/registry-config.json"
 }`}
 />
-<SubHeading>meta</SubHeading>
+
+<SubHeading>allowSubdirectories</SubHeading>
 <p>
-	<CodeSpan>meta</CodeSpan> allows you to provide optional information about the registry that can be
-	displayed to users for better documentation.
+	<CodeSpan>allowSubdirectories</CodeSpan> allows subdirectories to be built.
 </p>
 <Code
 	lang="json"
 	code={`{
-	"meta": {
-		"authors": ["Aidan Bleser"],
-		"bugs": "https://github.com/ieedan/std/issues",
-		"description": "Fully tested and documented TypeScript utilities brokered by jsrepo.",
-		"homepage": "https://ieedan.github.io/std/",
-		"repository": "https://github.com/ieedan/std",
-		"tags": ["typescript", "std"]
-	}	
+	"allowSubdirectories": false
 }`}
 />
-<div class="flex flex-col gap-2">
-	<CodeSpan class="w-fit">authors</CodeSpan>
-	<p>The names of the authors of this registry.</p>
-</div>
-<div class="flex flex-col gap-2">
-	<CodeSpan class="w-fit">bugs</CodeSpan>
-	<p>Where users should report bugs.</p>
-</div>
-<div class="flex flex-col gap-2">
-	<CodeSpan class="w-fit">description</CodeSpan>
-	<p>A description of the registry.</p>
-</div>
-<div class="flex flex-col gap-2">
-	<CodeSpan class="w-fit">homepage</CodeSpan>
-	<p>The URL to the registry homepage.</p>
-</div>
-<div class="flex flex-col gap-2">
-	<CodeSpan class="w-fit">repository</CodeSpan>
-	<p>
-		The source repository for the registry. (Omit this if you are distributing from a git
-		repository)
-	</p>
-</div>
-<div class="flex flex-col gap-2">
-	<CodeSpan class="w-fit">tags</CodeSpan>
-	<p>Keywords that describe your registry.</p>
-</div>
-<SubHeading>dirs</SubHeading>
-<p>
-	<CodeSpan>dirs</CodeSpan> is a list of the directories that contain your block categories.
-</p>
-<Code
-	lang="json"
-	code={`{
-    "dirs": [
-        "./src",
-        "./blocks"
-    ]
-}`}
-/>
+
 <SubHeading>configFiles</SubHeading>
 <p>
 	<CodeSpan>configFiles</CodeSpan> allows you to specify files that the user may need in their project
@@ -94,55 +50,196 @@
 	code={`{
 	"configFiles": [
 		{
-			"name": "app.css",
-			"path": "./src/app.css",
-			"expectedPath": "./src/app.css",
-			"optional": false
+		"name": "app.css",
+		"path": "./src/app.css",
+		"expectedPath": "./src/app.css",
+		"optional": false
 		}
 	]
 }`}
 />
 <div class="flex flex-col gap-2">
-	<CodeSpan class="w-fit">name</CodeSpan>
-	<p>The name as it will be displayed in prompts to the user.</p>
-</div>
-<div class="flex flex-col gap-2">
-	<CodeSpan class="w-fit">path</CodeSpan>
-	<p>The path of the file in your registry.</p>
-</div>
-<div class="flex flex-col gap-2">
 	<CodeSpan class="w-fit">expectedPath</CodeSpan>
 	<p>The path where you expect users to have this file (used as a default in prompts).</p>
+</div>
+<div class="flex flex-col gap-2">
+	<CodeSpan class="w-fit">name</CodeSpan>
+	<p>The name as it will be displayed in prompts to the user.</p>
 </div>
 <div class="flex flex-col gap-2">
 	<CodeSpan class="w-fit">optional</CodeSpan>
 	<p>When true users will be prompted to ask whether or not they want to add the config file.</p>
 </div>
-<SubHeading>peerDependencies</SubHeading>
+<div class="flex flex-col gap-2">
+	<CodeSpan class="w-fit">path</CodeSpan>
+	<p>The path of the file in your registry.</p>
+</div>
+
+<SubHeading>dirs</SubHeading>
 <p>
-	<CodeSpan>peerDependencies</CodeSpan> allow you to warn users when they are missing dependencies that
-	are required or are using dependency versions that are incompatible.
+	<CodeSpan>dirs</CodeSpan> is a list of the directories that contain your block categories.
 </p>
 <Code
 	lang="json"
 	code={`{
-	"peerDependencies": {
-		"svelte": {
-			"version": "5.x.x",
-			"message": "Svelte 5 is the only supported version for this registry see: https://github.com/ieedan/jsrepo" 
-		},
-		"tailwindcss": "3.x.x"
-	}
+	"dirs": [
+		"./src",
+		"./blocks"
+	]
 }`}
-/>.
-<div class="flex flex-col gap-2">
-	<CodeSpan class="w-fit">message</CodeSpan>
-	<p>A message displayed to users when installing with an incompatible peer dependency.</p>
-</div>
-<div class="flex flex-col gap-2">
-	<CodeSpan class="w-fit">version</CodeSpan>
-	<p>The version or version range that is supported by your registry.</p>
-</div>
+/>
+
+<SubHeading>doNotListBlocks</SubHeading>
+<p>
+	<CodeSpan>doNotListBlocks</CodeSpan> is a list of block names that shouldn't be listed when the user
+	runs the <CodeSpan>add</CodeSpan> command.
+</p>
+<Code
+	lang="json"
+	code={`{
+	"doNotListBlocks": [
+		"utils"
+	]
+}`}
+/>
+
+<SubHeading>doNotListCategories</SubHeading>
+<p>
+	<CodeSpan>doNotListCategories</CodeSpan> is a list of category names that shouldn't be listed when
+	the user runs the <CodeSpan>add</CodeSpan> command.
+</p>
+<Code
+	lang="json"
+	code={`{
+	"doNotListCategories": [
+		"utils"
+	]
+}`}
+/>
+
+<SubHeading>excludeBlocks</SubHeading>
+<p>
+	<CodeSpan>excludeBlocks</CodeSpan> allows you to prevent the specified blocks from being included in
+	the manifest.
+</p>
+<Code
+	lang="json"
+	code={`{
+	"excludeBlocks": [
+		"domain"
+	]
+}`}
+/>
+
+<SubHeading>excludeCategories</SubHeading>
+<p>
+	<CodeSpan>excludeCategories</CodeSpan> allows you to prevent the specified categories from being included
+	in the manifest.
+</p>
+<Code
+	lang="json"
+	code={`{
+	"excludeCategories": [
+		"INTERNAL"
+	]
+}`}
+/>
+
+<SubHeading>excludeDeps</SubHeading>
+<p>
+	<CodeSpan>excludeDeps</CodeSpan> allows you to prevent specified remote dependencies from being installed
+	when the user adds/updates blocks. This is useful for framework specific API's like React or Svelte.
+</p>
+<Code
+	lang="json"
+	code={`{
+	"excludeDeps": [
+		"svelte",
+		"react",
+		"vue"
+	]
+}`}
+/>
+
+<SubHeading>includeBlocks</SubHeading>
+<p>
+	<CodeSpan>includeBlocks</CodeSpan> allows you to only include specified blocks in the final manifest
+	file. Keep in mind that if these blocks are referenced by other blocks that are included then your
+	build will break.
+</p>
+<Code
+	lang="json"
+	code={`{
+	"includeBlocks": [
+		"ui",
+		"hooks"
+	]
+}`}
+/>
+
+<SubHeading>includeCategories</SubHeading>
+<p>
+	<CodeSpan>includeCategories</CodeSpan> allows you to only include specified categories in the final
+	manifest file. Keep in mind that if these categories are referenced by other categories that are included
+	then your build will break.
+</p>
+<Code
+	lang="json"
+	code={`{
+	"includeCategories": [
+		"components",
+		"utils"
+	]
+}`}
+/>
+
+<SubHeading>listBlocks</SubHeading>
+<p>
+	<CodeSpan>listBlocks</CodeSpan> is a list of block names that should be listed when the user runs the
+	<CodeSpan>add</CodeSpan> command.
+</p>
+<Code
+	lang="json"
+	code={`{
+	"listBlocks": [
+		"utils"
+	]
+}`}
+/>
+
+<SubHeading>listCategories</SubHeading>
+<p>
+	<CodeSpan>listCategories</CodeSpan> is a list of category names that should be listed when the user
+	runs the <CodeSpan>add</CodeSpan> command.
+</p>
+<Code
+	lang="json"
+	code={`{
+	"listCategories": [
+		"utils"
+	]
+}`}
+/>
+
+<SubHeading>meta</SubHeading>
+<p>
+	<CodeSpan>meta</CodeSpan> allows you to provide optional information about the registry that can be
+	displayed to users for better documentation.
+</p>
+<Code
+	lang="json"
+	code={`{
+	"meta": {
+	  "authors": ["Aidan Bleser"],
+	  "bugs": "https://github.com/ieedan/std/issues",
+	  "description": "Fully tested and documented TypeScript utilities brokered by jsrepo.",
+	  "homepage": "https://ieedan.github.io/std/",
+	  "repository": "https://github.com/ieedan/std",
+	  "tags": ["typescript", "std"]
+	} 
+}`}
+/>
+
 <SubHeading>outputDir</SubHeading>
 <p>
 	<CodeSpan>outputDir</CodeSpan> is an optional key that allows you to copy the resulting
@@ -155,142 +252,36 @@
 <Code
 	lang="json"
 	code={`{
-    "outputDir": "./static/new-york"
+	  "outputDir": "./static/new-york"
 }`}
 />
-<SubHeading>listBlocks</SubHeading>
+
+<SubHeading>peerDependencies</SubHeading>
 <p>
-	<CodeSpan>listBlocks</CodeSpan> is a list of block names that should be listed when the user runs the
-	<CodeSpan>add</CodeSpan> command.
+	<CodeSpan>peerDependencies</CodeSpan> allow you to warn users when they are missing dependencies that
+	are required or are using dependency versions that are incompatible.
 </p>
 <Code
 	lang="json"
 	code={`{
-    "listBlocks": [
-        "utils"
-    ]
+	"peerDependencies": {
+	  "svelte": {
+		"version": "5.x.x",
+		"message": "Svelte 5 is the only supported version for this registry see: https://github.com/ieedan/jsrepo"
+	  },
+	  "tailwindcss": "3.x.x"
+	}
 }`}
 />
-<SubHeading>listCategories</SubHeading>
-<p>
-	<CodeSpan>listCategories</CodeSpan> is a list of category names that should be listed when the user
-	runs the <CodeSpan>add</CodeSpan> command.
-</p>
-<Code
-	lang="json"
-	code={`{
-    "listCategories": [
-        "utils"
-    ]
-}`}
-/>
-<SubHeading>doNotListBlocks</SubHeading>
-<p>
-	<CodeSpan>doNotListBlocks</CodeSpan> is a list of block names that shouldn't be listed when the user
-	runs the <CodeSpan>add</CodeSpan> command.
-</p>
-<Code
-	lang="json"
-	code={`{
-    "doNotListBlocks": [
-        "utils"
-    ]
-}`}
-/>
-<SubHeading>doNotListCategories</SubHeading>
-<p>
-	<CodeSpan>doNotListCategories</CodeSpan> is a list of category names that shouldn't be listed when
-	the user runs the <CodeSpan>add</CodeSpan> command.
-</p>
-<Code
-	lang="json"
-	code={`{
-    "doNotListCategories": [
-        "utils"
-    ]
-}`}
-/>
-<SubHeading>excludeDeps</SubHeading>
-<p>
-	<CodeSpan>excludeDeps</CodeSpan> allows you to prevent specified remote dependencies from being installed
-	when the user adds/updates blocks. This is useful for framework specific API's like React or Svelte.
-</p>
-<Code
-	lang="json"
-	code={`{
-    "excludeDeps": [
-        "svelte",
-        "react",
-        "vue"
-    ]
-}`}
-/>
-<SubHeading>includeBlocks</SubHeading>
-<p>
-	<CodeSpan>includeBlocks</CodeSpan> allows you to only include specified blocks in the final manifest
-	file. Keep in mind that if these blocks are referenced by other blocks that are included then your
-	build will break.
-</p>
-<Code
-	lang="json"
-	code={`{
-    "includeBlocks": [
-        "ui",
-        "hooks"
-    ]
-}`}
-/>
-<SubHeading>includeCategories</SubHeading>
-<p>
-	<CodeSpan>includeCategories</CodeSpan> allows you to only include specified categories in the final
-	manifest file. Keep in mind that if these categories are referenced by other categories that are included
-	then your build will break.
-</p>
-<Code
-	lang="json"
-	code={`{
-    "includeCategories": [
-        "components",
-        "utils"
-    ]
-}`}
-/>
-<SubHeading>excludeBlocks</SubHeading>
-<p>
-	<CodeSpan>excludeBlocks</CodeSpan> allows you to prevent the specified blocks from being included in
-	the manifest.
-</p>
-<Code
-	lang="json"
-	code={`{
-    "excludeBlocks": [
-        "domain"
-    ]
-}`}
-/>
-<SubHeading>excludeCategories</SubHeading>
-<p>
-	<CodeSpan>excludeCategories</CodeSpan> allows you to prevent the specified categories from being included
-	in the manifest.
-</p>
-<Code
-	lang="json"
-	code={`{
-    "excludeCategories": [
-        "INTERNAL"
-    ]
-}`}
-/>
-<SubHeading>allowSubdirectories</SubHeading>
-<p>
-	<CodeSpan>allowSubdirectories</CodeSpan> allows subdirectories to be built.
-</p>
-<Code
-	lang="json"
-	code={`{
-    "allowSubdirectories": false
-}`}
-/>
+<div class="flex flex-col gap-2">
+	<CodeSpan class="w-fit">message</CodeSpan>
+	<p>A message displayed to users when installing with an incompatible peer dependency.</p>
+</div>
+<div class="flex flex-col gap-2">
+	<CodeSpan class="w-fit">version</CodeSpan>
+	<p>The version or version range that is supported by your registry.</p>
+</div>
+
 <SubHeading>preview</SubHeading>
 <p>
 	<CodeSpan>preview</CodeSpan> displays a preview of the blocks list.
@@ -298,9 +289,10 @@
 <Code
 	lang="json"
 	code={`{
-    "preview": false
+	  "preview": false
 }`}
 />
+
 <SubHeading>rules</SubHeading>
 <p>
 	<CodeSpan>rules</CodeSpan> allows you to configure the rules when checking the manifest file after
@@ -310,15 +302,15 @@
 <Code
 	lang="json"
 	code={`{
-		"rules": {
-			"no-category-index-file-dependency": "warn",
-			"no-unpinned-dependency": "warn",
-			"require-local-dependency-exists": "error",
-			"max-local-dependencies": ["warn", 10],
-			"no-circular-dependency": "error",
-			"no-unused-block": "warn",
-			"no-framework-dependency": "warn",
-		}
+	"rules": {
+		"no-category-index-file-dependency": "warn",
+		"no-unpinned-dependency": "warn",
+		"require-local-dependency-exists": "error",
+		"max-local-dependencies": ["warn", 10],
+		"no-cir-dependency": "error",
+		"no-unused-block": "warn",
+		"no-framework-dependency": "warn"
+	}
 }`}
 />
 <div class="flex flex-col gap-2">
