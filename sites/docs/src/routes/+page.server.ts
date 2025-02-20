@@ -5,7 +5,7 @@ import { redis, VIEW_SET_NAME } from '$lib/ts/redis-client';
 import { action } from '$lib/ts/server-actions/search-registries/server';
 
 export const load = async () => {
-	const ranked = await redis.zrange(VIEW_SET_NAME, 0, -1, {
+	const ranked = redis.zrange(VIEW_SET_NAME, 0, -1, {
 		rev: true,
 		count: 5,
 		offset: 0

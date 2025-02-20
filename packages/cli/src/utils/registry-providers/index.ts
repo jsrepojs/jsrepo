@@ -2,10 +2,10 @@ import { MANIFEST_FILE } from '../../constants';
 import type { Manifest } from '../../types';
 import { Err, Ok, type Result } from '../blocks/ts/result';
 import { parseManifest } from '../manifest';
-import { azure } from './azure';
-import { bitbucket } from './bitbucket';
-import { github } from './github';
-import { gitlab } from './gitlab';
+import { type AzureProviderState, azure } from './azure';
+import { type BitBucketProviderState, bitbucket } from './bitbucket';
+import { type GitHubProviderState, github } from './github';
+import { type GitLabProviderState, gitlab } from './gitlab';
 import { http } from './http';
 import type { RegistryProvider, RegistryProviderState } from './types';
 
@@ -75,4 +75,14 @@ export const fetchManifest = async (
 
 export * from './types';
 
-export { github, gitlab, bitbucket, azure, http };
+export {
+	github,
+	gitlab,
+	bitbucket,
+	azure,
+	http,
+	type AzureProviderState,
+	type GitHubProviderState,
+	type GitLabProviderState,
+	type BitBucketProviderState,
+};

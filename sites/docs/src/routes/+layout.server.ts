@@ -3,16 +3,22 @@ import { Err, Ok, type Result } from '$lib/ts/types/result';
 import { Octokit } from 'octokit';
 
 export const load = async () => {
-	const octokit = new Octokit({ auth: GITHUB_TOKEN });
-
-	const repo = await octokit.rest.repos.get({ owner: 'ieedan', repo: 'jsrepo' });
+	const stars = getStars();
 
 	const version = (await tryGetVersion()).unwrapOr('1.0.0');
 
 	return {
 		version,
-		stars: repo.data.stargazers_count
+		stars
 	};
+};
+
+const getStars = async () => {
+	const octokit = new Octokit({ auth: GITHUB_TOKEN });
+
+	const repo = await octokit.rest.repos.get({ owner: 'ieedan', repo: 'jsrepo' });
+
+	return repo.data.stargazers_count;
 };
 
 const tryGetVersion = async (): Promise<Result<string, string>> => {

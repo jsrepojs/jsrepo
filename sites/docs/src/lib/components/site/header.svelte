@@ -10,7 +10,7 @@
 
 	type Props = {
 		version: string;
-		stars: number;
+		stars: Promise<number>;
 	};
 
 	let { version, stars }: Props = $props();

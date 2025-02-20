@@ -10,6 +10,7 @@
 	import Marquee from '$lib/components/animations/marquee/marquee.svelte';
 	import * as Icons from '$lib/components/icons';
 	import * as Terminal from '$lib/components/ui/terminal';
+	import { Skeleton } from '$lib/components/ui/skeleton';
 
 	const featuredRegistries = [
 		'github/ieedan/shadcn-svelte-extras',
@@ -232,16 +233,24 @@
 						<h3 class="text-xl font-medium">Most Popular</h3>
 						<div class="border-border border rounded-md w-full overflow-hidden">
 							<ul class="flex flex-col">
-								{#each data.popular as registry}
-									<li class="odd:bg-accent/75">
-										<a
-											href="/registry?url={registry}"
-											class="flex place-items-center last:border-b-0 border-b hover:underline p-3 hover:bg-accent"
-										>
-											{registry}
-										</a>
-									</li>
-								{/each}
+								{#await data.popular}
+									{#each { length: 5 } as _}
+										<li class="odd:bg-accent/75 h-12 flex place-items-center justify-center p-3">
+											<Skeleton class="h-4 w-full" />
+										</li>
+									{/each}
+								{:then mostPopular}
+									{#each mostPopular as registry}
+										<li class="odd:bg-accent/75">
+											<a
+												href="/registry?url={registry}"
+												class="flex place-items-center last:border-b-0 border-b hover:underline p-3 hover:bg-accent"
+											>
+												{registry}
+											</a>
+										</li>
+									{/each}
+								{/await}
 							</ul>
 						</div>
 					</div>
