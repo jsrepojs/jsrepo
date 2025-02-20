@@ -50,10 +50,10 @@
 	code={`{
 	"configFiles": [
 		{
-		"name": "app.css",
-		"path": "./src/app.css",
-		"expectedPath": "./src/app.css",
-		"optional": false
+			"name": "app.css",
+			"path": "./src/app.css",
+			"expectedPath": "./src/app.css",
+			"optional": false
 		}
 	]
 }`}
