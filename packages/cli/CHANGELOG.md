@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.39.1
+
+### Patch Changes
+
+- 54d1d20: api: Export type definitions for individual provider states.
+
 ## 1.39.0
 
 ### Minor Changes
