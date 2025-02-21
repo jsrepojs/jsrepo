@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.39.2
+
+### Patch Changes
+
+- a42cebd: fix: Add more test suffixes.
+
 ## 1.39.1
 
 ### Patch Changes
