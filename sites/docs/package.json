@@ -34,7 +34,7 @@
 		"eslint-plugin-svelte": "^2.46.1",
 		"globals": "^16.0.0",
 		"isomorphic-dompurify": "^2.22.0",
-		"jsrepo": "^1.38.0",
+		"jsrepo": "^1.39.1",
 		"lucide-svelte": "^0.475.0",
 		"markdown-it": "^14.1.0",
 		"markdown-it-table": "^4.1.1",
