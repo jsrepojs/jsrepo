@@ -75,8 +75,8 @@ importers:
         specifier: ^0.5.13
         version: 0.5.13
       openai:
-        specifier: ^4.85.2
-        version: 4.85.2(ws@8.18.0)(zod@3.24.1)
+        specifier: ^4.85.3
+        version: 4.85.3(ws@8.18.0)(zod@3.24.1)
       package-manager-detector:
         specifier: ^0.2.9
         version: 0.2.9
@@ -202,8 +202,8 @@ importers:
         specifier: ^2.22.0
         version: 2.22.0
       jsrepo:
-        specifier: ^1.38.0
-        version: 1.38.0(typescript@5.7.3)(ws@8.18.0)(zod@3.24.1)
+        specifier: ^1.39.1
+        version: 1.39.1(typescript@5.7.3)(ws@8.18.0)(zod@3.24.1)
       lucide-svelte:
         specifier: ^0.475.0
         version: 0.475.0(svelte@5.20.2)
@@ -2277,8 +2277,8 @@ packages:
   jsonfile@4.0.0:
     resolution: {integrity: sha512-m6F1R3z8jjlf2imQHS2Qez5sjKWQzbuuhuJ/FKYFRZvPE3PuHcSMVZzfsLhGVOkfd20obL5SWEBew5ShlquNxg==}
 
-  jsrepo@1.38.0:
-    resolution: {integrity: sha512-fsOkwgKrDGkdh7JF8JFr3qLAyfDcfE5a7vtpYu6tKpxNi6U2Wr3MBvHf/iZJjuWh0N98PYSTzwEKQhgu5STerQ==}
+  jsrepo@1.39.1:
+    resolution: {integrity: sha512-Po6UfjUERtpvbiFhKsfRKe5clN8GYSRylBBb/XAg2Aq00sJJ2rM5wHtCHDJPJPzun7sEHMGWioc28OZKaP8jAw==}
     hasBin: true
 
   keyv@4.5.4:
@@ -2532,6 +2532,18 @@ packages:
 
   openai@4.85.2:
     resolution: {integrity: sha512-ZQg3Q+K4A6M9dLFh5W36paZkZBQO+VbxMNJ1gUSyHsGiEWuXahdn02ermqNV68LhWQxdJQaWUFRAYpW/suTPWQ==}
+    hasBin: true
+    peerDependencies:
+      ws: ^8.18.0
+      zod: ^3.23.8
+    peerDependenciesMeta:
+      ws:
+        optional: true
+      zod:
+        optional: true
+
+  openai@4.85.3:
+    resolution: {integrity: sha512-KTMXAK6FPd2IvsPtglMt0J1GyVrjMxCYzu/mVbCPabzzquSJoZlYpHtE0p0ScZPyt11XTc757xSO4j39j5g+Xw==}
     hasBin: true
     peerDependencies:
       ws: ^8.18.0
@@ -5843,7 +5855,7 @@ snapshots:
     optionalDependencies:
       graceful-fs: 4.2.11
 
-  jsrepo@1.38.0(typescript@5.7.3)(ws@8.18.0)(zod@3.24.1):
+  jsrepo@1.39.1(typescript@5.7.3)(ws@8.18.0)(zod@3.24.1):
     dependencies:
       '@anthropic-ai/sdk': 0.36.3
       '@biomejs/js-api': 0.7.1(@biomejs/wasm-nodejs@1.9.4)
@@ -6114,6 +6126,21 @@ snapshots:
       regex-recursion: 6.0.2
 
   openai@4.85.2(ws@8.18.0)(zod@3.24.1):
+    dependencies:
+      '@types/node': 18.19.74
+      '@types/node-fetch': 2.6.12
+      abort-controller: 3.0.0
+      agentkeepalive: 4.6.0
+      form-data-encoder: 1.7.2
+      formdata-node: 4.4.1
+      node-fetch: 2.7.0
+    optionalDependencies:
+      ws: 8.18.0
+      zod: 3.24.1
+    transitivePeerDependencies:
+      - encoding
+
+  openai@4.85.3(ws@8.18.0)(zod@3.24.1):
     dependencies:
       '@types/node': 18.19.74
       '@types/node-fetch': 2.6.12

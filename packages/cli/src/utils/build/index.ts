@@ -10,7 +10,20 @@ import type { RegistryConfig } from '../config';
 import { languages } from '../language-support';
 import { isDependedOn } from './check';
 
-const TEST_SUFFIXES = ['.test.ts', '_test.ts', '.test.js', '_test.js'] as const;
+const TEST_SUFFIXES = [
+	'.test.ts',
+	'_test.ts',
+	'.test.js',
+	'_test.js',
+	'.spec.ts',
+	'_spec.ts',
+	'.spec.js',
+	'_spec.js',
+	'.stories.jsx',
+	'_stories.jsx',
+	'.stories.tsx',
+	'_stories.tsx',
+] as const;
 
 export const isTestFile = (file: string): boolean =>
 	TEST_SUFFIXES.find((suffix) => file.endsWith(suffix)) !== undefined;
