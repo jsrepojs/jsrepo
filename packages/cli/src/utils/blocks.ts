@@ -8,20 +8,15 @@ import { Err, Ok, type Result } from './blocks/ts/result';
 import * as url from './blocks/ts/url';
 import { type ProjectConfig, getPathForBlock, resolvePaths } from './config';
 import * as registry from './registry-providers/internal';
+import { isTestFile } from './build';
 
-export type InstallingBlock = {
-	name: string;
-	subDependency: boolean;
-	block: registry.RemoteBlock;
-};
-
-const resolveTree = async (
+export const resolveTree = async (
 	blockSpecifiers: string[],
 	blocksMap: Map<string, registry.RemoteBlock>,
 	repoPaths: registry.RegistryProviderState[],
-	installed: Map<string, InstallingBlock> = new Map()
-): Promise<Result<InstallingBlock[], string>> => {
-	const blocks = new Map<string, InstallingBlock>();
+	installed: Map<string, registry.RemoteBlock> = new Map()
+): Promise<Result<registry.RemoteBlock[], string>> => {
+	const blocks = new Map<string, registry.RemoteBlock>();
 
 	for (const blockSpecifier of blockSpecifiers) {
 		let block: registry.RemoteBlock | undefined = undefined;
@@ -71,7 +66,7 @@ const resolveTree = async (
 
 		const specifier = `${block.category}/${block.name}`;
 
-		blocks.set(specifier, { name: block.name, subDependency: false, block });
+		blocks.set(specifier, block);
 
 		if (block.localDependencies && block.localDependencies.length > 0) {
 			const subDeps = await resolveTree(
@@ -84,7 +79,7 @@ const resolveTree = async (
 			if (subDeps.isErr()) return Err(subDeps.unwrapErr());
 
 			for (const dep of subDeps.unwrap()) {
-				blocks.set(`${dep.block.category}/${dep.block.name}`, dep);
+				blocks.set(`${dep.category}/${dep.name}`, dep);
 			}
 		}
 	}
@@ -104,7 +99,7 @@ type InstalledBlock = {
  * @param config
  * @returns
  */
-const getInstalled = (
+export const getInstalled = (
 	blocks: Map<string, Block>,
 	config: ProjectConfig,
 	cwd: string
@@ -138,4 +133,50 @@ const getInstalled = (
 	return installedBlocks;
 };
 
-export { resolveTree, getInstalled };
+export type RegistryFile = {
+	name: string;
+	content: Result<string, string>;
+};
+
+type PreloadedBlock = {
+	block: registry.RemoteBlock;
+	files: Promise<RegistryFile[]>;
+};
+
+/** Starts loading the content of the files for each block and
+ * returns the blocks mapped to a promise that contains their files and their contents.
+ *
+ * @param blocks
+ * @returns
+ */
+export const preloadBlocks = (
+	blocks: registry.RemoteBlock[],
+	config: ProjectConfig
+): PreloadedBlock[] => {
+	const preloaded: PreloadedBlock[] = [];
+
+	for (const block of blocks) {
+		// filters out test files if they are not supposed to be included
+		const includedFiles = block.files.filter((file) =>
+			isTestFile(file) ? config.includeTests : true
+		);
+
+		const files = Promise.all(
+			includedFiles.map(async (file) => {
+				const content = await registry.fetchRaw(
+					block.sourceRepo,
+					path.join(block.directory, file)
+				);
+
+				return { name: file, content };
+			})
+		);
+
+		preloaded.push({
+			block,
+			files,
+		});
+	}
+
+	return preloaded;
+};

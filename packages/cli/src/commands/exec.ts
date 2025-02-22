@@ -232,7 +232,7 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 
 	const addedBlocks: string[] = [];
 
-	for (const { block } of installingBlocks) {
+	for (const block of installingBlocks) {
 		const fullSpecifier = `${block.sourceRepo.url}/${block.category}/${block.name}`;
 		const shortSpecifier = `${block.category}/${block.name}`;
 
@@ -401,16 +401,10 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 	let file: string;
 
 	// tsx seems to be smart enough to figure out if it is a .ts file
-	if (runningBlock.block.subdirectory) {
-		file = path.join(
-			tempDirectory,
-			`${runningBlock.block.category}/${runningBlock.block.name}/index.js`
-		);
+	if (runningBlock.subdirectory) {
+		file = path.join(tempDirectory, `${runningBlock.category}/${runningBlock.name}/index.js`);
 	} else {
-		file = path.join(
-			tempDirectory,
-			`${runningBlock.block.category}/${runningBlock.block.name}.js`
-		);
+		file = path.join(tempDirectory, `${runningBlock.category}/${runningBlock.name}.js`);
 	}
 
 	const cmd = resolveCommand(pm, 'execute', ['tsx', file, ...passthroughArgs]);

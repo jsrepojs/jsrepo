@@ -7,7 +7,7 @@ import { detect } from 'package-manager-detector/detect';
 import path from 'pathe';
 import * as v from 'valibot';
 import * as ascii from '../utils/ascii';
-import { getInstalled, resolveTree } from '../utils/blocks';
+import { getInstalled, preloadBlocks, resolveTree } from '../utils/blocks';
 import * as url from '../utils/blocks/ts/url';
 import { isTestFile } from '../utils/build';
 import {
@@ -29,6 +29,7 @@ import {
 	type ConcurrentTask,
 	intro,
 	nextSteps,
+	promptUpdateFile,
 	runTasksConcurrently,
 	spinner,
 	truncatedList,
@@ -308,7 +309,7 @@ const _add = async (blockNames: string[], options: Options) => {
 
 		const zeroConfig = zeroConfigParsed.success ? zeroConfigParsed.output : config;
 
-		const categories = Array.from(new Set(installingBlocks.map((b) => b.block.category)));
+		const categories = Array.from(new Set(installingBlocks.map((b) => b.category)));
 
 		for (const cat of categories) {
 			const blocksPath = await text({
@@ -407,27 +408,47 @@ const _add = async (blockNames: string[], options: Options) => {
 
 	const resolvedPaths = resolvedPathsResult.unwrap();
 
-	const addedBlocks: string[] = [];
+	const updatedBlocks = new Set<string>();
 
 	let overwriteAll: boolean | undefined;
 
-	for (const { block } of installingBlocks) {
-		const fullSpecifier = url.join(block.sourceRepo.url, block.category, block.name);
-		const shortSpecifier = `${block.category}/${block.name}`;
-		const watermark = getWatermark(block.sourceRepo.url);
+	const preloaded = preloadBlocks(installingBlocks, config);
 
-		const providerInfo = block.sourceRepo;
+	const updatedFiles: { destination: string; content: string; block: registry.RemoteBlock }[] =
+		[];
+
+	for (const block of preloaded) {
+		const fullSpecifier = url.join(
+			block.block.sourceRepo.url,
+			block.block.category,
+			block.block.name
+		);
+		const shortSpecifier = `${block.block.category}/${block.block.name}`;
 
 		verbose(`Setting up ${fullSpecifier}`);
 
-		const directory = getPathForBlock(block, resolvedPaths, options.cwd);
+		const directory = getPathForBlock(block.block, resolvedPaths, options.cwd);
 
 		const blockExists = installedBlocks.find((b) => shortSpecifier === b);
+
+		if (config.includeTests && block.block.tests) {
+			verbose('Trying to include tests');
+
+			devDeps.add('vitest');
+		}
+
+		for (const dep of block.block.devDependencies) {
+			devDeps.add(dep);
+		}
+
+		for (const dep of block.block.dependencies) {
+			deps.add(dep);
+		}
 
 		if (blockExists && !options.yes && !overwriteAll) {
 			if (overwriteAll === undefined) {
 				const overwriteBlocks = installingBlocks
-					.map((installing) => `${installing.block.category}/${installing.block.name}`)
+					.map((installing) => `${installing.category}/${installing.name}`)
 					.filter((spec) => installedBlocks.find((b) => b === spec));
 
 				log.warn(
@@ -450,132 +471,157 @@ const _add = async (blockNames: string[], options: Options) => {
 			}
 
 			if (!overwriteAll) {
-				const result = await confirm({
-					message: `${color.cyan(shortSpecifier)} already exists in your project would you like to overwrite it?`,
-					initialValue: false,
-				});
+				const files = await block.files;
 
-				if (isCancel(result)) {
-					cancel('Canceled!');
-					process.exit(0);
-				}
-
-				// just skip this block if they don't want to overwrite it
-				if (!result) continue;
-			}
-		}
-
-		addedBlocks.push(shortSpecifier);
-
-		tasks.push({
-			run: async ({ message }) => {
-				message(`Adding ${color.cyan(fullSpecifier)}`);
-
-				verbose(`Creating directory ${color.bold(directory)}`);
-
-				// in case the directory didn't already exist
-				fs.mkdirSync(directory, { recursive: true });
-
-				verbose(`Created directory ${color.bold(directory)}`);
-
-				const files: { content: string; destPath: string }[] = [];
-
-				const getSourceFile = async (filePath: string) => {
-					const content = await registry.fetchRaw(providerInfo, filePath, {
-						verbose,
-					});
-
-					if (content.isErr()) {
-						loading.stop(color.red(`Error fetching ${color.bold(filePath)}`));
+				for (const file of files) {
+					if (file.content.isErr()) {
 						program.error(
-							color.red(`There was an error trying to get ${fullSpecifier}`)
+							color.red(
+								`There was an error trying to get ${file.name} from ${fullSpecifier}: ${file.content.unwrapErr()}`
+							)
 						);
 					}
 
-					return content.unwrap();
-				};
-
-				for (const sourceFile of block.files) {
-					if (!config.includeTests && isTestFile(sourceFile)) continue;
-
-					const sourcePath = path.join(block.directory, sourceFile);
-
 					let destPath: string;
-					if (block.subdirectory) {
-						destPath = path.join(directory, block.name, sourceFile);
+					if (block.block.subdirectory) {
+						destPath = path.join(directory, block.block.name, file.name);
 					} else {
-						destPath = path.join(directory, sourceFile);
+						destPath = path.join(directory, file.name);
 					}
 
-					verbose(`Adding ${color.bold(sourcePath)}`);
-
-					const content = await getSourceFile(sourcePath);
-
-					const pathFolder = destPath.slice(0, destPath.length - sourceFile.length);
-
-					verbose(`Creating directory ${color.bold(pathFolder)}`);
-
-					fs.mkdirSync(pathFolder, {
-						recursive: true,
-					});
-
-					verbose(`Created directory ${color.bold(pathFolder)}`);
-
-					files.push({ content, destPath });
-
-					verbose(`Got ${color.bold(sourcePath)}`);
-				}
-
-				for (const file of files) {
-					const content = await transformRemoteContent({
-						file,
+					const remoteContent = await transformRemoteContent({
+						file: {
+							content: file.content.unwrap(),
+							destPath: destPath,
+						},
 						biomeOptions,
 						prettierOptions,
 						config,
-						imports: block._imports_,
-						watermark,
+						imports: block.block._imports_,
+						watermark: getWatermark(block.block.sourceRepo.url),
 						verbose,
 						cwd: options.cwd,
 					});
 
-					if (content.isErr()) {
-						program.error(color.red(content.unwrapErr()));
+					if (remoteContent.isErr()) {
+						program.error(color.red(remoteContent.unwrapErr()));
 					}
 
-					verbose(`Writing to ${color.bold(file.destPath)}`);
+					let localContent = '';
+					if (fs.existsSync(destPath)) {
+						localContent = fs.readFileSync(destPath).toString();
+					}
 
-					fs.writeFileSync(file.destPath, content.unwrap());
+					const updateResult = await promptUpdateFile({
+						config: { biomeOptions, prettierOptions, formatter: config.formatter },
+						current: {
+							path: destPath,
+							content: localContent,
+						},
+						incoming: {
+							path: url.join(fullSpecifier, file.name),
+							content: remoteContent.unwrap(),
+						},
+						options: {
+							loading,
+							yes: options.yes,
+							no: false,
+							verbose,
+							expand: false,
+							maxUnchanged: 5,
+						},
+					});
+
+					if (updateResult.applyChanges) {
+						updatedFiles.push({
+							destination: destPath,
+							content: updateResult.updatedContent,
+							block: block.block,
+						});
+
+						updatedBlocks.add(shortSpecifier);
+					}
 				}
 
-				if (config.includeTests && block.tests) {
-					verbose('Trying to include tests');
+				continue;
+			}
+		}
 
-					const { devDependencies } = JSON.parse(
-						fs.readFileSync(path.join(options.cwd, 'package.json')).toString()
+		// await files promise
+		block.files.then((files) => {
+			files.forEach(async (file) => {
+				if (file.content.isErr()) {
+					program.error(
+						color.red(
+							`There was an error trying to get ${file.name} from ${fullSpecifier}: ${file.content.unwrapErr()}`
+						)
 					);
-
-					if (devDependencies === undefined || devDependencies.vitest === undefined) {
-						devDeps.add('vitest');
-					}
 				}
 
-				for (const dep of block.devDependencies) {
-					devDeps.add(dep);
+				let destPath: string;
+				if (block.block.subdirectory) {
+					destPath = path.join(directory, block.block.name, file.name);
+				} else {
+					destPath = path.join(directory, file.name);
 				}
 
-				for (const dep of block.dependencies) {
-					deps.add(dep);
+				const content = await transformRemoteContent({
+					file: {
+						content: file.content.unwrap(),
+						destPath: destPath,
+					},
+					biomeOptions,
+					prettierOptions,
+					config,
+					imports: block.block._imports_,
+					watermark: getWatermark(block.block.sourceRepo.url),
+					verbose,
+					cwd: options.cwd,
+				});
+
+				if (content.isErr()) {
+					program.error(color.red(content.unwrapErr()));
 				}
-			},
+
+				updatedFiles.push({
+					destination: destPath,
+					content: content.unwrap(),
+					block: block.block,
+				});
+			});
 		});
+
+		updatedBlocks.add(shortSpecifier);
 	}
 
-	await runTasksConcurrently({
-		startMessage: 'Adding blocks',
-		stopMessage: `Added ${color.cyan(addedBlocks.join(', '))}`,
-		tasks,
-		loading,
-	});
+	if (updatedBlocks.size === 0) {
+		log.success('Nothing to update');
+	} else {
+		loading.start('Adding blocks');
+
+		// wait for any remaining files to finish loading
+		await Promise.all(preloaded.map((p) => p.files));
+
+		await Promise.all(
+			updatedFiles.map(async (file) => {
+				const folder = path.dirname(file.destination);
+
+				if (!fs.existsSync(folder)) {
+					verbose(`Creating directory ${color.bold(folder)}`);
+
+					fs.mkdirSync(folder, {
+						recursive: true,
+					});
+				}
+
+				verbose(`Writing to ${color.bold(file.destination)}`);
+
+				fs.writeFileSync(file.destination, file.content);
+			})
+		);
+
+		loading.stop(`Added blocks ${color.cyan(Array.from(updatedBlocks).join(', '))}`);
+	}
 
 	// check if dependencies are already installed
 	const requiredDependencies = returnShouldInstall(deps, devDeps, { cwd: options.cwd });

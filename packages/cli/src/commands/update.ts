@@ -207,7 +207,7 @@ const _update = async (blockNames: string[], options: Options) => {
 
 	const resolvedPaths = resolvedPathsResult.unwrap();
 
-	for (const { block } of updatingBlocks) {
+	for (const block of updatingBlocks) {
 		const fullSpecifier = url.join(block.sourceRepo.url, block.category, block.name);
 
 		const watermark = getWatermark(block.sourceRepo.url);
