@@ -6,9 +6,9 @@ import type { Block } from '../types';
 import * as array from './blocks/ts/array';
 import { Err, Ok, type Result } from './blocks/ts/result';
 import * as url from './blocks/ts/url';
+import { isTestFile } from './build';
 import { type ProjectConfig, getPathForBlock, resolvePaths } from './config';
 import * as registry from './registry-providers/internal';
-import { isTestFile } from './build';
 
 export const resolveTree = async (
 	blockSpecifiers: string[],

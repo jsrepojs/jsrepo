@@ -8,8 +8,8 @@ import path from 'pathe';
 import * as v from 'valibot';
 import * as ascii from '../utils/ascii';
 import { getInstalled, preloadBlocks, resolveTree } from '../utils/blocks';
+import * as promises from '../utils/blocks/ts/promises';
 import * as url from '../utils/blocks/ts/url';
-import { isTestFile } from '../utils/build';
 import {
 	type Formatter,
 	type ProjectConfig,
@@ -30,7 +30,6 @@ import {
 	intro,
 	nextSteps,
 	promptUpdateFile,
-	runTasksConcurrently,
 	spinner,
 	truncatedList,
 } from '../utils/prompts';
@@ -295,8 +294,6 @@ const _add = async (blockNames: string[], options: Options) => {
 
 	const pm = (await detect({ cwd: options.cwd }))?.agent ?? 'npm';
 
-	const tasks: ConcurrentTask[] = [];
-
 	let devDeps: Set<string> = new Set<string>();
 	let deps: Set<string> = new Set<string>();
 
@@ -414,8 +411,11 @@ const _add = async (blockNames: string[], options: Options) => {
 
 	const preloaded = preloadBlocks(installingBlocks, config);
 
-	const updatedFiles: { destination: string; content: string; block: registry.RemoteBlock }[] =
-		[];
+	const updatedFiles: Promise<{
+		destination: string;
+		content: string;
+		block: registry.RemoteBlock;
+	}>[] = [];
 
 	for (const block of preloaded) {
 		const fullSpecifier = url.join(
@@ -533,11 +533,13 @@ const _add = async (blockNames: string[], options: Options) => {
 					});
 
 					if (updateResult.applyChanges) {
-						updatedFiles.push({
-							destination: destPath,
-							content: updateResult.updatedContent,
-							block: block.block,
-						});
+						updatedFiles.push(
+							promises.noopPromise({
+								destination: destPath,
+								content: updateResult.updatedContent,
+								block: block.block,
+							})
+						);
 
 						updatedBlocks.add(shortSpecifier);
 					}
@@ -549,7 +551,7 @@ const _add = async (blockNames: string[], options: Options) => {
 
 		// await files promise
 		block.files.then((files) => {
-			files.forEach(async (file) => {
+			files.map(async (file) => {
 				if (file.content.isErr()) {
 					program.error(
 						color.red(
@@ -565,7 +567,7 @@ const _add = async (blockNames: string[], options: Options) => {
 					destPath = path.join(directory, file.name);
 				}
 
-				const content = await transformRemoteContent({
+				const updatedFile = transformRemoteContent({
 					file: {
 						content: file.content.unwrap(),
 						destPath: destPath,
@@ -577,17 +579,19 @@ const _add = async (blockNames: string[], options: Options) => {
 					watermark: getWatermark(block.block.sourceRepo.url),
 					verbose,
 					cwd: options.cwd,
+				}).then((content) => {
+					if (content.isErr()) {
+						program.error(color.red(content.unwrapErr()));
+					}
+
+					return {
+						destination: destPath,
+						content: content.unwrap(),
+						block: block.block,
+					};
 				});
 
-				if (content.isErr()) {
-					program.error(color.red(content.unwrapErr()));
-				}
-
-				updatedFiles.push({
-					destination: destPath,
-					content: content.unwrap(),
-					block: block.block,
-				});
+				updatedFiles.push(updatedFile);
 			});
 		});
 
@@ -603,7 +607,9 @@ const _add = async (blockNames: string[], options: Options) => {
 		await Promise.all(preloaded.map((p) => p.files));
 
 		await Promise.all(
-			updatedFiles.map(async (file) => {
+			updatedFiles.map(async (updatedFile) => {
+				const file = await updatedFile;
+
 				const folder = path.dirname(file.destination);
 
 				if (!fs.existsSync(folder)) {
