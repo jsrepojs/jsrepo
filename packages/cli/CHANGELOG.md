@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.39.3
+
+### Patch Changes
+
+- f8d5dd7: chore: bump deps
+
 ## 1.39.2
 
 ### Patch Changes
