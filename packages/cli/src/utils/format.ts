@@ -4,12 +4,12 @@ import path from 'pathe';
 import * as prettier from 'prettier';
 import type { Formatter } from './config';
 
-type FormatterConfig = {
+export type FormatterConfig = {
 	prettierOptions: prettier.Options | null;
 	biomeOptions: PartialConfiguration | null;
 };
 
-const loadFormatterConfig = async ({
+export const loadFormatterConfig = async ({
 	formatter,
 	cwd,
 }: { formatter?: Formatter; cwd: string }): Promise<FormatterConfig> => {
@@ -31,5 +31,3 @@ const loadFormatterConfig = async ({
 		prettierOptions,
 	};
 };
-
-export { type FormatterConfig, loadFormatterConfig };

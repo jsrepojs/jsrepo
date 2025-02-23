@@ -7,7 +7,7 @@ import { detect } from 'package-manager-detector/detect';
 import path from 'pathe';
 import * as v from 'valibot';
 import * as ascii from '../utils/ascii';
-import { getInstalled, preloadBlocks, resolveTree } from '../utils/blocks';
+import { getBlockFilePath, getInstalled, preloadBlocks, resolveTree } from '../utils/blocks';
 import * as promises from '../utils/blocks/ts/promises';
 import * as url from '../utils/blocks/ts/url';
 import {
@@ -34,6 +34,8 @@ import {
 import * as registry from '../utils/registry-providers/internal';
 
 const schema = v.object({
+	expand: v.boolean(),
+	maxUnchanged: v.number(),
 	repo: v.optional(v.string()),
 	allow: v.boolean(),
 	yes: v.boolean(),
@@ -49,6 +51,13 @@ export const add = new Command('add')
 	.argument(
 		'[blocks...]',
 		'Names of the blocks you want to add to your project. ex: (utils/math, github/ieedan/std/utils/math)'
+	)
+	.option('-E, --expand', 'Expands the diff so you see the entire file.', false)
+	.option(
+		'--max-unchanged <number>',
+		'Maximum unchanged lines that will show without being collapsed.',
+		(val) => Number.parseInt(val), // this is such a dumb api thing
+		3
 	)
 	.option('--repo <repo>', 'Repository to download the blocks from.')
 	.option('-A, --allow', 'Allow jsrepo to download code from the provided repo.', false)
@@ -235,7 +244,7 @@ const _add = async (blockNames: string[], options: Options) => {
 	verbose(`Retrieved blocks from ${color.cyan(repoPaths.join(', '))}`);
 
 	for (const manifest of manifests) {
-		checkPreconditions(manifest.state, manifest.manifest);
+		checkPreconditions(manifest.state, manifest.manifest, options.cwd);
 	}
 
 	let installedBlocks = getInstalled(blocksMap, config, options.cwd).map((val) => val.specifier);
@@ -393,19 +402,16 @@ const _add = async (blockNames: string[], options: Options) => {
 		cwd: options.cwd,
 	});
 
-	const resolvedPathsResult = resolvePaths(config.paths, options.cwd);
-
-	if (resolvedPathsResult.isErr()) {
-		program.error(color.red(resolvedPathsResult.unwrapErr()));
-	}
-
-	const resolvedPaths = resolvedPathsResult.unwrap();
+	const resolvedPaths = resolvePaths(config.paths, options.cwd).match(
+		(v) => v,
+		(err) => program.error(color.red(err))
+	);
 
 	const updatedBlocks = new Set<string>();
 
 	let overwriteAll: boolean | undefined;
 
-	const preloaded = preloadBlocks(installingBlocks, config);
+	const preloadedBlocks = preloadBlocks(installingBlocks, config);
 
 	const updatedFiles: Promise<{
 		destination: string;
@@ -413,31 +419,29 @@ const _add = async (blockNames: string[], options: Options) => {
 		block: registry.RemoteBlock;
 	}>[] = [];
 
-	for (const block of preloaded) {
+	for (const preloadedBlock of preloadedBlocks) {
 		const fullSpecifier = url.join(
-			block.block.sourceRepo.url,
-			block.block.category,
-			block.block.name
+			preloadedBlock.block.sourceRepo.url,
+			preloadedBlock.block.category,
+			preloadedBlock.block.name
 		);
-		const shortSpecifier = `${block.block.category}/${block.block.name}`;
+		const shortSpecifier = `${preloadedBlock.block.category}/${preloadedBlock.block.name}`;
 
 		verbose(`Setting up ${fullSpecifier}`);
 
-		const directory = getPathForBlock(block.block, resolvedPaths, options.cwd);
-
 		const blockExists = installedBlocks.find((b) => shortSpecifier === b);
 
-		if (config.includeTests && block.block.tests) {
+		if (config.includeTests && preloadedBlock.block.tests) {
 			verbose('Trying to include tests');
 
 			devDeps.add('vitest');
 		}
 
-		for (const dep of block.block.devDependencies) {
+		for (const dep of preloadedBlock.block.devDependencies) {
 			devDeps.add(dep);
 		}
 
-		for (const dep of block.block.dependencies) {
+		for (const dep of preloadedBlock.block.dependencies) {
 			deps.add(dep);
 		}
 
@@ -467,41 +471,43 @@ const _add = async (blockNames: string[], options: Options) => {
 			}
 
 			if (!overwriteAll) {
-				const files = await block.files;
+				const files = await preloadedBlock.files;
+
+				process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
+
+				process.stdout.write(`${ascii.VERTICAL_LINE}  ${fullSpecifier}\n`);
 
 				for (const file of files) {
-					if (file.content.isErr()) {
-						program.error(
-							color.red(
-								`There was an error trying to get ${file.name} from ${fullSpecifier}: ${file.content.unwrapErr()}`
-							)
-						);
-					}
+					const content = file.content.match(
+						(v) => v,
+						(err) => program.error(color.red(err))
+					);
 
-					let destPath: string;
-					if (block.block.subdirectory) {
-						destPath = path.join(directory, block.block.name, file.name);
-					} else {
-						destPath = path.join(directory, file.name);
-					}
+					const destPath = getBlockFilePath(
+						file.name,
+						preloadedBlock.block,
+						resolvedPaths,
+						options.cwd
+					);
 
-					const remoteContent = await transformRemoteContent({
-						file: {
-							content: file.content.unwrap(),
-							destPath: destPath,
-						},
-						biomeOptions,
-						prettierOptions,
-						config,
-						imports: block.block._imports_,
-						watermark: getWatermark(block.block.sourceRepo.url),
-						verbose,
-						cwd: options.cwd,
-					});
-
-					if (remoteContent.isErr()) {
-						program.error(color.red(remoteContent.unwrapErr()));
-					}
+					const remoteContent = (
+						await transformRemoteContent({
+							file: {
+								content: content,
+								destPath: destPath,
+							},
+							biomeOptions,
+							prettierOptions,
+							config,
+							imports: preloadedBlock.block._imports_,
+							watermark: getWatermark(preloadedBlock.block.sourceRepo.url),
+							verbose,
+							cwd: options.cwd,
+						})
+					).match(
+						(v) => v,
+						(err) => program.error(color.red(err))
+					);
 
 					let localContent = '';
 					if (fs.existsSync(destPath)) {
@@ -516,15 +522,13 @@ const _add = async (blockNames: string[], options: Options) => {
 						},
 						incoming: {
 							path: url.join(fullSpecifier, file.name),
-							content: remoteContent.unwrap(),
+							content: remoteContent,
 						},
 						options: {
+							...options,
 							loading,
-							yes: options.yes,
 							no: false,
-							verbose,
-							expand: false,
-							maxUnchanged: 5,
+							verbose: options.verbose ? verbose : undefined,
 						},
 					});
 
@@ -533,7 +537,7 @@ const _add = async (blockNames: string[], options: Options) => {
 							promises.noopPromise({
 								destination: destPath,
 								content: updateResult.updatedContent,
-								block: block.block,
+								block: preloadedBlock.block,
 							})
 						);
 
@@ -545,45 +549,42 @@ const _add = async (blockNames: string[], options: Options) => {
 			}
 		}
 
-		// await files promise
-		block.files.then((files) => {
+		// once files load map over them and add them to updatedFiles
+		preloadedBlock.files.then((files) => {
 			files.map(async (file) => {
-				if (file.content.isErr()) {
-					program.error(
-						color.red(
-							`There was an error trying to get ${file.name} from ${fullSpecifier}: ${file.content.unwrapErr()}`
-						)
-					);
-				}
+				const content = file.content.match(
+					(v) => v,
+					(err) => program.error(color.red(err))
+				);
 
-				let destPath: string;
-				if (block.block.subdirectory) {
-					destPath = path.join(directory, block.block.name, file.name);
-				} else {
-					destPath = path.join(directory, file.name);
-				}
+				const destPath = getBlockFilePath(
+					file.name,
+					preloadedBlock.block,
+					resolvedPaths,
+					options.cwd
+				);
 
 				const updatedFile = transformRemoteContent({
 					file: {
-						content: file.content.unwrap(),
+						content,
 						destPath: destPath,
 					},
 					biomeOptions,
 					prettierOptions,
 					config,
-					imports: block.block._imports_,
-					watermark: getWatermark(block.block.sourceRepo.url),
+					imports: preloadedBlock.block._imports_,
+					watermark: getWatermark(preloadedBlock.block.sourceRepo.url),
 					verbose,
 					cwd: options.cwd,
-				}).then((content) => {
-					if (content.isErr()) {
-						program.error(color.red(content.unwrapErr()));
+				}).then((remoteContent) => {
+					if (remoteContent.isErr()) {
+						program.error(color.red(remoteContent.unwrapErr()));
 					}
 
 					return {
 						destination: destPath,
-						content: content.unwrap(),
-						block: block.block,
+						content: remoteContent.unwrap(),
+						block: preloadedBlock.block,
 					};
 				});
 
@@ -600,7 +601,7 @@ const _add = async (blockNames: string[], options: Options) => {
 		loading.start('Adding blocks');
 
 		// wait for any remaining files to finish loading
-		await Promise.all(preloaded.map((p) => p.files));
+		await Promise.all(preloadedBlocks.map((p) => p.files));
 
 		await Promise.all(
 			updatedFiles.map(async (updatedFile) => {

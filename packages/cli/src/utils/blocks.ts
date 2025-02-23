@@ -7,7 +7,7 @@ import * as array from './blocks/ts/array';
 import { Err, Ok, type Result } from './blocks/ts/result';
 import * as url from './blocks/ts/url';
 import { isTestFile } from './build';
-import { type ProjectConfig, getPathForBlock, resolvePaths } from './config';
+import { type Paths, type ProjectConfig, getPathForBlock, resolvePaths } from './config';
 import * as registry from './registry-providers/internal';
 
 export const resolveTree = async (
@@ -106,13 +106,10 @@ export const getInstalled = (
 ): InstalledBlock[] => {
 	const installedBlocks: InstalledBlock[] = [];
 
-	const resolvedPathsResult = resolvePaths(config.paths, cwd);
-
-	if (resolvedPathsResult.isErr()) {
-		program.error(color.red(resolvedPathsResult.unwrapErr()));
-	}
-
-	const resolvedPaths = resolvedPathsResult.unwrap();
+	const resolvedPaths = resolvePaths(config.paths, cwd).match(
+		(v) => v,
+		(err) => program.error(color.red(err))
+	);
 
 	for (const [_, block] of blocks) {
 		const baseDir = getPathForBlock(block, resolvedPaths, cwd);
@@ -179,4 +176,27 @@ export const preloadBlocks = (
 	}
 
 	return preloaded;
+};
+
+/** Gets the path for the file belonging to the provided block
+ *
+ * @param fileName
+ * @param block
+ * @param resolvedPaths
+ * @param cwd
+ * @returns
+ */
+export const getBlockFilePath = (
+	fileName: string,
+	block: registry.RemoteBlock,
+	resolvedPaths: Paths,
+	cwd: string
+) => {
+	const directory = getPathForBlock(block, resolvedPaths, cwd);
+
+	if (block.subdirectory) {
+		return path.join(directory, block.name, fileName);
+	}
+
+	return path.join(directory, fileName);
 };

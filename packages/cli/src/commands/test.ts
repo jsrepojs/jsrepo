@@ -194,13 +194,10 @@ const _test = async (blockNames: string[], options: Options) => {
 		testingBlocksMapped.push({ name: blockSpecifier, block });
 	}
 
-	const resolvedPathsResult = resolvePaths(config.paths, options.cwd);
-
-	if (resolvedPathsResult.isErr()) {
-		program.error(color.red(resolvedPathsResult.unwrapErr()));
-	}
-
-	const resolvedPaths = resolvedPathsResult.unwrap();
+	const resolvedPaths = resolvePaths(config.paths, options.cwd).match(
+		(v) => v,
+		(err) => program.error(color.red(err))
+	);
 
 	for (const { block } of testingBlocksMapped) {
 		const providerState = block.sourceRepo;
