@@ -1,9 +1,10 @@
 import type { PartialConfiguration } from '@biomejs/wasm-nodejs';
-import { cancel, intro, isCancel, log, select, spinner, text } from '@clack/prompts';
+import { cancel, confirm, intro, isCancel, log, select, spinner, text } from '@clack/prompts';
 import boxen from 'boxen';
 import color from 'chalk';
+import { program } from 'commander';
 import { diffLines } from 'diff';
-import { detectSync, resolveCommand } from 'package-manager-detector';
+import { type Agent, detectSync, resolveCommand } from 'package-manager-detector';
 import type * as prettier from 'prettier';
 import semver from 'semver';
 import { type Message, type ModelName, models } from './ai';
@@ -11,9 +12,11 @@ import * as ascii from './ascii';
 import { stripAsni } from './blocks/ts/strip-ansi';
 import type { ProjectConfig } from './config';
 import { packageJson } from './context';
+import { installDependencies } from './dependencies';
 import { formatDiff } from './diff';
 import { formatFile } from './files';
 import { getLatestVersion } from './get-latest-version';
+import { returnShouldInstall } from './package';
 import * as persisted from './persisted';
 
 export type Task = {
@@ -26,7 +29,7 @@ type TaskOptions = {
 	loading: ReturnType<typeof spinner>;
 };
 
-const runTasks = async (tasks: Task[], { loading }: TaskOptions) => {
+export const runTasks = async (tasks: Task[], { loading }: TaskOptions) => {
 	for (const task of tasks) {
 		loading.start(task.loadingMessage);
 
@@ -52,7 +55,7 @@ export type ConcurrentOptions = {
 	tasks: ConcurrentTask[];
 };
 
-const runTasksConcurrently = async ({
+export const runTasksConcurrently = async ({
 	tasks,
 	startMessage,
 	stopMessage,
@@ -100,7 +103,7 @@ const _spinner = ({
 	};
 };
 
-const nextSteps = (steps: string[]): string => {
+export const nextSteps = (steps: string[]): string => {
 	const box = boxen(steps.join('\n'), {
 		title: 'Next Steps',
 		textAlignment: 'left',
@@ -121,7 +124,7 @@ const nextSteps = (steps: string[]): string => {
 	return `${ascii.VERTICAL_LINE}\n${box}\n`;
 };
 
-const truncatedList = (items: string[], maxLength = 3) => {
+export const truncatedList = (items: string[], maxLength = 3) => {
 	const truncated = items.slice(0, maxLength);
 
 	const remaining = items.length - truncated.length;
@@ -399,11 +402,100 @@ export const promptUpdateFile = async ({
 	return { applyChanges: false };
 };
 
-export {
-	runTasks,
-	nextSteps,
-	_intro as intro,
-	_spinner as spinner,
-	runTasksConcurrently,
-	truncatedList,
+type InstallDependenciesOptions = {
+	yes: boolean;
+	no?: boolean;
+	cwd: string;
+	loading: ReturnType<typeof spinner>;
+	pm: Agent;
+	ignoreWorkspace?: boolean;
 };
+
+type InstallDependenciesResult = {
+	/** True if dependencies were installed */
+	installed: boolean;
+	dependencies: Set<string>;
+	devDependencies: Set<string>;
+};
+
+export const promptInstallDependencies = async (
+	deps: Set<string>,
+	devDeps: Set<string>,
+	{ yes, no = false, loading, cwd, pm, ignoreWorkspace = false }: InstallDependenciesOptions
+): Promise<InstallDependenciesResult> => {
+	// check if dependencies are already installed
+	const { dependencies, devDependencies } = returnShouldInstall(deps, devDeps, { cwd });
+
+	const hasDependencies = dependencies.size > 0 || devDependencies.size > 0;
+
+	if (hasDependencies) {
+		let install = yes;
+		if (!yes && !no) {
+			const result = await confirm({
+				message: 'Would you like to install dependencies?',
+				initialValue: true,
+			});
+
+			if (isCancel(result)) {
+				cancel('Canceled!');
+				process.exit(0);
+			}
+
+			install = result;
+		}
+
+		if (install) {
+			if (dependencies.size > 0) {
+				loading.start(`Installing dependencies with ${color.cyan(pm)}`);
+
+				(
+					await installDependencies({
+						pm,
+						deps: Array.from(dependencies),
+						dev: false,
+						cwd,
+						ignoreWorkspace,
+					})
+				).match(
+					(installed) => {
+						loading.stop(`Installed ${color.cyan(installed.join(', '))}`);
+					},
+					(err) => {
+						loading.stop('Failed to install dependencies');
+
+						program.error(err);
+					}
+				);
+			}
+
+			if (devDependencies.size > 0) {
+				loading.start(`Installing dependencies with ${color.cyan(pm)}`);
+
+				(
+					await installDependencies({
+						pm,
+						deps: Array.from(devDependencies),
+						dev: true,
+						cwd,
+						ignoreWorkspace,
+					})
+				).match(
+					(installed) => {
+						loading.stop(`Installed ${color.cyan(installed.join(', '))}`);
+					},
+					(err) => {
+						loading.stop('Failed to install dev dependencies');
+
+						program.error(err);
+					}
+				);
+			}
+
+			return { installed: true, dependencies, devDependencies };
+		}
+	}
+
+	return { installed: false, dependencies, devDependencies };
+};
+
+export { _intro as intro, _spinner as spinner };

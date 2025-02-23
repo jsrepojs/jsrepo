@@ -18,17 +18,15 @@ import {
 	projectConfigSchema,
 	resolvePaths,
 } from '../utils/config';
-import { installDependencies } from '../utils/dependencies';
 import { transformRemoteContent } from '../utils/files';
 import { loadFormatterConfig } from '../utils/format';
 import { getWatermark } from '../utils/get-watermark';
-import { returnShouldInstall } from '../utils/package';
 import * as persisted from '../utils/persisted';
 import { checkPreconditions } from '../utils/preconditions';
 import {
-	type ConcurrentTask,
 	intro,
 	nextSteps,
+	promptInstallDependencies,
 	promptUpdateFile,
 	spinner,
 	truncatedList,
@@ -46,7 +44,7 @@ const schema = v.object({
 
 type Options = v.InferInput<typeof schema>;
 
-const add = new Command('add')
+export const add = new Command('add')
 	.description('Add blocks to your project.')
 	.argument(
 		'[blocks...]',
@@ -292,10 +290,8 @@ const _add = async (blockNames: string[], options: Options) => {
 		(err) => program.error(err)
 	);
 
-	const pm = (await detect({ cwd: options.cwd }))?.agent ?? 'npm';
-
-	let devDeps: Set<string> = new Set<string>();
-	let deps: Set<string> = new Set<string>();
+	const devDeps: Set<string> = new Set<string>();
+	const deps: Set<string> = new Set<string>();
 
 	const store = persisted.get();
 
@@ -629,114 +625,46 @@ const _add = async (blockNames: string[], options: Options) => {
 		loading.stop(`Added blocks ${color.cyan(Array.from(updatedBlocks).join(', '))}`);
 	}
 
-	// check if dependencies are already installed
-	const requiredDependencies = returnShouldInstall(deps, devDeps, { cwd: options.cwd });
+	const pm = (await detect({ cwd: options.cwd }))?.agent ?? 'npm';
 
-	deps = requiredDependencies.dependencies;
-	devDeps = requiredDependencies.devDependencies;
+	const installResult = await promptInstallDependencies(deps, devDeps, {
+		yes: options.yes,
+		loading,
+		cwd: options.cwd,
+		pm,
+	});
 
-	const hasDependencies = deps.size > 0 || devDeps.size > 0;
+	// next steps if they didn't install dependencies
+	let steps = [];
 
-	if (hasDependencies) {
-		let install = options.yes;
-		if (!options.yes) {
-			const result = await confirm({
-				message: 'Would you like to install dependencies?',
-				initialValue: true,
-			});
+	if (!installResult.installed) {
+		if (deps.size > 0) {
+			const cmd = resolveCommand(pm, 'add', [...deps]);
 
-			if (isCancel(result)) {
-				cancel('Canceled!');
-				process.exit(0);
-			}
-
-			install = result;
+			steps.push(
+				`Install dependencies \`${color.cyan(`${cmd?.command} ${cmd?.args.join(' ')}`)}\``
+			);
 		}
 
-		if (install) {
-			if (deps.size > 0) {
-				if (!options.verbose)
-					loading.start(`Installing dependencies with ${color.cyan(pm)}`);
+		if (devDeps.size > 0) {
+			const cmd = resolveCommand(pm, 'add', [...devDeps, '-D']);
 
-				(
-					await installDependencies({
-						pm,
-						deps: Array.from(deps),
-						dev: false,
-						cwd: options.cwd,
-					})
-				).match(
-					(installed) => {
-						if (!options.verbose)
-							loading.stop(`Installed ${color.cyan(installed.join(', '))}`);
-					},
-					(err) => {
-						if (!options.verbose) loading.stop('Failed to install dependencies');
-
-						program.error(err);
-					}
-				);
-			}
-
-			if (devDeps.size > 0) {
-				if (!options.verbose)
-					loading.start(`Installing dependencies with ${color.cyan(pm)}`);
-
-				(
-					await installDependencies({
-						pm,
-						deps: Array.from(devDeps),
-						dev: true,
-						cwd: options.cwd,
-					})
-				).match(
-					(installed) => {
-						if (!options.verbose)
-							loading.stop(`Installed ${color.cyan(installed.join(', '))}`);
-					},
-					(err) => {
-						if (!options.verbose) loading.stop('Failed to install dev dependencies');
-
-						program.error(err);
-					}
-				);
-			}
+			steps.push(
+				`Install dev dependencies \`${color.cyan(`${cmd?.command} ${cmd?.args.join(' ')}`)}\``
+			);
 		}
-
-		// next steps if they didn't install dependencies
-		let steps = [];
-
-		if (!install) {
-			if (deps.size > 0) {
-				const cmd = resolveCommand(pm, 'add', [...deps]);
-
-				steps.push(
-					`Install dependencies \`${color.cyan(`${cmd?.command} ${cmd?.args.join(' ')}`)}\``
-				);
-			}
-
-			if (devDeps.size > 0) {
-				const cmd = resolveCommand(pm, 'add', [...devDeps, '-D']);
-
-				steps.push(
-					`Install dev dependencies \`${color.cyan(`${cmd?.command} ${cmd?.args.join(' ')}`)}\``
-				);
-			}
-		}
-
-		// put steps with numbers above here
-		steps = steps.map((step, i) => `${i + 1}. ${step}`);
-
-		if (!install) {
-			steps.push('');
-		}
-
-		steps.push('Import and use the blocks!');
-
-		const next = nextSteps(steps);
-
-		process.stdout.write(next);
 	}
-};
 
-export { add };
+	// put steps with numbers above here
+	steps = steps.map((step, i) => `${i + 1}. ${step}`);
+
+	if (!installResult.installed) {
+		steps.push('');
+	}
+
+	steps.push('Import and use the blocks!');
+
+	const next = nextSteps(steps);
+
+	process.stdout.write(next);
+};
