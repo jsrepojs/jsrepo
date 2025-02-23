@@ -20,6 +20,24 @@
 <p>Include another registry in the blocks list:</p>
 <Snippet command="execute" args={['jsrepo', 'add', '--repo', 'github/ieedan/std']} />
 <SubHeading>Options</SubHeading>
+<OptionDocs name="-E, --expand">
+	{#snippet description()}
+		Expands the diff past the limit set by <CodeSpan>--max-unchanged</CodeSpan> so that you can see the
+		entire file.
+	{/snippet}
+	{#snippet usage()}
+		<Snippet command="execute" args={['jsrepo', 'update', '--expand']} />
+	{/snippet}
+</OptionDocs>
+<OptionDocs name="--max-unchanged">
+	{#snippet description()}
+		Sets a limit on the maximum unchanged lines to display in a diff before it is collapsed.
+		<CodeSpan>default: 3</CodeSpan>
+	{/snippet}
+	{#snippet usage()}
+		<Snippet command="execute" args={['jsrepo', 'update', '--max-unchanged', '10']} />
+	{/snippet}
+</OptionDocs>
 <OptionDocs name="--repo">
 	{#snippet description()}
 		The repository to download the blocks from.
