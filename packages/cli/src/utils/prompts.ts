@@ -1,3 +1,4 @@
+import { stripVTControlCharacters as stripAsni } from 'node:util';
 import type { PartialConfiguration } from '@biomejs/wasm-nodejs';
 import { cancel, confirm, intro, isCancel, log, select, spinner, text } from '@clack/prompts';
 import boxen from 'boxen';
@@ -9,7 +10,6 @@ import type * as prettier from 'prettier';
 import semver from 'semver';
 import { type Message, type ModelName, models } from './ai';
 import * as ascii from './ascii';
-import { stripAsni } from './blocks/ts/strip-ansi';
 import type { ProjectConfig } from './config';
 import { packageJson } from './context';
 import { installDependencies } from './dependencies';

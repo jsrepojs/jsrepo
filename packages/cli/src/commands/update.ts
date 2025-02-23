@@ -344,39 +344,41 @@ const _update = async (blockNames: string[], options: Options) => {
 		pm,
 	});
 
-	// next steps if they didn't install dependencies
-	let steps = [];
+	if (installResult.dependencies.size > 0 || installResult.devDependencies.size > 0) {
+		// next steps if they didn't install dependencies
+		let steps = [];
 
-	if (!installResult.installed) {
-		if (deps.size > 0) {
-			const cmd = resolveCommand(pm, 'add', [...deps]);
+		if (!installResult.installed) {
+			if (deps.size > 0) {
+				const cmd = resolveCommand(pm, 'add', [...deps]);
 
-			steps.push(
-				`Install dependencies \`${color.cyan(`${cmd?.command} ${cmd?.args.join(' ')}`)}\``
-			);
+				steps.push(
+					`Install dependencies \`${color.cyan(`${cmd?.command} ${cmd?.args.join(' ')}`)}\``
+				);
+			}
+
+			if (devDeps.size > 0) {
+				const cmd = resolveCommand(pm, 'add', [...devDeps, '-D']);
+
+				steps.push(
+					`Install dev dependencies \`${color.cyan(`${cmd?.command} ${cmd?.args.join(' ')}`)}\``
+				);
+			}
 		}
 
-		if (devDeps.size > 0) {
-			const cmd = resolveCommand(pm, 'add', [...devDeps, '-D']);
+		// put steps with numbers above here
+		steps = steps.map((step, i) => `${i + 1}. ${step}`);
 
-			steps.push(
-				`Install dev dependencies \`${color.cyan(`${cmd?.command} ${cmd?.args.join(' ')}`)}\``
-			);
+		if (!installResult.installed) {
+			steps.push('');
 		}
+
+		steps.push('Import and use the blocks!');
+
+		const next = nextSteps(steps);
+
+		process.stdout.write(next);
 	}
-
-	// put steps with numbers above here
-	steps = steps.map((step, i) => `${i + 1}. ${step}`);
-
-	if (!installResult.installed) {
-		steps.push('');
-	}
-
-	steps.push('Import and use the blocks!');
-
-	const next = nextSteps(steps);
-
-	process.stdout.write(next);
 };
 
 export { update };

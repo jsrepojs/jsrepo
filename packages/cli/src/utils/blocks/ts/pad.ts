@@ -1,10 +1,10 @@
 /*
-	jsrepo 1.22.1
+	jsrepo 1.39.3
 	Installed from github/ieedan/std
-	1-4-2025
+	2-23-2025
 */
 
-import { stripAsni } from './strip-ansi';
+import { stripVTControlCharacters as stripAsni } from 'node:util';
 
 /** Adds the `padWith` (default `' '`) to the string the amount of times specified by the `space` argument
  *

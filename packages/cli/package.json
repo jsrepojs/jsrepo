@@ -15,7 +15,16 @@
 	"bugs": {
 		"url": "https://github.com/ieedan/jsrepo/issues"
 	},
-	"keywords": ["repo", "cli", "svelte", "vue", "typescript", "javascript", "shadcn", "registry"],
+	"keywords": [
+		"repo",
+		"cli",
+		"svelte",
+		"vue",
+		"typescript",
+		"javascript",
+		"shadcn",
+		"registry"
+	],
 	"type": "module",
 	"exports": {
 		".": {
@@ -25,7 +34,10 @@
 	},
 	"bin": "./dist/index.js",
 	"main": "./dist/index.js",
-	"files": ["./schemas/**/*", "dist/**/*"],
+	"files": [
+		"./schemas/**/*",
+		"dist/**/*"
+	],
 	"scripts": {
 		"start": "tsup --silent && node ./dist/index.js",
 		"build": "tsup",
@@ -51,7 +63,6 @@
 		"@biomejs/js-api": "^0.7.1",
 		"@biomejs/wasm-nodejs": "^1.9.4",
 		"@clack/prompts": "^0.10.0",
-		"ansi-regex": "^6.1.0",
 		"boxen": "^8.0.1",
 		"chalk": "^5.4.1",
 		"commander": "^13.1.0",

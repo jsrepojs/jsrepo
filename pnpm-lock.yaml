@@ -29,9 +29,6 @@ importers:
       '@clack/prompts':
         specifier: ^0.10.0
         version: 0.10.0
-      ansi-regex:
-        specifier: ^6.1.0
-        version: 6.1.0
       boxen:
         specifier: ^8.0.1
         version: 8.0.1
