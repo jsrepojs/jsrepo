@@ -1,5 +1,12 @@
 # jsrepo
 
+## 1.40.0
+
+### Minor Changes
+
+- 3c06fe3: feat: Allow for updating existing blocks when running `add`
+- 3c06fe3: perf: Improve concurrency to improve performance of `add` and `update` commands.
+
 ## 1.39.3
 
 ### Patch Changes
