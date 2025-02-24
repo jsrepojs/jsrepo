@@ -215,7 +215,7 @@ const _update = async (blockNames: string[], options: Options) => {
 
 		const watermark = getWatermark(preloadedBlock.block.sourceRepo.url);
 
-		verbose(`Attempting to add ${fullSpecifier}`);
+		verbose(`Attempting to update ${fullSpecifier}`);
 
 		if (config.includeTests && preloadedBlock.block.tests) {
 			verbose('Trying to include tests');
