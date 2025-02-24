@@ -30,7 +30,11 @@ const getPackage = (path: string): Result<Partial<PackageJson>, string> => {
 
 	const contents = fs.readFileSync(path).toString();
 
-	return Ok(JSON.parse(contents));
+	try {
+		return Ok(JSON.parse(contents));
+	} catch (err) {
+		return Err(`Error reading package.json: ${err}`);
+	}
 };
 
 export const cleanVersion = (version: string) => {

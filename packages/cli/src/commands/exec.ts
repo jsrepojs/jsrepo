@@ -344,7 +344,6 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 		yes: true,
 		no: false,
 		cwd: tempDirectory,
-		loading,
 		pm,
 		ignoreWorkspace: true,
 	});

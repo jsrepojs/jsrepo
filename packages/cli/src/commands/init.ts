@@ -34,9 +34,15 @@ import { installDependencies } from '../utils/dependencies';
 import { formatFile, matchJSDescendant, tryGetTsconfig } from '../utils/files';
 import { loadFormatterConfig } from '../utils/format';
 import { json } from '../utils/language-support';
-import { returnShouldInstall } from '../utils/package';
 import { checkPreconditions } from '../utils/preconditions';
-import { type Task, intro, nextSteps, promptUpdateFile, runTasks } from '../utils/prompts';
+import {
+	type Task,
+	intro,
+	nextSteps,
+	promptInstallDependencies,
+	promptUpdateFile,
+	runTasks,
+} from '../utils/prompts';
 import * as registry from '../utils/registry-providers/internal';
 import { TokenManager } from '../utils/token-manager';
 
@@ -228,8 +234,29 @@ const _initProject = async (registries: string[], options: Options) => {
 		])
 	);
 
-	const dependencies: string[] = [];
-	const devDependencies: string[] = [];
+	const deps = new Set<string>();
+	const devDeps = new Set<string>();
+
+	const setupRepo = async (repo: string) => {
+		const promptResult = await promptForProviderConfig({
+			repo,
+			paths,
+			configFiles,
+			options,
+			formatter: options.formatter,
+		});
+
+		for (const dep of promptResult.dependencies) {
+			deps.add(dep);
+		}
+
+		for (const dep of promptResult.devDependencies) {
+			devDeps.add(dep);
+		}
+
+		paths = promptResult.paths;
+		configFiles = promptResult.configFiles;
+	};
 
 	if (repos.length > 0) {
 		for (const repo of repos) {
@@ -254,18 +281,7 @@ const _initProject = async (registries: string[], options: Options) => {
 
 			log.info(`Initializing ${color.cyan(repo)}`);
 
-			const promptResult = await promptForProviderConfig({
-				repo,
-				paths,
-				configFiles,
-				options,
-				formatter: options.formatter,
-			});
-
-			dependencies.push(...promptResult.dependencies);
-			devDependencies.push(...promptResult.devDependencies);
-			paths = promptResult.paths;
-			configFiles = promptResult.configFiles;
+			await setupRepo(repo);
 		}
 	}
 
@@ -299,18 +315,7 @@ const _initProject = async (registries: string[], options: Options) => {
 			process.exit(0);
 		}
 
-		const promptResult = await promptForProviderConfig({
-			repo: result,
-			paths,
-			configFiles,
-			options,
-			formatter: options.formatter,
-		});
-
-		dependencies.push(...promptResult.dependencies);
-		devDependencies.push(...promptResult.devDependencies);
-		paths = promptResult.paths;
-		configFiles = promptResult.configFiles;
+		await setupRepo(result);
 
 		repos.push(result);
 	}
@@ -352,83 +357,19 @@ const _initProject = async (registries: string[], options: Options) => {
 
 	loading.stop(`Wrote config to \`${PROJECT_CONFIG_NAME}\`.`);
 
-	// check if dependencies are already installed
-	const { dependencies: deps, devDependencies: devDeps } = returnShouldInstall(
-		new Set(dependencies),
-		new Set(devDependencies),
-		{ cwd: options.cwd }
-	);
-
-	const hasDependencies = deps.size > 0 || devDeps.size > 0;
-
 	const pm = (await detect({ cwd: options.cwd }))?.agent ?? 'npm';
 
-	if (hasDependencies) {
-		let install = options.yes;
-		if (!options.yes) {
-			const result = await confirm({
-				message: 'Would you like to install dependencies?',
-				initialValue: true,
-			});
+	const installResult = await promptInstallDependencies(deps, devDeps, {
+		yes: options.yes,
+		cwd: options.cwd,
+		pm,
+	});
 
-			if (isCancel(result)) {
-				cancel('Canceled!');
-				process.exit(0);
-			}
-
-			install = result;
-		}
-
-		if (install) {
-			if (deps.size > 0) {
-				loading.start(`Installing dependencies with ${color.cyan(pm)}`);
-
-				(
-					await installDependencies({
-						pm,
-						deps: Array.from(deps),
-						dev: false,
-						cwd: options.cwd,
-					})
-				).match(
-					(installed) => {
-						loading.stop(`Installed ${color.cyan(installed.join(', '))}`);
-					},
-					(err) => {
-						loading.stop('Failed to install dependencies');
-
-						program.error(err);
-					}
-				);
-			}
-
-			if (devDeps.size > 0) {
-				loading.start(`Installing dependencies with ${color.cyan(pm)}`);
-
-				(
-					await installDependencies({
-						pm,
-						deps: Array.from(devDeps),
-						dev: true,
-						cwd: options.cwd,
-					})
-				).match(
-					(installed) => {
-						loading.stop(`Installed ${color.cyan(installed.join(', '))}`);
-					},
-					(err) => {
-						loading.stop('Failed to install dev dependencies');
-
-						program.error(err);
-					}
-				);
-			}
-		}
-
+	if (installResult.dependencies.size > 0 || installResult.devDependencies.size > 0) {
 		// next steps if they didn't install dependencies
 		let steps = [];
 
-		if (!install) {
+		if (!installResult.installed) {
 			if (deps.size > 0) {
 				const cmd = resolveCommand(pm, 'add', [...deps]);
 
@@ -449,11 +390,11 @@ const _initProject = async (registries: string[], options: Options) => {
 		// put steps with numbers above here
 		steps = steps.map((step, i) => `${i + 1}. ${step}`);
 
-		if (!install) {
+		if (!installResult.installed) {
 			steps.push('');
 		}
 
-		steps.push('Import and use the blocks!');
+		steps.push(`Add blocks with ${color.cyan('jsrepo add')}!`);
 
 		const next = nextSteps(steps);
 
@@ -945,20 +886,12 @@ const _initRegistry = async (options: Options) => {
 		if (shouldInstall) {
 			loading.start(`Installing ${ascii.JSREPO}`);
 
-			const installedResult = await installDependencies({
+			await installDependencies({
 				pm,
 				deps: ['jsrepo'],
 				dev: true,
 				cwd: options.cwd,
 			});
-
-			installedResult.match(
-				() => loading.stop(`Installed ${ascii.JSREPO}.`),
-				(err) => {
-					loading.stop(`Failed to install ${ascii.JSREPO}.`);
-					program.error(err);
-				}
-			);
 
 			installed = true;
 		}

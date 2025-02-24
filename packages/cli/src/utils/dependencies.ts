@@ -1,10 +1,11 @@
 import color from 'chalk';
+import { program } from 'commander';
 import { execa } from 'execa';
 import { type Agent, resolveCommand } from 'package-manager-detector';
 import path from 'pathe';
 import { flags } from './blocks/package-managers/flags';
-import { Err, Ok, type Result } from './blocks/ts/result';
 import type { ProjectConfig } from './config';
+import { taskLog } from './prompts';
 
 export type Options = {
 	pm: Agent;
@@ -20,13 +21,13 @@ export type Options = {
  * @param param0
  * @returns
  */
-const installDependencies = async ({
+export const installDependencies = async ({
 	pm,
 	deps,
 	dev,
 	cwd,
 	ignoreWorkspace = false,
-}: Options): Promise<Result<string[], string>> => {
+}: Options) => {
 	const args = [...deps];
 
 	if (dev) {
@@ -41,20 +42,29 @@ const installDependencies = async ({
 
 	const add = resolveCommand(pm, 'add', args);
 
-	if (add == null) return Err(color.red(`Could not resolve add command for '${pm}'.`));
+	if (add == null) {
+		program.error(color.red(`Could not resolve add command for '${pm}'.`));
+	}
+
+	const task = taskLog(`Installing dependencies with ${pm}...`);
 
 	try {
-		await execa(add.command, [...add.args], { cwd });
+		const proc = execa(add.command, [...add.args], { cwd });
 
-		return Ok(deps);
+		proc.stdout.on('data', (data) => {
+			task.text = data;
+		});
+
+		proc.stderr.on('data', (data) => {
+			task.text = data;
+		});
+
+		await proc;
+
+		task.success(`Installed ${color.cyan(deps.join(', '))}`);
 	} catch {
-		return Err(
-			color.red(
-				`Failed to install ${color.bold(deps.join(', '))}! Failed while running '${color.bold(
-					`${add.command} ${add.args.join(' ')}`
-				)}'`
-			)
-		);
+		task.fail('Failed to install dependencies');
+		process.exit(2);
 	}
 };
 
@@ -72,7 +82,12 @@ export type ResolveOptions = {
  * @param param0
  * @returns
  */
-const resolveLocalDependencyTemplate = ({ template, config, destPath, cwd }: ResolveOptions) => {
+export const resolveLocalDependencyTemplate = ({
+	template,
+	config,
+	destPath,
+	cwd,
+}: ResolveOptions) => {
 	const destDir = path.join(destPath, '../');
 
 	return template.replace(templatePattern, (_, category, name) => {
@@ -100,5 +115,3 @@ const resolveLocalDependencyTemplate = ({ template, config, destPath, cwd }: Res
 		return path.join(config.paths[category], name);
 	});
 };
-
-export { installDependencies, resolveLocalDependencyTemplate };

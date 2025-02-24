@@ -306,7 +306,6 @@ const _update = async (blockNames: string[], options: Options) => {
 	const installResult = await promptInstallDependencies(deps, devDeps, {
 		yes: options.yes,
 		no: options.no,
-		loading,
 		cwd: options.cwd,
 		pm,
 	});
