@@ -16,7 +16,7 @@
 		<div class="flex justify-center py-8">
 			<div class="flex place-items-center gap-2">
 				<Icons.Jsrepo class="h-8" />
-				<span class="text-sm text-muted-foreground">v<Version {version}/></span>
+				<span class="text-sm text-muted-foreground">v<Version {version} /></span>
 			</div>
 		</div>
 		<div class="flex place-items-center gap-1">

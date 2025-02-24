@@ -5,7 +5,7 @@ import { Octokit } from 'octokit';
 export const load = async () => {
 	const stars = getStars();
 
-	const version = tryGetVersion().then(ver => ver.unwrapOr('1.0.0'));
+	const version = tryGetVersion().then((ver) => ver.unwrapOr('1.0.0'));
 
 	return {
 		version,

@@ -30,7 +30,7 @@
 						<a href="/" {...props}>
 							<div class="-ml-2.5 flex place-items-center gap-2">
 								<Icons.Jsrepo class="size-20 shrink-0" />
-								<span class="text-lg text-muted-foreground">v<Version {version}/></span>
+								<span class="text-lg text-muted-foreground">v<Version {version} /></span>
 							</div>
 						</a>
 					{/snippet}

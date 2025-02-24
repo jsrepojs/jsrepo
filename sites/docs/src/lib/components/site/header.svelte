@@ -33,7 +33,7 @@
 					<h1 class="bg-primary text-primary-foreground text-lg font-mono font-bold p-1 w-fit">
 						jsrepo
 					</h1>
-					<span class="text-base font-mono text-muted-foreground">v<Version {version}/></span>
+					<span class="text-base font-mono text-muted-foreground">v<Version {version} /></span>
 				</a>
 				<nav class="place-items-center gap-4 flex">
 					<a
