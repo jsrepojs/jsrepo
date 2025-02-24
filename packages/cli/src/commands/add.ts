@@ -13,7 +13,6 @@ import * as url from '../utils/blocks/ts/url';
 import {
 	type Formatter,
 	type ProjectConfig,
-	getPathForBlock,
 	getProjectConfig,
 	projectConfigSchema,
 	resolvePaths,
@@ -630,7 +629,6 @@ const _add = async (blockNames: string[], options: Options) => {
 
 	const installResult = await promptInstallDependencies(deps, devDeps, {
 		yes: options.yes,
-		loading,
 		cwd: options.cwd,
 		pm,
 	});

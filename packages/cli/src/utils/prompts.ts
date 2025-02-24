@@ -8,6 +8,7 @@ import { diffLines } from 'diff';
 import { type Agent, detectSync, resolveCommand } from 'package-manager-detector';
 import type * as prettier from 'prettier';
 import semver from 'semver';
+import { cursor, erase } from 'sisteransi';
 import { type Message, type ModelName, models } from './ai';
 import * as ascii from './ascii';
 import type { ProjectConfig } from './config';
@@ -406,7 +407,6 @@ type InstallDependenciesOptions = {
 	yes: boolean;
 	no?: boolean;
 	cwd: string;
-	loading: ReturnType<typeof spinner>;
 	pm: Agent;
 	ignoreWorkspace?: boolean;
 };
@@ -421,7 +421,7 @@ type InstallDependenciesResult = {
 export const promptInstallDependencies = async (
 	deps: Set<string>,
 	devDeps: Set<string>,
-	{ yes, no = false, loading, cwd, pm, ignoreWorkspace = false }: InstallDependenciesOptions
+	{ yes, no = false, cwd, pm, ignoreWorkspace = false }: InstallDependenciesOptions
 ): Promise<InstallDependenciesResult> => {
 	// check if dependencies are already installed
 	const { dependencies, devDependencies } = returnShouldInstall(deps, devDeps, { cwd });
@@ -446,49 +446,23 @@ export const promptInstallDependencies = async (
 
 		if (install) {
 			if (dependencies.size > 0) {
-				loading.start(`Installing dependencies with ${color.cyan(pm)}`);
-
-				(
-					await installDependencies({
-						pm,
-						deps: Array.from(dependencies),
-						dev: false,
-						cwd,
-						ignoreWorkspace,
-					})
-				).match(
-					(installed) => {
-						loading.stop(`Installed ${color.cyan(installed.join(', '))}`);
-					},
-					(err) => {
-						loading.stop('Failed to install dependencies');
-
-						program.error(err);
-					}
-				);
+				await installDependencies({
+					pm,
+					deps: Array.from(dependencies),
+					dev: false,
+					cwd,
+					ignoreWorkspace,
+				});
 			}
 
 			if (devDependencies.size > 0) {
-				loading.start(`Installing dependencies with ${color.cyan(pm)}`);
-
-				(
-					await installDependencies({
-						pm,
-						deps: Array.from(devDependencies),
-						dev: true,
-						cwd,
-						ignoreWorkspace,
-					})
-				).match(
-					(installed) => {
-						loading.stop(`Installed ${color.cyan(installed.join(', '))}`);
-					},
-					(err) => {
-						loading.stop('Failed to install dev dependencies');
-
-						program.error(err);
-					}
-				);
+				await installDependencies({
+					pm,
+					deps: Array.from(devDependencies),
+					dev: false,
+					cwd,
+					ignoreWorkspace,
+				});
 			}
 
 			return { installed: true, dependencies, devDependencies };
@@ -496,6 +470,65 @@ export const promptInstallDependencies = async (
 	}
 
 	return { installed: false, dependencies, devDependencies };
+};
+
+// From sveltejs/cli https://github.com/sveltejs/cli/blob/main/packages/clack-prompts/index.ts#L606
+export const taskLog = (title: string) => {
+	const BAR = color.dim(ascii.VERTICAL_LINE);
+	const ACTIVE = color.green(ascii.S_STEP_ACTIVE);
+	const SUCCESS = color.green(ascii.S_SUCCESS);
+	const ERROR = color.red(ascii.S_ERROR);
+
+	// heading
+	process.stdout.write(`${BAR}\n`);
+	process.stdout.write(`${ACTIVE}  ${title}\n`);
+
+	let output = '';
+	let frame = '';
+
+	// clears previous output
+	const clear = (eraseTitle = false): void => {
+		if (!frame) return;
+		const terminalWidth = process.stdout.columns;
+		const frameHeight = frame.split('\n').reduce((height, line) => {
+			// accounts for line wraps
+			return height + Math.ceil(line.length / terminalWidth);
+		}, 0);
+		const lines = frameHeight + (eraseTitle ? 1 : 0);
+
+		process.stdout.write(cursor.up(lines));
+		process.stdout.write(erase.down());
+	};
+
+	// logs the output
+	const print = (limit = 0): void => {
+		const lines = output.split('\n').slice(-limit);
+		// reset frame
+		frame = '';
+		for (const line of lines) {
+			frame += `${BAR}  ${line}\n`;
+		}
+		process.stdout.write(color.dim(frame));
+	};
+
+	return {
+		set text(data: string) {
+			clear();
+			output += data;
+			// half the height of the terminal
+			const frameHeight = Math.ceil(process.stdout.rows / 2);
+			print(frameHeight);
+		},
+		fail(message: string): void {
+			clear(true);
+			process.stdout.write(`${ERROR}  ${message}\n`);
+			print(); // log the output on failure
+		},
+		success(message: string): void {
+			clear(true);
+			process.stdout.write(`${SUCCESS}  ${message}\n`);
+		},
+	};
 };
 
 export { _intro as intro, _spinner as spinner };

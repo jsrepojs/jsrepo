@@ -20,8 +20,14 @@ export const checkPreconditions = (
 ) => {
 	const pkg = getPackage(path.join(cwd, 'package.json')).match(
 		(v) => v,
-		() => {
-			program.error(`Couldn't find your ${color.bold('package.json')}. Please create one.`);
+		(err) => {
+			if (err.endsWith("doesn't exist")) {
+				program.error(
+					`Couldn't find your ${color.bold('package.json')}. Please create one.`
+				);
+			}
+
+			program.error(color.red(err));
 		}
 	);
 
