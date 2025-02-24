@@ -7,9 +7,10 @@
 	import { active } from '$lib/actions/active.svelte';
 	import { ChevronRight } from 'lucide-svelte';
 	import { Badge } from '$lib/components/ui/badge';
+	import Version from './version.svelte';
 
 	type Props = {
-		version: string;
+		version: Promise<string>;
 	};
 
 	let { version }: Props = $props();
@@ -29,7 +30,7 @@
 						<a href="/" {...props}>
 							<div class="-ml-2.5 flex place-items-center gap-2">
 								<Icons.Jsrepo class="size-20 shrink-0" />
-								<span class="text-lg text-muted-foreground">v{version}</span>
+								<span class="text-lg text-muted-foreground">v<Version {version} /></span>
 							</div>
 						</a>
 					{/snippet}

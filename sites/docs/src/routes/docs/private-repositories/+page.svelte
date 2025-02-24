@@ -10,8 +10,11 @@
 	import { Code } from '$lib/components/ui/code';
 	import { Snippet } from '$lib/components/ui/snippet';
 	import * as Accordion from '$lib/components/ui/accordion';
+	import { UseAwait } from '$lib/hooks/use-await.svelte.js';
 
 	let { data } = $props();
+
+	const version = new UseAwait(data.version, '1.0.0');
 </script>
 
 <DocHeader
@@ -29,7 +32,7 @@
 <Code
 	hideLines
 	hideCopy
-	code={`┌   jsrepo  v${data.version} 
+	code={`┌   jsrepo  v${version.current} 
 │
 ◇  Which provider is this token for?
 │  github

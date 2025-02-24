@@ -7,9 +7,10 @@
 	import { Kbd } from '$lib/components/ui/kbd';
 	import { commandContext } from '$lib/ts/context';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte';
+	import Version from './version.svelte';
 
 	type Props = {
-		version: string;
+		version: Promise<string>;
 		stars: Promise<number>;
 	};
 
@@ -32,7 +33,7 @@
 					<h1 class="bg-primary text-primary-foreground text-lg font-mono font-bold p-1 w-fit">
 						jsrepo
 					</h1>
-					<span class="text-base font-mono text-muted-foreground">v{version}</span>
+					<span class="text-base font-mono text-muted-foreground">v<Version {version} /></span>
 				</a>
 				<nav class="place-items-center gap-4 flex">
 					<a

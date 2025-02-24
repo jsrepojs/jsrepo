@@ -2,8 +2,11 @@
 	import { CodeSpan, DocHeader, SubHeading } from '$lib/components/site/docs';
 	import { Code } from '$lib/components/ui/code';
 	import { Snippet } from '$lib/components/ui/snippet';
+	import { UseAwait } from '$lib/hooks/use-await.svelte.js';
 
 	let { data } = $props();
+
+	const version = new UseAwait(data.version, '1.0.0');
 </script>
 
 <DocHeader title="jsrepo-build-config.json" description="Configuration for your registry." />
@@ -25,7 +28,7 @@
 <Code
 	lang="json"
 	code={`{
-	"$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/registry-config.json"
+	"$schema": "https://unpkg.com/jsrepo@${version.current}/schemas/registry-config.json"
 }`}
 />
 

@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { DocHeader, Link, SubHeading } from '$lib/components/site/docs';
 	import { Code } from '$lib/components/ui/code';
+	import { UseAwait } from '$lib/hooks/use-await.svelte.js';
 
 	let { data } = $props();
+
+	const version = new UseAwait(data.version, '1.0.0');
 </script>
 
 <DocHeader title="AzureDevops" description="How to use AzureDevops as your jsrepo registry." />
@@ -28,7 +31,7 @@ azure/ieedan/std/std/heads/next # branch reference`}
 <Code
 	lang="json"
 	code={`{
-		"$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/project-config.json",
+		"$schema": "https://unpkg.com/jsrepo@${version.current}/schemas/project-config.json",
 		// use a specific version tag
 		"repos": ["azure/ieedan/std/std/tags/v1.5.0"],
 		"path": "src/blocks",

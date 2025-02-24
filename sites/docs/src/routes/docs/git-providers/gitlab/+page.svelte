@@ -3,8 +3,11 @@
 	import { Code } from '$lib/components/ui/code';
 	import CodeSpan from '$lib/components/site/docs/code-span.svelte';
 	import { Snippet } from '$lib/components/ui/snippet';
+	import { UseAwait } from '$lib/hooks/use-await.svelte.js';
 
 	let { data } = $props();
+
+	const version = new UseAwait(data.version, '1.0.0');
 </script>
 
 <DocHeader title="GitLab" description="How to use GitLab as your jsrepo registry." />
@@ -28,7 +31,7 @@ https://gitlab.com/ieedan/std/-/tree/next # branch reference`}
 <Code
 	lang="json"
 	code={`{
-		"$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/project-config.json",
+		"$schema": "https://unpkg.com/jsrepo@${version.current}/schemas/project-config.json",
 		// use a specific version tag
 		"repos": ["https://gitlab.com/ieedan/std/-/tree/v1.5.0"],
 		"path": "src/blocks",
@@ -59,7 +62,7 @@ https://gitlab.com/ieedan/std/-/tree/next # branch reference`}
 <Code
 	lang="json"
 	code={`{
-		"$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/project-config.json",
+		"$schema": "https://unpkg.com/jsrepo@${version.current}/schemas/project-config.json",
 		// use gitlab instead of https://gitlab.com
 		"repos": ["gitlab/ieedan/std"],
 		"path": "src/blocks",

@@ -2,8 +2,11 @@
 	import { CodeSpan, DocHeader, Jsrepo } from '$lib/components/site/docs';
 	import { Code } from '$lib/components/ui/code';
 	import { Snippet } from '$lib/components/ui/snippet';
+	import { UseAwait } from '$lib/hooks/use-await.svelte.js';
 
 	let { data } = $props();
+
+	const version = new UseAwait(data.version, '1.0.0');
 </script>
 
 <DocHeader
@@ -24,7 +27,7 @@
 <Code
 	hideLines
 	hideCopy
-	code={`┌   jsrepo  v${data.version}
+	code={`┌   jsrepo  v${version.current}
 │
 ◇  Where should we add the blocks?
 │  ./src/blocks
@@ -52,7 +55,7 @@
 <Code
 	lang="json"
 	code={`{
-	"$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/project-config.json",
+	"$schema": "https://unpkg.com/jsrepo@${version.current}/schemas/project-config.json",
 	"repos": ["github/ieedan/std"],
 	"path": "src/blocks",
 	"includeTests": false,
