@@ -2,8 +2,11 @@
 	import { CodeSpan, DocHeader, Jsrepo, Link, SubHeading } from '$lib/components/site/docs';
 	import { Code } from '$lib/components/ui/code';
 	import { Snippet } from '$lib/components/ui/snippet';
+	import { UseAwait } from '$lib/hooks/use-await.svelte.js';
 
 	let { data } = $props();
+
+	const version = new UseAwait(data.version, '1.0.0');
 </script>
 
 <DocHeader title="jsrepo.json" description="Configuration for your project." />
@@ -24,7 +27,7 @@
 <Code
 	lang="json"
 	code={`{
-	"$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/project-config.json"
+	"$schema": "https://unpkg.com/jsrepo@${version.current}/schemas/project-config.json"
 }`}
 />
 
@@ -106,7 +109,7 @@
 <Code
 	lang="typescript"
 	code={`/*
-	jsrepo ${data.version}
+	jsrepo ${version.current}
 	Installed from github/ieedan/std
 	${new Date().toLocaleDateString().replaceAll('/', '-')}
 */

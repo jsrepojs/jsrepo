@@ -2,8 +2,11 @@
 	import { CodeSpan, DocHeader, Jsrepo, Link, SubHeading } from '$lib/components/site/docs';
 	import { Code } from '$lib/components/ui/code';
 	import { Snippet } from '$lib/components/ui/snippet';
+	import { UseAwait } from '$lib/hooks/use-await.svelte.js';
 
 	let { data } = $props();
+
+	const version = new UseAwait(data.version, '1.0.0');
 </script>
 
 <DocHeader title="Registry Setup" description="Create your own registry to share your code." />
@@ -162,7 +165,7 @@ const add = (a: number, b: number): number => {
 <Code
 	hideLines
 	hideCopy
-	code={`┌   jsrepo  v${data.version} 
+	code={`┌   jsrepo  v${version.current} 
 │
 ◇  Retrieved blocks from github/<owner>/<name>
 │

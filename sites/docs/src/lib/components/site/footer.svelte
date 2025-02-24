@@ -2,9 +2,10 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Icons from '$lib/components/icons';
 	import { LightSwitch } from '$lib/components/ui/light-switch';
+	import Version from './version.svelte';
 
 	type Props = {
-		version: string;
+		version: Promise<string>;
 	};
 
 	let { version }: Props = $props();
@@ -15,7 +16,7 @@
 		<div class="flex justify-center py-8">
 			<div class="flex place-items-center gap-2">
 				<Icons.Jsrepo class="h-8" />
-				<span class="text-sm text-muted-foreground">v{version}</span>
+				<span class="text-sm text-muted-foreground">v<Version {version}/></span>
 			</div>
 		</div>
 		<div class="flex place-items-center gap-1">

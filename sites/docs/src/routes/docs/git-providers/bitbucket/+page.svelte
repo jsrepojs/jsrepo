@@ -3,8 +3,11 @@
 	import { Code } from '$lib/components/ui/code';
 	import CodeSpan from '$lib/components/site/docs/code-span.svelte';
 	import { Snippet } from '$lib/components/ui/snippet';
+	import { UseAwait } from '$lib/hooks/use-await.svelte.js';
 
 	let { data } = $props();
+
+	const version = new UseAwait(data.version, '1.0.0');
 </script>
 
 <DocHeader title="BitBucket" description="How to use BitBucket as your jsrepo registry." />
@@ -28,7 +31,7 @@ https://bitbucket.org/ieedan/std/src/next # branch reference`}
 <Code
 	lang="json"
 	code={`{
-		"$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/project-config.json",
+		"$schema": "https://unpkg.com/jsrepo@${version.current}/schemas/project-config.json",
 		// use a specific version tag
 		"repos": ["https://bitbucket.org/ieedan/std/src/v1.5.0"],
 		"path": "src/blocks",
@@ -59,7 +62,7 @@ https://bitbucket.org/ieedan/std/src/next # branch reference`}
 <Code
 	lang="json"
 	code={`{
-		"$schema": "https://unpkg.com/jsrepo@${data.version}/schemas/project-config.json",
+		"$schema": "https://unpkg.com/jsrepo@${version.current}/schemas/project-config.json",
 		// use bitbucket instead of https://bitbucket.org
 		"repos": ["bitbucket/ieedan/std/src/main"],
 		"path": "src/blocks",
