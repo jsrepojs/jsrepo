@@ -3,9 +3,9 @@ import { execa } from 'execa';
 import { type Agent, resolveCommand } from 'package-manager-detector';
 import path from 'pathe';
 import { flags } from './blocks/package-managers/flags';
-import { Err, Ok, type Result } from './blocks/ts/result';
 import type { ProjectConfig } from './config';
 import { taskLog } from './prompts';
+import { program } from 'commander';
 
 export type Options = {
 	pm: Agent;
@@ -42,7 +42,9 @@ export const installDependencies = async ({
 
 	const add = resolveCommand(pm, 'add', args);
 
-	if (add == null) return Err(color.red(`Could not resolve add command for '${pm}'.`));
+	if (add == null) {
+		program.error(color.red(`Could not resolve add command for '${pm}'.`));
+	}
 
 	const task = taskLog(`Installing dependencies with ${pm}...`);
 
