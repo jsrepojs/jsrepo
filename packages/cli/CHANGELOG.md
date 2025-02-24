@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.40.1
+
+### Patch Changes
+
+- f89ecdf: feat: Display logs when installing dependencies
+
 ## 1.40.0
 
 ### Minor Changes
