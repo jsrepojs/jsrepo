@@ -1,11 +1,11 @@
 import color from 'chalk';
+import { program } from 'commander';
 import { execa } from 'execa';
 import { type Agent, resolveCommand } from 'package-manager-detector';
 import path from 'pathe';
 import { flags } from './blocks/package-managers/flags';
 import type { ProjectConfig } from './config';
 import { taskLog } from './prompts';
-import { program } from 'commander';
 
 export type Options = {
 	pm: Agent;
