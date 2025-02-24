@@ -526,23 +526,21 @@ const promptForProviderConfig = async ({
 
 	loading.start(`Fetching manifest from ${color.cyan(repo)}`);
 
-	const providerState = await registry.getProviderState(repo, { noCache: !options.cache });
+	const providerState = (
+		await registry.getProviderState(repo, { noCache: !options.cache })
+	).match(
+		(v) => v,
+		(err) => program.error(color.red(err))
+	);
 
-	if (providerState.isErr()) {
-		program.error(color.red(providerState.unwrapErr()));
-	}
-
-	const manifestResult = await registry.fetchManifest(providerState.unwrap());
+	const manifest = (await registry.fetchManifest(providerState)).match(
+		(v) => v,
+		(err) => program.error(color.red(err))
+	);
 
 	loading.stop(`Fetched manifest from ${color.cyan(repo)}`);
 
-	if (manifestResult.isErr()) {
-		program.error(color.red(manifestResult.unwrapErr()));
-	}
-
-	const manifest = manifestResult.unwrap();
-
-	checkPreconditions(providerState.unwrap(), manifest);
+	checkPreconditions(providerState, manifest, options.cwd);
 
 	const dependencies: string[] = [];
 	const devDependencies: string[] = [];
@@ -623,15 +621,14 @@ const promptForProviderConfig = async ({
 
 			loading.start(`Fetching the ${color.cyan(file.name)} from ${color.cyan(repo)}`);
 
-			const remoteContentResult = await registry.fetchRaw(providerState.unwrap(), file.path);
-
-			if (remoteContentResult.isErr()) {
-				program.error(color.red(remoteContentResult.unwrapErr()));
-			}
+			const remoteContent = (await registry.fetchRaw(providerState, file.path)).match(
+				(v) => v,
+				(err) => program.error(color.red(err))
+			);
 
 			const originalRemoteContent = await formatFile({
 				file: {
-					content: remoteContentResult.unwrap(),
+					content: remoteContent,
 					destPath: fullFilePath,
 				},
 				biomeOptions,
@@ -645,7 +642,7 @@ const promptForProviderConfig = async ({
 
 			if (fileContents) {
 				if (!options.yes) {
-					const from = url.join(providerState.unwrap().url, file.name);
+					const from = url.join(providerState.url, file.name);
 
 					const updateResult = await promptUpdateFile({
 						config: { biomeOptions, prettierOptions, formatter },

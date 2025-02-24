@@ -4,20 +4,22 @@ import color from 'chalk';
 import { Command, program } from 'commander';
 import { resolveCommand } from 'package-manager-detector/commands';
 import { detect } from 'package-manager-detector/detect';
-import path from 'pathe';
 import * as v from 'valibot';
 import * as ascii from '../utils/ascii';
-import { getInstalled, resolveTree } from '../utils/blocks';
+import { getBlockFilePath, getInstalled, preloadBlocks, resolveTree } from '../utils/blocks';
 import * as url from '../utils/blocks/ts/url';
-import { isTestFile } from '../utils/build';
-import { getPathForBlock, getProjectConfig, resolvePaths } from '../utils/config';
-import { installDependencies } from '../utils/dependencies';
+import { getProjectConfig, resolvePaths } from '../utils/config';
 import { transformRemoteContent } from '../utils/files';
 import { loadFormatterConfig } from '../utils/format';
 import { getWatermark } from '../utils/get-watermark';
-import { returnShouldInstall } from '../utils/package';
 import { checkPreconditions } from '../utils/preconditions';
-import { intro, nextSteps, promptUpdateFile, spinner } from '../utils/prompts';
+import {
+	intro,
+	nextSteps,
+	promptInstallDependencies,
+	promptUpdateFile,
+	spinner,
+} from '../utils/prompts';
 import * as registry from '../utils/registry-providers/internal';
 
 const schema = v.object({
@@ -140,7 +142,7 @@ const _update = async (blockNames: string[], options: Options) => {
 	verbose(`Retrieved blocks from ${color.cyan(repoPaths.join(', '))}`);
 
 	for (const manifest of manifests) {
-		checkPreconditions(manifest.state, manifest.manifest);
+		checkPreconditions(manifest.state, manifest.manifest, options.cwd);
 	}
 
 	const installedBlocks = getInstalled(blocksMap, config, options.cwd);
@@ -189,111 +191,98 @@ const _update = async (blockNames: string[], options: Options) => {
 		program.error
 	);
 
-	const pm = (await detect({ cwd: options.cwd }))?.agent ?? 'npm';
-
-	let devDeps: Set<string> = new Set<string>();
-	let deps: Set<string> = new Set<string>();
+	const devDeps: Set<string> = new Set<string>();
+	const deps: Set<string> = new Set<string>();
 
 	const { prettierOptions, biomeOptions } = await loadFormatterConfig({
 		formatter: config.formatter,
 		cwd: options.cwd,
 	});
 
-	const resolvedPathsResult = resolvePaths(config.paths, options.cwd);
+	const resolvedPaths = resolvePaths(config.paths, options.cwd).match(
+		(v) => v,
+		(err) => program.error(color.red(err))
+	);
 
-	if (resolvedPathsResult.isErr()) {
-		program.error(color.red(resolvedPathsResult.unwrapErr()));
-	}
+	const preloadedBlocks = preloadBlocks(updatingBlocks, config);
 
-	const resolvedPaths = resolvedPathsResult.unwrap();
+	for (const preloadedBlock of preloadedBlocks) {
+		const fullSpecifier = url.join(
+			preloadedBlock.block.sourceRepo.url,
+			preloadedBlock.block.category,
+			preloadedBlock.block.name
+		);
 
-	for (const { block } of updatingBlocks) {
-		const fullSpecifier = url.join(block.sourceRepo.url, block.category, block.name);
+		const watermark = getWatermark(preloadedBlock.block.sourceRepo.url);
 
-		const watermark = getWatermark(block.sourceRepo.url);
+		verbose(`Attempting to update ${fullSpecifier}`);
 
-		const providerState = block.sourceRepo;
+		if (config.includeTests && preloadedBlock.block.tests) {
+			verbose('Trying to include tests');
 
-		verbose(`Attempting to add ${fullSpecifier}`);
-
-		const directory = getPathForBlock(block, resolvedPaths, options.cwd);
-
-		const files: { content: string; destPath: string; fileName: string }[] = [];
-
-		const getSourceFile = async (filePath: string) => {
-			const content = await registry.fetchRaw(providerState, filePath, {
-				verbose,
-			});
-
-			if (content.isErr()) {
-				loading.stop(color.red(`Error fetching ${color.bold(filePath)}`));
-				program.error(color.red(`There was an error trying to get ${fullSpecifier}`));
-			}
-
-			return content.unwrap();
-		};
-
-		for (const sourceFile of block.files) {
-			if (!config.includeTests && isTestFile(sourceFile)) continue;
-
-			const sourcePath = path.join(block.directory, sourceFile);
-
-			let destPath: string;
-			if (block.subdirectory) {
-				destPath = path.join(directory, block.name, sourceFile);
-			} else {
-				destPath = path.join(directory, sourceFile);
-			}
-
-			const content = await getSourceFile(sourcePath);
-
-			fs.mkdirSync(destPath.slice(0, destPath.length - sourceFile.length), {
-				recursive: true,
-			});
-
-			files.push({ content, destPath, fileName: sourceFile });
+			devDeps.add('vitest');
 		}
+
+		for (const dep of preloadedBlock.block.devDependencies) {
+			devDeps.add(dep);
+		}
+
+		for (const dep of preloadedBlock.block.dependencies) {
+			deps.add(dep);
+		}
+
+		const files = await preloadedBlock.files;
 
 		process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
 
 		process.stdout.write(`${ascii.VERTICAL_LINE}  ${fullSpecifier}\n`);
 
 		for (const file of files) {
-			const remoteContentResult = await transformRemoteContent({
-				file,
-				biomeOptions,
-				prettierOptions,
-				config,
-				imports: block._imports_,
-				watermark,
-				verbose,
-				cwd: options.cwd,
-			});
+			const content = file.content.match(
+				(v) => v,
+				(err) => program.error(color.red(err))
+			);
 
-			if (remoteContentResult.isErr()) {
-				program.error(color.red(remoteContentResult.unwrapErr()));
-			}
+			const destPath = getBlockFilePath(
+				file.name,
+				preloadedBlock.block,
+				resolvedPaths,
+				options.cwd
+			);
 
-			const remoteContent = remoteContentResult.unwrap();
+			const remoteContent = (
+				await transformRemoteContent({
+					file: {
+						content,
+						destPath: destPath,
+					},
+					biomeOptions,
+					prettierOptions,
+					config,
+					imports: preloadedBlock.block._imports_,
+					watermark,
+					verbose,
+					cwd: options.cwd,
+				})
+			).match(
+				(v) => v,
+				(err) => program.error(color.red(err))
+			);
 
 			let localContent = '';
-			if (fs.existsSync(file.destPath)) {
-				localContent = fs.readFileSync(file.destPath).toString();
+			if (fs.existsSync(destPath)) {
+				localContent = fs.readFileSync(destPath).toString();
 			}
-
-			const from = url.join(providerState.url, file.fileName);
-
-			const to = path.relative(options.cwd, file.destPath);
 
 			const updateResult = await promptUpdateFile({
 				config: { biomeOptions, prettierOptions, formatter: config.formatter },
 				current: {
+					path: destPath,
 					content: localContent,
-					path: to,
 				},
 				incoming: {
+					path: url.join(fullSpecifier, file.name),
 					content: remoteContent,
-					path: from,
 				},
 				options: {
 					...options,
@@ -303,113 +292,30 @@ const _update = async (blockNames: string[], options: Options) => {
 			});
 
 			if (updateResult.applyChanges) {
-				loading.start(`Writing changes to ${color.cyan(file.destPath)}`);
+				loading.start(`Writing changes to ${color.cyan(destPath)}`);
 
-				fs.writeFileSync(file.destPath, updateResult.updatedContent);
+				fs.writeFileSync(destPath, updateResult.updatedContent);
 
-				loading.stop(`Wrote changes to ${color.cyan(file.destPath)}.`);
+				loading.stop(`Wrote changes to ${color.cyan(destPath)}.`);
 			}
-		}
-
-		if (config.includeTests && block.tests) {
-			verbose('Trying to include tests');
-
-			const { devDependencies } = JSON.parse(
-				fs.readFileSync(path.join(options.cwd, 'package.json')).toString()
-			);
-
-			if (devDependencies === undefined || devDependencies.vitest === undefined) {
-				devDeps.add('vitest');
-			}
-		}
-
-		for (const dep of block.devDependencies) {
-			devDeps.add(dep);
-		}
-
-		for (const dep of block.dependencies) {
-			deps.add(dep);
 		}
 	}
 
-	// check if dependencies are already installed
-	const requiredDependencies = returnShouldInstall(deps, devDeps, { cwd: options.cwd });
+	const pm = (await detect({ cwd: options.cwd }))?.agent ?? 'npm';
 
-	deps = requiredDependencies.dependencies;
-	devDeps = requiredDependencies.devDependencies;
+	const installResult = await promptInstallDependencies(deps, devDeps, {
+		yes: options.yes,
+		no: options.no,
+		loading,
+		cwd: options.cwd,
+		pm,
+	});
 
-	const hasDependencies = deps.size > 0 || devDeps.size > 0;
-
-	if (hasDependencies) {
-		let install = options.yes;
-		if (!options.yes && !options.no) {
-			const result = await confirm({
-				message: 'Would you like to install dependencies?',
-				initialValue: true,
-			});
-
-			if (isCancel(result)) {
-				cancel('Canceled!');
-				process.exit(0);
-			}
-
-			install = result;
-		}
-
-		if (install) {
-			if (deps.size > 0) {
-				if (!options.verbose)
-					loading.start(`Installing dependencies with ${color.cyan(pm)}`);
-
-				(
-					await installDependencies({
-						pm,
-						deps: Array.from(deps),
-						dev: false,
-						cwd: options.cwd,
-					})
-				).match(
-					(installed) => {
-						if (!options.verbose)
-							loading.stop(`Installed ${color.cyan(installed.join(', '))}`);
-					},
-					(err) => {
-						if (!options.verbose) loading.stop('Failed to install dependencies');
-
-						program.error(err);
-					}
-				);
-			}
-
-			if (devDeps.size > 0) {
-				if (!options.verbose)
-					loading.start(`Installing dependencies with ${color.cyan(pm)}`);
-
-				(
-					await installDependencies({
-						pm,
-						deps: Array.from(devDeps),
-						dev: true,
-						cwd: options.cwd,
-					})
-				).match(
-					(installed) => {
-						if (!options.verbose)
-							loading.stop(`Installed ${color.cyan(installed.join(', '))}`);
-					},
-					(err) => {
-						if (!options.verbose) loading.stop('Failed to install dev dependencies');
-
-						program.error(err);
-					}
-				);
-			}
-		}
-
+	if (installResult.dependencies.size > 0 || installResult.devDependencies.size > 0) {
 		// next steps if they didn't install dependencies
 		let steps = [];
 
-		if (!install) {
+		if (!installResult.installed) {
 			if (deps.size > 0) {
 				const cmd = resolveCommand(pm, 'add', [...deps]);
 
@@ -430,7 +336,7 @@ const _update = async (blockNames: string[], options: Options) => {
 		// put steps with numbers above here
 		steps = steps.map((step, i) => `${i + 1}. ${step}`);
 
-		if (!install) {
+		if (!installResult.installed) {
 			steps.push('');
 		}
 

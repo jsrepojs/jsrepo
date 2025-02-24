@@ -2,7 +2,7 @@
 
 > A CLI to add shared code from remote repositories.
  
-Latest Version: 1.37.0
+Latest Version: 1.39.3
 
 ## Commands
 
@@ -16,6 +16,8 @@ jsrepo add [options] [blocks...]
 ```
 
 #### Options
+- -E, --expand: Expands the diff so you see the entire file. 
+- --max-unchanged <number>: Maximum unchanged lines that will show without being collapsed. (default: 3)
 - --repo <repo>: Repository to download the blocks from. 
 - -A, --allow: Allow jsrepo to download code from the provided repo. 
 - -y, --yes: Skip confirmation prompt. 

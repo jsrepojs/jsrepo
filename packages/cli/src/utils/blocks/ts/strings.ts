@@ -1,3 +1,9 @@
+/*
+	jsrepo 1.39.3
+	Installed from github/ieedan/std
+	2-23-2025
+*/
+
 /** Returns true if `str` starts with one of the provided `strings`.
  *
  * ## Usage

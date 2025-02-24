@@ -12,8 +12,13 @@ import { resolveTree } from '../utils/blocks';
 import * as url from '../utils/blocks/ts/url';
 import { isTestFile } from '../utils/build';
 import { type ProjectConfig, getProjectConfig, resolvePaths } from '../utils/config';
-import { installDependencies } from '../utils/dependencies';
-import { type ConcurrentTask, intro, runTasksConcurrently, spinner } from '../utils/prompts';
+import {
+	type ConcurrentTask,
+	intro,
+	promptInstallDependencies,
+	runTasksConcurrently,
+	spinner,
+} from '../utils/prompts';
 import * as registry from '../utils/registry-providers/internal';
 
 const schema = v.objectWithRest(
@@ -232,7 +237,7 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 
 	const addedBlocks: string[] = [];
 
-	for (const { block } of installingBlocks) {
+	for (const block of installingBlocks) {
 		const fullSpecifier = `${block.sourceRepo.url}/${block.category}/${block.name}`;
 		const shortSpecifier = `${block.category}/${block.name}`;
 
@@ -321,6 +326,7 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 
 	const hasDependencies = deps.size > 0 || devDeps.size > 0;
 
+	// create temporary package.json
 	if (hasDependencies) {
 		// add package.json
 		const packageContent = {
@@ -332,55 +338,16 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 		const packagePath = path.join(tempDirectory, 'package.json');
 
 		fs.writeFileSync(packagePath, JSON.stringify(packageContent, null, '\t'));
-
-		if (deps.size > 0) {
-			if (!options.verbose) loading.start(`Installing dependencies with ${color.cyan(pm)}`);
-
-			(
-				await installDependencies({
-					pm,
-					deps: Array.from(deps),
-					dev: false,
-					cwd: tempDirectory,
-					ignoreWorkspace: true,
-				})
-			).match(
-				(installed) => {
-					if (!options.verbose)
-						loading.stop(`Installed ${color.cyan(installed.join(', '))}`);
-				},
-				(err) => {
-					if (!options.verbose) loading.stop('Failed to install dependencies');
-
-					program.error(err);
-				}
-			);
-		}
-
-		if (devDeps.size > 0) {
-			if (!options.verbose) loading.start(`Installing dependencies with ${color.cyan(pm)}`);
-
-			(
-				await installDependencies({
-					pm,
-					deps: Array.from(devDeps),
-					dev: true,
-					cwd: tempDirectory,
-					ignoreWorkspace: true,
-				})
-			).match(
-				(installed) => {
-					if (!options.verbose)
-						loading.stop(`Installed ${color.cyan(installed.join(', '))}`);
-				},
-				(err) => {
-					if (!options.verbose) loading.stop('Failed to install dev dependencies');
-
-					program.error(err);
-				}
-			);
-		}
 	}
+
+	await promptInstallDependencies(deps, devDeps, {
+		yes: true,
+		no: false,
+		cwd: tempDirectory,
+		loading,
+		pm,
+		ignoreWorkspace: true,
+	});
 
 	const startIndex = (command.parent.rawArgs as string[]).findIndex((arg) => arg === '--');
 
@@ -401,16 +368,10 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 	let file: string;
 
 	// tsx seems to be smart enough to figure out if it is a .ts file
-	if (runningBlock.block.subdirectory) {
-		file = path.join(
-			tempDirectory,
-			`${runningBlock.block.category}/${runningBlock.block.name}/index.js`
-		);
+	if (runningBlock.subdirectory) {
+		file = path.join(tempDirectory, `${runningBlock.category}/${runningBlock.name}/index.js`);
 	} else {
-		file = path.join(
-			tempDirectory,
-			`${runningBlock.block.category}/${runningBlock.block.name}.js`
-		);
+		file = path.join(tempDirectory, `${runningBlock.category}/${runningBlock.name}.js`);
 	}
 
 	const cmd = resolveCommand(pm, 'execute', ['tsx', file, ...passthroughArgs]);

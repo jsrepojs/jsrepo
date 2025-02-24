@@ -1,5 +1,6 @@
 import color from 'chalk';
 import { program } from 'commander';
+import path from 'pathe';
 import semver from 'semver';
 import type { Manifest } from '../types';
 import * as ASCII from './ascii';
@@ -12,8 +13,12 @@ import type { RegistryProviderState } from './registry-providers';
  * @param manifest
  * @returns
  */
-export const checkPreconditions = (providerState: RegistryProviderState, manifest: Manifest) => {
-	const pkg = getPackage('package.json').match(
+export const checkPreconditions = (
+	providerState: RegistryProviderState,
+	manifest: Manifest,
+	cwd: string
+) => {
+	const pkg = getPackage(path.join(cwd, 'package.json')).match(
 		(v) => v,
 		() => {
 			program.error(`Couldn't find your ${color.bold('package.json')}. Please create one.`);
