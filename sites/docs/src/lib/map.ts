@@ -137,6 +137,10 @@ const categories: Category[] = [
 				href: '/docs/private-repositories'
 			},
 			{
+				name: 'Dynamic Registries',
+				href: '/docs/dynamic-registries'
+			},
+			{
 				name: 'Badges',
 				href: '/docs/badges'
 			},
