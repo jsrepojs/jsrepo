@@ -1,20 +1,6 @@
 <script lang="ts">
-	import {
-		Blockquote,
-		DocHeader,
-		Jsrepo,
-		Link,
-		SubHeading,
-		CodeSpan
-	} from '$lib/components/site/docs';
+	import { DocHeader, Jsrepo, Link, SubHeading, CodeSpan } from '$lib/components/site/docs';
 	import { Code } from '$lib/components/ui/code';
-	import { Snippet } from '$lib/components/ui/snippet';
-	import * as Accordion from '$lib/components/ui/accordion';
-	import { UseAwait } from '$lib/hooks/use-await.svelte.js';
-
-	let { data } = $props();
-
-	const version = new UseAwait(data.version, '1.0.0');
 </script>
 
 <DocHeader title="Dynamic Registries" description="The final frontier of reusable code." />
@@ -123,6 +109,10 @@ import { cn } from '../utils/utils/index.js';`}
 	Essentially the path to the local dependency is insignificant but the file or extension after it
 	must be included.
 </p>
+<SubHeading>Type Definitions</SubHeading>
+<p>Type definitions for the manifest can be acquired via the JS API:</p>
+<Code lang="typescript" code={`import type { Manifest } from 'jsrepo';`} />
+<SubHeading>Conclusion</SubHeading>
 <p>
 	With all of this considered you can pretty easily create a dynamic jsrepo registry in a few
 	minutes and start distributing components through the jsrepo CLI.
