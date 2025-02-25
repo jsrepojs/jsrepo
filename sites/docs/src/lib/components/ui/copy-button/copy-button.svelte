@@ -16,6 +16,7 @@
 	interface Props extends Omit<ButtonProps, 'href'> {
 		text: string;
 		icon?: Snippet<[]>;
+		child?: Snippet<[{ status: UseClipboard['status'] }]>;
 		animationDuration?: number;
 		onCopy?: (status: UseClipboard['status']) => void;
 	}
@@ -27,6 +28,7 @@
 		variant = 'ghost',
 		size = 'icon',
 		onCopy,
+		child,
 		class: className,
 		...restProps
 	}: Props = $props();
@@ -48,7 +50,9 @@
 		onCopy?.(status);
 	}}
 >
-	{#if clipboard.status === 'success'}
+	{#if child}
+		{@render child({ status: clipboard.status })}
+	{:else if clipboard.status === 'success'}
 		<div in:scale={{ duration: animationDuration, start: 0.85 }}>
 			<Check />
 			<span class="sr-only">Copied</span>

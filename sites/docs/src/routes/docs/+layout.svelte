@@ -82,7 +82,7 @@
 	let { children } = $props();
 </script>
 
-<div>
+<div class="w-full max-w-7xl">
 	<div class="relative xl:grid-cols-[1fr_300px] py-8 xl:grid xl:gap-10 flex justify-center w-full">
 		<div
 			class="flex flex-col gap-5 w-full justify-between flex-grow max-w-3xl px-6 lg:px-12"

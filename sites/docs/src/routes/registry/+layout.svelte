@@ -34,7 +34,7 @@
 </script>
 
 <div class="w-full border-b py-2 px-4 flex place-items-center justify-center">
-	<form method="POST" use:enhance class="w-full flex place-items-center justify-center max-w-5xl">
+	<form method="POST" use:enhance class="w-full flex place-items-center justify-center max-w-7xl">
 		<Search
 			bind:value={$form.search}
 			disabled={$submitting}
