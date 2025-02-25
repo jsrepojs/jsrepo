@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.41.0
+
+### Minor Changes
+
+- 3a0af9e: feat: Update options for `Update with AI` to use Claude 3.7 Sonnet.
+
 ## 1.40.1
 
 ### Patch Changes
