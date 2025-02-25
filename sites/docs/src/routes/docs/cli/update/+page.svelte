@@ -41,7 +41,7 @@
 <ul>
 	<li>
 		-
-		<Link href="https://console.anthropic.com/settings/keys">Claude 3.5 Sonnet</Link>
+		<Link href="https://console.anthropic.com/settings/keys">Claude 3.7 Sonnet</Link>
 		(API Key required)
 	</li>
 	<li>

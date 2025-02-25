@@ -33,7 +33,7 @@ export interface Model {
 	}) => Promise<UpdateFileResult>;
 }
 
-export type ModelName = 'Claude 3.5 Sonnet' | 'ChatGPT 4o-mini' | 'ChatGPT 4o' | 'Phi4';
+export type ModelName = 'Claude 3.7 Sonnet' | 'ChatGPT 4o-mini' | 'ChatGPT 4o' | 'Phi4';
 
 type Prompt = {
 	system: string;
@@ -41,7 +41,7 @@ type Prompt = {
 };
 
 const models: Record<ModelName, Model> = {
-	'Claude 3.5 Sonnet': {
+	'Claude 3.7 Sonnet': {
 		updateFile: async ({
 			originalFile,
 			newFile,
@@ -52,7 +52,7 @@ const models: Record<ModelName, Model> = {
 		}) => {
 			const apiKey = await getApiKey('Anthropic');
 
-			if (!verbose) loading.start(`Asking ${'Claude 3.5 Sonnet'}`);
+			if (!verbose) loading.start(`Asking ${'Claude 3.7 Sonnet'}`);
 
 			const prompt = createUpdatePrompt({
 				originalFile,
@@ -62,18 +62,18 @@ const models: Record<ModelName, Model> = {
 			});
 
 			verbose?.(
-				`Prompting ${'Claude 3.5 Sonnet'} with:\n${JSON.stringify(prompt, null, '\t')}`
+				`Prompting ${'Claude 3.7 Sonnet'} with:\n${JSON.stringify(prompt, null, '\t')}`
 			);
 
 			const text = await getNextCompletionAnthropic({
-				model: 'claude-3-5-sonnet-latest',
+				model: 'claude-3-7-sonnet-latest',
 				prompt,
 				apiKey,
 				messages,
 				maxTokens: (originalFile.content.length + newFile.content.length) * 2,
 			});
 
-			if (!verbose) loading.stop(`${'Claude 3.5 Sonnet'} updated the file`);
+			if (!verbose) loading.stop(`${'Claude 3.7 Sonnet'} updated the file`);
 
 			if (!text) return { content: newFile.content, prompt: prompt.message };
 

@@ -44,10 +44,10 @@
 		"@types/validate-npm-package-name": "^4.0.2",
 		"tsup": "^8.3.6",
 		"typescript": "^5.7.3",
-		"vitest": "^3.0.6"
+		"vitest": "^3.0.7"
 	},
 	"dependencies": {
-		"@anthropic-ai/sdk": "^0.36.3",
+		"@anthropic-ai/sdk": "^0.37.0",
 		"@biomejs/js-api": "^0.7.1",
 		"@biomejs/wasm-nodejs": "^1.9.4",
 		"@clack/prompts": "^0.10.0",
@@ -65,7 +65,7 @@
 		"is-unicode-supported": "^2.1.0",
 		"node-fetch": "^3.3.2",
 		"octokit": "^4.1.2",
-		"ollama": "^0.5.13",
+		"ollama": "^0.5.14",
 		"openai": "^4.85.4",
 		"package-manager-detector": "^0.2.9",
 		"parse5": "^7.2.1",
@@ -75,7 +75,7 @@
 		"sisteransi": "^1.0.5",
 		"svelte": "^5.20.4",
 		"ts-morph": "^25.0.1",
-		"valibot": "1.0.0-rc.1",
+		"valibot": "1.0.0-rc.2",
 		"validate-npm-package-name": "^6.0.0",
 		"vue": "^3.5.13"
 	}
