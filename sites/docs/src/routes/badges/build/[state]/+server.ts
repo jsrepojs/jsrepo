@@ -1,3 +1,4 @@
+import { error } from '@sveltejs/kit';
 import { makeBadge } from 'badge-maker';
 
 export const GET = async ({ params }) => {
@@ -5,7 +6,7 @@ export const GET = async ({ params }) => {
 
 	if (state.endsWith('.svg')) state = state.slice(0, state.length - 4);
 
-	if (!['passing', 'failing'].includes(state));
+	if (!['passing', 'failing'].includes(state)) throw error(404);
 
 	const svg = makeBadge({
 		label: 'jsrepo',
