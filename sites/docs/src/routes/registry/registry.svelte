@@ -224,7 +224,7 @@
 			<div class="flex flex-col md:flex-row place-items-start w-full py-4 gap-4">
 				<div class="w-full flex-grow">
 					<div
-						class="w-full prose max-w-none prose-lg prose-td:border-r prose-td:last:border-r-0 prose-th:p-2 prose-th:border-r prose-th:last:border-r-0 dark:prose-invert prose-tr:border-b prose-tr:border-border prose-table:border-x prose-thead:border-border prose-thead:border-y prose-td:p-2 prose-img:m-0"
+						class="w-full prose max-w-none lg:prose-lg prose-td:border-r prose-td:last:border-r-0 prose-th:p-2 prose-th:border-r prose-th:last:border-r-0 dark:prose-invert prose-tr:border-b prose-tr:border-border prose-table:border-x prose-thead:border-border prose-thead:border-y prose-td:p-2 prose-img:m-0"
 					>
 						{#if readme}
 							{@html readme}
