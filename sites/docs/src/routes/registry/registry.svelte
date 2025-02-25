@@ -181,32 +181,32 @@
 	</div>
 	<div class="flex flex-col">
 		<!-- tabs -->
-		<div class="flex place-items-center border-b gap-2 py-1">
+		<div class="flex place-items-center scrollbar-hide border-b gap-2 py-1 max-w-full overflow-x-auto">
 			<a
 				href="#/"
 				use:active={{ isHash: true }}
-				class="font-medium p-2 data-[active=true]:text-foreground data-[active=true]:bg-accent hover:bg-accent transition-all text-muted-foreground hover:text-foreground rounded-md"
+				class="font-medium text-nowrap p-2 data-[active=true]:text-foreground data-[active=true]:bg-accent hover:bg-accent transition-all text-muted-foreground hover:text-foreground rounded-md"
 			>
 				Overview
 			</a>
 			<a
 				href="#blocks"
 				use:active={{ isHash: true }}
-				class="font-medium p-2 data-[active=true]:text-foreground data-[active=true]:bg-accent hover:bg-accent transition-all text-muted-foreground hover:text-foreground rounded-md"
+				class="font-medium text-nowrap p-2 data-[active=true]:text-foreground data-[active=true]:bg-accent hover:bg-accent transition-all text-muted-foreground hover:text-foreground rounded-md"
 			>
 				Blocks
 			</a>
 			<a
 				href="#dependencies"
 				use:active={{ isHash: true }}
-				class="font-medium p-2 data-[active=true]:text-foreground data-[active=true]:bg-accent hover:bg-accent transition-all text-muted-foreground hover:text-foreground rounded-md"
+				class="font-medium text-nowrap p-2 data-[active=true]:text-foreground data-[active=true]:bg-accent hover:bg-accent transition-all text-muted-foreground hover:text-foreground rounded-md"
 			>
-				Dependencies
+				Dependencies (<span class="font-mono">{registryInfo.dependencies.length}</span>)
 			</a>
 			<a
 				href="#manifest"
 				use:active={{ isHash: true }}
-				class="font-medium p-2 data-[active=true]:text-foreground data-[active=true]:bg-accent hover:bg-accent transition-all text-muted-foreground hover:text-foreground rounded-md"
+				class="font-medium text-nowrap p-2 data-[active=true]:text-foreground data-[active=true]:bg-accent hover:bg-accent transition-all text-muted-foreground hover:text-foreground rounded-md"
 			>
 				Manifest
 			</a>
