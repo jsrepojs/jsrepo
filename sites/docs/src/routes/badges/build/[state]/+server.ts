@@ -1,4 +1,3 @@
-import { error } from '@sveltejs/kit';
 import { makeBadge } from 'badge-maker';
 
 export const GET = async ({ params }) => {
