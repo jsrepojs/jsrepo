@@ -186,6 +186,9 @@ importers:
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.5.3)
+      badge-maker:
+        specifier: ^4.1.0
+        version: 4.1.0
       bits-ui:
         specifier: 1.3.4
         version: 1.3.4(svelte@5.20.4)
@@ -1544,6 +1547,9 @@ packages:
   ajv@8.17.1:
     resolution: {integrity: sha512-B/gBuNg5SiMTrPkC+A2+cW0RszwxYmn6VYxB/inlBStS5nx6xHIt/ehKRhIMhqusl7a8LjQoZnjCs5vhwxOQ1g==}
 
+  anafanafo@2.0.0:
+    resolution: {integrity: sha512-Nlfq7NC4AOkTJerWRIZcOAiMNtIDVIGWGvQ98O7Jl6Kr2Dk0dX5u4MqN778kSRTy5KRqchpLdF2RtLFEz9FVkQ==}
+
   ansi-align@3.0.1:
     resolution: {integrity: sha512-IOfwwBF5iczOjp/WeY4YxyjqAFMQoZufdQWDd19SEExbVLNXqvpzSJ/M7Za4/sCPmQ0+GRquoA7bGcINcxew6w==}
 
@@ -1618,6 +1624,11 @@ packages:
     resolution: {integrity: sha512-qIj0G9wZbMGNLjLmg1PT6v2mE9AH2zlnADJD/2tC6E00hgmhUOfEB6greHPAfLRSufHqROIUTkw6E+M3lH0PTQ==}
     engines: {node: '>= 0.4'}
 
+  badge-maker@4.1.0:
+    resolution: {integrity: sha512-qYImXoz0WZRMaauqSMo6QNurKp26K3RcOhefuGfno50xmAzHEJsgHbP4gnHs6Ps53KgQgFi4MJKB6Rq8H7siww==}
+    engines: {node: '>=16'}
+    hasBin: true
+
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
@@ -1634,6 +1645,9 @@ packages:
   binary-extensions@2.3.0:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
     engines: {node: '>=8'}
+
+  binary-search@1.3.6:
+    resolution: {integrity: sha512-nbE1WxOTTrUWIfsfZ4aHGYu5DOuNkbxGokjV6Z2kxfJK3uaAb8zNK1muzOeipoLHZjInT4Br88BHpzevc681xA==}
 
   bindings@1.5.0:
     resolution: {integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==}
@@ -1712,6 +1726,9 @@ packages:
     resolution: {integrity: sha512-zgVZuo2WcZgfUEmsn6eO3kINexW8RAE4maiQ8QNs8CtpPCSyMiYsULR3HQYkm3w8FIA3SberyMJMSldGsW+U3w==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
 
+  char-width-table-consumer@1.0.0:
+    resolution: {integrity: sha512-Fz4UD0LBpxPgL9i29CJ5O4KANwaMnX/OhhbxzvNa332h+9+nRKyeuLw4wA51lt/ex67+/AdsoBQJF3kgX2feYQ==}
+
   character-entities-html4@2.1.0:
     resolution: {integrity: sha512-1v7fgQRj6hnSwFpq1Eu0ynr/CDEw0rXo2B61qXrLNdHZmPKgb7fqS1a2JwF0rISo9q77jDI8VMEHoApn8qDoZA==}
 
@@ -1754,6 +1771,9 @@ packages:
 
   code-block-writer@13.0.3:
     resolution: {integrity: sha512-Oofo0pq3IKnsFtuHqSF7TqBfr71aeyZDVJ0HpmqB7FBM2qEigL0iPONSCZSO9pE9dZTAxANe5XHG9Uy0YMv8cg==}
+
+  color-convert@0.5.3:
+    resolution: {integrity: sha512-RwBeO/B/vZR3dfKL1ye/vx8MHZ40ugzpyfeVG5GsiuGnrlMWe2o8wxBbLCpw9CsxV+wHuzYlCiWnybrIA0ling==}
 
   color-convert@2.0.1:
     resolution: {integrity: sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==}
@@ -1802,8 +1822,14 @@ packages:
   crypto-js@4.2.0:
     resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
 
+  css-color-converter@2.0.0:
+    resolution: {integrity: sha512-oLIG2soZz3wcC3aAl/7Us5RS8Hvvc6I8G8LniF/qfMmrm7fIKQ8RIDDRZeKyGL2SrWfNqYspuLShbnjBMVWm8g==}
+
   css-dependency@0.0.3:
     resolution: {integrity: sha512-jLQuve6jhpjkH3+k2Y8jK3j27Hm3rnIsRW/8oOf9oxFOBI5iu6sndwSv6lj5dNfO9JVP6cNb8Xs+VXhndgtLfQ==}
+
+  css-unit-converter@1.1.2:
+    resolution: {integrity: sha512-IiJwMC8rdZE0+xiEZHeru6YoONC4rfPMqGm2W85jMIbkFvv5nFTwJVFHam2eFrN6txmoUYFAFXiv8ICVeTO0MA==}
 
   cssesc@3.0.0:
     resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
@@ -5096,6 +5122,10 @@ snapshots:
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
+  anafanafo@2.0.0:
+    dependencies:
+      char-width-table-consumer: 1.0.0
+
   ansi-align@3.0.1:
     dependencies:
       string-width: 4.2.3
@@ -5160,6 +5190,11 @@ snapshots:
 
   axobject-query@4.1.0: {}
 
+  badge-maker@4.1.0:
+    dependencies:
+      anafanafo: 2.0.0
+      css-color-converter: 2.0.0
+
   balanced-match@1.0.2: {}
 
   before-after-hook@2.2.3: {}
@@ -5171,6 +5206,8 @@ snapshots:
       is-windows: 1.0.2
 
   binary-extensions@2.3.0: {}
+
+  binary-search@1.3.6: {}
 
   bindings@1.5.0:
     dependencies:
@@ -5257,6 +5294,10 @@ snapshots:
 
   chalk@5.4.1: {}
 
+  char-width-table-consumer@1.0.0:
+    dependencies:
+      binary-search: 1.3.6
+
   character-entities-html4@2.1.0: {}
 
   character-entities-legacy@3.0.0: {}
@@ -5297,6 +5338,8 @@ snapshots:
   clsx@2.1.1: {}
 
   code-block-writer@13.0.3: {}
+
+  color-convert@0.5.3: {}
 
   color-convert@2.0.1:
     dependencies:
@@ -5342,9 +5385,17 @@ snapshots:
 
   crypto-js@4.2.0: {}
 
+  css-color-converter@2.0.0:
+    dependencies:
+      color-convert: 0.5.3
+      color-name: 1.1.4
+      css-unit-converter: 1.1.2
+
   css-dependency@0.0.3:
     dependencies:
       ansi-regex: 6.1.0
+
+  css-unit-converter@1.1.2: {}
 
   cssesc@3.0.0: {}
 

@@ -135,7 +135,7 @@ export const fetchReadme = async (state: RegistryProviderState): Promise<string 
 	}
 };
 
-const getProviderToken = (provider: RegistryProvider): string | undefined => {
+export const getProviderToken = (provider: RegistryProvider): string | undefined => {
 	switch (provider.name) {
 		case github.name:
 			return GITHUB_TOKEN;

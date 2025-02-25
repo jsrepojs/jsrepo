@@ -121,40 +121,39 @@
 	<title>jsrepo ~ {prettyUrl}</title>
 </svelte:head>
 
-<div class="max-w-5xl w-full flex flex-col gap-4 py-4">
-	<div class="w-full">
+<div class="max-w-7xl w-full flex flex-col gap-4 py-4">
+	<div class="w-full flex flex-col gap-2">
 		<div class="flex flex-wrap md:place-items-center gap-2">
 			{#if provider?.name == 'http'}
 				<a href={provider.baseUrl(registryUrl)} target="_blank">
-					<h1 class="text-lg font-bold flex place-items-center gap-2 text-nowrap">
+					<h1 class="text-2xl font-bold flex place-items-center gap-2">
 						{prettyUrl}
 						<ArrowUpRightFromSquare class="size-4 md:size-5 text-muted-foreground" />
 					</h1>
 				</a>
 			{:else}
-				<h1 class="text-lg font-bold text-nowrap">{prettyUrl}</h1>
+				<h1 class="font-bold text-2xl">{prettyUrl}</h1>
 			{/if}
-			<div class="flex place-items-center gap-2">
-				<FileIcon extension={registryPrimaryLanguage} />
+			<div class="flex place-items-center flex-wrap gap-2">
 				{#if manifest.meta?.repository}
 					{@const repoProvider = selectProvider(manifest.meta.repository)}
 					<Badge
 						variant="secondary"
-						class="flex text-sm font-medium place-items-center gap-1 w-fit"
+						class="flex text-base text-nowrap font-medium place-items-center gap-1.5 w-fit"
 						target="_blank"
 						href={repoProvider?.baseUrl(manifest.meta.repository)}
 					>
 						{#if repoProvider?.name === 'github'}
-							<Icons.GitHub class="size-3" />
+							<Icons.GitHub class="size-4" />
 						{:else if repoProvider?.name === 'gitlab'}
-							<Icons.GitLab class="size-3" />
+							<Icons.GitLab class="size-4" />
 						{:else if repoProvider?.name === 'bitbucket'}
-							<Icons.BitBucket class="size-3" />
+							<Icons.BitBucket class="size-4" />
 						{:else if repoProvider?.name === 'azure'}
-							<Icons.AzureDevops class="size-3" />
+							<Icons.AzureDevops class="size-4" />
 						{/if}
 						{repoProvider?.parse(manifest.meta.repository, { fullyQualified: false }).url}
-						<ArrowUpRightFromSquare class="size-3 text-muted-foreground" />
+						<ArrowUpRightFromSquare class="size-4 text-muted-foreground" />
 					</Badge>
 				{:else if provider?.name !== 'http'}
 					<Badge
@@ -176,12 +175,20 @@
 						<ArrowUpRightFromSquare class="size-3 text-muted-foreground" />
 					</Badge>
 				{/if}
+				<FileIcon extension={registryPrimaryLanguage} />
 			</div>
 		</div>
+		<p class="text-muted-foreground text-lg">
+			{#if manifest.meta?.description}
+				{manifest.meta.description}
+			{/if}
+		</p>
 	</div>
 	<div class="flex flex-col">
 		<!-- tabs -->
-		<div class="flex place-items-center scrollbar-hide border-b gap-2 py-1 max-w-full overflow-x-auto">
+		<div
+			class="flex place-items-center scrollbar-hide border-b gap-2 py-1 max-w-full overflow-x-auto"
+		>
 			<a
 				href="#/"
 				use:active={{ isHash: true }}
@@ -199,9 +206,9 @@
 			<a
 				href="#dependencies"
 				use:active={{ isHash: true }}
-				class="font-medium text-nowrap p-2 data-[active=true]:text-foreground data-[active=true]:bg-accent hover:bg-accent transition-all text-muted-foreground hover:text-foreground rounded-md"
+				class="font-medium text-nowrap flex place-items-center justify-center gap-2 p-2 data-[active=true]:text-foreground data-[active=true]:bg-accent hover:bg-accent transition-all text-muted-foreground hover:text-foreground rounded-md"
 			>
-				Dependencies (<span class="font-mono">{registryInfo.dependencies.length}</span>)
+				Dependencies <Badge class="font-mono px-1.5">{registryInfo.dependencies.length}</Badge>
 			</a>
 			<a
 				href="#manifest"
@@ -217,7 +224,7 @@
 			<div class="flex flex-col md:flex-row place-items-start w-full py-4 gap-4">
 				<div class="w-full flex-grow">
 					<div
-						class="w-full prose prose-td:border-r prose-td:last:border-r-0 prose-th:p-2 prose-th:border-r prose-th:last:border-r-0 dark:prose-invert prose-tr:border-b prose-tr:border-border prose-table:border-x prose-thead:border-border prose-thead:border-y prose-td:p-2 prose-img:m-0"
+						class="w-full prose max-w-none prose-lg prose-td:border-r prose-td:last:border-r-0 prose-th:p-2 prose-th:border-r prose-th:last:border-r-0 dark:prose-invert prose-tr:border-b prose-tr:border-border prose-table:border-x prose-thead:border-border prose-thead:border-y prose-td:p-2 prose-img:m-0"
 					>
 						{#if readme}
 							{@html readme}
@@ -235,11 +242,6 @@
 				</div>
 				<div class="w-full md:w-96 shrink-0">
 					<JsrepoSnippet args={['init', prettyUrl ?? '']} class="mb-2" />
-					{#if manifest.meta?.description}
-						<div class="p-2 flex flex-col">
-							<span>{manifest.meta.description}</span>
-						</div>
-					{/if}
 					{#if manifest.meta?.tags}
 						<div class="flex flex-wrap place-items-center gap-2 pb-2">
 							{#each manifest.meta.tags as tag}
