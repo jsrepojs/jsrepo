@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.41.1
+
+### Patch Changes
+
+- 56b0004: fix: Fix install dependencies prompt for regisry init
+
 ## 1.41.0
 
 ### Minor Changes
