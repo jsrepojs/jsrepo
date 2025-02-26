@@ -18,6 +18,8 @@ export const checkPreconditions = (
 	manifest: Manifest,
 	cwd: string
 ) => {
+	if (!manifest.peerDependencies) return;
+
 	const pkg = getPackage(path.join(cwd, 'package.json')).match(
 		(v) => v,
 		(err) => {
@@ -30,8 +32,6 @@ export const checkPreconditions = (
 			program.error(color.red(err));
 		}
 	);
-
-	if (!manifest.peerDependencies) return;
 
 	const dependencies = { ...pkg.dependencies, ...pkg.devDependencies };
 
