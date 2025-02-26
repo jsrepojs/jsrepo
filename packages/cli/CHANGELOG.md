@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.41.2
+
+### Patch Changes
+
+- 32f5561: fix: Don't require package.json if there are no peer dependencies
+
 ## 1.41.1
 
 ### Patch Changes
