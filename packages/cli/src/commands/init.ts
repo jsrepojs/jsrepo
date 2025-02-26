@@ -868,33 +868,13 @@ const _initRegistry = async (options: Options) => {
 	let installed = alreadyInstalled;
 
 	if (installAsDevDependency && !alreadyInstalled) {
-		let shouldInstall = options.yes;
-		if (!options.yes) {
-			const response = await confirm({
-				message: 'Install dependencies?',
-				initialValue: true,
-			});
+		const installedResult = await promptInstallDependencies(new Set(), new Set(['jsrepo']), {
+			cwd: options.cwd,
+			pm,
+			yes: options.yes,
+		});
 
-			if (isCancel(response)) {
-				cancel('Canceled!');
-				process.exit(0);
-			}
-
-			shouldInstall = response;
-		}
-
-		if (shouldInstall) {
-			loading.start(`Installing ${ascii.JSREPO}`);
-
-			await installDependencies({
-				pm,
-				deps: ['jsrepo'],
-				dev: true,
-				cwd: options.cwd,
-			});
-
-			installed = true;
-		}
+		installed = installedResult.installed;
 	}
 
 	let steps: string[] = [];
