@@ -164,7 +164,11 @@ const _intro = async () => {
 	if (latestVersion.isOk()) {
 		if (semver.lt(packageJson.version, latestVersion.unwrap())) {
 			console.info(
-				await newerVersionAvailable(packageJson.name, packageJson.version, latestVersion.unwrap())
+				await newerVersionAvailable(
+					packageJson.name,
+					packageJson.version,
+					latestVersion.unwrap()
+				)
 			);
 		}
 	}
