@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.41.3
+
+### Patch Changes
+
+- 40d81e0: chore: Bump `package-manager-detector`
+
 ## 1.41.2
 
 ### Patch Changes
