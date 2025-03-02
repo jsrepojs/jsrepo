@@ -134,7 +134,7 @@ export const truncatedList = (items: string[], maxLength = 3) => {
 };
 
 const newerVersionAvailable = async (name: string, oldVersion: string, newVersion: string) => {
-	const pm = detect({ cwd: process.cwd() })?.agent ?? 'npm';
+	const pm = (await detect({ cwd: process.cwd() }))?.agent ?? 'npm';
 
 	const installCommand = resolveCommand(pm, 'global', ['jsrepo@latest']);
 
