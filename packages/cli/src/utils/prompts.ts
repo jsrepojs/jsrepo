@@ -5,7 +5,7 @@ import boxen from 'boxen';
 import color from 'chalk';
 import { program } from 'commander';
 import { diffLines } from 'diff';
-import { type Agent, detectSync, resolveCommand } from 'package-manager-detector';
+import { type Agent, detect, resolveCommand } from 'package-manager-detector';
 import type * as prettier from 'prettier';
 import semver from 'semver';
 import { cursor, erase } from 'sisteransi';
@@ -133,8 +133,8 @@ export const truncatedList = (items: string[], maxLength = 3) => {
 	return `${truncated.join(', ')}${remaining > 0 ? ` and ${remaining} other(s)` : ''}`;
 };
 
-const newerVersionAvailable = (name: string, oldVersion: string, newVersion: string) => {
-	const pm = detectSync({ cwd: process.cwd() })?.agent ?? 'npm';
+const newerVersionAvailable = async (name: string, oldVersion: string, newVersion: string) => {
+	const pm = detect({ cwd: process.cwd() })?.agent ?? 'npm';
 
 	const installCommand = resolveCommand(pm, 'global', ['jsrepo@latest']);
 
@@ -164,7 +164,7 @@ const _intro = async () => {
 	if (latestVersion.isOk()) {
 		if (semver.lt(packageJson.version, latestVersion.unwrap())) {
 			console.info(
-				newerVersionAvailable(packageJson.name, packageJson.version, latestVersion.unwrap())
+				await newerVersionAvailable(packageJson.name, packageJson.version, latestVersion.unwrap())
 			);
 		}
 	}
