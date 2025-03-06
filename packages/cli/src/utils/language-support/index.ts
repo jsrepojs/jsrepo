@@ -96,6 +96,9 @@ export const resolveImports = ({
 	const imports: Record<string, string> = {};
 
 	for (const specifier of moduleSpecifiers) {
+		// don't add dependencies to node
+		if (builtinModules.includes(specifier) || specifier.startsWith('node:')) continue;
+
 		// check if specifier is a local dependency
 		if (specifier.startsWith('.')) {
 			const localDep = resolveLocalImport(specifier, isSubDir, {
@@ -420,10 +423,6 @@ const resolveRemoteDeps = (
 ) => {
 	const exemptDeps = new Set(doNotInstall);
 
-	const filteredDeps = deps.filter(
-		(dep) => !builtinModules.includes(dep) && !dep.startsWith('node:')
-	);
-
 	const pkgPath = findNearestPackageJson(path.dirname(filePath), '');
 
 	const dependencies = new Set<string>();
@@ -433,7 +432,7 @@ const resolveRemoteDeps = (
 		const { devDependencies: packageDevDependencies, dependencies: packageDependencies } =
 			JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
 
-		for (const dep of filteredDeps) {
+		for (const dep of deps) {
 			const parsed = parsePackageName(dep);
 
 			if (parsed.isErr()) {
