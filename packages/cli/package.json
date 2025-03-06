@@ -67,6 +67,7 @@
 		"octokit": "^4.1.2",
 		"ollama": "^0.5.14",
 		"openai": "^4.86.2",
+		"oxc-parser": "^0.56.0",
 		"package-manager-detector": "^0.2.11",
 		"parse5": "^7.2.1",
 		"pathe": "^2.0.3",
@@ -74,7 +75,6 @@
 		"semver": "^7.7.1",
 		"sisteransi": "^1.0.5",
 		"svelte": "^5.22.5",
-		"ts-morph": "^25.0.1",
 		"valibot": "1.0.0-rc.3",
 		"validate-npm-package-name": "^6.0.0",
 		"vue": "^3.5.13"

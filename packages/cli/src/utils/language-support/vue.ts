@@ -4,34 +4,35 @@ import * as v from 'vue/compiler-sfc';
 import { type Lang, formatError, resolveImports } from '.';
 import * as lines from '../blocks/ts/lines';
 import { Err, Ok } from '../blocks/ts/result';
+import { getJavascriptImports } from './javascript';
 
 /** Language support for `*.vue` files. */
 export const vue: Lang = {
 	matches: (fileName) => fileName.endsWith('.vue'),
 	resolveDependencies: ({ filePath, isSubDir, excludeDeps, dirs, cwd, containingDir }) => {
-		const sourceCode = fs.readFileSync(filePath).toString();
+		const code = fs.readFileSync(filePath).toString();
 
-		const parsed = v.parse(sourceCode, { filename: filePath });
+		const parsed = v.parse(code, { filename: filePath });
 
-		if (!parsed.descriptor.script?.content && !parsed.descriptor.scriptSetup?.content)
-			return Ok({ dependencies: [], devDependencies: [], local: [], imports: {} });
+		const modules: string[] = [];
 
-		let compiled: v.SFCScriptBlock;
-		try {
-			compiled = v.compileScript(parsed.descriptor, {
-				id: 'shut-it',
-			}); // you need this id to remove a warning
-		} catch (err) {
-			return Err(`Compile error: ${err}`);
+		if (parsed.descriptor.script?.content) {
+			const mods = getJavascriptImports('noop.ts', parsed.descriptor.script.content);
+
+			modules.push(...mods);
 		}
 
-		if (!compiled.imports)
+		if (parsed.descriptor.scriptSetup?.content) {
+			const mods = getJavascriptImports('noop.ts', parsed.descriptor.scriptSetup.content);
+
+			modules.push(...mods);
+		}
+
+		if (modules.length === 0)
 			return Ok({ dependencies: [], devDependencies: [], local: [], imports: {} });
 
-		const imports = Object.values(compiled.imports).map((imp) => imp.source);
-
 		const resolveResult = resolveImports({
-			moduleSpecifiers: imports,
+			moduleSpecifiers: modules,
 			filePath,
 			isSubDir,
 			dirs,

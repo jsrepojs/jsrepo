@@ -3,10 +3,10 @@ import { cancel, confirm, isCancel, outro } from '@clack/prompts';
 import color from 'chalk';
 import { Argument, Command, program } from 'commander';
 import { execa } from 'execa';
+import oxc from 'oxc-parser';
 import { resolveCommand } from 'package-manager-detector/commands';
 import { detect } from 'package-manager-detector/detect';
 import path from 'pathe';
-import { Project } from 'ts-morph';
 import * as v from 'valibot';
 import * as ascii from '../utils/ascii';
 import { getInstalled } from '../utils/blocks';
@@ -154,7 +154,9 @@ const _test = async (blockNames: string[], options: Options) => {
 
 				const { url: parsedRepo, specifier } = provider.parse(
 					url.join(repo, blockSpecifier),
-					{ fullyQualified: true }
+					{
+						fullyQualified: true,
+					}
 				);
 
 				const tempBlock = blocksMap.get(url.join(parsedRepo, specifier!));
@@ -242,20 +244,19 @@ const _test = async (blockNames: string[], options: Options) => {
 			testFiles.push(destPath);
 		}
 
-		const project = new Project();
-
 		// resolve imports for the block
 		for (const file of testFiles) {
 			verbose(`Opening test file ${file}`);
 
-			const tempFile = project.addSourceFileAtPath(file);
+			let code = fs.readFileSync(file).toString();
 
-			for (const importDeclaration of tempFile.getImportDeclarations()) {
-				const moduleSpecifier = importDeclaration.getModuleSpecifierValue();
+			const result = oxc.parseSync(file, code);
+
+			for (const mod of result.module.staticImports) {
+				const moduleSpecifier = mod.moduleRequest.value;
 
 				let newModuleSpecifier: string | undefined = undefined;
 
-				// if the module is relative resolve it relative to the new path of the tests
 				if (moduleSpecifier.startsWith('.')) {
 					if (block.subdirectory) {
 						newModuleSpecifier = path.join(directory, block.name, moduleSpecifier);
@@ -265,13 +266,12 @@ const _test = async (blockNames: string[], options: Options) => {
 				}
 
 				if (newModuleSpecifier) {
-					// we need to add the replace so that paths are correctly translated on windows
-					importDeclaration.setModuleSpecifier(newModuleSpecifier.replaceAll(/\\/g, '/'));
+					code = code.replaceAll(moduleSpecifier, newModuleSpecifier);
 				}
 			}
-		}
 
-		project.saveSync();
+			fs.writeFileSync(file, code);
+		}
 
 		verbose(`Completed ${color.cyan.bold(fullSpecifier)} test file`);
 
