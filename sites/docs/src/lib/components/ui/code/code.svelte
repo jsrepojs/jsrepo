@@ -17,7 +17,7 @@
 		base: 'not-prose relative h-fit max-h-[650px] overflow-auto rounded-lg',
 		variants: {
 			variant: {
-				default: 'bg-transparent',
+				default: 'bg-background',
 				secondary: 'bg-secondary/50'
 			}
 		}
