@@ -12,8 +12,8 @@ importers:
         specifier: ^2.28.1
         version: 2.28.1
       pkg-pr-new:
-        specifier: ^0.0.39
-        version: 0.0.39
+        specifier: ^0.0.40
+        version: 0.0.40
 
   packages/cli:
     dependencies:
@@ -1076,9 +1076,6 @@ packages:
 
   '@octokit/types@12.6.0':
     resolution: {integrity: sha512-1rhSOfRa6H9w4YwK0yrf5faDaDTb+yLyBUKOCV4xtCDB5VmIPqd/v9yr9o6SAzOAlRxMiRiCic6JVM1/kunVkw==}
-
-  '@octokit/types@13.7.0':
-    resolution: {integrity: sha512-BXfRP+3P3IN6fd4uF3SniaHKOO4UXWBfkdR3vA8mIvaoO/wLjGN5qivUtW0QRitBHHMcfC41SLhNVYIZZE+wkA==}
 
   '@octokit/types@13.8.0':
     resolution: {integrity: sha512-x7DjTIbEpEWXK99DMd01QfWy0hd5h4EN+Q7shkdKds3otGQP+oWE/y0A76i1OvH9fygo4ddvNf7ZvF0t78P98A==}
@@ -2910,8 +2907,8 @@ packages:
     resolution: {integrity: sha512-saLsH7WeYYPiD25LDuLRRY/i+6HaPYr6G1OUlN39otzkSTxKnubR9RTxS3/Kk50s1g2JTgFwWQDQyplC5/SHZg==}
     engines: {node: '>= 6'}
 
-  pkg-pr-new@0.0.39:
-    resolution: {integrity: sha512-ItcsHK+4uO0qmjK4RNs6vTWv3xFhbPZd5U6RoYbxRURWNZfH7KvpyqRzaw4GR7de/IjkdHVZHCzQkjnp3VOVdg==}
+  pkg-pr-new@0.0.40:
+    resolution: {integrity: sha512-/JdrhkpXCU4BSpE3KS6pIPaAzcIQQA7YesGjpJThqoqRvNnXcPGRDs678Qfammi8HCkr9HJUcq07/WfSJJMjhg==}
     hasBin: true
 
   pkg-types@1.2.1:
@@ -3388,10 +3385,6 @@ packages:
 
   tinyexec@0.3.2:
     resolution: {integrity: sha512-KQQR9yN7R5+OSwaK0XQoj22pwHoTlgYqmUscPYoknOoWCWfj/5/ABTMRi69FrKU5ffPVh5QcFikpWJI/P1ocHA==}
-
-  tinyglobby@0.2.10:
-    resolution: {integrity: sha512-Zc+8eJlFMvgatPZTl6A9L/yht8QqdmUNtURHaKZLmKBE12hNPSrqNkUp2cs3M/UKmNVVAMFQYSjYIVHDjW5zew==}
-    engines: {node: '>=12.0.0'}
 
   tinyglobby@0.2.12:
     resolution: {integrity: sha512-qkf4trmKSIiMTs/E63cxH+ojC2unam7rJ0WrauAzpT3ECNTxGRMlaXxVbfxMUC/w0LaYk6jQ4y/nGR9uBO3tww==}
@@ -4505,7 +4498,7 @@ snapshots:
   '@octokit/auth-action@4.1.0':
     dependencies:
       '@octokit/auth-token': 4.0.0
-      '@octokit/types': 13.7.0
+      '@octokit/types': 13.8.0
 
   '@octokit/auth-app@7.1.5':
     dependencies:
@@ -4556,7 +4549,7 @@ snapshots:
       '@octokit/graphql': 7.1.0
       '@octokit/request': 8.4.0
       '@octokit/request-error': 5.1.0
-      '@octokit/types': 13.7.0
+      '@octokit/types': 13.8.0
       before-after-hook: 2.2.3
       universal-user-agent: 6.0.1
 
@@ -4577,13 +4570,13 @@ snapshots:
 
   '@octokit/endpoint@9.0.5':
     dependencies:
-      '@octokit/types': 13.7.0
+      '@octokit/types': 13.8.0
       universal-user-agent: 6.0.1
 
   '@octokit/graphql@7.1.0':
     dependencies:
       '@octokit/request': 8.4.0
-      '@octokit/types': 13.7.0
+      '@octokit/types': 13.8.0
       universal-user-agent: 6.0.1
 
   '@octokit/graphql@8.1.2':
@@ -4657,7 +4650,7 @@ snapshots:
 
   '@octokit/request-error@5.1.0':
     dependencies:
-      '@octokit/types': 13.7.0
+      '@octokit/types': 13.8.0
       deprecation: 2.3.1
       once: 1.4.0
 
@@ -4669,7 +4662,7 @@ snapshots:
     dependencies:
       '@octokit/endpoint': 9.0.5
       '@octokit/request-error': 5.1.0
-      '@octokit/types': 13.7.0
+      '@octokit/types': 13.8.0
       universal-user-agent: 6.0.1
 
   '@octokit/request@9.2.2':
@@ -4683,10 +4676,6 @@ snapshots:
   '@octokit/types@12.6.0':
     dependencies:
       '@octokit/openapi-types': 20.0.0
-
-  '@octokit/types@13.7.0':
-    dependencies:
-      '@octokit/openapi-types': 23.0.1
 
   '@octokit/types@13.8.0':
     dependencies:
@@ -6602,7 +6591,7 @@ snapshots:
 
   pirates@4.0.6: {}
 
-  pkg-pr-new@0.0.39:
+  pkg-pr-new@0.0.40:
     dependencies:
       '@jsdevtools/ez-spawn': 3.0.4
       '@octokit/action': 6.1.0
@@ -6610,7 +6599,7 @@ snapshots:
       isbinaryfile: 5.0.4
       pkg-types: 1.2.1
       query-registry: 3.0.1
-      tinyglobby: 0.2.10
+      tinyglobby: 0.2.12
 
   pkg-types@1.2.1:
     dependencies:
@@ -7140,11 +7129,6 @@ snapshots:
   tinybench@2.9.0: {}
 
   tinyexec@0.3.2: {}
-
-  tinyglobby@0.2.10:
-    dependencies:
-      fdir: 6.4.3(picomatch@4.0.2)
-      picomatch: 4.0.2
 
   tinyglobby@0.2.12:
     dependencies:
