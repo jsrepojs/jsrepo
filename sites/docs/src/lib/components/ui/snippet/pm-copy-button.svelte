@@ -36,7 +36,7 @@
 			{/snippet}
 		</DropdownMenu.Trigger>
 		<DropdownMenu.Content align="end">
-			{#each AGENTS.filter((a) => a !== 'pnpm@6' && a !== 'yarn@berry') as agent}
+			{#each AGENTS.filter((a) => a !== 'pnpm@6' && a !== 'yarn@berry') as agent (agent)}
 				<DropdownMenu.Item
 					onclick={() => {
 						pm = agent;

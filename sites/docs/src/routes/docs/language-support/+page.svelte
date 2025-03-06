@@ -188,7 +188,7 @@
 		</Table.Row>
 	</Table.Header>
 	<Table.Body>
-		{#each supportedLanguages as { name, logo, dependencyResolutionStatus, formattingStatus, watermarkStatus }}
+		{#each supportedLanguages as { name, logo, dependencyResolutionStatus, formattingStatus, watermarkStatus } (name)}
 			<Table.Row>
 				<Table.Cell>
 					<div class="flex place-items-center gap-2">

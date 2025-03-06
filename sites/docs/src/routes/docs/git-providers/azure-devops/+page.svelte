@@ -16,7 +16,7 @@
 	URL from the homepage like you can for other providers won't just work.
 </p>
 <p>Instead you need to follow the following format:</p>
-<Code hideLines lang="diff" code={`azure/<organization>/<project>/<repo>/(tags|heads)/<ref>`} />
+<Code hideLines lang="diff" code="azure/<organization>/<project>/<repo>/(tags|heads)/<ref>" />
 <Code
 	hideLines
 	lang="bash"

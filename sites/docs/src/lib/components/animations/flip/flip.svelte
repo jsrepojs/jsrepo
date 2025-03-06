@@ -16,7 +16,7 @@
 		class={cn('flex flex-col transition-all duration-500 ease-in-out')}
 		style="transform: translateY(calc(-{100 / items.length}% * {index}));"
 	>
-		{#each items as item, i}
+		{#each items as item, i (i)}
 			<span
 				aria-hidden={index !== i}
 				style="height: {height}px;"

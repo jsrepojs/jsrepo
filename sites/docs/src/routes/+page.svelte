@@ -216,7 +216,7 @@
 						<h3 class="text-xl font-medium">Featured</h3>
 						<div class="border-border border rounded-md w-full overflow-hidden">
 							<ul class="flex flex-col">
-								{#each featuredRegistries as registry}
+								{#each featuredRegistries as registry (registry)}
 									<li class="odd:bg-accent/75">
 										<a
 											href="/registry?url={registry}"
@@ -234,13 +234,13 @@
 						<div class="border-border border rounded-md w-full overflow-hidden">
 							<ul class="flex flex-col">
 								{#await data.popular}
-									{#each { length: 5 } as _}
+									{#each { length: 5 } as _, i (i)}
 										<li class="odd:bg-accent/75 h-12 flex place-items-center justify-center p-3">
 											<Skeleton class="h-4 w-full" />
 										</li>
 									{/each}
 								{:then mostPopular}
-									{#each mostPopular as registry}
+									{#each mostPopular as registry (registry)}
 										<li class="odd:bg-accent/75">
 											<a
 												href="/registry?url={registry}"

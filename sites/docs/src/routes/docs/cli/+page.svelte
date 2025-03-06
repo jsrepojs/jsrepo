@@ -49,7 +49,7 @@
 		</Table.Row>
 	</Table.Header>
 	<Table.Body>
-		{#each commands as { name, description }}
+		{#each commands as { name, description } (name)}
 			<Table.Row class="hover:cursor-pointer" onclick={() => goto(`/docs/cli/${name}`)}>
 				<Table.Cell>
 					<CodeSpan>{name}</CodeSpan>

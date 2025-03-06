@@ -244,7 +244,7 @@
 					<JsrepoSnippet args={['init', prettyUrl ?? '']} class="mb-2" />
 					{#if manifest.meta?.tags}
 						<div class="flex flex-wrap place-items-center gap-2 pb-2">
-							{#each manifest.meta.tags as tag}
+							{#each manifest.meta.tags as tag (tag)}
 								<Badge variant="secondary">{tag}</Badge>
 							{/each}
 						</div>
@@ -330,8 +330,8 @@
 			<!-- blocks -->
 
 			<div class="flex flex-col gap-2 py-4">
-				{#each manifest.categories as category}
-					{#each category.blocks.filter((b) => b.list) as block}
+				{#each manifest.categories as category (category)}
+					{#each category.blocks.filter((b) => b.list) as block (block.name)}
 						{@const primaryLanguage = determinePrimaryLanguage(block)}
 						<Collapsible.Root>
 							<Collapsible.Trigger>
@@ -371,7 +371,7 @@
 									<div>
 										<span class="text-muted-foreground font-medium">Files</span>
 										<ul>
-											{#each block.files as file}
+											{#each block.files as file (file)}
 												{@const ext = parseFileExtension(file)}
 												<li class="flex place-items-center gap-1">
 													<div class="size-4 flex place-items-center justify-center">
@@ -389,7 +389,7 @@
 									<div>
 										<span class="text-muted-foreground font-medium">Remote Dependencies</span>
 										<ul>
-											{#each [...block.dependencies, ...block.devDependencies] as dep}
+											{#each [...block.dependencies, ...block.devDependencies] as dep (dep)}
 												<li>{dep}</li>
 											{/each}
 										</ul>
@@ -397,7 +397,7 @@
 									<div>
 										<span class="text-muted-foreground font-medium">Local Dependencies</span>
 										<ul>
-											{#each block.localDependencies as dep}
+											{#each block.localDependencies as dep (dep)}
 												<li>{dep}</li>
 											{/each}
 										</ul>
@@ -422,7 +422,7 @@
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
-						{#each registryInfo.dependencies as dep}
+						{#each registryInfo.dependencies as dep (dep)}
 							{@const pkg = parsePackageName(dep).unwrap()}
 							<Table.Row>
 								<Table.Cell>

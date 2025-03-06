@@ -87,7 +87,7 @@
 		</Table.Row>
 	</Table.Header>
 	<Table.Body>
-		{#each support as { name, logo, status, href }}
+		{#each support as { name, logo, status, href } (name)}
 			<Table.Row>
 				<Table.Cell>
 					<div class="flex place-items-center gap-2">
