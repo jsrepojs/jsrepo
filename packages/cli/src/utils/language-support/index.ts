@@ -96,6 +96,7 @@ export const resolveImports = ({
 	const imports: Record<string, string> = {};
 
 	for (const specifier of moduleSpecifiers) {
+		// check if specifier is a local dependency
 		if (specifier.startsWith('.')) {
 			const localDep = resolveLocalImport(specifier, isSubDir, {
 				filePath,
@@ -119,6 +120,19 @@ export const resolveImports = ({
 			continue;
 		}
 
+		// check if the specifier is a package
+		const parsed = parsePackageName(specifier);
+
+		if (!parsed.isErr()) {
+			const depInfo = parsed.unwrap();
+
+			if (validatePackageName(depInfo.name).validForNewPackages) {
+				deps.add(specifier);
+				continue;
+			}
+		}
+
+		// if specifier wasn't a local dependency or package then it might be a path alias
 		const localDep = tryResolveLocalAlias(specifier, isSubDir, {
 			filePath,
 			containingDir,
@@ -137,7 +151,9 @@ export const resolveImports = ({
 			localDeps.add(dep.dependency);
 			imports[specifier] = dep.template;
 		} else {
-			deps.add(specifier);
+			console.warn(
+				`${ascii.VERTICAL_LINE}  ${ascii.WARN} Skipped adding import \`${color.cyan(specifier)}\` from ${filePath}. Reason: Not a valid package name or path alias.`
+			);
 		}
 	}
 
