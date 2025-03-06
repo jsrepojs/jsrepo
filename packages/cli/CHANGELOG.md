@@ -1,5 +1,15 @@
 # jsrepo
 
+## 1.42.0
+
+### Minor Changes
+
+- 41926d7: feat: Stability improvements for nuxt/vue
+
+### Patch Changes
+
+- 41926d7: chore: Remove ts-morph in favor of oxc
+
 ## 1.41.4
 
 ### Patch Changes
