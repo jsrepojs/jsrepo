@@ -18,7 +18,7 @@
 <DocHeader title="Setup" description="Get started with jsrepo." />
 <SubHeading>Guides</SubHeading>
 <div class="grid md:grid-cols-2 grid-rows-2 md:grid-rows-1 gap-2">
-	{#each guides as { name, href, description }}
+	{#each guides as { name, href, description } (name)}
 		<a
 			{href}
 			class="bg-background border border-border rounded-lg p-4 flex place-items-center justify-center h-44 hover:bg-secondary transition-all"

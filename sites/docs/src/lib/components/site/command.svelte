@@ -13,9 +13,9 @@
 		<Command.Input placeholder="Search the documentation..." />
 		<Command.List class="min-h-[300px]">
 			<Command.Empty>No results found.</Command.Empty>
-			{#each categories as category}
+			{#each categories as category (category.name)}
 				<Command.Group heading={category.name}>
-					{#each category.routes as route}
+					{#each category.routes as route (route.name)}
 						<Command.Item
 							onclick={async () => {
 								await goto(route.href);
@@ -24,7 +24,7 @@
 						>
 							{route.name}
 						</Command.Item>
-						{#each route.routes ?? [] as { name, href, icon: Icon }}
+						{#each route.routes ?? [] as { name, href, icon: Icon } (name)}
 							<Command.Item
 								onclick={async () => {
 									await goto(href);

@@ -46,18 +46,13 @@
 	</li>
 	<li>
 		-
-		<Link href="https://platform.openai.com/settings/organization/api-keys">ChatGPT 4o</Link>
-		(API Key required)
-	</li>
-	<li>
-		-
-		<Link href="https://platform.openai.com/settings/organization/api-keys">ChatGPT 4o-mini</Link>
+		<Link href="https://platform.openai.com/settings/organization/api-keys">OpenAI o3-mini</Link>
 		(API Key required)
 	</li>
 	<li>
 		-
 		<Link href="https://github.com/ollama/ollama#model-library">Phi4</Link>
-		(via Ollama)
+		(with Ollama)
 	</li>
 </ul>
 <SubHeading>Options</SubHeading>

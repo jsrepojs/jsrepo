@@ -37,7 +37,7 @@
 
 <main class="flex justify-center px-4" style="min-height: calc(100svh - 56px);">
 	<div class="grid sm:grid-cols-2 w-full py-8 gap-5 flex-col h-fit">
-		{#each videos as { title, description, src }}
+		{#each videos as { title, description, src } (title)}
 			<div class="border border-border rounded-lg max-w-[500px] overflow-hidden">
 				<iframe
 					class="aspect-video w-full"

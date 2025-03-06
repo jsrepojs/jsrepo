@@ -67,7 +67,7 @@
 		</Table.Row>
 	</Table.Header>
 	<Table.Body>
-		{#each badges as { alt, href }, i}
+		{#each badges as { alt, href }, i (i)}
 			<Table.Row>
 				<Table.Cell>
 					<div class="flex place-items-center gap-2">
@@ -119,7 +119,7 @@
 		</Table.Row>
 	</Table.Header>
 	<Table.Body>
-		{#each dynamicBadges as { alt, href }}
+		{#each dynamicBadges as { alt, href }, i (i)}
 			<Table.Row>
 				<Table.Cell>
 					<div class="flex place-items-center gap-2">

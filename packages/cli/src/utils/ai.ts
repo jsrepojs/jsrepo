@@ -3,7 +3,6 @@ import { cancel, isCancel, password, type spinner } from '@clack/prompts';
 import ollama from 'ollama';
 import OpenAI from 'openai';
 import * as lines from './blocks/ts/lines';
-import * as persisted from './persisted';
 import { TokenManager } from './token-manager';
 
 type File = {
@@ -33,7 +32,7 @@ export interface Model {
 	}) => Promise<UpdateFileResult>;
 }
 
-export type ModelName = 'Claude 3.7 Sonnet' | 'ChatGPT 4o-mini' | 'ChatGPT 4o' | 'Phi4';
+export type ModelName = 'Claude 3.7 Sonnet' | 'OpenAI o3-mini' | 'Phi4';
 
 type Prompt = {
 	system: string;
@@ -80,7 +79,7 @@ const models: Record<ModelName, Model> = {
 			return { content: unwrapCodeFromQuotes(text), prompt: prompt.message };
 		},
 	},
-	'ChatGPT 4o': {
+	'OpenAI o3-mini': {
 		updateFile: async ({
 			originalFile,
 			newFile,
@@ -91,7 +90,7 @@ const models: Record<ModelName, Model> = {
 		}) => {
 			const apiKey = await getApiKey('OpenAI');
 
-			if (!verbose) loading.start(`Asking ${'ChatGPT 4o'}`);
+			if (!verbose) loading.start(`Asking ${'OpenAI o3-mini'}`);
 
 			const prompt = createUpdatePrompt({
 				originalFile,
@@ -100,54 +99,17 @@ const models: Record<ModelName, Model> = {
 				rePrompt: messages !== undefined && messages.length > 0,
 			});
 
-			verbose?.(`Prompting ${'ChatGPT 4o'} with:\n${JSON.stringify(prompt, null, '\t')}`);
+			verbose?.(`Prompting ${'OpenAI o3-mini'} with:\n${JSON.stringify(prompt, null, '\t')}`);
 
 			const text = await getNextCompletionOpenAI({
-				model: 'gpt-4o',
+				model: 'o3-mini',
 				prompt,
 				apiKey,
 				messages,
 				maxTokens: (originalFile.content.length + newFile.content.length) * 2,
 			});
 
-			if (!verbose) loading.stop(`${'ChatGPT 4o'} updated the file`);
-
-			if (!text) return { content: newFile.content, prompt: prompt.message };
-
-			return { content: unwrapCodeFromQuotes(text), prompt: prompt.message };
-		},
-	},
-	'ChatGPT 4o-mini': {
-		updateFile: async ({
-			originalFile,
-			newFile,
-			loading,
-			verbose,
-			additionalInstructions,
-			messages,
-		}) => {
-			const apiKey = await getApiKey('OpenAI');
-
-			if (!verbose) loading.start(`Asking ${'ChatGPT 4o-mini'}`);
-
-			const prompt = createUpdatePrompt({
-				originalFile,
-				newFile,
-				additionalInstructions,
-				rePrompt: messages !== undefined && messages.length > 0,
-			});
-
-			verbose?.(`Prompting ${'ChatGPT 4o'} with:\n${JSON.stringify(prompt, null, '\t')}`);
-
-			const text = await getNextCompletionOpenAI({
-				model: 'gpt-4o-mini',
-				prompt,
-				apiKey,
-				messages,
-				maxTokens: (originalFile.content.length + newFile.content.length) * 2,
-			});
-
-			if (!verbose) loading.stop(`${'ChatGPT 4o-mini'} updated the file`);
+			if (!verbose) loading.stop(`${'OpenAI o3-mini'} updated the file`);
 
 			if (!text) return { content: newFile.content, prompt: prompt.message };
 

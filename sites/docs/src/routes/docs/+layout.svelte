@@ -139,7 +139,7 @@
 			{#if pageHeadings && pageHeadings.length > 0}
 				<p class="font-semibold text-sm">On This Page</p>
 				<div class="flex flex-col gap-1">
-					{#each pageHeadings as heading}
+					{#each pageHeadings as heading (heading)}
 						<a
 							href="#{heading.el.innerText}"
 							class="text-muted-foreground text-sm hover:text-foreground hover:dark:text-primary transition-all data-[active=true]:text-foreground data-[active=true]:dark:text-primary"

@@ -1,7 +1,7 @@
 <!--
-	jsrepo 1.36.0
+	jsrepo 1.41.2
 	Installed from github/ieedan/shadcn-svelte-extras
-	2-16-2025
+	3-6-2025
 -->
 
 <script lang="ts">
@@ -32,6 +32,6 @@
 	});
 </script>
 
-<Window class={cn('', className)}>
+<Window class={cn('font-mono', className)}>
 	{@render children?.()}
 </Window>

@@ -39,7 +39,7 @@
 		</Sidebar.Menu>
 	</Sidebar.Header>
 	<Sidebar.Content>
-		{#each categories.filter((cat) => isMobile.current || cat.name !== 'General') as { name: group, routes }}
+		{#each categories.filter((cat) => isMobile.current || cat.name !== 'General') as { name: group, routes } (group)}
 			<Sidebar.Group>
 				<Sidebar.GroupLabel>{group}</Sidebar.GroupLabel>
 				<Sidebar.Menu>
