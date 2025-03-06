@@ -15,7 +15,16 @@
 	"bugs": {
 		"url": "https://github.com/ieedan/jsrepo/issues"
 	},
-	"keywords": ["repo", "cli", "svelte", "vue", "typescript", "javascript", "shadcn", "registry"],
+	"keywords": [
+		"repo",
+		"cli",
+		"svelte",
+		"vue",
+		"typescript",
+		"javascript",
+		"shadcn",
+		"registry"
+	],
 	"type": "module",
 	"exports": {
 		".": {
@@ -25,7 +34,10 @@
 	},
 	"bin": "./dist/index.js",
 	"main": "./dist/index.js",
-	"files": ["./schemas/**/*", "dist/**/*"],
+	"files": [
+		"./schemas/**/*",
+		"dist/**/*"
+	],
 	"scripts": {
 		"start": "tsup --silent && node ./dist/index.js",
 		"build": "tsup",
@@ -44,7 +56,7 @@
 		"@types/validate-npm-package-name": "^4.0.2",
 		"tsup": "^8.4.0",
 		"typescript": "^5.8.2",
-		"vitest": "^3.0.7"
+		"vitest": "^3.0.8"
 	},
 	"dependencies": {
 		"@anthropic-ai/sdk": "^0.39.0",
