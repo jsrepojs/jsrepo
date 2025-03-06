@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.41.4
+
+### Patch Changes
+
+- 2ed3e67: feat: Update model choices for `Update with AI` --ChatGPT 4o, ChatGPT 4o-mini ++OpenAI o3-mini
+
 ## 1.41.3
 
 ### Patch Changes
