@@ -1,0 +1,15 @@
+{
+	"$schema": "https://unpkg.com/jsrepo@1.41.2/schemas/registry-config.json",
+	"dirs": ["./src/lib", "./src/lib/components"],
+	"outputDir": "./static/r",
+	"doNotListBlocks": [],
+	"doNotListCategories": ["utils"],
+	"listBlocks": [],
+	"listCategories": [],
+	"excludeDeps": [],
+	"includeBlocks": [],
+	"includeCategories": ["ui", "utils"],
+	"excludeBlocks": [],
+	"excludeCategories": [],
+	"preview": false
+}
