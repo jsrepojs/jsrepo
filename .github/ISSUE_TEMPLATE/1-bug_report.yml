@@ -28,7 +28,7 @@ body:
               Provide a link to the source repository where the issue can be reproduced as well as any reproduction steps.
 
               **For install issues**:
-              Using the public registry please reproduce your issue in our [project template](https://stackblitz.com/github/ieedan/jsrepo/tree/main/examples/project) then provide a link to the instance as well as any reproduction steps.
+              Using a public registry please provide the steps needed to reproduce.
     - type: input
       id: registry-link
       attributes:
