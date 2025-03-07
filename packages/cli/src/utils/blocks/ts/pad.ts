@@ -1,7 +1,5 @@
 /*
-	jsrepo 1.39.3
 	Installed from github/ieedan/std
-	2-23-2025
 */
 
 import { stripVTControlCharacters as stripAsni } from 'node:util';
