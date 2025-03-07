@@ -1,7 +1,5 @@
 /*
-	jsrepo 1.28.2
 	Installed from github/ieedan/std
-	1-23-2025
 */
 
 /** Joins the segments into a single url correctly handling leading and trailing slashes in each segment.

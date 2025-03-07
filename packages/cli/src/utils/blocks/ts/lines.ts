@@ -1,7 +1,5 @@
 /*
-	jsrepo 1.2.4
 	Installed from github/ieedan/std
-	11-21-2024
 */
 
 import os from 'node:os';
