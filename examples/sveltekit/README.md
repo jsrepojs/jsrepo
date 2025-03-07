@@ -1,4 +1,4 @@
-# jsrepo x svelte
+# jsrepo x sveltekit
 
 An example of how to serve your registry from a SvelteKit app.
 

@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { cn } from '$lib/utils/utils';
-    import { type WithChildren } from 'bits-ui'
+	import type { HTMLButtonAttributes } from 'svelte/elements';
 
-    type Props = {
+    interface Props extends HTMLButtonAttributes {
         class?: string;
     }
 
-    let { class: className, children }: WithChildren<Props> = $props();
+    let { class: className, children }: Props = $props();
 </script>
 
 <button class={cn("bg-red-500 text-white font-bold size-20 rounded-full",className)}>

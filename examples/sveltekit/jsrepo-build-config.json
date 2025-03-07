@@ -6,7 +6,7 @@
 	"doNotListCategories": ["utils"],
 	"listBlocks": [],
 	"listCategories": [],
-	"excludeDeps": [],
+	"excludeDeps": ["svelte", "@sveltejs/kit"],
 	"includeBlocks": [],
 	"includeCategories": ["ui", "utils"],
 	"excludeBlocks": [],

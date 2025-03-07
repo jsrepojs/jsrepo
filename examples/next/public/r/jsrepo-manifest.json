@@ -1,0 +1,51 @@
+{
+	"categories": [
+		{
+			"name": "ui",
+			"blocks": [
+				{
+					"name": "button",
+					"directory": "components/ui",
+					"category": "ui",
+					"tests": false,
+					"subdirectory": false,
+					"list": true,
+					"files": [
+						"button.tsx"
+					],
+					"localDependencies": [
+						"lib/utils"
+					],
+					"_imports_": {
+						"@/lib/utils": "{{lib/utils}}"
+					},
+					"dependencies": [],
+					"devDependencies": []
+				}
+			]
+		},
+		{
+			"name": "lib",
+			"blocks": [
+				{
+					"name": "utils",
+					"directory": "lib",
+					"category": "lib",
+					"tests": false,
+					"subdirectory": false,
+					"list": false,
+					"files": [
+						"utils.ts"
+					],
+					"localDependencies": [],
+					"_imports_": {},
+					"dependencies": [
+						"clsx@^2.1.1",
+						"tailwind-merge@^3.0.2"
+					],
+					"devDependencies": []
+				}
+			]
+		}
+	]
+}
