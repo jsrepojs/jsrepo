@@ -1,7 +1,5 @@
 /*
-	jsrepo 1.32.0
 	Installed from github/ieedan/shadcn-svelte-extras
-	2-6-2025
 */
 
 // Follows the best practices established in https://shiki.matsu.io/guide/best-performance

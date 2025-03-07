@@ -1,7 +1,5 @@
 <!--
-	jsrepo 1.41.2
 	Installed from github/ieedan/shadcn-svelte-extras
-	3-6-2025
 -->
 
 <script lang="ts" module>

@@ -103,15 +103,13 @@
 }`}
 />
 <p>
-	When true adds a watermark with the jsrepo version repository it was added from and the date it
-	was added on.
+	When true jsrepo adds a watermark to each block that includes the registry that it was added from
+	from.
 </p>
 <Code
 	lang="typescript"
 	code={`/*
-	jsrepo ${version.current}
 	Installed from github/ieedan/std
-	${new Date().toLocaleDateString().replaceAll('/', '-')}
 */
   
 export type Point = {
