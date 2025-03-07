@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.43.0
+
+### Minor Changes
+
+- 1311e97: feat: Remove version and date from watermarks to simplify diffs.
+
 ## 1.42.0
 
 ### Minor Changes
