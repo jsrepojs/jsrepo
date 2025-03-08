@@ -436,8 +436,7 @@ const promptForProviderConfig = async ({
 
 	const token = storage.get(provider.name);
 
-	// don't ask if the provider is a custom domain
-	if (!token && provider.name !== registry.http.name && !options.yes) {
+	if (!token && !options.yes) {
 		const result = await confirm({
 			message: 'Would you like to add an auth token?',
 			initialValue: false,

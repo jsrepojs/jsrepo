@@ -2,13 +2,14 @@ import {
 	fetchManifest,
 	github,
 	gitlab,
+	http,
 	type Manifest,
 	type RegistryProvider,
 	type RegistryProviderState
 } from 'jsrepo';
 import { markdownIt } from '../markdown';
 import DOMPurify from 'isomorphic-dompurify';
-import { GITHUB_TOKEN, GITLAB_TOKEN } from '$env/static/private';
+import { GITHUB_TOKEN, GITLAB_TOKEN, HTTP_TOKEN } from '$env/static/private';
 import { redis } from '../redis-client';
 
 const REGISTRY_STATE_CACHE_PREFIX = 'registry:state';
@@ -141,6 +142,8 @@ export const getProviderToken = (provider: RegistryProvider): string | undefined
 			return GITHUB_TOKEN;
 		case gitlab.name:
 			return GITLAB_TOKEN;
+		case http.name:
+			return HTTP_TOKEN;
 		// add the rest of the tokens here
 	}
 

@@ -12,7 +12,7 @@ const schema = v.object({
 
 type Options = v.InferInput<typeof schema>;
 
-const services = ['Anthropic', 'Azure', 'BitBucket', 'GitHub', 'GitLab', 'OpenAI'].sort();
+const services = ['Anthropic', 'Azure', 'BitBucket', 'GitHub', 'GitLab', 'OpenAI', 'Http'].sort();
 
 const auth = new Command('auth')
 	.description('Provide a token for access to private repositories.')
