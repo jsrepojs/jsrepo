@@ -15,6 +15,7 @@ import type { Block, Manifest } from '../../types';
 import { Err, Ok, type Result } from '../blocks/ts/result';
 import * as u from '../blocks/ts/url';
 import * as persisted from '../persisted';
+import { TokenManager } from '../token-manager';
 import type { RegistryProvider, RegistryProviderState } from './types';
 
 export type RemoteBlock = Block & { sourceRepo: RegistryProviderState };
@@ -29,7 +30,7 @@ export const internalFetchRaw = async (
 		verbose,
 		// @ts-expect-error but it does work
 		fetch: nodeFetch,
-		token: getProviderToken(state.provider),
+		token: getProviderToken(state.provider, state.url),
 	});
 };
 
@@ -42,20 +43,20 @@ export const internalFetchManifest = async (
 		verbose,
 		// @ts-expect-error but it does work
 		fetch: nodeFetch,
-		token: getProviderToken(state.provider),
+		token: getProviderToken(state.provider, state.url),
 	});
 };
 
 /** Gets the locally stored token for the given provider */
-export const getProviderToken = (provider: RegistryProvider): string | undefined => {
+export const getProviderToken = (provider: RegistryProvider, url: string): string | undefined => {
+	const storage = new TokenManager();
+
 	// there isn't an auth implementation for http
-	if (provider.name === 'http') return;
+	if (provider.name === 'http') {
+		return storage.get(`${provider.name}-${url}`);
+	}
 
-	const token = persisted.get().get(`${provider.name}-token`);
-
-	if (!token) return;
-
-	return token as string;
+	return storage.get(provider.name);
 };
 
 /** Parses the provided url and returns the state.
@@ -79,8 +80,10 @@ export const getProviderState = async (
 			if (cached) return Ok({ ...(cached as RegistryProviderState), provider });
 		}
 
+		const parsed = provider.parse(repo, { fullyQualified: false });
+
 		const state = await provider.state(repo, {
-			token: getProviderToken(provider),
+			token: getProviderToken(provider, parsed.url),
 			// @ts-expect-error but it does work
 			fetch: nodeFetch,
 		});
