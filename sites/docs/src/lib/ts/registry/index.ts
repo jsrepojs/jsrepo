@@ -145,7 +145,7 @@ export const getProviderToken = (provider: RegistryProvider, url: string): strin
 		case gitlab.name:
 			return GITLAB_TOKEN;
 		case http.name:
-			return url;
+			return http.keys.token(url);
 		// add the rest of the tokens here
 	}
 

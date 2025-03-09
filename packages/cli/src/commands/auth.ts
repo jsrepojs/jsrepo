@@ -68,7 +68,10 @@ const _auth = async (service: string | undefined, url: string | undefined, optio
 
 	if (options.logout) {
 		if (selectedService !== undefined) {
-			storage.delete(selectedService);
+			const storageKey = http.matches(selectedService)
+				? http.keys.token(selectedService)
+				: selectedService;
+			storage.delete(storageKey);
 			log.success(`Logged out of ${selectedService}.`);
 			return;
 		}
@@ -91,7 +94,8 @@ const _auth = async (service: string | undefined, url: string | undefined, optio
 
 			if (!response) continue;
 
-			storage.delete(serviceName);
+			const storageKey = http.matches(serviceName) ? http.keys.token(serviceName) : serviceName;
+			storage.delete(storageKey);
 		}
 		return;
 	}
@@ -132,7 +136,10 @@ const _auth = async (service: string | undefined, url: string | undefined, optio
 		options.token = response;
 	}
 
-	storage.set(selectedService, options.token);
+	const storageKey = http.matches(selectedService)
+		? http.keys.token(selectedService)
+		: selectedService;
+	storage.set(storageKey, options.token);
 
 	log.success(`Logged into ${selectedService}.`);
 };

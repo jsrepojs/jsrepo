@@ -48,7 +48,7 @@ export const internalFetchManifest = async (
 
 /** Gets the locally stored token for the given provider */
 export const getProviderToken = (provider: RegistryProvider, url: string): string | undefined => {
-	const key = provider.name === http.name ? url : provider.name;
+	const key = provider.name === http.name ? http.keys.token(url) : provider.name;
 
 	const token = persisted.get().get(`${key}-token`);
 
