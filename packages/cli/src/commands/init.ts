@@ -18,7 +18,7 @@ import { detect, resolveCommand } from 'package-manager-detector';
 import path from 'pathe';
 import * as v from 'valibot';
 import * as ascii from '../utils/ascii';
-import * as url from '../utils/blocks/ts/url';
+import * as u from '../utils/blocks/ts/url';
 import {
 	type Formatter,
 	PROJECT_CONFIG_NAME,
@@ -30,7 +30,6 @@ import {
 	getRegistryConfig,
 } from '../utils/config';
 import { packageJson } from '../utils/context';
-import { installDependencies } from '../utils/dependencies';
 import { formatFile, matchJSDescendant, tryGetTsconfig } from '../utils/files';
 import { loadFormatterConfig } from '../utils/format';
 import { json } from '../utils/language-support';
@@ -237,9 +236,9 @@ const _initProject = async (registries: string[], options: Options) => {
 	const deps = new Set<string>();
 	const devDeps = new Set<string>();
 
-	const setupRepo = async (repo: string) => {
-		const promptResult = await promptForProviderConfig({
-			repo,
+	const setupRepo = async (url: string) => {
+		const promptResult = await promptForRegistryConfig({
+			url,
 			paths,
 			configFiles,
 			options,
@@ -402,14 +401,14 @@ const _initProject = async (registries: string[], options: Options) => {
 	}
 };
 
-const promptForProviderConfig = async ({
-	repo,
+const promptForRegistryConfig = async ({
+	url,
 	paths,
 	configFiles,
 	formatter,
 	options,
 }: {
-	repo: string;
+	url: string;
 	paths: Paths;
 	configFiles: Record<string, string>;
 	formatter: ProjectConfig['formatter'];
@@ -424,7 +423,7 @@ const promptForProviderConfig = async ({
 
 	const storage = new TokenManager();
 
-	const provider = registry.selectProvider(repo);
+	const provider = registry.selectProvider(url);
 
 	if (!provider) {
 		program.error(
@@ -434,10 +433,18 @@ const promptForProviderConfig = async ({
 		);
 	}
 
-	const token = storage.get(provider.name);
+	let tokenKey: string = provider.name;
+
+	if (provider.name === registry.http.name) {
+		const parsed = registry.http.parse(url, { fullyQualified: false });
+
+		tokenKey = `http-${parsed.url}`;
+	}
+
+	const token = storage.get(tokenKey);
 
 	// don't ask if the provider is a custom domain
-	if (!token && provider.name !== registry.http.name && !options.yes) {
+	if (!token && !options.yes) {
 		const result = await confirm({
 			message: 'Would you like to add an auth token?',
 			initialValue: false,
@@ -461,15 +468,13 @@ const promptForProviderConfig = async ({
 				process.exit(0);
 			}
 
-			storage.set(provider.name, response);
+			storage.set(tokenKey, response);
 		}
 	}
 
-	loading.start(`Fetching manifest from ${color.cyan(repo)}`);
+	loading.start(`Fetching manifest from ${color.cyan(url)}`);
 
-	const providerState = (
-		await registry.getProviderState(repo, { noCache: !options.cache })
-	).match(
+	const providerState = (await registry.getProviderState(url, { noCache: !options.cache })).match(
 		(v) => v,
 		(err) => program.error(color.red(err))
 	);
@@ -479,7 +484,7 @@ const promptForProviderConfig = async ({
 		(err) => program.error(color.red(err))
 	);
 
-	loading.stop(`Fetched manifest from ${color.cyan(repo)}`);
+	loading.stop(`Fetched manifest from ${color.cyan(url)}`);
 
 	checkPreconditions(providerState, manifest, options.cwd);
 
@@ -560,7 +565,7 @@ const promptForProviderConfig = async ({
 				}
 			}
 
-			loading.start(`Fetching the ${color.cyan(file.name)} from ${color.cyan(repo)}`);
+			loading.start(`Fetching the ${color.cyan(file.name)} from ${color.cyan(url)}`);
 
 			const remoteContent = (await registry.fetchRaw(providerState, file.path)).match(
 				(v) => v,
@@ -577,13 +582,13 @@ const promptForProviderConfig = async ({
 				formatter,
 			});
 
-			loading.stop(`Fetched the ${color.cyan(file.name)} from ${color.cyan(repo)}`);
+			loading.stop(`Fetched the ${color.cyan(file.name)} from ${color.cyan(url)}`);
 
 			let acceptedChanges = options.yes || fileContents === undefined;
 
 			if (fileContents) {
 				if (!options.yes) {
-					const from = url.join(providerState.url, file.name);
+					const from = u.join(providerState.url, file.name);
 
 					const updateResult = await promptUpdateFile({
 						config: { biomeOptions, prettierOptions, formatter },
