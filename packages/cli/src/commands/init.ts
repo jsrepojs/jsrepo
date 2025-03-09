@@ -435,7 +435,7 @@ const promptForProviderConfig = async ({
 	}
 
 	// if the provider is http then use the repo as the key
-	const tokenKey = provider.name === 'http' ? repo : provider.name;
+	const tokenKey = provider.name === 'http' ? registry.http.keys.token(repo) : provider.name;
 	const token = storage.get(tokenKey);
 
 	if (!token && !options.yes) {
