@@ -24,47 +24,44 @@ const auth = new Command('auth')
 			.choices(services.map((s) => s.toLowerCase()))
 			.argOptional()
 	)
+	.addArgument(
+		new Argument(
+			'url',
+			'The URL of the HTTP provider you want to authenticate to. Must be one from `repos` in `jsrepo.json`.'
+		).argOptional()
+	)
 	.option('--logout', 'Execute the logout flow.', false)
 	.option('--token <token>', 'The token to use for authenticating to this service.')
 	.option('--cwd <path>', 'The current working directory.', process.cwd())
-	.action(async (service, opts) => {
+	.action(async (service, url, opts) => {
 		const options = v.parse(schema, opts);
 
 		await intro();
 
-		await _auth(service, options);
+		await _auth(service, url, options);
 
 		outro(color.green('All done!'));
 	});
 
-const _auth = async (service: string | undefined, options: Options) => {
+const _auth = async (service: string | undefined, url: string | undefined, options: Options) => {
 	let selectedService = services.find((s) => s.toLowerCase() === service?.toLowerCase());
 
 	const configResult = getProjectConfig(options.cwd);
+	if (selectedService?.toLowerCase() === 'http') {
+		if (configResult.isErr()) {
+			log.error(color.red('Could not find a config file.'));
+			return;
+		}
+	}
 	const config = configResult.unwrap();
 	const httpProviders = config.repos.filter((repoUrl) => http.matches(repoUrl));
 
 	// If the user wants to authenticate to HTTP, we need to get the URL from the config file
-	if (selectedService === 'HTTP') {
-		if (configResult.isErr()) {
-			program.error(color.red('Could not find a config file.'));
-		}
-
-		const response = await select({
-			message: 'What URL would you like to use?',
-			options: httpProviders.map((repoUrl) => ({
-				value: repoUrl,
-				label: repoUrl
-			})),
-			initialValue: httpProviders[0]
-		});
-
-		if (isCancel(response)) {
-			cancel('Canceled!');
-			process.exit(0);
-		}
-
-		selectedService = response;
+	if (selectedService?.toLowerCase() === 'http') {
+		// If the user provided a URL, use that, but check if it's valid and exists in the config file
+		selectedService =
+			httpProviders.find((repoUrl) => repoUrl === url) ??
+			(await getSelectedHTTPService(httpProviders));
 	}
 
 	const storage = new TokenManager();
@@ -102,11 +99,13 @@ const _auth = async (service: string | undefined, options: Options) => {
 	if (selectedService === undefined) {
 		const response = await select({
 			message: 'Which service do you want to authenticate to?',
-			options: [...services, ...httpProviders].map((serviceName) => ({
-				label: serviceName,
-				value: serviceName
-			})),
-			initialValue: services[0]
+			options: [...services.filter((s) => s.toLowerCase() !== 'http'), ...httpProviders].map(
+				(serviceName) => ({
+					label: serviceName,
+					value: serviceName
+				})
+			),
+			initialValue: [...services.filter((s) => s.toLowerCase() !== 'http'), ...httpProviders][0]
 		});
 
 		if (isCancel(response)) {
@@ -139,3 +138,20 @@ const _auth = async (service: string | undefined, options: Options) => {
 };
 
 export { auth };
+
+async function getSelectedHTTPService(httpProviders: string[]) {
+	const response = await select({
+		message: 'What URL would you like to use?',
+		options: httpProviders.map((repoUrl) => ({
+			value: repoUrl,
+			label: repoUrl
+		})),
+		initialValue: httpProviders[0]
+	});
+
+	if (isCancel(response)) {
+		cancel('Canceled!');
+		process.exit(0);
+	}
+	return response;
+}
