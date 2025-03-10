@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { DocHeader, Jsrepo } from '$lib/components/site/docs';
+	import { DocHeader, Jsrepo, SubHeading } from '$lib/components/site/docs';
 	import { Code } from '$lib/components/ui/code';
 	import CodeSpan from '$lib/components/site/docs/code-span.svelte';
 	import { Snippet } from '$lib/components/ui/snippet';
@@ -72,3 +72,13 @@
 	command="execute"
 	args={['jsrepo', 'add', '--repo', 'https://example.com/default/ui/accordion']}
 />
+<SubHeading>Private Registries</SubHeading>
+<p>
+	You can keep your self-hosted registries private only allowing authenticated users to access
+	blocks.
+</p>
+<p>
+	Users can provide a token to the <CodeSpan>auth</CodeSpan> method or during initialization so that
+	they can access the registry. This token will be passed using the Authorization header with the Bearer
+	scheme.
+</p>

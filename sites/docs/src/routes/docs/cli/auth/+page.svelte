@@ -35,6 +35,14 @@
 		<Snippet command="execute" args={['jsrepo', 'auth', '--logout']} />
 	{/snippet}
 </OptionDocs>
+<OptionDocs name="--cwd">
+	{#snippet description()}
+		Run the current command on the provided directory absolute or relative.
+	{/snippet}
+	{#snippet usage()}
+		<Snippet command="execute" args={['jsrepo', 'update', '--cwd', './sites/docs']} />
+	{/snippet}
+</OptionDocs>
 <OptionDocs name="-h, --help">
 	{#snippet description()}
 		Help with the command.

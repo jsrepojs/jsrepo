@@ -11,7 +11,16 @@ export interface HttpProviderState extends RegistryProviderState {}
 export const http: RegistryProvider = {
 	name: 'http',
 
-	matches: (url) => url.toLowerCase().startsWith('http'),
+	matches: (url) => {
+		// if parsing is a success then it's a match
+		try {
+			new URL(url);
+
+			return true;
+		} catch {
+			return false;
+		}
+	},
 
 	parse: (url, opts) => {
 		const parsed = parseUrl(url, opts);
@@ -47,6 +56,8 @@ export const http: RegistryProvider = {
 
 		return new URL(resourcePath, state.url);
 	},
+
+	authHeader: (token) => ['Authorization', `Bearer ${token}`],
 
 	formatFetchError: (state, filePath, error) => {
 		return `There was an error fetching ${color.bold(new URL(filePath, state.url).toString())}
