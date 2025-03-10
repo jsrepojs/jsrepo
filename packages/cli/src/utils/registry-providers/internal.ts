@@ -53,7 +53,7 @@ export const getProviderToken = (provider: RegistryProvider, url: string): strin
 
 	// there isn't an auth implementation for http
 	if (provider.name === 'http') {
-		return storage.get(`http-${url}`);
+		return storage.get(`http-${new URL(url).origin}`);
 	}
 
 	return storage.get(provider.name);
