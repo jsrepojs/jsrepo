@@ -79,6 +79,6 @@
 </p>
 <p>
 	Users can provide a token to the <CodeSpan>auth</CodeSpan> method or during initialization so that
-	they can access the registry. This token will be passed using the Authentication header with the Bearer
+	they can access the registry. This token will be passed using the Authorization header with the Bearer
 	scheme.
 </p>
