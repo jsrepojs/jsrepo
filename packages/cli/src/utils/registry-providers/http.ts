@@ -57,7 +57,7 @@ export const http: RegistryProvider = {
 		return new URL(resourcePath, state.url);
 	},
 
-	authHeader: (token) => ['Authorization', `Bearer ${token}`],
+	authHeader: (token) => ['Authentication', `Bearer ${token}`],
 
 	formatFetchError: (state, filePath, error) => {
 		return `There was an error fetching ${color.bold(new URL(filePath, state.url).toString())}
