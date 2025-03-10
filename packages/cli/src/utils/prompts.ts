@@ -463,7 +463,7 @@ export const promptInstallDependencies = async (
 				await installDependencies({
 					pm,
 					deps: Array.from(devDependencies),
-					dev: false,
+					dev: true,
 					cwd,
 					ignoreWorkspace,
 				});
