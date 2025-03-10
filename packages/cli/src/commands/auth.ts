@@ -128,7 +128,7 @@ const _auth = async (service: string | undefined, options: Options) => {
 					process.exit(0);
 				}
 
-				selectedRegistry = response;
+				selectedRegistry = new URL(response).origin;
 			}
 
 			// prompt for registry
