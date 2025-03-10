@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.44.1
+
+### Patch Changes
+
+- d148d4a: fix: Ensure token is read using registry origin.
+
 ## 1.44.0
 
 ### Minor Changes
