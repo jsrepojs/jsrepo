@@ -139,7 +139,13 @@ const _auth = async (service: string | undefined, options: Options) => {
 					validate(value) {
 						if (value.trim() === '') return 'Please provide a value';
 
-						if (!http.matches(value)) return 'Please provide a valid url';
+						try {
+							// try to parse the url
+							new URL(value);
+						} catch {
+							// if parsing fails return the error
+							return 'Please provide a valid url';
+						}
 					},
 				});
 
@@ -148,12 +154,10 @@ const _auth = async (service: string | undefined, options: Options) => {
 					process.exit(0);
 				}
 
-				selectedRegistry = response;
+				selectedRegistry = new URL(response).origin;
 			}
 
-			const parsed = http.parse(selectedRegistry, { fullyQualified: false });
-
-			selectedService = `http-${parsed.url}`;
+			selectedService = `http-${selectedRegistry}`;
 		}
 	}
 
@@ -193,8 +197,16 @@ const promptHttpLogout = async (storage: TokenManager) => {
 	}
 
 	for (const registry of registries) {
+		let registryUrl: URL;
+
+		try {
+			registryUrl = new URL(registry);
+		} catch {
+			continue;
+		}
+
 		const response = await confirm({
-			message: `Logout of ${color.bold(registry)}?`,
+			message: `Logout of ${color.bold(registryUrl.origin)}?`,
 			initialValue: true,
 		});
 
@@ -205,6 +217,6 @@ const promptHttpLogout = async (storage: TokenManager) => {
 
 		if (!response) continue;
 
-		storage.delete(`http-${registry}`);
+		storage.delete(`http-${registryUrl.origin}`);
 	}
 };

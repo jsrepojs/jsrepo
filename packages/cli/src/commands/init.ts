@@ -438,7 +438,10 @@ const promptForRegistryConfig = async ({
 	if (provider.name === registry.http.name) {
 		const parsed = registry.http.parse(url, { fullyQualified: false });
 
-		tokenKey = `http-${parsed.url}`;
+		// this is safe since we had to parse the url earlier to get the provider
+		const registryUrl = new URL(parsed.url);
+
+		tokenKey = `http-${registryUrl.origin}`;
 	}
 
 	const token = storage.get(tokenKey);
