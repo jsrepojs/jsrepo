@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.44.0
+
+### Minor Changes
+
+- cecf74c: feat: Allow users to provide a token to self-hosted registries with the `Bearer` scheme.
+
 ## 1.43.0
 
 ### Minor Changes
