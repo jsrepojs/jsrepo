@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.44.2
+
+### Patch Changes
+
+- e0b4b93: fix: Ensure devDependencies are installed as such.
+
 ## 1.44.1
 
 ### Patch Changes
