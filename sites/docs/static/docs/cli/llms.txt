@@ -37,6 +37,7 @@ jsrepo auth [options] [service]
 #### Options
 - --logout: Execute the logout flow. 
 - --token <token>: The token to use for authenticating to this service. 
+- --cwd <path>: The current working directory. (default: ./)
 
 ### build
     
