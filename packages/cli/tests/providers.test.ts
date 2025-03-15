@@ -609,7 +609,7 @@ describe('gitlab', () => {
 `);
 	});
 
-	it('Fetches the manifest with "gitlab" prefix', async () => {		
+	it('Fetches the manifest with "gitlab" prefix', async () => {
 		const repoURL = 'gitlab:https://gitlab.com/ieedan/std';
 
 		const providerState = await registry.getProviderState(repoURL);
@@ -622,7 +622,7 @@ describe('gitlab', () => {
 	});
 
 	// this is just here to make sure fetch manifest is actually using the right url
-	it('Fails to fetch with incorrect prefixed url', async () => {		
+	it('Fails to fetch with incorrect prefixed url', async () => {
 		const repoURL = 'gitlab:https://gitlab.om/ieedan/std';
 
 		const providerState = await registry.getProviderState(repoURL);
