@@ -608,6 +608,31 @@ describe('gitlab', () => {
 ]
 `);
 	});
+
+	it('Fetches the manifest with "gitlab" prefix', async () => {		
+		const repoURL = 'gitlab:https://gitlab.com/ieedan/std';
+
+		const providerState = await registry.getProviderState(repoURL);
+
+		assert(providerState.isOk());
+
+		const content = await registry.fetchManifest(providerState.unwrap());
+
+		expect(content.isErr()).toBe(false);
+	});
+
+	// this is just here to make sure fetch manifest is actually using the right url
+	it('Fails to fetch with incorrect prefixed url', async () => {		
+		const repoURL = 'gitlab:https://gitlab.om/ieedan/std';
+
+		const providerState = await registry.getProviderState(repoURL);
+
+		assert(providerState.isOk());
+
+		const content = await registry.fetchManifest(providerState.unwrap());
+
+		expect(content.isErr()).toBe(true);
+	});
 });
 
 describe('bitbucket', () => {
