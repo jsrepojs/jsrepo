@@ -42,6 +42,8 @@ export const fetchRaw = async (
 			headers.append(key, value);
 		}
 
+		console.log(url);
+
 		const response = await f(url, { headers });
 
 		verbose?.(`Got a response from ${url} ${response.status} ${response.statusText}`);
