@@ -112,10 +112,10 @@ export const gitlab: RegistryProvider = {
 		const { baseUrl, owner, repoName, ref } = state as GitLabProviderState;
 
 		return new URL(
-			`${encodeURIComponent(resourcePath)}/raw?ref=${ref}`,
 			u.join(
 				baseUrl,
-				`api/v4/projects/${encodeURIComponent(`${owner}/${repoName}`)}/repository/files/`
+				`api/v4/projects/${encodeURIComponent(`${owner}/${repoName}`)}`,
+				`repository/files/${encodeURIComponent(resourcePath)}/raw?ref=${ref}`
 			)
 		);
 	},

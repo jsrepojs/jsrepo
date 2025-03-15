@@ -427,8 +427,6 @@ describe('gitlab', () => {
 		// this way we just get the text and skip the schema validation
 		const content = await registry.fetchRaw(providerState.unwrap(), 'jsrepo-manifest.json');
 
-		console.log(content.unwrapErr());
-
 		expect(content.unwrap()).toBe(`[
 	{
 		"name": "types",
