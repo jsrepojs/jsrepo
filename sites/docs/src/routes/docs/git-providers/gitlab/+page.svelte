@@ -74,3 +74,14 @@ https://gitlab.com/ieedan/std/-/tree/next # branch reference`}
 		}
 }`}
 />
+<SubHeading>Self hosted GitLab</SubHeading>
+<p>Some companies prefer to host their own GitLab instance so we allow that too!</p>
+<p>
+	You can use the <CodeSpan>gitlab:</CodeSpan> prefix followed by your custom domain to point to your
+	self hosted instance:
+</p>
+<Code lang="diff" hideLines hideCopy code={'gitlab:https://example.com/ieedan/std'} />
+<p>
+	Now requests will be made to <CodeSpan>https://example.com</CodeSpan> with the owner
+	<CodeSpan>ieedan</CodeSpan> and the repository name <CodeSpan>std</CodeSpan>.
+</p>
