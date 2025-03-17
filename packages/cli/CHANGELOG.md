@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.45.0
+
+### Minor Changes
+
+- 9153afe: feat: Enable usage of self hosted gitlab using the `gitlab:` prefix.
+
 ## 1.44.2
 
 ### Patch Changes
