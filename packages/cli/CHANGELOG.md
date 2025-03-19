@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.45.1
+
+### Patch Changes
+
+- 222935f: fix: Ensure that Svelte files can be formatted when using `--cwd`.
+
 ## 1.45.0
 
 ### Minor Changes
