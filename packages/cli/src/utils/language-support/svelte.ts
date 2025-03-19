@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import { type Node, walk } from 'estree-walker';
 import * as prettier from 'prettier';
+import prettierPluginSvelte from 'prettier-plugin-svelte';
 import * as sv from 'svelte/compiler';
 import { type Lang, formatError, resolveImports } from '.';
 import * as lines from '../blocks/ts/lines';
@@ -79,7 +80,11 @@ export const svelte: Lang = {
 			prettierOptions &&
 			prettierOptions.plugins?.find((plugin) => plugin === 'prettier-plugin-svelte')
 		) {
-			return await prettier.format(code, { filepath: filePath, ...prettierOptions });
+			return await prettier.format(code, {
+				filepath: filePath,
+				plugins: [prettierPluginSvelte],
+				...prettierOptions,
+			});
 		}
 
 		return code;
