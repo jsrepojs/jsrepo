@@ -80,7 +80,11 @@ export const svelte: Lang = {
 			prettierOptions &&
 			prettierOptions.plugins?.find((plugin) => plugin === 'prettier-plugin-svelte')
 		) {
-			return await prettier.format(code, { filepath: filePath, plugins: [prettierPluginSvelte], ...prettierOptions });
+			return await prettier.format(code, {
+				filepath: filePath,
+				plugins: [prettierPluginSvelte],
+				...prettierOptions,
+			});
 		}
 
 		return code;
