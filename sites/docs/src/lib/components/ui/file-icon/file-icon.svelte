@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as Icons from '$lib/components/icons';
-	import { Braces } from 'lucide-svelte';
+	import { Braces } from '@lucide/svelte';
 	import type { Snippet } from 'svelte';
 
 	type Props = {

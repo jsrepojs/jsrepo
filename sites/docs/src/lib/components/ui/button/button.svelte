@@ -44,7 +44,7 @@
 
 <script lang="ts">
 	import { cn } from '$lib/utils/utils.js';
-	import { LoaderCircle } from 'lucide-svelte';
+	import { LoaderCircle } from '@lucide/svelte';
 
 	let {
 		class: className,

@@ -3,7 +3,7 @@
 	import * as Table from '$lib/components/ui/table/index.js';
 	import type { Snippet } from 'svelte';
 	import * as Icons from '$lib/components/icons';
-	import { Braces } from 'lucide-svelte';
+	import { Braces } from '@lucide/svelte';
 
 	type Status = '✅' | '⌛️' | '🚫' | '⚠️';
 

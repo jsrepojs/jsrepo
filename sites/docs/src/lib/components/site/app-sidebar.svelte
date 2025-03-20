@@ -5,7 +5,7 @@
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte';
 	import * as Collapsible from '$lib/components/ui/collapsible/index.js';
 	import { active } from '$lib/actions/active.svelte';
-	import { ChevronRight } from 'lucide-svelte';
+	import { ChevronRight } from '@lucide/svelte';
 	import { Badge } from '$lib/components/ui/badge';
 	import Version from './version.svelte';
 

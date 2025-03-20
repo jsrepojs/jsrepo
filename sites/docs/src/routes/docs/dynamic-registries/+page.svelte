@@ -42,7 +42,7 @@
             localDependencies: ['utils/utils'],
             dependencies: [],
             devDependencies: [
-                'lucide-svelte@^0.475.0',
+                '@lucide/svelte@^0.475.0',
                 'bits-ui@1.3.2',
                 'tailwind-variants@^0.3.1'
             ],

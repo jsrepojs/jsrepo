@@ -1,6 +1,6 @@
 <script lang="ts">
 	import LightSwitch from '$lib/components/ui/light-switch/light-switch.svelte';
-	import { Command, Search } from 'lucide-svelte';
+	import { Command, Search } from '@lucide/svelte';
 	import { active } from '$lib/actions/active.svelte';
 	import { StarButton } from '$lib/components/ui/github';
 	import { Button } from '$lib/components/ui/button';

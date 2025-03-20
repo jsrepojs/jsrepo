@@ -36,7 +36,7 @@
     └── <category>
 `}
 />
-<p>You will need to create a folder that will have the block categories (`blocks` above).</p>
+<p>You will need to create a folder that will have the block categories (`{'<folder>'}` above).</p>
 <p>Inside this folder you add your categories ex: (utils, components, etc.).</p>
 <p>
 	Inside your categories folders you add the code for your blocks. You can either add the block code
@@ -74,7 +74,7 @@
 	code={`┌   jsrepo  v1.15.1 
 │
 ◇  Where are your blocks located?
-│  ./src
+│  ./blocks
 │
 ◇  Add another blocks directory?
 │  No
@@ -108,36 +108,36 @@
   {
     "name": "utils", // category name
     "blocks": [ // blocks in the category
-	  {
-		"name": "print", // name of the block
-        "directory": "src/utils", // directory containing the files
-        "category": "utils",
-        "tests": false, // whether or not the block has tests
-        "subdirectory": false, // is the block in a subdirectory of it's category
-        "files": [
-            "print.ts"
-        ],
-        "localDependencies": [], // any dependencies to other blocks
-        "dependencies": [], // any dependencies 
-        "devDependencies": []  // any dependencies 
-      },
-      {
-        "name": "print",
-        "directory": "src/utils",
-        "category": "utils",
-        "tests": false,
-        "subdirectory": true,
-        "files": [
-            "add.ts",
-            "subtract.ts"
-        ],
-        "localDependencies": [
-            "utils/print"
-        ], 
-        "dependencies": [],
-        "devDependencies": []
-      }
-	]
+		{
+			"name": "print", // name of the block
+			"directory": "src/utils", // directory containing the files
+			"category": "utils",
+			"tests": false, // whether or not the block has tests
+			"subdirectory": false, // is the block in a subdirectory of it's category
+			"files": [
+				"print.ts"
+			],
+			"localDependencies": [], // any dependencies to other blocks
+			"dependencies": [], // any dependencies 
+			"devDependencies": []  // any dependencies 
+		},
+		{
+			"name": "print",
+			"directory": "src/utils",
+			"category": "utils",
+			"tests": false,
+			"subdirectory": true,
+			"files": [
+				"add.ts",
+				"subtract.ts"
+			],
+			"localDependencies": [
+				"utils/print"
+			], 
+			"dependencies": [],
+			"devDependencies": []
+		}
+	  ]
   },
 ]`}
 />

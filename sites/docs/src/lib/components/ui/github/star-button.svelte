@@ -2,7 +2,7 @@
 	import { Button, type ButtonProps } from '$lib/components/ui/button';
 	import { Separator } from '$lib/components/ui/separator';
 	import * as Icons from '$lib/components/icons';
-	import { Star } from 'lucide-svelte';
+	import { Star } from '@lucide/svelte';
 	import { Tween } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
 

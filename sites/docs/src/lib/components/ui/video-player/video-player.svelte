@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { HTMLVideoAttributes } from 'svelte/elements';
 	import { Skeleton } from '$lib/components/ui/skeleton';
-	import { Clapperboard, Pause, Play } from 'lucide-svelte';
+	import { Clapperboard, Pause, Play } from '@lucide/svelte';
 	import { scale } from 'svelte/transition';
 	import { dev } from '$app/environment';
 	import * as math from '$lib/ts/math';
