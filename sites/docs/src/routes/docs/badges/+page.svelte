@@ -3,7 +3,7 @@
 	import * as Table from '$lib/components/ui/table';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { Check, Copy, Ellipsis } from 'lucide-svelte';
+	import { Check, Copy, Ellipsis } from '@lucide/svelte';
 	import { scale } from 'svelte/transition';
 	import * as Popover from '$lib/components/ui/popover';
 	import { Input } from '$lib/components/ui/input';

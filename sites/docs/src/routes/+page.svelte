@@ -1,7 +1,7 @@
 <script lang="ts">
 	import AnimatedGradientText from '$lib/components/animations/animated-gradient-text.svelte';
 	import { Button } from '$lib/components/ui/button';
-	import { ArrowUpRight } from 'lucide-svelte';
+	import { ArrowUpRight } from '@lucide/svelte';
 	import { onMount } from 'svelte';
 	import { Search } from '$lib/components/ui/search';
 	import { cn } from '$lib/utils/utils';
@@ -15,9 +15,9 @@
 	const featuredRegistries = [
 		'github/ieedan/shadcn-svelte-extras',
 		'github/ieedan/std',
+		'github/SikandarJODD/cnblocks',
 		'github/shyakadavis/geist',
-		'https://reactbits.dev/tailwind',
-		'https://reactbits.dev/ts/tailwind'
+		'https://reactbits.dev/tailwind'
 	];
 
 	let { data } = $props();
@@ -314,7 +314,7 @@
 							delay={4000}
 							class="text-blue-400 data-[completed]:text-green-500"
 							loadingMessage="Installing dependencies"
-							completeMessage="Installed clsx@^2.1.1 tailwind-merge@^2.6.0 lucide-svelte@^0.475.0 bits-ui@^1.1.0 tailwind-variants@^0.3.1"
+							completeMessage="Installed clsx@^2.1.1 tailwind-merge@^2.6.0 @lucide/svelte@^0.475.0 bits-ui@^1.1.0 tailwind-variants@^0.3.1"
 						/>
 						<Terminal.AnimatedSpan delay={5250} class="text-green-500"
 							>✔ All done.</Terminal.AnimatedSpan

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Flip } from '$lib/components/animations/flip';
 	import { cn } from '$lib/utils/utils';
-	import { LoaderCircle, Search } from 'lucide-svelte';
+	import { LoaderCircle, Search } from '@lucide/svelte';
 	import { onMount, untrack } from 'svelte';
 	import type { HTMLInputAttributes } from 'svelte/elements';
 

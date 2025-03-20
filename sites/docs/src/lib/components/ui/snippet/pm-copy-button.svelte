@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { cn } from '$lib/utils';
-	import Check from 'lucide-svelte/icons/check';
-	import Copy from 'lucide-svelte/icons/copy';
-	import { ChevronsUpDown } from 'lucide-svelte';
+	import Check from '@lucide/svelte/icons/check';
+	import Copy from '@lucide/svelte/icons/copy';
+	import { ChevronsUpDown } from '@lucide/svelte';
 	import { scale } from 'svelte/transition';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import type { Agent } from 'package-manager-detector';
