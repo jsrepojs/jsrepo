@@ -12,8 +12,8 @@ importers:
         specifier: ^2.28.1
         version: 2.28.1
       pkg-pr-new:
-        specifier: ^0.0.40
-        version: 0.0.40
+        specifier: ^0.0.41
+        version: 0.0.41
 
   packages/cli:
     dependencies:
@@ -2902,8 +2902,8 @@ packages:
     resolution: {integrity: sha512-saLsH7WeYYPiD25LDuLRRY/i+6HaPYr6G1OUlN39otzkSTxKnubR9RTxS3/Kk50s1g2JTgFwWQDQyplC5/SHZg==}
     engines: {node: '>= 6'}
 
-  pkg-pr-new@0.0.40:
-    resolution: {integrity: sha512-/JdrhkpXCU4BSpE3KS6pIPaAzcIQQA7YesGjpJThqoqRvNnXcPGRDs678Qfammi8HCkr9HJUcq07/WfSJJMjhg==}
+  pkg-pr-new@0.0.41:
+    resolution: {integrity: sha512-jpxquPsewDDx2pn33gZBgrlczN41gsCrqOkhBoW00rBBcwqLyBD5baQzp/nbZZf53LCgSrGVM9xp2rgAkgjTfg==}
     hasBin: true
 
   pkg-types@1.2.1:
@@ -3876,9 +3876,6 @@ packages:
     resolution: {integrity: sha512-HIAfWdYIt1sssHfYZFCXp4rU1w2r8hVVXYIlmoa0r0gABLs5di3RCqPU5DDROogVz1pAdYBaz7HK5n9pSUNs3A==}
     peerDependencies:
       zod: ^3.24.1
-
-  zod@3.24.1:
-    resolution: {integrity: sha512-muH7gBL9sI1nciMZV67X5fTKKBLtwpZ5VBp1vsOQzj1MhrBZ4wlVCm3gedKZWLp0Oyel8sIGfeiz54Su+OVT+A==}
 
   zod@3.24.2:
     resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
@@ -6611,7 +6608,7 @@ snapshots:
 
   pirates@4.0.6: {}
 
-  pkg-pr-new@0.0.40:
+  pkg-pr-new@0.0.41:
     dependencies:
       '@jsdevtools/ez-spawn': 3.0.4
       '@octokit/action': 6.1.0
@@ -6732,7 +6729,7 @@ snapshots:
       quick-lru: 7.0.0
       url-join: 5.0.0
       validate-npm-package-name: 5.0.1
-      zod: 3.24.1
+      zod: 3.24.2
       zod-package-json: 1.0.3
 
   query-string@9.1.1:
@@ -7532,16 +7529,13 @@ snapshots:
 
   zod-package-json@1.0.3:
     dependencies:
-      zod: 3.24.1
+      zod: 3.24.2
 
   zod-to-json-schema@3.24.3(zod@3.24.2):
     dependencies:
       zod: 3.24.2
     optional: true
 
-  zod@3.24.1: {}
-
-  zod@3.24.2:
-    optional: true
+  zod@3.24.2: {}
 
   zwitch@2.0.4: {}
