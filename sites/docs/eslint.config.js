@@ -40,7 +40,8 @@ export default ts.config(
 
 		languageOptions: {
 			parserOptions: {
-				projectService: true,
+				// only enable this if you want linting to take 3 minutes
+				// projectService: true,
 				extraFileExtensions: ['.svelte'],
 				parser: ts.parser,
 				svelteConfig
