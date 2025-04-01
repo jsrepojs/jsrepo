@@ -1,0 +1,5 @@
+---
+"jsrepo": patch
+---
+
+Bump dependencies
