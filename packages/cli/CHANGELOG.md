@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.45.2
+
+### Patch Changes
+
+- cbea8cb: Bump dependencies
+
 ## 1.45.1
 
 ### Patch Changes
