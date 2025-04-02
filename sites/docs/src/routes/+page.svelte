@@ -208,7 +208,7 @@
 						<h3 class="text-xl font-medium">Featured</h3>
 						<div class="border-border border rounded-md w-full overflow-hidden">
 							<ul class="flex flex-col">
-								{#await data.popular}
+								{#await data.featured}
 									{#each { length: 5 } as _, i (i)}
 										<li class="odd:bg-accent/75 h-12 flex place-items-center justify-center p-3">
 											<Skeleton class="h-4 w-full" />
