@@ -4,7 +4,7 @@ import { selectProvider } from 'jsrepo';
 import * as array from '$lib/ts/array.js';
 import { db, functions } from '$lib/db/index.js';
 import { registries } from '$lib/db/schema.js';
-import { desc } from 'drizzle-orm';
+import { desc, isNotNull, like } from 'drizzle-orm';
 
 type RegistryResponse = {
 	registries:
@@ -19,10 +19,12 @@ export async function GET({ url }) {
 	const offset = parseInt(url.searchParams.get('offset') ?? '0');
 	const descending = url.searchParams.get('order') !== 'asc';
 	const withData = (url.searchParams.get('with_data') ?? 'true') === 'true';
+	const query = url.searchParams.get('query');
 
 	const urls = await db
 		.select()
 		.from(registries)
+		.where(query !== null ? like(registries.url, `${query}%`) : isNotNull(registries.url)) // isNotNull is to say always match
 		.orderBy(descending ? desc(registries.views) : registries.views)
 		.offset(offset)
 		.limit(limit);
