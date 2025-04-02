@@ -373,6 +373,14 @@ describe('gitlab', () => {
 					specifier: undefined,
 				},
 			},
+			{
+				url: 'gitlab:https://sub.example.com/ieedan/std',
+				opts: { fullyQualified: false },
+				expected: {
+					url: 'https://sub.example.com/ieedan/std',
+					specifier: undefined,
+				},
+			},
 		];
 
 		for (const c of cases) {
@@ -397,6 +405,10 @@ describe('gitlab', () => {
 			{
 				url: 'gitlab:https://example.com/ieedan/std/-/tree/next',
 				expected: 'https://example.com/ieedan/std',
+			},
+			{
+				url: 'gitlab:https://sub.example.com/ieedan/std/-/tree/next',
+				expected: 'https://sub.example.com/ieedan/std',
 			},
 		];
 
