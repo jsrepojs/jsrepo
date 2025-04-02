@@ -151,10 +151,7 @@ const parseUrl = (
 		baseUrl = new URL(url.slice(7)).origin;
 	}
 
-	const repo = url.replaceAll(
-		/gitlab\/|https:\/\/gitlab\.com\/|gitlab:https?:\/\/[^/]+\//g,
-		''
-	);
+	const repo = url.replaceAll(/gitlab\/|https:\/\/gitlab\.com\/|gitlab:https?:\/\/[^/]+\//g, '');
 
 	let [owner, repoName, ...rest] = repo.split('/');
 
