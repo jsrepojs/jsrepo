@@ -21,6 +21,10 @@ export type RegistryPageData = {
 
 export type RegistryInfo = Omit<RegistryPageData, 'registryUrl'>;
 
+export function getStateKey(registryUrl: string) {
+	return `${REGISTRY_STATE_CACHE_PREFIX}:${registryUrl}`;
+}
+
 /** Gets the provider state either locally or from the cache then caches the state
  *
  * @param registryUrl
@@ -33,7 +37,9 @@ export const getProviderState = async (
 	provider: RegistryProvider,
 	{ cache = true }: { cache?: boolean } = {}
 ): Promise<RegistryProviderState> => {
-	const stateKey = `${REGISTRY_STATE_CACHE_PREFIX}:${registryUrl}`;
+	const normalizedUrl = provider.parse(registryUrl, { fullyQualified: false }).url;
+
+	const stateKey = getStateKey(normalizedUrl);
 
 	let state: RegistryProviderState | undefined = undefined;
 
