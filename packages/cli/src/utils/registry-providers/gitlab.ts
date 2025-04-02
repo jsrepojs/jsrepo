@@ -152,7 +152,7 @@ const parseUrl = (
 	}
 
 	const repo = url.replaceAll(
-		/gitlab\/|https:\/\/gitlab\.com\/|gitlab:https?:\/\/[a-zA-Z0-9-]+\.[a-zA-Z]+\//g,
+		/gitlab\/|https:\/\/gitlab\.com\/|gitlab:https?:\/\/[^/]+\//g,
 		''
 	);
 
