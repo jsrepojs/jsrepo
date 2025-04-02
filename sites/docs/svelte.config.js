@@ -10,8 +10,7 @@ const config = {
 		csrf: {
 			checkOrigin: false
 		}
-	},
-
+	}
 };
 
 export default config;
