@@ -244,7 +244,7 @@
 					<JsrepoSnippet args={['init', prettyUrl ?? '']} class="mb-2" />
 					{#if manifest.meta?.tags}
 						<div class="flex flex-wrap place-items-center gap-2 pb-2">
-							{#each manifest.meta.tags as tag (tag)}
+							{#each manifest.meta.tags as tag, i (i)}
 								<Badge variant="secondary">{tag}</Badge>
 							{/each}
 						</div>

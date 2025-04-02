@@ -53,7 +53,7 @@ export const sum = <T>(arr: T[], fn: (item: T) => number): number => {
 
 type Options = {
 	replace?: boolean;
-}
+};
 
 /** Maps the provided array into a map
  *

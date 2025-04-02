@@ -1,8 +1,10 @@
-import { redis, VIEW_SET_NAME } from '$lib/ts/redis-client';
-import { getProviderState, getRegistryData, getStateKey, type RegistryInfo } from '$lib/ts/registry';
+import { getProviderState, getRegistryData, type RegistryInfo } from '$lib/ts/registry';
 import { error, json } from '@sveltejs/kit';
 import { selectProvider } from 'jsrepo';
 import * as array from '$lib/ts/array.js';
+import { db, functions } from '$lib/db/index.js';
+import { registries } from '$lib/db/schema.js';
+import { desc } from 'drizzle-orm';
 
 type RegistryResponse = {
 	registries:
@@ -18,14 +20,15 @@ export async function GET({ url }) {
 	const descending = url.searchParams.get('order') !== 'asc';
 	const withData = (url.searchParams.get('with_data') ?? 'true') === 'true';
 
-	const urls = (await redis.zrange(VIEW_SET_NAME, 0, -1, {
-		rev: descending,
-		count: limit + 1,
-		offset: offset
-	})) as string[];
+	const urls = await db
+		.select()
+		.from(registries)
+		.orderBy(descending ? desc(registries.views) : registries.views)
+		.offset(offset)
+		.limit(limit);
 
-	const registries = await Promise.all(
-		urls.map(async (url, i) => {
+	const registryData = await Promise.all(
+		urls.map(async ({ url }, i) => {
 			try {
 				const provider = selectProvider(url);
 
@@ -60,7 +63,7 @@ export async function GET({ url }) {
 		})
 	);
 
-	const validRegistries = registries.flatMap((r) => {
+	const validRegistries = registryData.flatMap((r) => {
 		if (r === undefined) return [];
 
 		return [r];
@@ -83,27 +86,27 @@ export async function POST({ request }) {
 	const body = await request.json();
 
 	if (typeof body !== 'object') {
-        throw error(400, 'request body should be an object with the `url` property!');
-    }
+		throw error(400, 'request body should be an object with the `url` property!');
+	}
 
-	if (typeof body.url !== 'string') throw error(400, 'the `url` property is required and must be a string!');
+	if (typeof body.url !== 'string')
+		throw error(400, 'the `url` property is required and must be a string!');
 
-    const url = body.url as string;
+	const url = body.url as string;
 
-    const provider = selectProvider(url);
+	const provider = selectProvider(url);
 
-    if (!provider) throw error(400, 'invalid registry url!');
+	if (!provider) throw error(400, 'invalid registry url!');
 
-    const normalizedUrl = provider.parse(url, { fullyQualified: false });
+	const normalizedUrl = provider.parse(url, { fullyQualified: false });
 
-    const state = await getProviderState(url, provider, { cache: false });
+	const state = await getProviderState(url, provider);
 
-    const data = await getRegistryData(state);
+	const data = await getRegistryData(state);
 
-    if (data === undefined) throw error(404, 'invalid registry');
+	if (data === undefined) throw error(404, 'invalid registry');
 
-    // cache state
-    await redis.set(getStateKey(normalizedUrl.url), state);
+	await functions.tryInsert(normalizedUrl.url);
 
-    return json(data);
+	return json(data);
 }
