@@ -56,5 +56,5 @@
 	</form>
 </div>
 <div class="min-h-[calc(100vh-120px)] flex flex-col place-items-center w-full px-4">
-	{@render children()}
+	{@render children?.()}
 </div>
