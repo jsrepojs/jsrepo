@@ -1,5 +1,11 @@
 # jsrepo
 
+## 1.45.3
+
+### Patch Changes
+
+- a5daf17: fix: Fix url parsing for gitlab self hosted on a subdomain
+
 ## 1.45.2
 
 ### Patch Changes
