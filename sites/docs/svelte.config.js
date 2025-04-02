@@ -6,7 +6,10 @@ const config = {
 	preprocess: vitePreprocess(),
 	kit: {
 		// https://svelte.dev/docs/kit/adapter-vercel
-		adapter: adapter()
+		adapter: adapter(),
+		csrf: {
+			checkOrigin: false
+		}
 	}
 };
 
