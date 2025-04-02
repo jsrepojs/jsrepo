@@ -1,21 +1,21 @@
 import { superValidate } from 'sveltekit-superforms';
 import { valibot } from 'sveltekit-superforms/adapters';
 import { schema } from '$lib/ts/server-actions/search-registries/client';
-import { redis, VIEW_SET_NAME } from '$lib/ts/redis-client';
 import { action } from '$lib/ts/server-actions/search-registries/server';
+import { db } from '$lib/db';
+import { featuredRegistries, registries } from '$lib/db/schema.js';
+import { desc } from 'drizzle-orm';
 
 export const load = async () => {
-	const ranked = redis.zrange(VIEW_SET_NAME, 0, -1, {
-		rev: true,
-		count: 5,
-		offset: 0
-	});
+	const mostPopular = db.select().from(registries).orderBy(desc(registries.views)).limit(5);
+	const featured = db.select().from(featuredRegistries).orderBy(featuredRegistries.url).limit(5);
 
 	const form = await superValidate(valibot(schema));
 
 	return {
 		form,
-		popular: ranked
+		featured,
+		popular: mostPopular
 	};
 };
 

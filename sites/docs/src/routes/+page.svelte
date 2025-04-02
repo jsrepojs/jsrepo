@@ -12,14 +12,6 @@
 	import * as Terminal from '$lib/components/ui/terminal';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 
-	const featuredRegistries = [
-		'github/ieedan/shadcn-svelte-extras',
-		'github/ieedan/std',
-		'github/SikandarJODD/cnblocks',
-		'github/shyakadavis/geist',
-		'https://reactbits.dev/tailwind'
-	];
-
 	let { data } = $props();
 
 	const { form, submitting, enhance, errors } = superForm(data.form);
@@ -216,16 +208,24 @@
 						<h3 class="text-xl font-medium">Featured</h3>
 						<div class="border-border border rounded-md w-full overflow-hidden">
 							<ul class="flex flex-col">
-								{#each featuredRegistries as registry (registry)}
-									<li class="odd:bg-accent/75">
-										<a
-											href="/registry?url={registry}"
-											class="flex place-items-center last:border-b-0 border-b hover:underline p-3 hover:bg-accent"
-										>
-											{registry}
-										</a>
-									</li>
-								{/each}
+								{#await data.featured}
+									{#each { length: 5 } as _, i (i)}
+										<li class="odd:bg-accent/75 h-12 flex place-items-center justify-center p-3">
+											<Skeleton class="h-4 w-full" />
+										</li>
+									{/each}
+								{:then featured}
+									{#each featured as { url } (url)}
+										<li class="odd:bg-accent/75">
+											<a
+												href="/registry?url={url}"
+												class="flex place-items-center last:border-b-0 border-b hover:underline p-3 hover:bg-accent"
+											>
+												{url}
+											</a>
+										</li>
+									{/each}
+								{/await}
 							</ul>
 						</div>
 					</div>
@@ -240,13 +240,13 @@
 										</li>
 									{/each}
 								{:then mostPopular}
-									{#each mostPopular as registry (registry)}
+									{#each mostPopular as { url } (url)}
 										<li class="odd:bg-accent/75">
 											<a
-												href="/registry?url={registry}"
+												href="/registry?url={url}"
 												class="flex place-items-center last:border-b-0 border-b hover:underline p-3 hover:bg-accent"
 											>
-												{registry}
+												{url}
 											</a>
 										</li>
 									{/each}

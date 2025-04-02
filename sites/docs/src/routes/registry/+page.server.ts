@@ -1,9 +1,9 @@
 import { error, redirect } from '@sveltejs/kit';
 import { selectProvider } from 'jsrepo';
 import { getProviderState, getRegistryData } from '$lib/ts/registry/index.js';
-import { redis, VIEW_SET_NAME } from '$lib/ts/redis-client.js';
 import { action } from '$lib/ts/server-actions/search-registries/server.js';
 import { dev } from '$app/environment';
+import { functions } from '$lib/db/index.js';
 
 export const load = async ({ url }) => {
 	const registryUrl = url.searchParams.get('url');
@@ -23,7 +23,7 @@ export const load = async ({ url }) => {
 	}
 
 	if (!dev) {
-		await redis.zincrby(VIEW_SET_NAME, 1, registryUrl);
+		await functions.tryIncrementViews(registryUrl);
 	}
 
 	return {

@@ -51,6 +51,10 @@ export const sum = <T>(arr: T[], fn: (item: T) => number): number => {
 	return total;
 };
 
+type Options = {
+	replace?: boolean;
+};
+
 /** Maps the provided array into a map
  *
  * @param arr Array of items to be entered into a map
@@ -66,12 +70,15 @@ export const sum = <T>(arr: T[], fn: (item: T) => number): number => {
  */
 export const toMap = <T, K, V>(
 	arr: T[],
-	fn: (item: T, index: number) => [key: K, value: V]
+	fn: (item: T, index: number) => [key: K, value: V],
+	{ replace = false }: Options = {}
 ): Map<K, V> => {
 	const map = new Map<K, V>();
 
 	for (let i = 0; i < arr.length; i++) {
 		const [key, value] = fn(arr[i], i);
+
+		if (!replace && map.has(key)) continue;
 
 		map.set(key, value);
 	}
