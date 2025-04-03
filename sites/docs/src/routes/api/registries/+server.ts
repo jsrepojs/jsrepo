@@ -4,7 +4,7 @@ import { selectProvider } from 'jsrepo';
 import * as array from '$lib/ts/array.js';
 import { db, functions } from '$lib/db/index.js';
 import { registries } from '$lib/db/schema.js';
-import { desc, isNotNull, like, SQL } from 'drizzle-orm';
+import { desc, isNotNull, like } from 'drizzle-orm';
 import type { PgColumn } from 'drizzle-orm/pg-core';
 
 type RegistryResponse = {
