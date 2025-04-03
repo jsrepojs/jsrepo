@@ -4,7 +4,8 @@ import { selectProvider } from 'jsrepo';
 import * as array from '$lib/ts/array.js';
 import { db, functions } from '$lib/db/index.js';
 import { registries } from '$lib/db/schema.js';
-import { desc, isNotNull, like } from 'drizzle-orm';
+import { desc, isNotNull, like, SQL } from 'drizzle-orm';
+import type { PgColumn } from 'drizzle-orm/pg-core';
 
 type RegistryResponse = {
 	registries:
@@ -17,15 +18,27 @@ export async function GET({ url }) {
 	// limit the maximum possible retrieved rows to 100
 	const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '20'), 100);
 	const offset = parseInt(url.searchParams.get('offset') ?? '0');
-	const descending = url.searchParams.get('order') !== 'asc';
+	const descending = (url.searchParams.get('order') ?? 'asc') === 'desc';
+	const orderBy = url.searchParams.get('order_by');
 	const withData = (url.searchParams.get('with_data') ?? 'true') === 'true';
 	const query = url.searchParams.get('query');
+
+	let orderBySql: PgColumn | SQL;
+
+	switch (orderBy) {
+		case 'views':
+			orderBySql = descending ? desc(registries.views) : registries.views;
+			break;
+		default:
+			orderBySql = descending ? desc(registries.url) : registries.url;
+			break;
+	}
 
 	const urls = await db
 		.select()
 		.from(registries)
-		.where(query !== null ? like(registries.url, `${query}%`) : isNotNull(registries.url)) // isNotNull is to say always match
-		.orderBy(descending ? desc(registries.views) : registries.views)
+		.where(query !== null ? like(registries.url, `%${query}%`) : isNotNull(registries.url)) // isNotNull is to say always match
+		.orderBy(orderBySql)
 		.offset(offset)
 		.limit(limit);
 
