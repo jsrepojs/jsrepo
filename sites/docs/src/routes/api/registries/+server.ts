@@ -4,7 +4,7 @@ import { selectProvider } from 'jsrepo';
 import * as array from '$lib/ts/array.js';
 import { db, functions } from '$lib/db/index.js';
 import { registries } from '$lib/db/schema.js';
-import { desc, isNotNull, like } from 'drizzle-orm';
+import { desc, isNotNull, ilike } from 'drizzle-orm';
 import type { PgColumn } from 'drizzle-orm/pg-core';
 
 type RegistryResponse = {
@@ -37,7 +37,7 @@ export async function GET({ url }) {
 	const urls = await db
 		.select()
 		.from(registries)
-		.where(query !== null ? like(registries.url, `%${query}%`) : isNotNull(registries.url)) // isNotNull is to say always match
+		.where(query !== null ? ilike(registries.url, `%${query}%`) : isNotNull(registries.url)) // isNotNull is to say always match
 		.orderBy(descending ? desc(orderByColumn) : orderByColumn)
 		.offset(offset)
 		.limit(limit);
