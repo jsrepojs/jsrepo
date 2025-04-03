@@ -23,14 +23,14 @@ export async function GET({ url }) {
 	const withData = (url.searchParams.get('with_data') ?? 'true') === 'true';
 	const query = url.searchParams.get('query');
 
-	let orderBySql: PgColumn | SQL;
+	let orderByColumn: PgColumn;
 
 	switch (orderBy) {
 		case 'views':
-			orderBySql = descending ? desc(registries.views) : registries.views;
+			orderByColumn = registries.views;
 			break;
 		default:
-			orderBySql = descending ? desc(registries.url) : registries.url;
+			orderByColumn = registries.url;
 			break;
 	}
 
@@ -38,7 +38,7 @@ export async function GET({ url }) {
 		.select()
 		.from(registries)
 		.where(query !== null ? like(registries.url, `%${query}%`) : isNotNull(registries.url)) // isNotNull is to say always match
-		.orderBy(orderBySql)
+		.orderBy(descending ? desc(orderByColumn) : orderByColumn)
 		.offset(offset)
 		.limit(limit);
 
