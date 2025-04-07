@@ -1,6 +1,6 @@
 {
   "name": "jsrepo-monorepo",
-  "packageManager": "pnpm@10.4.1",
+  "packageManager": "pnpm@10.7.1",
   "version": "0.0.0",
   "description": "A monorepo for jsrepo",
   "scripts": {
