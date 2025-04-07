@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import { cancel, confirm, isCancel, log, multiselect, outro, select, text } from '@clack/prompts';
 import color from 'chalk';
-import { Command, program } from 'commander';
+import { Command, Option, program } from 'commander';
 import { resolveCommand } from 'package-manager-detector/commands';
 import { detect } from 'package-manager-detector/detect';
 import path from 'pathe';
@@ -13,6 +13,7 @@ import * as url from '../utils/blocks/ts/url';
 import {
 	type Formatter,
 	type ProjectConfig,
+	formatterSchema,
 	getProjectConfig,
 	projectConfigSchema,
 	resolvePaths,
@@ -31,8 +32,13 @@ import {
 	truncatedList,
 } from '../utils/prompts';
 import * as registry from '../utils/registry-providers/internal';
+import { parseRecord } from '../utils/blocks/commander/parsers';
 
 const schema = v.object({
+	watermark: v.optional(v.boolean()),
+	tests: v.optional(v.boolean()),
+	formatter: v.optional(formatterSchema),
+	paths: v.optional(v.record(v.string(), v.string())),
 	expand: v.boolean(),
 	maxUnchanged: v.number(),
 	repo: v.optional(v.string()),
@@ -50,6 +56,24 @@ export const add = new Command('add')
 	.argument(
 		'[blocks...]',
 		'Names of the blocks you want to add to your project. ex: (utils/math, github/ieedan/std/utils/math)'
+	)
+	.addOption(
+		new Option('--formatter <choice>', 'The formatter to use when adding blocks.').choices([
+			'prettier',
+			'biome',
+		])
+	)
+	.option(
+		'--no-watermark',
+		"jsrepo shouldn't leave a watermark at the top of the added files.",
+		undefined
+	)
+	.option('--no-tests', "jsrepo shouldn't include tests when adding blocks.", undefined)
+	.option(
+		'--paths <category=path,category=path>',
+		'The paths where categories should be added to your project.',
+		parseRecord,
+		undefined
 	)
 	.option('-E, --expand', 'Expands the diff so you see the entire file.', false)
 	.option(
@@ -127,6 +151,12 @@ const _add = async (blockNames: string[], options: Options) => {
 	} else {
 		config = configResult.unwrap();
 	}
+
+	config.formatter = options.formatter !== undefined ? options.formatter : config.formatter;
+	config.watermark = options.watermark !== undefined ? options.watermark : config.watermark;
+	config.includeTests = options.tests !== undefined ? options.tests : config.includeTests;
+	config.paths =
+		options.paths !== undefined ? { ...config.paths, ...options.paths } : config.paths;
 
 	let repoPaths = config.repos;
 	const mustResolveRepos = new Set<string>();
