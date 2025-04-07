@@ -1,18 +1,20 @@
 import fs from 'node:fs';
 import { cancel, confirm, isCancel, log, multiselect, outro, select, text } from '@clack/prompts';
 import color from 'chalk';
-import { Command, program } from 'commander';
+import { Command, Option, program } from 'commander';
 import { resolveCommand } from 'package-manager-detector/commands';
 import { detect } from 'package-manager-detector/detect';
 import path from 'pathe';
 import * as v from 'valibot';
 import * as ascii from '../utils/ascii';
 import { getBlockFilePath, getInstalled, preloadBlocks, resolveTree } from '../utils/blocks';
+import { parseRecord } from '../utils/blocks/commander/parsers';
 import * as promises from '../utils/blocks/ts/promises';
 import * as url from '../utils/blocks/ts/url';
 import {
 	type Formatter,
 	type ProjectConfig,
+	formatterSchema,
 	getProjectConfig,
 	projectConfigSchema,
 	resolvePaths,
@@ -33,6 +35,10 @@ import {
 import * as registry from '../utils/registry-providers/internal';
 
 const schema = v.object({
+	watermark: v.optional(v.boolean()),
+	tests: v.optional(v.boolean()),
+	formatter: v.optional(formatterSchema),
+	paths: v.optional(v.record(v.string(), v.string())),
 	expand: v.boolean(),
 	maxUnchanged: v.number(),
 	repo: v.optional(v.string()),
@@ -50,6 +56,24 @@ export const add = new Command('add')
 	.argument(
 		'[blocks...]',
 		'Names of the blocks you want to add to your project. ex: (utils/math, github/ieedan/std/utils/math)'
+	)
+	.addOption(
+		new Option('--formatter <choice>', 'The formatter to use when adding blocks.').choices([
+			'prettier',
+			'biome',
+		])
+	)
+	.option(
+		'--no-watermark',
+		"jsrepo shouldn't leave a watermark at the top of the added files.",
+		undefined
+	)
+	.option('--no-tests', "jsrepo shouldn't include tests when adding blocks.", undefined)
+	.option(
+		'--paths <category=path,category=path>',
+		'The paths where categories should be added to your project.',
+		parseRecord,
+		undefined
 	)
 	.option('-E, --expand', 'Expands the diff so you see the entire file.', false)
 	.option(
@@ -127,6 +151,12 @@ const _add = async (blockNames: string[], options: Options) => {
 	} else {
 		config = configResult.unwrap();
 	}
+
+	config.formatter = options.formatter !== undefined ? options.formatter : config.formatter;
+	config.watermark = options.watermark !== undefined ? options.watermark : config.watermark;
+	config.includeTests = options.tests !== undefined ? options.tests : config.includeTests;
+	config.paths =
+		options.paths !== undefined ? { ...config.paths, ...options.paths } : config.paths;
 
 	let repoPaths = config.repos;
 	const mustResolveRepos = new Set<string>();
@@ -312,26 +342,28 @@ const _add = async (blockNames: string[], options: Options) => {
 
 		const categories = Array.from(new Set(installingBlocks.map((b) => b.category)));
 
-		for (const cat of categories) {
-			const blocksPath = await text({
-				message: `Where would you like to add ${color.cyan(cat)}?`,
-				placeholder: zeroConfig ? zeroConfig.paths[cat] : `./src/${cat}`,
-				initialValue: zeroConfig ? zeroConfig.paths[cat] : `./src/${cat}`,
-				defaultValue: zeroConfig ? zeroConfig.paths[cat] : `./src/${cat}`,
-				validate(value) {
-					if (value.trim() === '') return 'Please provide a value';
-				},
-			});
+		if (options.paths === undefined) {
+			for (const cat of categories) {
+				const blocksPath = await text({
+					message: `Where would you like to add ${color.cyan(cat)}?`,
+					placeholder: zeroConfig ? zeroConfig.paths[cat] : `./src/${cat}`,
+					initialValue: zeroConfig ? zeroConfig.paths[cat] : `./src/${cat}`,
+					defaultValue: zeroConfig ? zeroConfig.paths[cat] : `./src/${cat}`,
+					validate(value) {
+						if (value.trim() === '') return 'Please provide a value';
+					},
+				});
 
-			if (isCancel(blocksPath)) {
-				cancel('Canceled!');
-				process.exit(0);
+				if (isCancel(blocksPath)) {
+					cancel('Canceled!');
+					process.exit(0);
+				}
+
+				config.paths[cat] = blocksPath;
 			}
-
-			config.paths[cat] = blocksPath;
 		}
 
-		if (!options.yes) {
+		if (!options.yes && options.tests === undefined) {
 			const includeTests = await confirm({
 				message: 'Include tests?',
 				initialValue: zeroConfig.includeTests,
@@ -343,7 +375,9 @@ const _add = async (blockNames: string[], options: Options) => {
 			}
 
 			config.includeTests = includeTests;
+		}
 
+		if (!options.yes && options.watermark === undefined) {
 			const addWatermark = await confirm({
 				message: 'Add watermark?',
 				initialValue: zeroConfig.watermark,
@@ -357,37 +391,39 @@ const _add = async (blockNames: string[], options: Options) => {
 			config.watermark = addWatermark;
 		}
 
-		let defaultFormatter = 'none';
+		if (options.formatter === undefined) {
+			let defaultFormatter = 'none';
 
-		if (fs.existsSync(path.join(options.cwd, '.prettierrc'))) {
-			defaultFormatter = 'prettier';
-		}
+			if (fs.existsSync(path.join(options.cwd, '.prettierrc'))) {
+				defaultFormatter = 'prettier';
+			}
 
-		if (fs.existsSync(path.join(options.cwd, 'biome.json'))) {
-			defaultFormatter = 'biome';
-		}
+			if (fs.existsSync(path.join(options.cwd, 'biome.json'))) {
+				defaultFormatter = 'biome';
+			}
 
-		const response = await select({
-			message: 'What formatter would you like to use?',
-			options: ['Prettier', 'Biome', 'None'].map((val) => ({
-				value: val.toLowerCase(),
-				label: val,
-			})),
-			initialValue:
-				defaultFormatter === 'none'
-					? zeroConfig.formatter
+			const response = await select({
+				message: 'What formatter would you like to use?',
+				options: ['Prettier', 'Biome', 'None'].map((val) => ({
+					value: val.toLowerCase(),
+					label: val,
+				})),
+				initialValue:
+					defaultFormatter === 'none'
 						? zeroConfig.formatter
-						: 'none'
-					: defaultFormatter,
-		});
+							? zeroConfig.formatter
+							: 'none'
+						: defaultFormatter,
+			});
 
-		if (isCancel(response)) {
-			cancel('Canceled!');
-			process.exit(0);
-		}
+			if (isCancel(response)) {
+				cancel('Canceled!');
+				process.exit(0);
+			}
 
-		if (response !== 'none') {
-			config.formatter = response as Formatter;
+			if (response !== 'none') {
+				config.formatter = response as Formatter;
+			}
 		}
 
 		store.set(zeroConfigKey, config);
