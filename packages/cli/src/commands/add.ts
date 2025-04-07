@@ -569,7 +569,7 @@ const _add = async (blockNames: string[], options: Options) => {
 
 					if (updateResult.applyChanges) {
 						updatedFiles.push(
-							promises.noopPromise({
+							promises.immediate({
 								destination: destPath,
 								content: updateResult.updatedContent,
 								block: preloadedBlock.block,
