@@ -8,6 +8,7 @@ import path from 'pathe';
 import * as v from 'valibot';
 import * as ascii from '../utils/ascii';
 import { getBlockFilePath, getInstalled, preloadBlocks, resolveTree } from '../utils/blocks';
+import { parseRecord } from '../utils/blocks/commander/parsers';
 import * as promises from '../utils/blocks/ts/promises';
 import * as url from '../utils/blocks/ts/url';
 import {
@@ -32,7 +33,6 @@ import {
 	truncatedList,
 } from '../utils/prompts';
 import * as registry from '../utils/registry-providers/internal';
-import { parseRecord } from '../utils/blocks/commander/parsers';
 
 const schema = v.object({
 	watermark: v.optional(v.boolean()),
