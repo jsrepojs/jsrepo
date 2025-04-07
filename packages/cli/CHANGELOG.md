@@ -1,5 +1,14 @@
 # jsrepo
 
+## 1.46.0
+### Minor Changes
+
+- 47d0c1c: feat: Add flags for "zero-config" adds.
+
+### Patch Changes
+
+- 2090485: chore: bump deps
+
 ## 1.45.3
 
 ### Patch Changes
