@@ -1,5 +1,10 @@
 # jsrepo
 
+## 1.46.1
+### Patch Changes
+
+- 144cff5: fix: Ensure original import is quoted before replacing it in test files.
+
 ## 1.46.0
 ### Minor Changes
 
