@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import { cancel, confirm, isCancel, outro } from '@clack/prompts';
 import color from 'chalk';
 import { Argument, Command, program } from 'commander';
+import escapeStringRegexp from 'escape-string-regexp';
 import { execa } from 'execa';
 import oxc from 'oxc-parser';
 import { resolveCommand } from 'package-manager-detector/commands';
@@ -266,7 +267,13 @@ const _test = async (blockNames: string[], options: Options) => {
 				}
 
 				if (newModuleSpecifier) {
-					code = code.replaceAll(moduleSpecifier, newModuleSpecifier);
+					// this way we only replace the exact import since it will be surrounded in quotes
+					const literalRegex = new RegExp(
+						`(['"])${escapeStringRegexp(moduleSpecifier)}\\1`,
+						'g'
+					);
+
+					code = code.replaceAll(literalRegex, `$1${newModuleSpecifier}$1`);
 				}
 			}
 
