@@ -342,26 +342,28 @@ const _add = async (blockNames: string[], options: Options) => {
 
 		const categories = Array.from(new Set(installingBlocks.map((b) => b.category)));
 
-		for (const cat of categories) {
-			const blocksPath = await text({
-				message: `Where would you like to add ${color.cyan(cat)}?`,
-				placeholder: zeroConfig ? zeroConfig.paths[cat] : `./src/${cat}`,
-				initialValue: zeroConfig ? zeroConfig.paths[cat] : `./src/${cat}`,
-				defaultValue: zeroConfig ? zeroConfig.paths[cat] : `./src/${cat}`,
-				validate(value) {
-					if (value.trim() === '') return 'Please provide a value';
-				},
-			});
+		if (options.paths === undefined) {
+			for (const cat of categories) {
+				const blocksPath = await text({
+					message: `Where would you like to add ${color.cyan(cat)}?`,
+					placeholder: zeroConfig ? zeroConfig.paths[cat] : `./src/${cat}`,
+					initialValue: zeroConfig ? zeroConfig.paths[cat] : `./src/${cat}`,
+					defaultValue: zeroConfig ? zeroConfig.paths[cat] : `./src/${cat}`,
+					validate(value) {
+						if (value.trim() === '') return 'Please provide a value';
+					},
+				});
 
-			if (isCancel(blocksPath)) {
-				cancel('Canceled!');
-				process.exit(0);
+				if (isCancel(blocksPath)) {
+					cancel('Canceled!');
+					process.exit(0);
+				}
+
+				config.paths[cat] = blocksPath;
 			}
-
-			config.paths[cat] = blocksPath;
 		}
 
-		if (!options.yes) {
+		if (!options.yes && options.tests === undefined) {
 			const includeTests = await confirm({
 				message: 'Include tests?',
 				initialValue: zeroConfig.includeTests,
@@ -373,7 +375,9 @@ const _add = async (blockNames: string[], options: Options) => {
 			}
 
 			config.includeTests = includeTests;
+		}
 
+		if (!options.yes && options.watermark === undefined) {
 			const addWatermark = await confirm({
 				message: 'Add watermark?',
 				initialValue: zeroConfig.watermark,
@@ -387,37 +391,39 @@ const _add = async (blockNames: string[], options: Options) => {
 			config.watermark = addWatermark;
 		}
 
-		let defaultFormatter = 'none';
+		if (options.formatter === undefined) {
+			let defaultFormatter = 'none';
 
-		if (fs.existsSync(path.join(options.cwd, '.prettierrc'))) {
-			defaultFormatter = 'prettier';
-		}
+			if (fs.existsSync(path.join(options.cwd, '.prettierrc'))) {
+				defaultFormatter = 'prettier';
+			}
 
-		if (fs.existsSync(path.join(options.cwd, 'biome.json'))) {
-			defaultFormatter = 'biome';
-		}
+			if (fs.existsSync(path.join(options.cwd, 'biome.json'))) {
+				defaultFormatter = 'biome';
+			}
 
-		const response = await select({
-			message: 'What formatter would you like to use?',
-			options: ['Prettier', 'Biome', 'None'].map((val) => ({
-				value: val.toLowerCase(),
-				label: val,
-			})),
-			initialValue:
-				defaultFormatter === 'none'
-					? zeroConfig.formatter
+			const response = await select({
+				message: 'What formatter would you like to use?',
+				options: ['Prettier', 'Biome', 'None'].map((val) => ({
+					value: val.toLowerCase(),
+					label: val,
+				})),
+				initialValue:
+					defaultFormatter === 'none'
 						? zeroConfig.formatter
-						: 'none'
-					: defaultFormatter,
-		});
+							? zeroConfig.formatter
+							: 'none'
+						: defaultFormatter,
+			});
 
-		if (isCancel(response)) {
-			cancel('Canceled!');
-			process.exit(0);
-		}
+			if (isCancel(response)) {
+				cancel('Canceled!');
+				process.exit(0);
+			}
 
-		if (response !== 'none') {
-			config.formatter = response as Formatter;
+			if (response !== 'none') {
+				config.formatter = response as Formatter;
+			}
 		}
 
 		store.set(zeroConfigKey, config);
