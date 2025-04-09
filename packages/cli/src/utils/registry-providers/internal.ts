@@ -21,34 +21,34 @@ import type { RegistryProvider, RegistryProviderState } from './types';
 export type RemoteBlock = Block & { sourceRepo: RegistryProviderState };
 
 /** Wraps the basic implementation to inject `node-fetch` and the correct token. */
-export const internalFetchRaw = async (
+export async function internalFetchRaw(
 	state: RegistryProviderState,
 	resourcePath: string,
 	{ verbose }: { verbose?: (msg: string) => void } = {}
-) => {
+) {
 	return await fetchRaw(state, resourcePath, {
 		verbose,
 		// @ts-expect-error but it does work
 		fetch: nodeFetch,
 		token: getProviderToken(state.provider, state.url),
 	});
-};
+}
 
 /** Wraps the basic implementation to inject `node-fetch` and the correct token. */
-export const internalFetchManifest = async (
+export async function internalFetchManifest(
 	state: RegistryProviderState,
 	{ verbose }: { verbose?: (msg: string) => void } = {}
-) => {
+) {
 	return await fetchManifest(state, {
 		verbose,
 		// @ts-expect-error but it does work
 		fetch: nodeFetch,
 		token: getProviderToken(state.provider, state.url),
 	});
-};
+}
 
 /** Gets the locally stored token for the given provider */
-export const getProviderToken = (provider: RegistryProvider, url: string): string | undefined => {
+export function getProviderToken(provider: RegistryProvider, url: string): string | undefined {
 	const storage = new TokenManager();
 
 	// there isn't an auth implementation for http
@@ -57,17 +57,17 @@ export const getProviderToken = (provider: RegistryProvider, url: string): strin
 	}
 
 	return storage.get(provider.name);
-};
+}
 
 /** Parses the provided url and returns the state.
  *
  * @param repo
  * @returns
  */
-export const getProviderState = async (
+export async function getProviderState(
 	repo: string,
 	{ noCache = false }: { noCache?: boolean } = {}
-): Promise<Result<RegistryProviderState, string>> => {
+): Promise<Result<RegistryProviderState, string>> {
 	const provider = selectProvider(repo);
 
 	if (provider) {
@@ -104,17 +104,17 @@ export const getProviderState = async (
 	return Err(
 		`Only ${providers.map((p, i) => `${i === providers.length - 1 ? 'and ' : ''}${color.bold(p.name)}`).join(', ')} registries are supported at this time!`
 	);
-};
+}
 
 /** Gets the provider state for each provided repo url
  *
  * @param repos
  * @returns
  */
-export const forEachPathGetProviderState = async (
+export async function forEachPathGetProviderState(
 	repos: string[],
 	{ noCache = false }: { noCache?: boolean } = {}
-): Promise<Result<RegistryProviderState[], { message: string; repo: string }>> => {
+): Promise<Result<RegistryProviderState[], { message: string; repo: string }>> {
 	const resolvedPaths: RegistryProviderState[] = [];
 
 	const errors = await Promise.all(
@@ -135,7 +135,7 @@ export const forEachPathGetProviderState = async (
 	if (err) return err;
 
 	return Ok(resolvedPaths);
-};
+}
 
 /** Fetches blocks for each registry and stores them in a map by their repo as well as category and block name.
  *
@@ -145,9 +145,9 @@ export const forEachPathGetProviderState = async (
  * @param repos
  * @returns
  */
-export const fetchBlocks = async (
+export async function fetchBlocks(
 	...repos: RegistryProviderState[]
-): Promise<Result<Map<string, RemoteBlock>, { message: string; repo: string }>> => {
+): Promise<Result<Map<string, RemoteBlock>, { message: string; repo: string }>> {
 	const blocksMap = new Map<string, RemoteBlock>();
 
 	const errors = await Promise.all(
@@ -176,13 +176,13 @@ export const fetchBlocks = async (
 	if (err) return err;
 
 	return Ok(blocksMap);
-};
+}
 
 /** Maps the result of fetchManifests into a map of remote blocks
  *
  * @param manifests
  */
-export const getRemoteBlocks = (manifests: FetchManifestResult[]) => {
+export function getRemoteBlocks(manifests: FetchManifestResult[]) {
 	const blocksMap = new Map<string, RemoteBlock>();
 
 	for (const manifest of manifests) {
@@ -197,7 +197,7 @@ export const getRemoteBlocks = (manifests: FetchManifestResult[]) => {
 	}
 
 	return blocksMap;
-};
+}
 
 export type FetchManifestResult = {
 	state: RegistryProviderState;
@@ -209,9 +209,9 @@ export type FetchManifestResult = {
  * @param repos
  * @returns
  */
-export const fetchManifests = async (
+export async function fetchManifests(
 	...repos: RegistryProviderState[]
-): Promise<Result<FetchManifestResult[], { message: string; repo: string }>> => {
+): Promise<Result<FetchManifestResult[], { message: string; repo: string }>> {
 	const manifests: FetchManifestResult[] = [];
 
 	const errors = await Promise.all(
@@ -233,7 +233,7 @@ export const fetchManifests = async (
 	if (err) return err;
 
 	return Ok(manifests);
-};
+}
 
 export * from './types';
 

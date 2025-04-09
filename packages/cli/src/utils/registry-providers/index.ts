@@ -11,11 +11,11 @@ import type { RegistryProvider, RegistryProviderState } from './types';
 
 export const providers = [github, gitlab, bitbucket, azure, http];
 
-export const selectProvider = (url: string): RegistryProvider | undefined => {
+export function selectProvider(url: string): RegistryProvider | undefined {
 	const provider = providers.find((p) => p.matches(url));
 
 	return provider;
-};
+}
 
 export type FetchOptions = {
 	token: string;
@@ -24,11 +24,11 @@ export type FetchOptions = {
 	verbose: (str: string) => void;
 };
 
-export const fetchRaw = async (
+export async function fetchRaw(
 	state: RegistryProviderState,
 	resourcePath: string,
 	{ verbose, fetch: f = fetch, token }: Partial<FetchOptions> = {}
-): Promise<Result<string, string>> => {
+): Promise<Result<string, string>> {
 	const url = await state.provider.resolveRaw(state, resourcePath);
 
 	verbose?.(`Trying to fetch from ${url}`);
@@ -60,18 +60,18 @@ export const fetchRaw = async (
 	} catch (err) {
 		return Err(state.provider.formatFetchError(state, resourcePath, err));
 	}
-};
+}
 
-export const fetchManifest = async (
+export async function fetchManifest(
 	state: RegistryProviderState,
 	{ fetch: f = fetch, ...rest }: Partial<FetchOptions> = {}
-): Promise<Result<Manifest, string>> => {
+): Promise<Result<Manifest, string>> {
 	const manifest = await fetchRaw(state, MANIFEST_FILE, { fetch: f, ...rest });
 
 	if (manifest.isErr()) return Err(manifest.unwrapErr());
 
 	return parseManifest(manifest.unwrap());
-};
+}
 
 export * from './types';
 

@@ -10,12 +10,12 @@ import { isTestFile } from './build';
 import { type Paths, type ProjectConfig, getPathForBlock, resolvePaths } from './config';
 import * as registry from './registry-providers/internal';
 
-export const resolveTree = async (
+export async function resolveTree(
 	blockSpecifiers: string[],
 	blocksMap: Map<string, registry.RemoteBlock>,
 	repoPaths: registry.RegistryProviderState[],
 	installed: Map<string, registry.RemoteBlock> = new Map()
-): Promise<Result<registry.RemoteBlock[], string>> => {
+): Promise<Result<registry.RemoteBlock[], string>> {
 	const blocks = new Map<string, registry.RemoteBlock>();
 
 	for (const blockSpecifier of blockSpecifiers) {
@@ -85,7 +85,7 @@ export const resolveTree = async (
 	}
 
 	return Ok(array.fromMap(blocks, (_, val) => val));
-};
+}
 
 type InstalledBlock = {
 	specifier: `${string}/${string}`;
@@ -99,11 +99,11 @@ type InstalledBlock = {
  * @param config
  * @returns
  */
-export const getInstalled = (
+export function getInstalled(
 	blocks: Map<string, Block>,
 	config: ProjectConfig,
 	cwd: string
-): InstalledBlock[] => {
+): InstalledBlock[] {
 	const installedBlocks: InstalledBlock[] = [];
 
 	const resolvedPaths = resolvePaths(config.paths, cwd).match(
@@ -128,7 +128,7 @@ export const getInstalled = (
 	}
 
 	return installedBlocks;
-};
+}
 
 export type RegistryFile = {
 	name: string;
@@ -146,10 +146,10 @@ type PreloadedBlock = {
  * @param blocks
  * @returns
  */
-export const preloadBlocks = (
+export function preloadBlocks(
 	blocks: registry.RemoteBlock[],
 	config: ProjectConfig
-): PreloadedBlock[] => {
+): PreloadedBlock[] {
 	const preloaded: PreloadedBlock[] = [];
 
 	for (const block of blocks) {
@@ -176,7 +176,7 @@ export const preloadBlocks = (
 	}
 
 	return preloaded;
-};
+}
 
 /** Gets the path for the file belonging to the provided block
  *
@@ -186,12 +186,12 @@ export const preloadBlocks = (
  * @param cwd
  * @returns
  */
-export const getBlockFilePath = (
+export function getBlockFilePath(
 	fileName: string,
 	block: registry.RemoteBlock,
 	resolvedPaths: Paths,
 	cwd: string
-) => {
+) {
 	const directory = getPathForBlock(block, resolvedPaths, cwd);
 
 	if (block.subdirectory) {
@@ -199,4 +199,4 @@ export const getBlockFilePath = (
 	}
 
 	return path.join(directory, fileName);
-};
+}

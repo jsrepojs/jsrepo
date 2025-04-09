@@ -6,7 +6,7 @@ import { Err, Ok, type Result } from './blocks/ts/result';
  *
  * @param json
  */
-export const parseManifest = (json: string): Result<Manifest, string> => {
+export function parseManifest(json: string): Result<Manifest, string> {
 	let parsed: unknown;
 
 	try {
@@ -37,4 +37,4 @@ export const parseManifest = (json: string): Result<Manifest, string> => {
 	}
 
 	return Ok(validated.output);
-};
+}

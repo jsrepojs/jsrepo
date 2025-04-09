@@ -66,13 +66,13 @@ ${color.bold(error)}`;
 	},
 };
 
-const parseUrl = (
+function parseUrl(
 	url: string,
 	{ fullyQualified }: ParseOptions
 ): {
 	url: string;
 	specifier?: string;
-} => {
+} {
 	const parsedUrl = new URL(url);
 
 	let segments = parsedUrl.pathname.split('/');
@@ -89,4 +89,4 @@ const parseUrl = (
 		url: u.addTrailingSlash(u.join(parsedUrl.origin, ...segments)),
 		specifier,
 	};
-};
+}

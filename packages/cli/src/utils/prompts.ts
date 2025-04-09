@@ -30,7 +30,7 @@ type TaskOptions = {
 	loading: ReturnType<typeof spinner>;
 };
 
-export const runTasks = async (tasks: Task[], { loading }: TaskOptions) => {
+export async function runTasks(tasks: Task[], { loading }: TaskOptions) {
 	for (const task of tasks) {
 		loading.start(task.loadingMessage);
 
@@ -43,7 +43,7 @@ export const runTasks = async (tasks: Task[], { loading }: TaskOptions) => {
 
 		loading.stop(task.completedMessage);
 	}
-};
+}
 
 export type ConcurrentTask = {
 	run: ({ message }: { message: (str: string) => void }) => Promise<void>;
@@ -56,27 +56,27 @@ export type ConcurrentOptions = {
 	tasks: ConcurrentTask[];
 };
 
-export const runTasksConcurrently = async ({
+export async function runTasksConcurrently({
 	tasks,
 	startMessage,
 	stopMessage,
 	loading,
-}: ConcurrentOptions) => {
+}: ConcurrentOptions) {
 	loading.start(startMessage);
 
 	await Promise.all([...tasks.map((t) => t.run({ message: loading.message }))]);
 
 	loading.stop(stopMessage);
-};
+}
 
 /** A spinner compatible with verbose logging
  *
  * @param param0
  * @returns
  */
-const _spinner = ({
+function _spinner({
 	verbose,
-}: { verbose?: (msg: string) => void } = {}): ReturnType<typeof spinner> => {
+}: { verbose?: (msg: string) => void } = {}): ReturnType<typeof spinner> {
 	const loading = spinner();
 
 	return {
@@ -102,9 +102,9 @@ const _spinner = ({
 			}
 		},
 	};
-};
+}
 
-export const nextSteps = (steps: string[]): string => {
+export function nextSteps(steps: string[]): string {
 	const box = boxen(steps.join('\n'), {
 		title: 'Next Steps',
 		textAlignment: 'left',
@@ -123,17 +123,17 @@ export const nextSteps = (steps: string[]): string => {
 	});
 
 	return `${ascii.VERTICAL_LINE}\n${box}\n`;
-};
+}
 
-export const truncatedList = (items: string[], maxLength = 3) => {
+export function truncatedList(items: string[], maxLength = 3) {
 	const truncated = items.slice(0, maxLength);
 
 	const remaining = items.length - truncated.length;
 
 	return `${truncated.join(', ')}${remaining > 0 ? ` and ${remaining} other(s)` : ''}`;
-};
+}
 
-const newerVersionAvailable = async (name: string, oldVersion: string, newVersion: string) => {
+async function newerVersionAvailable(name: string, oldVersion: string, newVersion: string) {
 	const pm = (await detect({ cwd: process.cwd() }))?.agent ?? 'npm';
 
 	const installCommand = resolveCommand(pm, 'global', ['jsrepo@latest']);
@@ -154,9 +154,9 @@ const newerVersionAvailable = async (name: string, oldVersion: string, newVersio
 	});
 
 	return box;
-};
+}
 
-const _intro = async () => {
+async function _intro() {
 	console.clear();
 
 	const latestVersion = await getLatestVersion();
@@ -176,7 +176,7 @@ const _intro = async () => {
 	intro(
 		`${color.bgHex('#f7df1e').black(` ${packageJson.name} `)}${color.gray(` v${packageJson.version} `)}`
 	);
-};
+}
 
 type UpdateBlockOptions = {
 	incoming: {
@@ -213,12 +213,12 @@ type UpdateBlockResult =
 
 const MODEL_PREFERENCE_KEY = 'model-preference';
 
-export const promptUpdateFile = async ({
+export async function promptUpdateFile({
 	incoming,
 	current,
 	config,
 	options,
-}: UpdateBlockOptions): Promise<UpdateBlockResult> => {
+}: UpdateBlockOptions): Promise<UpdateBlockResult> {
 	const storage = persisted.get();
 
 	process.stdout.write(`${ascii.VERTICAL_LINE}\n`);
@@ -247,9 +247,7 @@ export const promptUpdateFile = async ({
 			intro: ({ from, to, changes, prefix }) => {
 				const totalChanges = changes.filter((a) => a.added || a.removed).length;
 
-				return `${prefix?.() ?? ''}${color.cyan(from)} → ${color.gray(to)} (${totalChanges} change${
-					totalChanges === 1 ? '' : 's'
-				})\n${prefix?.() ?? ''}\n`;
+				return `${prefix?.() ?? ''}${color.cyan(from)} → ${color.gray(to)} (${totalChanges} change${totalChanges === 1 ? '' : 's'})\n${prefix?.() ?? ''}\n`;
 			},
 		});
 
@@ -405,7 +403,7 @@ export const promptUpdateFile = async ({
 	}
 
 	return { applyChanges: false };
-};
+}
 
 type InstallDependenciesOptions = {
 	yes: boolean;
@@ -422,11 +420,11 @@ type InstallDependenciesResult = {
 	devDependencies: Set<string>;
 };
 
-export const promptInstallDependencies = async (
+export async function promptInstallDependencies(
 	deps: Set<string>,
 	devDeps: Set<string>,
 	{ yes, no = false, cwd, pm, ignoreWorkspace = false }: InstallDependenciesOptions
-): Promise<InstallDependenciesResult> => {
+): Promise<InstallDependenciesResult> {
 	// check if dependencies are already installed
 	const { dependencies, devDependencies } = returnShouldInstall(deps, devDeps, { cwd });
 
@@ -474,10 +472,10 @@ export const promptInstallDependencies = async (
 	}
 
 	return { installed: false, dependencies, devDependencies };
-};
+}
 
 // From sveltejs/cli https://github.com/sveltejs/cli/blob/main/packages/clack-prompts/index.ts#L606
-export const taskLog = (title: string) => {
+export function taskLog(title: string) {
 	const BAR = color.dim(ascii.VERTICAL_LINE);
 	const ACTIVE = color.green(ascii.S_STEP_ACTIVE);
 	const SUCCESS = color.green(ascii.S_SUCCESS);
@@ -533,6 +531,6 @@ export const taskLog = (title: string) => {
 			process.stdout.write(`${SUCCESS}  ${message}\n`);
 		},
 	};
-};
+}
 
 export { _intro as intro, _spinner as spinner };

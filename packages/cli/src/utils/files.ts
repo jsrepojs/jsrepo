@@ -32,7 +32,7 @@ type TransformRemoteContentOptions = {
  * @param param0
  * @returns
  */
-export const transformRemoteContent = async ({
+export async function transformRemoteContent({
 	file,
 	config,
 	imports,
@@ -41,7 +41,7 @@ export const transformRemoteContent = async ({
 	biomeOptions,
 	cwd,
 	verbose,
-}: TransformRemoteContentOptions): Promise<Result<string, string>> => {
+}: TransformRemoteContentOptions): Promise<Result<string, string>> {
 	const lang = languages.find((lang) => lang.matches(file.destPath));
 
 	let content: string = file.content;
@@ -83,7 +83,7 @@ export const transformRemoteContent = async ({
 	}
 
 	return Ok(content);
-};
+}
 
 type FormatOptions = {
 	file: {
@@ -102,12 +102,12 @@ type FormatOptions = {
  * @param param0
  * @returns
  */
-export const formatFile = async ({
+export async function formatFile({
 	file,
 	formatter,
 	prettierOptions,
 	biomeOptions,
-}: FormatOptions): Promise<string> => {
+}: FormatOptions): Promise<string> {
 	const lang = languages.find((lang) => lang.matches(file.destPath));
 
 	let newContent = file.content;
@@ -126,9 +126,9 @@ export const formatFile = async ({
 	}
 
 	return newContent;
-};
+}
 
-export const matchJSDescendant = (searchFilePath: string): string | undefined => {
+export function matchJSDescendant(searchFilePath: string): string | undefined {
 	const MATCH_EXTENSIONS = ['.js', '.ts', '.cjs', '.mjs'];
 
 	if (!endsWithOneOf(searchFilePath, MATCH_EXTENSIONS)) return undefined;
@@ -146,14 +146,14 @@ export const matchJSDescendant = (searchFilePath: string): string | undefined =>
 	}
 
 	return undefined;
-};
+}
 
 /** Attempts to get the js/tsconfig file for the searched path
  *
  * @param searchPath
  * @returns
  */
-export const tryGetTsconfig = (searchPath?: string): Result<TsConfigResult | null, string> => {
+export function tryGetTsconfig(searchPath?: string): Result<TsConfigResult | null, string> {
 	let config: TsConfigResult | null;
 
 	try {
@@ -172,4 +172,4 @@ export const tryGetTsconfig = (searchPath?: string): Result<TsConfigResult | nul
 	}
 
 	return Ok(config);
-};
+}

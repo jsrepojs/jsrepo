@@ -70,7 +70,7 @@ export type ResolveImportOptions = {
 	cwd: string;
 };
 
-export const formatError = (err: string) => {
+export function formatError(err: string) {
 	return `${lines.join(lines.get(err), {
 		prefix: (l) => {
 			if (l === 0) return `${ascii.VERTICAL_LINE}  ${ascii.ERROR} `;
@@ -78,9 +78,9 @@ export const formatError = (err: string) => {
 			return `${ascii.VERTICAL_LINE}  `;
 		},
 	})}`;
-};
+}
 
-export const resolveImports = ({
+export function resolveImports({
 	moduleSpecifiers,
 	isSubDir,
 	filePath,
@@ -88,7 +88,7 @@ export const resolveImports = ({
 	doNotInstall,
 	dirs,
 	cwd,
-}: ResolveImportOptions): Result<ResolvedDependencies, string[]> => {
+}: ResolveImportOptions): Result<ResolvedDependencies, string[]> {
 	const errors: string[] = [];
 
 	const deps = new Set<string>();
@@ -174,7 +174,7 @@ export const resolveImports = ({
 		local: Array.from(localDeps),
 		imports,
 	} satisfies ResolvedDependencies);
-};
+}
 
 type ResolveLocalImportResult = {
 	/** The local block that is a dependency */
@@ -183,7 +183,7 @@ type ResolveLocalImportResult = {
 	template: string;
 };
 
-const resolveLocalImport = (
+function resolveLocalImport(
 	mod: string,
 	isSubDir: boolean,
 	{
@@ -202,7 +202,7 @@ const resolveLocalImport = (
 		cwd: string;
 		dropExtension?: boolean;
 	}
-): Result<ResolveLocalImportResult | undefined, string> => {
+): Result<ResolveLocalImportResult | undefined, string> {
 	if (isSubDir && (mod.startsWith('./') || mod === '.')) return Ok(undefined);
 
 	// get the path to the current category
@@ -234,9 +234,9 @@ const resolveLocalImport = (
 	return Err(
 		`${filePath}:\n${alias ? alias : mod} references code not contained in ${color.bold(dirs.join(', '))} and cannot be resolved.`
 	);
-};
+}
 
-const parsePath = (localPath: string, dropExtension = true): ResolveLocalImportResult => {
+function parsePath(localPath: string, dropExtension = true): ResolveLocalImportResult {
 	let [category, block, ...rest] = localPath.split('/');
 
 	// if undefined we assume we are pointing to the index file
@@ -268,10 +268,10 @@ const parsePath = (localPath: string, dropExtension = true): ResolveLocalImportR
 	}
 
 	return { dependency: blockSpecifier, template };
-};
+}
 
 /** Tries to resolve the modules as an alias using the tsconfig. */
-const tryResolveLocalAlias = (
+function tryResolveLocalAlias(
 	mod: string,
 	isSubDir: boolean,
 	{
@@ -280,7 +280,7 @@ const tryResolveLocalAlias = (
 		cwd,
 		containingDir,
 	}: { filePath: string; containingDir?: string; dirs: string[]; cwd: string }
-): Result<ResolveLocalImportResult | undefined, string> => {
+): Result<ResolveLocalImportResult | undefined, string> {
 	const configResult = tryGetTsconfig(filePath);
 
 	if (configResult.isErr()) return Err(configResult.unwrapErr());
@@ -331,13 +331,13 @@ const tryResolveLocalAlias = (
 	}
 
 	return Ok(undefined);
-};
+}
 
 /** Node allows no extension or a .js extension or a .ts extension to all resolve to the same place because of this we employ a different method of equality.
  *
  *  Basically we want to treat a path with a .js extension as equal to the same path with a .ts extension and vise versa.
  */
-const resolutionEquality = (pathA: string, pathB: string, validExtensions = ['.ts', '.js', '']) => {
+function resolutionEquality(pathA: string, pathB: string, validExtensions = ['.ts', '.js', '']) {
 	if (pathA === pathB) return true;
 
 	const parsedA = path.parse(pathA);
@@ -353,15 +353,15 @@ const resolutionEquality = (pathA: string, pathB: string, validExtensions = ['.t
 	if (validExtensions.includes(parsedA.ext) && validExtensions.includes(parsedB.ext)) return true;
 
 	return false;
-};
+}
 
 /** Searches around for the module
  *
  * @param path
  */
-const searchForModule = (
+function searchForModule(
 	modPath: string
-): { path: string; prettyPath: string; type: 'file' | 'directory' } | undefined => {
+): { path: string; prettyPath: string; type: 'file' | 'directory' } | undefined {
 	if (fs.existsSync(modPath)) {
 		return {
 			path: modPath,
@@ -405,7 +405,7 @@ const searchForModule = (
 	}
 
 	return undefined;
-};
+}
 
 /** Iterates over the dependency and resolves each one using the nearest package.json file.
  * Strips node APIs and pins the version of each dependency based on what is in the package.json.
@@ -414,13 +414,13 @@ const searchForModule = (
  * @param filePath
  * @returns
  */
-const resolveRemoteDeps = (
+function resolveRemoteDeps(
 	deps: string[],
 	filePath: string,
 	{ doNotInstall }: { doNotInstall: string[] } = {
 		doNotInstall: [],
 	}
-) => {
+) {
 	const exemptDeps = new Set(doNotInstall);
 
 	const pkgPath = findNearestPackageJson(path.dirname(filePath), '');
@@ -481,7 +481,7 @@ const resolveRemoteDeps = (
 		dependencies: Array.from(dependencies),
 		devDependencies: Array.from(devDependencies),
 	};
-};
+}
 
 const languages: Lang[] = [css, html, json, jsonc, sass, svelte, svg, typescript, vue, yaml];
 

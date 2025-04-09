@@ -147,7 +147,7 @@ const models: Record<ModelName, Model> = {
 	},
 };
 
-const getNextCompletionOpenAI = async ({
+async function getNextCompletionOpenAI({
 	prompt,
 	maxTokens,
 	model,
@@ -159,7 +159,7 @@ const getNextCompletionOpenAI = async ({
 	maxTokens: number;
 	model: OpenAI.Chat.ChatModel;
 	apiKey: string;
-}): Promise<string | null> => {
+}): Promise<string | null> {
 	const openai = new OpenAI({ apiKey });
 
 	const msg = await openai.chat.completions.create({
@@ -183,9 +183,9 @@ const getNextCompletionOpenAI = async ({
 	if (first.message.content === null) return null;
 
 	return first.message.content;
-};
+}
 
-const getNextCompletionAnthropic = async ({
+async function getNextCompletionAnthropic({
 	prompt,
 	messages,
 	maxTokens,
@@ -197,7 +197,7 @@ const getNextCompletionAnthropic = async ({
 	maxTokens: number;
 	model: Anthropic.Messages.Model;
 	apiKey: string;
-}): Promise<string | null> => {
+}): Promise<string | null> {
 	const anthropic = new Anthropic({ apiKey });
 
 	// didn't want to do it this way but I couldn't get `.map` to work
@@ -238,9 +238,9 @@ const getNextCompletionAnthropic = async ({
 	if (first.type !== 'text') return null;
 
 	return first.text;
-};
+}
 
-const getNextCompletionOllama = async ({
+async function getNextCompletionOllama({
 	prompt,
 	messages,
 	model,
@@ -248,7 +248,7 @@ const getNextCompletionOllama = async ({
 	prompt: Prompt;
 	messages?: Message[];
 	model: string;
-}): Promise<string | null> => {
+}): Promise<string | null> {
 	const resp = await ollama.chat({
 		model,
 		messages: [
@@ -265,9 +265,9 @@ const getNextCompletionOllama = async ({
 	});
 
 	return resp.message.content;
-};
+}
 
-const createUpdatePrompt = ({
+function createUpdatePrompt({
 	originalFile,
 	newFile,
 	additionalInstructions,
@@ -277,7 +277,7 @@ const createUpdatePrompt = ({
 	newFile: File;
 	additionalInstructions?: string;
 	rePrompt: boolean;
-}): Prompt => {
+}): Prompt {
 	return {
 		system: 'You will merge two files provided by the user. You will respond only with the resulting code. DO NOT format the code with markdown, DO NOT put the code inside of triple quotes, only return the code as a raw string. DO NOT make unnecessary changes.',
 		message: rePrompt
@@ -294,12 +294,12 @@ ${newFile.content}
 </code>${additionalInstructions ? `<additional-instructions>${additionalInstructions}</additional-instructions>` : ''}
 	`,
 	};
-};
+}
 
 /** The AI isn't always that smart and likes to wrap the code in quotes even though I beg it not to.
  *  This function attempts to remove the quotes.
  */
-export const unwrapCodeFromQuotes = (quoted: string): string => {
+export function unwrapCodeFromQuotes(quoted: string): string {
 	let code = quoted.trim();
 
 	if (code.startsWith('```')) {
@@ -317,14 +317,14 @@ export const unwrapCodeFromQuotes = (quoted: string): string => {
 	}
 
 	return code;
-};
+}
 
 /** Attempts to get the cached api key if it can't it will prompt the user
  *
  * @param name
  * @returns
  */
-const getApiKey = async (name: 'OpenAI' | 'Anthropic'): Promise<string> => {
+async function getApiKey(name: 'OpenAI' | 'Anthropic'): Promise<string> {
 	const storage = new TokenManager();
 
 	let apiKey = storage.get(name);
@@ -349,6 +349,6 @@ const getApiKey = async (name: 'OpenAI' | 'Anthropic'): Promise<string> => {
 	storage.set(name, apiKey);
 
 	return apiKey;
-};
+}
 
 export { models };
