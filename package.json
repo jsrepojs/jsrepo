@@ -13,7 +13,7 @@
     "build:docs": "pnpm -F docs build",
     "ci:release": "pnpm build:cli && changeset publish",
     "changeset": "changeset",
-    "dev": "pnpm -F docs dev",
+    "dev": "pnpm -F next dev",
     "build:cli-docs": "pnpm -F jsrepo build:docs"
   },
   "keywords": [],
@@ -26,7 +26,8 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "@biomejs/biome",
-      "esbuild"
+      "esbuild",
+      "sharp"
     ]
   }
 }
