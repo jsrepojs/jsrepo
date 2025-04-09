@@ -40,10 +40,22 @@
 	{#snippet description()}
 		Configure the formatter used when adding and updating blocks. (<CodeSpan>prettier</CodeSpan>, <CodeSpan
 			>biome</CodeSpan
-		>) (For non-interactive zero-config adds)
+		>, <CodeSpan>none</CodeSpan>) (For non-interactive zero-config adds)
 	{/snippet}
 	{#snippet usage()}
 		<Snippet command="execute" args={['jsrepo', 'add', '--formatter', 'prettier']} />
+	{/snippet}
+</OptionDocs>
+<OptionDocs name="--paths">
+	{#snippet description()}
+		Allows you to specify where to install categories. A mirror of the paths functionality in the
+		<CodeSpan>jsrepo.json</CodeSpan> file. (For non-interactive zero-config adds)
+	{/snippet}
+	{#snippet usage()}
+		<Snippet
+			command="execute"
+			args={['jsrepo', 'add', '--paths', 'utils=./src/blocks/utils,ui=./src/blocks/ui']}
+		/>
 	{/snippet}
 </OptionDocs>
 <OptionDocs name="-E, --expand">

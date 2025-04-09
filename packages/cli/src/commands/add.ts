@@ -37,7 +37,7 @@ import * as registry from '../utils/registry-providers/internal';
 const schema = v.object({
 	watermark: v.optional(v.boolean()),
 	tests: v.optional(v.boolean()),
-	formatter: v.optional(formatterSchema),
+	formatter: v.optional(v.union([v.literal('prettier'), v.literal('biome'), v.literal('none')])),
 	paths: v.optional(v.record(v.string(), v.string())),
 	expand: v.boolean(),
 	maxUnchanged: v.number(),
@@ -61,6 +61,7 @@ export const add = new Command('add')
 		new Option('--formatter <choice>', 'The formatter to use when adding blocks.').choices([
 			'prettier',
 			'biome',
+			'none',
 		])
 	)
 	.addOption(
@@ -156,7 +157,10 @@ async function _add(blockNames: string[], options: Options) {
 		config = configResult.unwrap();
 	}
 
-	config.formatter = options.formatter !== undefined ? options.formatter : config.formatter;
+	config.formatter =
+		options.formatter !== undefined && options.formatter !== 'none'
+			? options.formatter
+			: config.formatter;
 	config.watermark = options.watermark !== undefined ? options.watermark : config.watermark;
 	config.includeTests = options.tests !== undefined ? options.tests : config.includeTests;
 	config.paths =

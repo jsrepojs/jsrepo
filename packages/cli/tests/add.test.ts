@@ -3,6 +3,7 @@ import { execa } from 'execa';
 import path from 'pathe';
 import { afterAll, beforeAll, describe, it } from 'vitest';
 import { cli } from '../src/cli';
+import * as u from '../src/utils/blocks/ts/url';
 import type { ProjectConfig } from '../src/utils/config';
 import { assertFilesExist } from './utils';
 
@@ -24,6 +25,27 @@ describe('add', () => {
 		fs.writeFileSync('jsrepo.json', JSON.stringify(config));
 
 		await cli.parseAsync(['node', 'jsrepo', 'add', block, '-y', '--verbose', '--cwd', testDir]);
+	};
+
+	const addBlockZeroConfig = async (registry: string, block: `${string}/${string}`) => {
+		await cli.parseAsync([
+			'node',
+			'jsrepo',
+			'add',
+			u.join(registry, block),
+			'--formatter',
+			'none',
+			'--watermark',
+			'true',
+			'--tests',
+			'false',
+			'--paths',
+			"'*=./src'",
+			'-y',
+			'--verbose',
+			'--cwd',
+			testDir,
+		]);
 	};
 
 	beforeAll(async () => {
@@ -125,5 +147,13 @@ describe('add', () => {
 		];
 
 		assertFilesExist(blockBaseDir, ...expectedFiles);
+	});
+
+	it('adds with zero-config without interaction', async () => {
+		await addBlockZeroConfig('github/ieedan/std', 'ts/is-letter');
+
+		const blockBaseDir = './src/ts';
+
+		assertFilesExist(blockBaseDir, 'is-letter.ts');
 	});
 });
