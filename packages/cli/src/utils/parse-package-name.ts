@@ -14,20 +14,18 @@ export type Package = {
 	/** Name of the package as it would be installed from npm */
 	name: string;
 	/** Version of the package */
-	version: string;
+	version: string | undefined;
 	path: string;
 };
 
-function parsePackageName(input: string): Result<Package, string> {
+export function parsePackageName(input: string): Result<Package, string> {
 	const m = RE_SCOPED.exec(input) || RE_NON_SCOPED.exec(input);
 
 	if (!m) return Err(`invalid package name: ${input}`);
 
 	return Ok({
 		name: m[1] || '',
-		version: m[2] || 'latest',
+		version: m[2] || undefined,
 		path: m[3] || '',
 	});
 }
-
-export { parsePackageName };

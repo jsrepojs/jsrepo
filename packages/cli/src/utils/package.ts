@@ -74,7 +74,7 @@ function returnShouldInstall(
 				}
 
 				// if the version installed satisfies the requested version remove the dep
-				if (foundDep && semver.satisfies(cleanVersion(foundDep), version)) {
+				if (foundDep && semver.satisfies(cleanVersion(foundDep), version!)) {
 					tempDeps.delete(dep);
 				}
 			}
@@ -94,7 +94,7 @@ function returnShouldInstall(
 				}
 
 				// if the version installed satisfies the requested version remove the dep
-				if (foundDep && semver.satisfies(cleanVersion(foundDep), version)) {
+				if (foundDep && semver.satisfies(cleanVersion(foundDep), version!)) {
 					tempDevDeps.delete(dep);
 				}
 			}
