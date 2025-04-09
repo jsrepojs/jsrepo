@@ -1,5 +1,12 @@
 # jsrepo
 
+## 1.46.2
+### Patch Changes
+
+- 0e41ca6: chore: bump deps
+- 2b9f754: fix: Delete outdated state cache entries when using `--no-cache`
+- 0e41ca6: fix: Fix self-hosted gitlab registries.
+
 ## 1.46.1
 ### Patch Changes
 
