@@ -167,7 +167,7 @@
 		More verbose logging. (May be used to troubleshoot issues)
 	{/snippet}
 	{#snippet usage()}
-		<Snippet command="execute" args={['jsrepo', 'add', '--verbose']} />
+		<Snippet command="execute" args={['jsrepo', 'build', '--verbose']} />
 	{/snippet}
 </OptionDocs>
 <OptionDocs name="--cwd">
@@ -175,7 +175,7 @@
 		Run the current command on the provided directory absolute or relative.
 	{/snippet}
 	{#snippet usage()}
-		<Snippet command="execute" args={['jsrepo', 'add', '--cwd', './sites/docs']} />
+		<Snippet command="execute" args={['jsrepo', 'build', '--cwd', './sites/docs']} />
 	{/snippet}
 </OptionDocs>
 <OptionDocs name="-h, --help">
@@ -183,6 +183,6 @@
 		Help with the command.
 	{/snippet}
 	{#snippet usage()}
-		<Snippet command="execute" args={['jsrepo', 'add', '--help']} />
+		<Snippet command="execute" args={['jsrepo', 'build', '--help']} />
 	{/snippet}
 </OptionDocs>
