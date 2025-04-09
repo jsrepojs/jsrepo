@@ -12,7 +12,7 @@ import { Err, Ok } from '../blocks/ts/result';
  * @param code The code to be parsed
  * @returns
  */
-export const getJavascriptImports = (fileName: string, code: string): string[] => {
+export function getJavascriptImports(fileName: string, code: string): string[] {
 	const result = oxc.parseSync(fileName, code);
 
 	const modules: string[] = [];
@@ -40,7 +40,7 @@ export const getJavascriptImports = (fileName: string, code: string): string[] =
 	}
 
 	return modules;
-};
+}
 
 /** Language support for `*.(js|ts|jsx|tsx)` files. */
 export const typescript: Lang = {

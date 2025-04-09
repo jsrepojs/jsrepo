@@ -98,7 +98,7 @@ export const add = new Command('add')
 		outro(color.green('All done!'));
 	});
 
-const _add = async (blockNames: string[], options: Options) => {
+async function _add(blockNames: string[], options: Options) {
 	const verbose = (msg: string) => {
 		if (options.verbose) {
 			console.info(`${ascii.INFO} ${msg}`);
@@ -704,4 +704,4 @@ const _add = async (blockNames: string[], options: Options) => {
 
 		process.stdout.write(next);
 	}
-};
+}

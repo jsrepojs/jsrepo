@@ -32,7 +32,7 @@ export const projectConfigSchema = v.object({
 	formatter: v.optional(formatterSchema),
 });
 
-export const getProjectConfig = (cwd: string): Result<ProjectConfig, string> => {
+export function getProjectConfig(cwd: string): Result<ProjectConfig, string> {
 	if (!fs.existsSync(path.join(cwd, PROJECT_CONFIG_NAME))) {
 		return Err('Could not find your configuration file! Please run `init`.');
 	}
@@ -47,7 +47,7 @@ export const getProjectConfig = (cwd: string): Result<ProjectConfig, string> => 
 	}
 
 	return Ok(config.output);
-};
+}
 
 export type ProjectConfig = v.InferOutput<typeof projectConfigSchema>;
 
@@ -74,7 +74,7 @@ export const registryConfigSchema = v.object({
 	rules: v.optional(ruleConfigSchema),
 });
 
-export const getRegistryConfig = (cwd: string): Result<RegistryConfig | null, string> => {
+export function getRegistryConfig(cwd: string): Result<RegistryConfig | null, string> {
 	if (!fs.existsSync(path.join(cwd, REGISTRY_CONFIG_NAME))) {
 		return Ok(null);
 	}
@@ -89,12 +89,12 @@ export const getRegistryConfig = (cwd: string): Result<RegistryConfig | null, st
 	}
 
 	return Ok(config.output);
-};
+}
 
 export type RegistryConfig = v.InferOutput<typeof registryConfigSchema>;
 
 /** Resolves the paths relative to the cwd */
-export const resolvePaths = (paths: Paths, cwd: string): Result<Paths, string> => {
+export function resolvePaths(paths: Paths, cwd: string): Result<Paths, string> {
 	const config = tryGetTsconfig(cwd).unwrapOr(null);
 
 	const matcher = config ? createPathsMatcher(config) : null;
@@ -125,17 +125,17 @@ export const resolvePaths = (paths: Paths, cwd: string): Result<Paths, string> =
 	}
 
 	return Ok(newPaths);
-};
+}
 
-const tryResolvePath = (
+function tryResolvePath(
 	unresolvedPath: string,
 	matcher: (specifier: string) => string[],
 	cwd: string
-): string | undefined => {
+): string | undefined {
 	const paths = matcher(unresolvedPath);
 
 	return paths.length > 0 ? path.relative(cwd, paths[0]) : undefined;
-};
+}
 
 /** Gets the path where the block should be installed.
  *
@@ -144,7 +144,7 @@ const tryResolvePath = (
  * @param cwd
  * @returns
  */
-export const getPathForBlock = (block: Block, resolvedPaths: Paths, cwd: string): string => {
+export function getPathForBlock(block: Block, resolvedPaths: Paths, cwd: string): string {
 	let directory: string;
 
 	if (resolvedPaths[block.category] !== undefined) {
@@ -154,4 +154,4 @@ export const getPathForBlock = (block: Block, resolvedPaths: Paths, cwd: string)
 	}
 
 	return directory;
-};
+}

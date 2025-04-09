@@ -13,11 +13,11 @@ import type { RegistryProviderState } from './registry-providers';
  * @param manifest
  * @returns
  */
-export const checkPreconditions = (
+export function checkPreconditions(
 	providerState: RegistryProviderState,
 	manifest: Manifest,
 	cwd: string
-) => {
+) {
 	if (!manifest.peerDependencies) return;
 
 	const pkg = getPackage(path.join(cwd, 'package.json')).match(
@@ -106,4 +106,4 @@ export const checkPreconditions = (
 
 		process.stdout.write(`${msgs}\n`);
 	}
-};
+}

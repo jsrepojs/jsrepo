@@ -21,13 +21,13 @@ export type Options = {
  * @param param0
  * @returns
  */
-export const installDependencies = async ({
+export async function installDependencies({
 	pm,
 	deps,
 	dev,
 	cwd,
 	ignoreWorkspace = false,
-}: Options) => {
+}: Options) {
 	const args = [...deps];
 
 	if (dev) {
@@ -66,7 +66,7 @@ export const installDependencies = async ({
 		task.fail('Failed to install dependencies');
 		process.exit(2);
 	}
-};
+}
 
 const templatePattern = /\{\{([^\/]+)\/([^\}]+)\}\}/g;
 
@@ -82,12 +82,12 @@ export type ResolveOptions = {
  * @param param0
  * @returns
  */
-export const resolveLocalDependencyTemplate = ({
+export function resolveLocalDependencyTemplate({
 	template,
 	config,
 	destPath,
 	cwd,
-}: ResolveOptions) => {
+}: ResolveOptions) {
 	const destDir = path.join(destPath, '../');
 
 	return template.replace(templatePattern, (_, category, name) => {
@@ -114,4 +114,4 @@ export const resolveLocalDependencyTemplate = ({
 
 		return path.join(config.paths[category], name);
 	});
-};
+}

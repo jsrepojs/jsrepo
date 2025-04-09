@@ -87,7 +87,7 @@ ${color.bold('This may be for one of the following reasons:')}
 	},
 };
 
-const parseUrl = (
+function parseUrl(
 	url: string,
 	{ fullyQualified }: ParseOptions
 ): {
@@ -98,7 +98,7 @@ const parseUrl = (
 	ref: string;
 	refs: 'tags' | 'heads';
 	specifier?: string;
-} => {
+} {
 	const repo = url.replaceAll(/(azure\/)/g, '');
 
 	let [owner, project, repoName, ...rest] = repo.split('/');
@@ -133,4 +133,4 @@ const parseUrl = (
 		refs,
 		specifier,
 	};
-};
+}

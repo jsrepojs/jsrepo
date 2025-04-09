@@ -18,7 +18,7 @@ export type Package = {
 	path: string;
 };
 
-const parsePackageName = (input: string): Result<Package, string> => {
+function parsePackageName(input: string): Result<Package, string> {
 	const m = RE_SCOPED.exec(input) || RE_NON_SCOPED.exec(input);
 
 	if (!m) return Err(`invalid package name: ${input}`);
@@ -28,6 +28,6 @@ const parsePackageName = (input: string): Result<Package, string> => {
 		version: m[2] || 'latest',
 		path: m[3] || '',
 	});
-};
+}
 
 export { parsePackageName };

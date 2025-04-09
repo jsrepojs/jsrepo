@@ -135,7 +135,7 @@ ${color.bold('This may be for one of the following reasons:')}
 	},
 };
 
-const parseUrl = (
+function parseUrl(
 	url: string,
 	{ fullyQualified }: ParseOptions
 ): {
@@ -145,7 +145,7 @@ const parseUrl = (
 	repoName: string;
 	ref?: string;
 	specifier?: string;
-} => {
+} {
 	let baseUrl = BASE_URL;
 
 	if (url.startsWith('gitlab:')) {
@@ -190,4 +190,4 @@ const parseUrl = (
 		ref,
 		specifier,
 	};
-};
+}

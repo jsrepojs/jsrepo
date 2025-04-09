@@ -115,10 +115,10 @@ ${color.bold('This may be for one of the following reasons:')}
 	},
 };
 
-const parseUrl = (
+function parseUrl(
 	url: string,
 	{ fullyQualified = false }: ParseOptions
-): { url: string; owner: string; repoName: string; ref?: string; specifier?: string } => {
+): { url: string; owner: string; repoName: string; ref?: string; specifier?: string } {
 	const repo = url.replaceAll(/(https:\/\/bitbucket.org\/)|(bitbucket\/)/g, '');
 
 	let [owner, repoName, ...rest] = repo.split('/');
@@ -144,4 +144,4 @@ const parseUrl = (
 		repoName: repoName,
 		ref,
 	};
-};
+}

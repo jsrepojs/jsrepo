@@ -37,7 +37,7 @@ export const auth = new Command('auth')
 		outro(color.green('All done!'));
 	});
 
-const _auth = async (service: string | undefined, options: Options) => {
+async function _auth(service: string | undefined, options: Options) {
 	const configuredRegistries: string[] = getProjectConfig(options.cwd).match(
 		(v) => v.repos.filter(http.matches),
 		() => []
@@ -186,9 +186,9 @@ const _auth = async (service: string | undefined, options: Options) => {
 	storage.set(selectedService, options.token);
 
 	log.success(`Logged into ${color.bold(serviceName)}.`);
-};
+}
 
-const promptHttpLogout = async (storage: TokenManager) => {
+async function promptHttpLogout(storage: TokenManager) {
 	// list all providers for logout
 	const registries = storage.getHttpRegistriesWithTokens();
 
@@ -219,4 +219,4 @@ const promptHttpLogout = async (storage: TokenManager) => {
 
 		storage.delete(`http-${registryUrl.origin}`);
 	}
-};
+}

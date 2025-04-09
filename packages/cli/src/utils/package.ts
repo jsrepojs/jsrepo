@@ -4,7 +4,7 @@ import semver from 'semver';
 import { Err, Ok, type Result } from './blocks/ts/result';
 import { parsePackageName } from './parse-package-name';
 
-const findNearestPackageJson = (startDir: string, until: string): string | undefined => {
+function findNearestPackageJson(startDir: string, until: string): string | undefined {
 	const packagePath = path.join(startDir, 'package.json');
 
 	if (fs.existsSync(packagePath)) return packagePath;
@@ -14,7 +14,7 @@ const findNearestPackageJson = (startDir: string, until: string): string | undef
 	const segments = startDir.split(/[\/\\]/);
 
 	return findNearestPackageJson(segments.slice(0, segments.length - 1).join('/'), until);
-};
+}
 
 export type PackageJson = {
 	name: string;
@@ -25,7 +25,7 @@ export type PackageJson = {
 	devDependencies: Record<string, string>;
 };
 
-const getPackage = (path: string): Result<Partial<PackageJson>, string> => {
+function getPackage(path: string): Result<Partial<PackageJson>, string> {
 	if (!fs.existsSync(path)) return Err(`${path} doesn't exist`);
 
 	const contents = fs.readFileSync(path).toString();
@@ -35,22 +35,22 @@ const getPackage = (path: string): Result<Partial<PackageJson>, string> => {
 	} catch (err) {
 		return Err(`Error reading package.json: ${err}`);
 	}
-};
+}
 
-export const cleanVersion = (version: string) => {
+export function cleanVersion(version: string) {
 	if (version[0] === '^') {
 		return version.slice(1);
 	}
 
 	return version;
-};
+}
 
 /** Returns only the dependencies that should be installed based on what is already in the package.json */
-const returnShouldInstall = (
+function returnShouldInstall(
 	dependencies: Set<string>,
 	devDependencies: Set<string>,
 	{ cwd }: { cwd: string }
-): { devDependencies: Set<string>; dependencies: Set<string> } => {
+): { devDependencies: Set<string>; dependencies: Set<string> } {
 	// don't mutate originals
 	const tempDeps = dependencies;
 	const tempDevDeps = devDependencies;
@@ -102,6 +102,6 @@ const returnShouldInstall = (
 	}
 
 	return { dependencies: tempDeps, devDependencies: tempDevDeps };
-};
+}
 
 export { findNearestPackageJson, getPackage, returnShouldInstall };

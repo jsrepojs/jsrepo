@@ -59,7 +59,7 @@ const exec = new Command('exec')
 	});
 
 // biome-ignore lint/suspicious/noExplicitAny: we don't have a type for command
-const _exec = async (s: string | undefined, options: Options, command: any) => {
+export async function _exec(s: string | undefined, options: Options, command: any) {
 	const verbose = (msg: string) => {
 		if (options.verbose) {
 			console.info(`${ascii.INFO} ${msg}`);
@@ -388,6 +388,6 @@ const _exec = async (s: string | undefined, options: Options, command: any) => {
 	} finally {
 		fs.rmSync(path.join(process.cwd(), tempDirBase), { recursive: true, force: true });
 	}
-};
+}
 
 export { exec };

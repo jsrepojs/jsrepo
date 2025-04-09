@@ -9,10 +9,10 @@ export type FormatterConfig = {
 	biomeOptions: PartialConfiguration | null;
 };
 
-export const loadFormatterConfig = async ({
+export async function loadFormatterConfig({
 	formatter,
 	cwd,
-}: { formatter?: Formatter; cwd: string }): Promise<FormatterConfig> => {
+}: { formatter?: Formatter; cwd: string }): Promise<FormatterConfig> {
 	let prettierOptions: prettier.Options | null = null;
 	if (formatter === 'prettier') {
 		prettierOptions = await prettier.resolveConfig(path.join(cwd, '.prettierrc'));
@@ -30,4 +30,4 @@ export const loadFormatterConfig = async ({
 		biomeOptions,
 		prettierOptions,
 	};
-};
+}

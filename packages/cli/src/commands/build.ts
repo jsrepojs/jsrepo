@@ -78,7 +78,7 @@ const build = new Command('build')
 		outro(color.green('All done!'));
 	});
 
-const _build = async (options: Options) => {
+async function _build(options: Options) {
 	const verbose = (msg: string) => {
 		if (options.verbose) {
 			console.info(`${ascii.INFO} ${msg}`);
@@ -308,13 +308,13 @@ const _build = async (options: Options) => {
 
 		loading.stop(`Wrote output to \`${color.cyan(manifestOut)}\``);
 	}
-};
+}
 
-export const createManifest = (
+export function createManifest(
 	categories: Category[],
 	configFiles: Manifest['configFiles'],
 	config: RegistryConfig
-) => {
+) {
 	const manifest: Manifest = {
 		meta: config.meta,
 		peerDependencies: config.peerDependencies,
@@ -323,6 +323,6 @@ export const createManifest = (
 	};
 
 	return manifest;
-};
+}
 
 export { build };

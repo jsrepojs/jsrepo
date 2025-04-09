@@ -47,7 +47,7 @@ const test = new Command('test')
 		outro(color.green('All done!'));
 	});
 
-const _test = async (blockNames: string[], options: Options) => {
+async function _test(blockNames: string[], options: Options) {
 	const verbose = (msg: string) => {
 		if (options.verbose) {
 			console.info(`${ascii.INFO} ${msg}`);
@@ -326,6 +326,6 @@ const _test = async (blockNames: string[], options: Options) => {
 
 		program.error(color.red(`Tests failed! Error ${err}`));
 	}
-};
+}
 
 export { test };

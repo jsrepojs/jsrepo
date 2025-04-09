@@ -34,7 +34,9 @@ type Options = {
  * @param str
  * @returns
  */
-const isWhitespace = (str: string) => /^\s+$/g.test(str);
+function isWhitespace(str: string) {
+	return /^\s+$/g.test(str);
+}
 
 /** We need to add a newline at the end of each change to make sure
  * the next change can start correctly. So we take off just 1.
@@ -42,7 +44,7 @@ const isWhitespace = (str: string) => /^\s+$/g.test(str);
  * @param str
  * @returns
  */
-const trimSingleNewLine = (str: string): string => {
+function trimSingleNewLine(str: string): string {
 	let i = str.length - 1;
 	while (isWhitespace(str[i]) && i >= 0) {
 		if (str[i] === '\n') {
@@ -57,9 +59,9 @@ const trimSingleNewLine = (str: string): string => {
 	}
 
 	return str;
-};
+}
 
-const formatDiff = ({
+function formatDiff({
 	from,
 	to,
 	changes,
@@ -72,7 +74,7 @@ const formatDiff = ({
 	prefix,
 	onUnchanged,
 	intro,
-}: Options): string => {
+}: Options): string {
 	let result = '';
 
 	const length = array.sum(changes, (change) => change.count ?? 0).toString().length + 1;
@@ -171,7 +173,6 @@ const formatDiff = ({
 			}
 
 			// show expanded
-
 			result += `${lines.join(lines.get(trimSingleNewLine(change.value)), {
 				prefix: linePrefix,
 			})}\n`;
@@ -248,6 +249,6 @@ const formatDiff = ({
 	}
 
 	return result;
-};
+}
 
 export { formatDiff };

@@ -24,7 +24,9 @@ export const NEW_LINE_REGEX = /\n|\r\n/g;
  * lines.split("hello\\nhello\nhello"); // ["hello\\nhello", "hello"]
  * ```
  */
-const get = (str: string): string[] => str.split(NEW_LINE_REGEX);
+export function get(str: string): string[] {
+	return str.split(NEW_LINE_REGEX);
+}
 
 export type Options = {
 	lineNumbers: boolean;
@@ -52,7 +54,10 @@ export type Options = {
  * // + console.log('test')
  * ```
  */
-const join = (lines: string[], { lineNumbers = false, prefix }: Partial<Options> = {}): string => {
+export function join(
+	lines: string[],
+	{ lineNumbers = false, prefix }: Partial<Options> = {}
+): string {
 	let transformed = lines;
 
 	if (lineNumbers) {
@@ -66,6 +71,4 @@ const join = (lines: string[], { lineNumbers = false, prefix }: Partial<Options>
 	}
 
 	return transformed.join(os.EOL);
-};
-
-export { get, join };
+}
