@@ -176,7 +176,7 @@ const parseUrl = (
 	}
 
 	return {
-		url: u.join(baseUrl, `${owner}/${repoName}${ref ? `/-/tree/${ref}` : ''}`),
+		url: u.join(`gitlab:${baseUrl}`, `${owner}/${repoName}${ref ? `/-/tree/${ref}` : ''}`),
 		baseUrl,
 		owner: owner,
 		repoName: repoName,
