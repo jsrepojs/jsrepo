@@ -1,5 +1,15 @@
 # jsrepo
 
+## 1.47.0
+### Minor Changes
+
+- 7a0c113: fix: Update args for `add` so that config takes priority as expected
+
+### Patch Changes
+
+- 7a0c113: fix: ensure package with unpinned version isn't installed if already installed in the users project
+- 5fd4c12: chore: housekeeping
+
 ## 1.46.2
 ### Patch Changes
 
