@@ -63,12 +63,16 @@ export const add = new Command('add')
 			'biome',
 		])
 	)
-	.option(
-		'--no-watermark',
-		"jsrepo shouldn't leave a watermark at the top of the added files.",
-		undefined
+	.addOption(
+		new Option('--watermark <choice>', 'Include a watermark at the top of added files.')
+			.choices(['true', 'false'])
+			.argParser((val) => val === 'true')
 	)
-	.option('--no-tests', "jsrepo shouldn't include tests when adding blocks.", undefined)
+	.addOption(
+		new Option('--tests <choice>', 'Include tests when adding blocks.')
+			.choices(['true', 'false'])
+			.argParser((val) => val === 'true')
+	)
 	.option(
 		'--paths <category=path,category=path>',
 		'The paths where categories should be added to your project.',
