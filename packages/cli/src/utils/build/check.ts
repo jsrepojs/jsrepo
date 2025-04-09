@@ -334,12 +334,12 @@ const DEFAULT_CONFIG: RuleConfig = {
  * @param ruleConfig
  * @returns
  */
-const runRules = (
+function runRules(
 	manifest: Manifest,
 	config: RegistryConfig,
 	cwd: string,
 	ruleConfig: RuleConfig = DEFAULT_CONFIG
-): { warnings: string[]; errors: string[] } => {
+): { warnings: string[]; errors: string[] } {
 	const warnings: string[] = [];
 	const errors: string[] = [];
 
@@ -424,15 +424,15 @@ const runRules = (
 	}
 
 	return { warnings, errors };
-};
+}
 
 /** Searches for the local dependency tree for the provided specifier returns the path it took to find the dependency */
-const searchForDep = (
+function searchForDep(
 	search: string,
 	block: Block,
 	categories: Category[],
 	chain: string[] = []
-): string[] | undefined => {
+): string[] | undefined {
 	const newChain = [...chain, `${block.category}/${block.name}`];
 
 	for (const dep of block.localDependencies) {
@@ -455,10 +455,10 @@ const searchForDep = (
 	}
 
 	return undefined;
-};
+}
 
 /** Checks if the provided block is depended on anywhere */
-const isDependedOn = (specifier: string, categories: Category[]): boolean => {
+function isDependedOn(specifier: string, categories: Category[]): boolean {
 	for (const category of categories) {
 		for (const block of category.blocks) {
 			if (!block.list) continue;
@@ -470,7 +470,7 @@ const isDependedOn = (specifier: string, categories: Category[]): boolean => {
 	}
 
 	return false;
-};
+}
 
 export {
 	rules,

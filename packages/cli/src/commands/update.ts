@@ -65,7 +65,7 @@ const update = new Command('update')
 		outro(color.green('All done!'));
 	});
 
-const _update = async (blockNames: string[], options: Options) => {
+async function _update(blockNames: string[], options: Options) {
 	const verbose = (msg: string) => {
 		if (options.verbose) {
 			console.info(`${ascii.INFO} ${msg}`);
@@ -345,6 +345,6 @@ const _update = async (blockNames: string[], options: Options) => {
 
 		process.stdout.write(next);
 	}
-};
+}
 
 export { update };

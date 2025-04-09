@@ -401,7 +401,7 @@ const _initProject = async (registries: string[], options: Options) => {
 	}
 };
 
-const promptForRegistryConfig = async ({
+async function promptForRegistryConfig({
 	url,
 	paths,
 	configFiles,
@@ -418,7 +418,7 @@ const promptForRegistryConfig = async ({
 	configFiles: Record<string, string>;
 	dependencies: string[];
 	devDependencies: string[];
-}> => {
+}> {
 	const loading = spinner();
 
 	const storage = new TokenManager();
@@ -673,7 +673,7 @@ const promptForRegistryConfig = async ({
 	}
 
 	return { paths, configFiles, dependencies, devDependencies };
-};
+}
 
 const _initRegistry = async (options: Options) => {
 	const loading = spinner();
