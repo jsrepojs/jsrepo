@@ -25,8 +25,9 @@ const TEST_SUFFIXES = [
 	'_stories.tsx',
 ] as const;
 
-export const isTestFile = (file: string): boolean =>
-	TEST_SUFFIXES.find((suffix) => file.endsWith(suffix)) !== undefined;
+export function isTestFile(file: string): boolean {
+	return TEST_SUFFIXES.find((suffix) => file.endsWith(suffix)) !== undefined;
+}
 
 type Options = {
 	cwd: string;
@@ -39,10 +40,10 @@ type Options = {
  * @param blocksPath
  * @returns
  */
-export const buildBlocksDirectory = (
+export function buildBlocksDirectory(
 	blocksPath: string,
 	{ cwd, ignore, config }: Options
-): Category[] => {
+): Category[] {
 	let paths: string[];
 
 	try {
@@ -266,12 +267,12 @@ export const buildBlocksDirectory = (
 	}
 
 	return categories;
-};
+}
 
-export const buildConfigFiles = (
+export function buildConfigFiles(
 	config: RegistryConfig,
 	{ cwd }: { cwd: string }
-): Manifest['configFiles'] => {
+): Manifest['configFiles'] {
 	if (!config.configFiles) return undefined;
 
 	const configFiles: Manifest['configFiles'] = [];
@@ -313,9 +314,9 @@ export const buildConfigFiles = (
 	}
 
 	return configFiles;
-};
+}
 
-export const shouldListBlock = (name: string, config: RegistryConfig) => {
+export function shouldListBlock(name: string, config: RegistryConfig) {
 	// the length check is just a short circuit here
 	if (config.doNotListBlocks.length > 0 && config.doNotListBlocks.includes(name)) return false;
 
@@ -326,9 +327,9 @@ export const shouldListBlock = (name: string, config: RegistryConfig) => {
 	}
 
 	return true;
-};
+}
 
-export const shouldIncludeBlock = (name: string, config: RegistryConfig) => {
+export function shouldIncludeBlock(name: string, config: RegistryConfig) {
 	// the length check is just a short circuit here
 	if (config.excludeBlocks.length > 0 && config.excludeBlocks.includes(name)) return false;
 
@@ -339,9 +340,9 @@ export const shouldIncludeBlock = (name: string, config: RegistryConfig) => {
 	}
 
 	return true;
-};
+}
 
-export const shouldListCategory = (name: string, config: RegistryConfig) => {
+export function shouldListCategory(name: string, config: RegistryConfig) {
 	// the length check is just a short circuit here
 	if (config.doNotListCategories.length > 0 && config.doNotListCategories.includes(name))
 		return false;
@@ -353,9 +354,9 @@ export const shouldListCategory = (name: string, config: RegistryConfig) => {
 	}
 
 	return true;
-};
+}
 
-export const shouldIncludeCategory = (name: string, config: RegistryConfig) => {
+export function shouldIncludeCategory(name: string, config: RegistryConfig) {
 	// the length check is just a short circuit here
 	if (config.excludeCategories.length > 0 && config.excludeCategories.includes(name))
 		return false;
@@ -367,14 +368,14 @@ export const shouldIncludeCategory = (name: string, config: RegistryConfig) => {
 	}
 
 	return true;
-};
+}
 
 /** Takes the given file and returns the block name */
-const transformBlockName = (file: string) => {
+function transformBlockName(file: string) {
 	return path.parse(path.basename(file)).name;
-};
+}
 
-export const pruneUnused = (categories: Category[]): [Category[], number] => {
+export function pruneUnused(categories: Category[]): [Category[], number] {
 	const pruned: Category[] = [];
 	const prunedCount = 0;
 
@@ -397,7 +398,8 @@ export const pruneUnused = (categories: Category[]): [Category[], number] => {
 	}
 
 	return [pruned, prunedCount];
-};
+}
 
-export const readCategories = (outputFilePath: string): Category[] =>
-	v.parse(v.array(categorySchema), JSON.parse(fs.readFileSync(outputFilePath).toString()));
+export function readCategories(outputFilePath: string): Category[] {
+	return v.parse(v.array(categorySchema), JSON.parse(fs.readFileSync(outputFilePath).toString()));
+}
