@@ -2,7 +2,7 @@
 
 > A CLI to add shared code from remote repositories.
  
-Latest Version: 1.43.0
+Latest Version: 1.46.2
 
 ## Commands
 
@@ -16,6 +16,10 @@ jsrepo add [options] [blocks...]
 ```
 
 #### Options
+- --formatter <choice>: The formatter to use when adding blocks. 
+- --watermark <choice>: Include a watermark at the top of added files. 
+- --tests <choice>: Include tests when adding blocks. 
+- --paths <category=path,category=path>: The paths where categories should be added to your project. 
 - -E, --expand: Expands the diff so you see the entire file. 
 - --max-unchanged <number>: Maximum unchanged lines that will show without being collapsed. (default: 3)
 - --repo <repo>: Repository to download the blocks from. 
