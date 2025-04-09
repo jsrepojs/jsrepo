@@ -369,7 +369,7 @@ describe('gitlab', () => {
 				url: 'gitlab:https://example.com/ieedan/std',
 				opts: { fullyQualified: false },
 				expected: {
-					url: 'https://example.com/ieedan/std',
+					url: 'gitlab:https://example.com/ieedan/std',
 					specifier: undefined,
 				},
 			},
@@ -377,7 +377,7 @@ describe('gitlab', () => {
 				url: 'gitlab:https://sub.example.com/ieedan/std',
 				opts: { fullyQualified: false },
 				expected: {
-					url: 'https://sub.example.com/ieedan/std',
+					url: 'gitlab:https://sub.example.com/ieedan/std',
 					specifier: undefined,
 				},
 			},

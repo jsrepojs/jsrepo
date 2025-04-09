@@ -4,6 +4,7 @@ import * as u from '../blocks/ts/url';
 import type { ParseOptions, RegistryProvider, RegistryProviderState } from './types';
 
 const DEFAULT_BRANCH = 'main';
+const BASE_URL = 'https://gitlab.com';
 
 export interface GitLabProviderState extends RegistryProviderState {
 	baseUrl: string;
@@ -145,7 +146,7 @@ const parseUrl = (
 	ref?: string;
 	specifier?: string;
 } => {
-	let baseUrl = 'https://gitlab.com';
+	let baseUrl = BASE_URL;
 
 	if (url.startsWith('gitlab:')) {
 		baseUrl = new URL(url.slice(7)).origin;
@@ -175,8 +176,14 @@ const parseUrl = (
 		}
 	}
 
+	const isCustom = baseUrl !== BASE_URL;
+
 	return {
-		url: u.join(baseUrl, `${owner}/${repoName}${ref ? `/-/tree/${ref}` : ''}`),
+		// if the url is custom instance of gitlab we must append gitlab: so that the url can be parsed correctly
+		url: u.join(
+			isCustom ? `gitlab:${baseUrl}` : baseUrl,
+			`${owner}/${repoName}${ref ? `/-/tree/${ref}` : ''}`
+		),
 		baseUrl,
 		owner: owner,
 		repoName: repoName,
