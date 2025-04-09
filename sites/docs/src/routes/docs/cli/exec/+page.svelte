@@ -61,7 +61,7 @@
 		default branch for a repository or changing a tag into a head or vise versa.
 	{/snippet}
 	{#snippet usage()}
-		<Snippet command="execute" args={['jsrepo', 'add', '--no-cache']} />
+		<Snippet command="execute" args={['jsrepo', 'exec', '--no-cache']} />
 	{/snippet}
 </OptionDocs>
 <OptionDocs name="--verbose">
@@ -69,7 +69,7 @@
 		More verbose logging. (May be used to troubleshoot issues)
 	{/snippet}
 	{#snippet usage()}
-		<Snippet command="execute" args={['jsrepo', 'add', '--verbose']} />
+		<Snippet command="execute" args={['jsrepo', 'exec', '--verbose']} />
 	{/snippet}
 </OptionDocs>
 <OptionDocs name="--cwd">

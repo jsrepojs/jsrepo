@@ -40,7 +40,7 @@
 		Run the current command on the provided directory absolute or relative.
 	{/snippet}
 	{#snippet usage()}
-		<Snippet command="execute" args={['jsrepo', 'update', '--cwd', './sites/docs']} />
+		<Snippet command="execute" args={['jsrepo', 'auth', '--cwd', './sites/docs']} />
 	{/snippet}
 </OptionDocs>
 <OptionDocs name="-h, --help">

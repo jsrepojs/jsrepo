@@ -125,7 +125,7 @@
 		default branch for a repository or changing a tag into a head or vise versa.
 	{/snippet}
 	{#snippet usage()}
-		<Snippet command="execute" args={['jsrepo', 'add', '--no-cache']} />
+		<Snippet command="execute" args={['jsrepo', 'update', '--no-cache']} />
 	{/snippet}
 </OptionDocs>
 <OptionDocs name="--verbose">

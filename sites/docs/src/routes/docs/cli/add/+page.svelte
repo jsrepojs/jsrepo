@@ -20,13 +20,51 @@
 <p>Include another registry in the blocks list:</p>
 <Snippet command="execute" args={['jsrepo', 'add', '--repo', 'github/ieedan/std']} />
 <SubHeading>Options</SubHeading>
+<OptionDocs name="--watermark">
+	{#snippet description()}
+		Include a watermark at the top of added files. (For non-interactive zero-config adds)
+	{/snippet}
+	{#snippet usage()}
+		<Snippet command="execute" args={['jsrepo', 'add', '--watermark', 'true']} />
+	{/snippet}
+</OptionDocs>
+<OptionDocs name="--tests">
+	{#snippet description()}
+		Include tests along with the blocks when adding them. (For non-interactive zero-config adds)
+	{/snippet}
+	{#snippet usage()}
+		<Snippet command="execute" args={['jsrepo', 'add', '--tests', 'true']} />
+	{/snippet}
+</OptionDocs>
+<OptionDocs name="--formatter">
+	{#snippet description()}
+		Configure the formatter used when adding and updating blocks. (<CodeSpan>prettier</CodeSpan>, <CodeSpan
+			>biome</CodeSpan
+		>, <CodeSpan>none</CodeSpan>) (For non-interactive zero-config adds)
+	{/snippet}
+	{#snippet usage()}
+		<Snippet command="execute" args={['jsrepo', 'add', '--formatter', 'prettier']} />
+	{/snippet}
+</OptionDocs>
+<OptionDocs name="--paths">
+	{#snippet description()}
+		Allows you to specify where to install categories. A mirror of the paths functionality in the
+		<CodeSpan>jsrepo.json</CodeSpan> file. (For non-interactive zero-config adds)
+	{/snippet}
+	{#snippet usage()}
+		<Snippet
+			command="execute"
+			args={['jsrepo', 'add', '--paths', 'utils=./src/blocks/utils,ui=./src/blocks/ui']}
+		/>
+	{/snippet}
+</OptionDocs>
 <OptionDocs name="-E, --expand">
 	{#snippet description()}
 		Expands the diff past the limit set by <CodeSpan>--max-unchanged</CodeSpan> so that you can see the
 		entire file.
 	{/snippet}
 	{#snippet usage()}
-		<Snippet command="execute" args={['jsrepo', 'update', '--expand']} />
+		<Snippet command="execute" args={['jsrepo', 'add', '--expand']} />
 	{/snippet}
 </OptionDocs>
 <OptionDocs name="--max-unchanged">
@@ -35,7 +73,7 @@
 		<CodeSpan>default: 3</CodeSpan>
 	{/snippet}
 	{#snippet usage()}
-		<Snippet command="execute" args={['jsrepo', 'update', '--max-unchanged', '10']} />
+		<Snippet command="execute" args={['jsrepo', 'add', '--max-unchanged', '10']} />
 	{/snippet}
 </OptionDocs>
 <OptionDocs name="--repo">

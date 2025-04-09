@@ -37,7 +37,7 @@ import * as registry from '../utils/registry-providers/internal';
 const schema = v.object({
 	watermark: v.optional(v.boolean()),
 	tests: v.optional(v.boolean()),
-	formatter: v.optional(formatterSchema),
+	formatter: v.optional(v.union([v.literal('prettier'), v.literal('biome'), v.literal('none')])),
 	paths: v.optional(v.record(v.string(), v.string())),
 	expand: v.boolean(),
 	maxUnchanged: v.number(),
@@ -61,14 +61,19 @@ export const add = new Command('add')
 		new Option('--formatter <choice>', 'The formatter to use when adding blocks.').choices([
 			'prettier',
 			'biome',
+			'none',
 		])
 	)
-	.option(
-		'--no-watermark',
-		"jsrepo shouldn't leave a watermark at the top of the added files.",
-		undefined
+	.addOption(
+		new Option('--watermark <choice>', 'Include a watermark at the top of added files.')
+			.choices(['true', 'false'])
+			.argParser((val) => val === 'true')
 	)
-	.option('--no-tests', "jsrepo shouldn't include tests when adding blocks.", undefined)
+	.addOption(
+		new Option('--tests <choice>', 'Include tests when adding blocks.')
+			.choices(['true', 'false'])
+			.argParser((val) => val === 'true')
+	)
 	.option(
 		'--paths <category=path,category=path>',
 		'The paths where categories should be added to your project.',
@@ -152,7 +157,10 @@ async function _add(blockNames: string[], options: Options) {
 		config = configResult.unwrap();
 	}
 
-	config.formatter = options.formatter !== undefined ? options.formatter : config.formatter;
+	config.formatter =
+		options.formatter !== undefined && options.formatter !== 'none'
+			? options.formatter
+			: config.formatter;
 	config.watermark = options.watermark !== undefined ? options.watermark : config.watermark;
 	config.includeTests = options.tests !== undefined ? options.tests : config.includeTests;
 	config.paths =
