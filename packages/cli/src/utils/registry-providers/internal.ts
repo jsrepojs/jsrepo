@@ -75,9 +75,14 @@ export const getProviderState = async (
 
 		// only git providers are cached
 		if (provider.name !== http.name && !noCache) {
-			const cached = storage.get(`${repo}-state`);
+			if (noCache) {
+				// remove the outdated cache if it exists
+				storage.delete(`${repo}-state`);
+			} else {
+				const cached = storage.get(`${repo}-state`);
 
-			if (cached) return Ok({ ...(cached as RegistryProviderState), provider });
+				if (cached) return Ok({ ...(cached as RegistryProviderState), provider });
+			}
 		}
 
 		const parsed = provider.parse(repo, { fullyQualified: false });
