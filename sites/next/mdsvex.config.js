@@ -6,7 +6,7 @@ import autoSlug from 'rehype-slug';
 const theme = 'github-dark';
 const highlighter = await createHighlighter({
 	themes: [theme],
-	langs: ['typescript', 'sh', 'bash', 'ts', 'js']
+	langs: ['typescript', 'sh', 'bash', 'ts', 'js', 'jsonc', 'json']
 });
 
 /** @type {import('mdsvex').MdsvexOptions} */

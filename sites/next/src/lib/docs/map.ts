@@ -30,6 +30,10 @@ const tempMap: Record<string, [TempDoc, TempDoc[]]> = {
 			{
 				title: 'Setup',
 				slug: 'setup'
+			},
+			{
+				title: 'jsrepo.json',
+				slug: 'jsrepo-json'
 			}
 		]
 	],
@@ -157,7 +161,7 @@ function fillHref(baseHref: string, docs: TempDoc[] | undefined): Doc[] | undefi
 	return result;
 }
 
-function sortAlphabetical(a: Doc, b: Doc) {
+function sortAlphabetical(a: TempDoc, b: TempDoc) {
 	const titleA = a.title.toUpperCase();
 	const titleB = b.title.toUpperCase();
 
