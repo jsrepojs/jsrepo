@@ -1,4 +1,3 @@
-import * as Icons from '$lib/components/icons';
 import * as u from '$lib/ts/url';
 
 const BASE_ROUTE = '/docs';
@@ -6,7 +5,6 @@ const BASE_ROUTE = '/docs';
 type TempDoc = {
 	title: string;
 	slug: string;
-	icon?: typeof Icons.GitHub;
 	tag?: string;
 	children?: TempDoc[];
 };
@@ -14,7 +12,6 @@ type TempDoc = {
 type Doc = {
 	title: string;
 	href: string;
-	icon?: typeof Icons.GitHub;
 	tag?: string;
 	children?: Doc[];
 };
@@ -85,23 +82,19 @@ const tempMap: Record<string, [TempDoc, TempDoc[]]> = {
 				children: [
 					{
 						title: 'GitHub',
-						slug: 'github',
-						icon: Icons.GitHub
+						slug: 'github'
 					},
 					{
 						title: 'GitLab',
-						slug: 'gitlab',
-						icon: Icons.GitLab
+						slug: 'gitlab'
 					},
 					{
 						title: 'BitBucket',
-						slug: 'bitbucket',
-						icon: Icons.BitBucket
+						slug: 'bitbucket'
 					},
 					{
 						title: 'AzureDevops',
-						slug: 'azure',
-						icon: Icons.AzureDevops
+						slug: 'azure'
 					},
 					{
 						title: 'http',

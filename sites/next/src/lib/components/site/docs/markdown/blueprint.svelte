@@ -1,6 +1,6 @@
 <script module>
 	import '../../../../../markdown.css';
-	export { pre } from '.';
+	export { pre, a } from '.';
 </script>
 
 <slot />

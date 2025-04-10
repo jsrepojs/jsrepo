@@ -1,7 +1,10 @@
 <script lang="ts">
-	import { active } from '$lib/actions/active.svelte';
 	import { map } from '$lib/docs/map.js';
 	import { cn } from '$lib/utils';
+	import NavLink from './nav-link.svelte';
+	import * as Collapsible from '$lib/components/ui/collapsible';
+	import { ChevronDown } from '@lucide/svelte';
+	import { buttonVariants } from '$lib/components/ui/button';
 
 	let { class: className }: { class?: string } = $props();
 </script>
@@ -14,25 +17,26 @@
 			</span>
 			<ul class="flex flex-col font-light text-muted-foreground">
 				{#each docs as doc}
-					<a
-						use:active={{ activeForSubdirectories: false }}
-						href={doc.href}
-						class="w-full p-0.5 transition-all hover:text-foreground data-[active=true]:text-foreground"
-					>
-						{doc.title}
-					</a>
 					{#if doc.children}
-						<ul class="flex flex-col pl-4 border-l ml-1">
-							{#each doc.children as child}
-								<a
-									use:active={{ activeForSubdirectories: false }}
-									href={child.href}
-									class="w-full p-0.5 transition-all hover:text-foreground data-[active=true]:text-foreground"
+						<Collapsible.Root class="group" open={true}>
+							<div class="flex place-items-center justify-between pr-2">
+								<NavLink href={doc.href} title={doc.title} />
+								<Collapsible.Trigger
+									class={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'size-6')}
 								>
-									{child.title}
-								</a>
-							{/each}
-						</ul>
+									<ChevronDown class="group-data-[state=open]:rotate-180" />
+								</Collapsible.Trigger>
+							</div>
+							<Collapsible.Content>
+								<ul class="ml-1 flex flex-col border-l pl-4">
+									{#each doc.children as child}
+										<NavLink href={child.href} title={child.title} />
+									{/each}
+								</ul>
+							</Collapsible.Content>
+						</Collapsible.Root>
+					{:else}
+						<NavLink href={doc.href} title={doc.title} />
 					{/if}
 				{/each}
 			</ul>
