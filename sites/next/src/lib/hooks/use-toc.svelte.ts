@@ -32,11 +32,11 @@ export const INDEX_ATTRIBUTE = 'data-toc-index';
  * ```
  */
 export class UseToc {
-	#ref = $state<HTMLElement>();
+	#ref = $state<Element>();
 	#toc = $state<Heading[]>([]);
 
 	// This sets everything up once #ref is bound
-	set ref(ref: HTMLElement | undefined) {
+	set ref(ref: Element | undefined) {
 		this.#ref = ref;
 
 		if (!this.#ref) return;
@@ -125,7 +125,7 @@ const createHeading = (element: HTMLHeadingElement, index: number): Heading => {
  * @param el
  * @returns
  */
-const getToc = (el: HTMLElement): Heading[] => {
+const getToc = (el: Element): Heading[] => {
 	const headings = Array.from(el.querySelectorAll('h1, h2, h3, h4, h5, h6')).map((h, i) =>
 		createHeading(h as HTMLHeadingElement, i)
 	);
