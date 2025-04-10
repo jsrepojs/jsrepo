@@ -67,7 +67,7 @@ const config: Config = {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			fontFamily: {
-				sans: ['Inter Variable', 'sans-serif'],
+				sans: ['Open Sans Variable', 'sans-serif'],
 				mono: ['JetBrains Mono Variable', 'monospace']
 			},
 			keyframes: {

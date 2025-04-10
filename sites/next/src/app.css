@@ -4,6 +4,7 @@
 
 @layer base {
 	:root {
+		--radius: 0.4rem;
 		--brand: 53 93% 54%;
 		--background: 0 0% 100%;
 		--foreground: 240 10% 3.9%;
@@ -24,7 +25,6 @@
 		--destructive: 0 72.2% 50.6%;
 		--destructive-foreground: 0 0% 98%;
 		--ring: 240 10% 3.9%;
-		--radius: 0.5rem;
 		--sidebar-background: 0 0% 98%;
 		--sidebar-foreground: 240 5.3% 26.1%;
 		--sidebar-primary: 240 5.9% 10%;

@@ -6,13 +6,13 @@
 	let { class: className }: { class?: string } = $props();
 </script>
 
-<div class={cn('flex flex-col border-r bg-background', className)}>
+<div class={cn('flex flex-col gap-4 border-r bg-background', className)}>
 	{#each Object.entries(map) as [title, docs]}
 		<div class="mt-4 flex flex-col gap-2">
-			<span class="text-xs font-medium uppercase text-muted-foreground">
+			<span class="text-xs font-mono uppercase tracking-wider text-muted-foreground">
 				{title}
 			</span>
-			<ul class="flex flex-col text-sm font-light text-muted-foreground">
+			<ul class="flex flex-col font-light text-muted-foreground">
 				{#each docs as doc}
 					<a
 						use:active={{ activeForSubdirectories: false }}
