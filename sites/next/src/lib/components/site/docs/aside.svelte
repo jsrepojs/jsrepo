@@ -14,6 +14,6 @@
 </script>
 
 <div class={cn('flex-col bg-background pb-4', className)}>
-	<span class="font-mono text-xs uppercase tracking-wider mt-4">On This Page</span>
+	<span class="font-mono text-xs uppercase tracking-wider mt-4 text-muted-foreground">On This Page</span>
 	<Toc.Root toc={toc.current} />
 </div>
