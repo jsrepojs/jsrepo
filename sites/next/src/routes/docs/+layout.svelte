@@ -5,6 +5,7 @@
 	import * as Toc from '$lib/components/ui/toc';
 	import { onMount } from 'svelte';
 	import { map } from '$lib/docs/map.js';
+	import { active } from '$lib/actions/active.svelte.js';
 
 	let { children } = $props();
 
@@ -29,9 +30,13 @@
 				<span class="text-xs font-medium uppercase text-muted-foreground">
 					{title}
 				</span>
-				<ul class="flex flex-col font-light text-muted-foreground text-sm">
+				<ul class="flex flex-col text-sm font-light text-muted-foreground">
 					{#each docs as doc}
-						<a href={doc.href} class="p-0.5 w-full hover:text-foreground transition-all">
+						<a
+							use:active={{ activeForSubdirectories: false }}
+							href={doc.href}
+							class="w-full p-0.5 transition-all hover:text-foreground data-[active=true]:text-foreground"
+						>
 							{doc.title}
 						</a>
 					{/each}

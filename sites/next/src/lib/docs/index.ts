@@ -32,8 +32,6 @@ function matchDoc(
 	slug: string,
 	modules: Modules
 ): { path: string; resolver: Resolver } | undefined {
-	console.log(modules)
-
 	for (const [path, resolver] of Object.entries(modules)) {
 		const stripped = path.slice(base.length);
 
