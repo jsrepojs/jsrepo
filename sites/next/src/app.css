@@ -1,3 +1,6 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -74,11 +77,11 @@
 	}
 }
 
-/* Markdown */
+/* Prose */
 
-.docs {
-	h1 {
-		@apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
+.prose {
+	h2, h3, h3, h4 {
+		@apply mt-6;
 	}
 
 	h2 {
@@ -99,5 +102,13 @@
 
 	ul {
 		@apply my-6 ml-6 list-disc [&>li]:mt-2;
+	}
+
+	:not(pre) code {
+		@apply relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm;
+	}
+
+	pre {
+		@apply border border-border rounded-lg mt-6 max-w-full overflow-auto p-3 text-sm !bg-background;
 	}
 }

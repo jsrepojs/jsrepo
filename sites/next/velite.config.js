@@ -7,7 +7,7 @@ export default defineConfig({
 			name: 'Docs',
 			pattern: './**/*.md',
 			schema: s.object({
-				title: s.string(),
+				title: s.string().max(25),
 				description: s.string(),
 				lastUpdated: s.isodate(),
 				path: s.path()

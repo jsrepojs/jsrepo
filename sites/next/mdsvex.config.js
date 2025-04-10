@@ -1,5 +1,7 @@
 import { createHighlighter } from 'shiki';
 import { escapeSvelte } from 'mdsvex';
+import autolinkHeadings from 'rehype-autolink-headings';
+import autoSlug from 'rehype-slug';
 
 const theme = 'github-dark';
 const highlighter = await createHighlighter({
@@ -16,6 +18,7 @@ const options = {
 			return `{@html \`${html}\` }`;
 		}
 	},
+	rehypePlugins: [autoSlug, autolinkHeadings],
 	extensions: ['.svx', '.md']
 };
 

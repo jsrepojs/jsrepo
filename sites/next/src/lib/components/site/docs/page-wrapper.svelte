@@ -1,11 +1,11 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { Docs } from '../../../../../.velite/index';
+	import { UseToc } from '$lib/hooks/use-toc.svelte.js'
 
 	let {
 		title,
 		description,
-		lastUpdated,
 		children
 	}: Omit<Docs, 'path'> & { children: Snippet<[]> } = $props();
 </script>
@@ -14,11 +14,10 @@
 	<title>{title}</title>
 </svelte:head>
 
-<div class="docs">
-	<h1>{title}</h1>
-	<p class="text-lg lg:text-xl text-muted-foreground">{description}</p>
-	<span class="font-mono text-xs text-muted-foreground">
-        {new Date(lastUpdated).toLocaleDateString()}
-    </span>
-	{@render children()}
+<div class="py-4 md:px-4">
+	<h1 class="text-4xl font-bold">{title}</h1>
+	<p class="mb-6 text-lg text-muted-foreground">{description}</p>
+	<div class="prose flex max-w-full flex-col">
+		{@render children()}
+	</div>
 </div>
