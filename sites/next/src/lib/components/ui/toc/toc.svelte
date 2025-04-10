@@ -17,7 +17,7 @@
 	let { toc, isChild = false, class: className }: Props = $props();
 </script>
 
-<ul class={cn('m-0 list-none text-sm font-medium', { 'pl-4': isChild })}>
+<ul class={cn('m-0 list-none text-sm font-light', { 'pl-4': isChild })}>
 	{#each toc as heading, i (i)}
 		<li
 			class={cn('mt-0 pt-2 text-muted-foreground transition-all', {
