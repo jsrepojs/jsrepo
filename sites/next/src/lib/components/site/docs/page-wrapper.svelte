@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { Docs } from '../../../../../.velite/index';
-	import { UseToc } from '$lib/hooks/use-toc.svelte.js';
+	import type { Docs } from '$content/index';
 
 	type Props = Omit<Docs, 'path'> & { children: Snippet<[]> };
 

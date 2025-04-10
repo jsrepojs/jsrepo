@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
-import { docs, type Docs } from '../../../.velite';
 
 export async function load() {
+    // @ts-expect-error wrong
     const doc = await import('../../lib/docs/index.md')
 
     if (!doc || !doc.metadata) {

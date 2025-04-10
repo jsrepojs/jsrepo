@@ -1,5 +1,5 @@
 import type { Component } from 'svelte';
-import { docs, type Docs } from '../../../.velite/index.js';
+import { docs, type Docs } from '$content/index';
 
 const base = '/src/lib/docs/';
 
