@@ -85,7 +85,7 @@
 	}
 
 	h2 {
-		@apply scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0;
+		@apply scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0;
 	}
 
 	h3 {
@@ -101,7 +101,11 @@
 	}
 
 	ul {
-		@apply my-6 ml-6 list-disc [&>li]:mt-2;
+		@apply mt-6 ml-6 list-disc [&>li]:mt-2;
+	}
+
+	hr {
+		@apply mt-6;
 	}
 
 	:not(pre) code {

@@ -11,7 +11,7 @@ export async function getDoc(slug: string) {
 	const metadata = docs.find((d) => d.path === slug);
 
 	if (!metadata || !component) {
-		throw new Error(`couldn't find doc at '${slug}'`);
+		return undefined;
 	}
 
 	return {
@@ -32,10 +32,12 @@ function matchDoc(
 	slug: string,
 	modules: Modules
 ): { path: string; resolver: Resolver } | undefined {
+	console.log(modules)
+
 	for (const [path, resolver] of Object.entries(modules)) {
 		const stripped = path.slice(base.length);
 
-		if (slug === `${stripped}.md`) {
+		if (`${slug}.md` === stripped) {
 			return { path, resolver: resolver as Resolver };
 		}
 

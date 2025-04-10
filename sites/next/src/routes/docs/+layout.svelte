@@ -4,6 +4,7 @@
 	import { UseToc } from '$lib/hooks/use-toc.svelte.js';
 	import * as Toc from '$lib/components/ui/toc';
 	import { onMount } from 'svelte';
+	import { map } from '$lib/docs/map.js';
 
 	let { children } = $props();
 
@@ -21,8 +22,23 @@
 		jsrepo
 	</header>
 	<div
-		class="fixed top-[--header-height] z-10 hidden h-[calc(100svh-var(--header-height))] w-[--aside-width] bg-background md:flex"
-	></div>
+		class="fixed top-[--header-height] z-10 hidden h-[calc(100svh-var(--header-height))] w-[--aside-width] flex-col border-r bg-background md:flex"
+	>
+		{#each Object.entries(map) as [title, docs]}
+			<div class="mt-4 flex flex-col gap-2">
+				<span class="text-xs font-medium uppercase text-muted-foreground">
+					{title}
+				</span>
+				<ul class="flex flex-col font-light text-muted-foreground text-sm">
+					{#each docs as doc}
+						<a href={doc.href} class="p-0.5 w-full hover:text-foreground transition-all">
+							{doc.title}
+						</a>
+					{/each}
+				</ul>
+			</div>
+		{/each}
+	</div>
 	<div
 		class="relative grid md:grid-cols-[var(--aside-width)_1fr] lg:grid-cols-[var(--aside-width)_1fr_var(--aside-width)]"
 	>
