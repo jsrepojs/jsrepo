@@ -1,0 +1,103 @@
+.prose {
+	h2,
+	h3,
+	h3,
+	h4 {
+		@apply mt-6;
+	}
+
+	h2 {
+		@apply scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0;
+	}
+
+	h3 {
+		@apply scroll-m-20 text-2xl font-semibold tracking-tight;
+	}
+
+	h4 {
+		@apply scroll-m-20 text-xl font-semibold tracking-tight;
+	}
+
+	p {
+		@apply leading-7 [&:not(:first-child)]:mt-6;
+	}
+
+    a {
+        @apply font-medium underline underline-offset-4;
+    }
+
+	ul {
+		@apply ml-6 mt-6 list-disc [&>li]:mt-2;
+	}
+
+	hr {
+		@apply mt-6;
+	}
+
+	code:not([data-language]) {
+		@apply relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm;
+	}
+}
+
+[data-theme*='github-dark-default'] {
+	@apply flex flex-col;
+}
+
+[data-rehype-pretty-code-figure] {
+	@apply relative text-sm font-mono;
+}
+
+[data-rehype-pretty-code-figure] code {
+	display: grid;
+	min-width: 100%;
+	border-radius: 0;
+	background: transparent;
+	padding: 0;
+	border: 0;
+	counter-reset: line;
+	box-decoration-break: clone;
+}
+
+[data-rehype-pretty-code-figure] [data-line] {
+	@apply w-full inline-block;
+
+	min-height: 1.5rem;
+	padding: 2px 1rem;
+}
+
+[data-rehype-pretty-code-figure] [data-line-numbers] [data-line] {
+	padding: 0 0.5rem;
+}
+
+[data-rehype-pretty-code-figure] [data-line-numbers] > [data-line]::before {
+	@apply text-muted-foreground text-right inline-block;
+
+	counter-increment: line;
+	content: counter(line);
+	width: 1.8rem;
+	margin-right: 1.4rem;
+}
+
+[data-rehype-pretty-code-figure] .line--highlighted {
+	@apply !bg-accent;
+}
+
+[data-rehype-pretty-code-figure] .line-highlighted span {
+	@apply relative;
+}
+
+[data-rehype-pretty-code-figure] .chars--highlighted {
+	@apply bg-accent rounded-md p-1;
+}
+
+code[data-theme*='github-light-default'],
+code[data-theme*='github-light-default'] span {
+	color: var(--shiki-light);
+	background-color: var(--shiki-light-bg);
+}
+
+.dark code[data-theme*='github-dark-default'],
+.dark code[data-theme*='github-dark-default'] span {
+	color: var(--shiki-dark);
+	background-color: var(--shiki-dark-bg);
+}
