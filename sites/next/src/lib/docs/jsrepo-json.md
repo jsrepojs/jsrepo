@@ -8,7 +8,7 @@ lastUpdated: 4-10-2025
     import { PMCommand } from "$lib/components/ui/pm-command"
 </script>
 
-The `jsrepo.json` allows you to configure how `jsrepo` installs blocks in your project.
+The `jsrepo.json` allows you to configure how *jsrepo* installs blocks in your project.
 
 You can create a `jsrepo.json` by running the init command with the `--project` flag:
 

@@ -14,8 +14,10 @@
 </script>
 
 <div class={cn('flex-col bg-background pb-4', className)}>
-	<span class="mt-4 font-mono text-xs font-normal uppercase tracking-wider text-muted-foreground">
-		On This Page
-	</span>
-	<Toc.Root toc={toc.current} />
+	{#if toc.current.length > 0}
+		<span class="mt-4 font-mono text-xs font-normal uppercase tracking-wider text-muted-foreground">
+			On This Page
+		</span>
+		<Toc.Root toc={toc.current} />
+	{/if}
 </div>
