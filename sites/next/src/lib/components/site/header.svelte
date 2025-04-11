@@ -12,7 +12,7 @@
 		<div>
 			<a
 				href="/"
-				class="flex h-9 w-fit place-items-center justify-center bg-brand p-1 font-mono font-bold text-black"
+				class="text-brand-foreground flex h-9 w-fit place-items-center justify-center bg-brand p-1 font-mono font-bold"
 			>
 				jsrepo
 			</a>

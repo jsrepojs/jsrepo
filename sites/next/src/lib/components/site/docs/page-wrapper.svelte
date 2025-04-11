@@ -8,7 +8,7 @@
 </script>
 
 <svelte:head>
-	<title>{title}</title>
+	<title>jsrepo ~ {title}</title>
 </svelte:head>
 
 <div class="py-6 md:px-8">

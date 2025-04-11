@@ -5,6 +5,7 @@
 	import * as Collapsible from '$lib/components/ui/collapsible';
 	import { ChevronDown } from '@lucide/svelte';
 	import { buttonVariants } from '$lib/components/ui/button';
+	import { Badge } from '$lib/components/ui/badge';
 
 	let { class: className }: { class?: string } = $props();
 </script>
@@ -20,7 +21,7 @@
 					{#if doc.children}
 						<Collapsible.Root class="group" open={true}>
 							<div class="flex place-items-center justify-between pr-2">
-								<NavLink href={doc.href} title={doc.title} />
+								{@render navLink(doc)}
 								<Collapsible.Trigger
 									class={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'size-6')}
 								>
@@ -30,16 +31,25 @@
 							<Collapsible.Content>
 								<ul class="ml-1 flex flex-col border-l pl-4">
 									{#each doc.children as child}
-										<NavLink href={child.href} title={child.title} />
+										{@render navLink(child)}
 									{/each}
 								</ul>
 							</Collapsible.Content>
 						</Collapsible.Root>
 					{:else}
-						<NavLink href={doc.href} title={doc.title} />
+						{@render navLink(doc)}
 					{/if}
 				{/each}
 			</ul>
 		</div>
 	{/each}
 </div>
+
+{#snippet navLink({ href, title, tag }: { href: string; title: string; tag?: string })}
+	<div class="flex place-items-center gap-2 w-full">
+		<NavLink {href} {title} />
+		{#if tag}
+			<Badge class="text-brand-foreground bg-brand px-1 py-0 rounded-xl hover:bg-brand">{tag}</Badge>
+		{/if}
+	</div>
+{/snippet}

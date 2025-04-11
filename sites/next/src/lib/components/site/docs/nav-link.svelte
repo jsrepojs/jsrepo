@@ -15,7 +15,7 @@
 	{...rest}
 	{href}
 	use:active={{ activeForSubdirectories: false }}
-	class={cn('w-full p-0.5 transition-all hover:text-foreground data-[active=true]:text-foreground')}
+	class={cn('p-0.5 transition-all hover:text-foreground data-[active=true]:text-foreground')}
 >
 	{title}
 </a>
