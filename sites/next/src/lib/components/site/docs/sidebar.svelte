@@ -11,13 +11,13 @@
 </script>
 
 <div class={cn('flex flex-col gap-4 overflow-y-auto border-r bg-background pb-4', className)}>
-	{#each Object.entries(map) as [title, docs]}
+	{#each Object.entries(map) as [title, docs] (title)}
 		<div class="mt-4 flex flex-col gap-2">
 			<span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">
 				{title}
 			</span>
 			<ul class="flex flex-col font-light text-muted-foreground">
-				{#each docs as doc}
+				{#each docs as doc (doc.href)}
 					{#if doc.children}
 						<Collapsible.Root class="group" open={true}>
 							<div class="flex place-items-center justify-between pr-2">
@@ -30,7 +30,7 @@
 							</div>
 							<Collapsible.Content>
 								<ul class="ml-1 flex flex-col border-l pl-4">
-									{#each doc.children as child}
+									{#each doc.children as child (doc.href)}
 										{@render navLink(child)}
 									{/each}
 								</ul>

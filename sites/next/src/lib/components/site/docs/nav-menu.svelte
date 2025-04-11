@@ -34,17 +34,17 @@
 	<div class="h-[calc(100svh-var(--header-height)-69px)] overflow-y-auto px-8 pb-4">
 		{#if page.url.pathname.startsWith('/docs')}
 			<div class="flex flex-col gap-4">
-				{#each Object.entries(map) as [title, docs]}
+				{#each Object.entries(map) as [title, docs] (title)}
 					<div class="mt-4 flex flex-col gap-2">
 						<span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">
 							{title}
 						</span>
 						<ul class="flex flex-col font-light text-muted-foreground">
-							{#each docs as doc}
+							{#each docs as doc (doc.href)}
 								{@render navLink(doc)}
 								{#if doc.children}
 									<ul class="ml-1 flex flex-col border-l pl-4">
-										{#each doc.children as child}
+										{#each doc.children as child (child.href)}
 											{@render navLink(child)}
 										{/each}
 									</ul>
