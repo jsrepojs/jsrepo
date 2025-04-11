@@ -25,7 +25,7 @@
 		</div>
 
 		<div class="flex place-items-center gap-2">
-			<StarButton {stars} class="hidden md:flex" />
+			<StarButton {stars} class="hidden h-9 md:flex" />
 			<LightSwitch class="hidden size-9 md:flex" />
 			<Dialog.Root bind:open={menuOpen}>
 				<Dialog.Trigger>

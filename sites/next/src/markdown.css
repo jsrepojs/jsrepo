@@ -3,7 +3,7 @@
 	h3,
 	h3,
 	h4 {
-		@apply mt-6;
+		@apply mt-4;
 	}
 
 	h2 {
@@ -19,35 +19,39 @@
 	}
 
 	p {
-		@apply leading-7 [&:not(:first-child)]:mt-6;
+		@apply leading-7 [&:not(:first-child)]:mt-4;
 	}
 
-    a {
-        @apply font-medium underline underline-offset-4;
-    }
+	a {
+		@apply font-medium underline underline-offset-4;
+	}
 
 	ul {
-		@apply ml-6 mt-6 list-disc [&>li]:mt-2;
+		@apply ml-4 mt-4 list-disc [&>li]:mt-2;
 	}
 
 	hr {
-		@apply mt-6;
+		@apply mt-4;
 	}
 
 	blockquote {
-		@apply bg-muted py-2 mt-6 px-4 border-l-2 border-l-brand text-muted-foreground;
+		@apply mt-4 border-l-2 border-l-brand bg-muted px-4 py-2 text-muted-foreground;
 	}
 
 	[data-pm-command] {
-		@apply mt-4;
+		@apply [&:not(:first-child)]:mt-4;
 	}
 
 	[data-snippet] {
-		@apply mt-4;
+		@apply [&:not(:first-child)]:mt-4;
 	}
 
 	code:not([data-language]) {
-		@apply relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm text-nowrap;
+		@apply relative text-nowrap rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono;
+	}
+
+	:not(h1, h2, h3, h4, h5, h6) code:not([data-language]) {
+		@apply text-sm;
 	}
 }
 
@@ -56,7 +60,7 @@
 }
 
 [data-rehype-pretty-code-figure] {
-	@apply relative text-sm font-mono;
+	@apply relative font-mono text-sm;
 }
 
 [data-rehype-pretty-code-figure] code {
@@ -71,7 +75,7 @@
 }
 
 [data-rehype-pretty-code-figure] [data-line] {
-	@apply w-full inline-block;
+	@apply inline-block w-full;
 
 	min-height: 1.5rem;
 	padding: 2px 1rem;
@@ -82,7 +86,7 @@
 }
 
 [data-rehype-pretty-code-figure] [data-line-numbers] > [data-line]::before {
-	@apply text-muted-foreground text-right inline-block;
+	@apply inline-block text-right text-muted-foreground;
 
 	counter-increment: line;
 	content: counter(line);
@@ -99,7 +103,7 @@
 }
 
 [data-rehype-pretty-code-figure] .chars--highlighted {
-	@apply bg-accent rounded-md p-1;
+	@apply rounded-md bg-accent p-1;
 }
 
 code[data-theme*='github-light-default'],

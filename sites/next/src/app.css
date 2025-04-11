@@ -75,3 +75,13 @@
 		@apply bg-background text-foreground;
 	}
 }
+
+/* For components that need horizontal scrolling */
+.scrollbar-hide {
+	-ms-overflow-style: none; /* Internet Explorer and Edge */
+	scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+	display: none; /* Chrome, Safari, and Opera */
+}

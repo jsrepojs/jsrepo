@@ -13,7 +13,7 @@
 	});
 </script>
 
-<div class={cn('flex-col bg-background pb-4', className)}>
+<div class={cn('flex-col bg-background pb-4 overflow-y-auto scrollbar-hide', className)}>
 	{#if toc.current.length > 0}
 		<span class="mt-4 font-mono text-xs font-normal uppercase tracking-wider text-muted-foreground">
 			On This Page
