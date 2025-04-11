@@ -46,10 +46,11 @@
 </div>
 
 {#snippet navLink({ href, title, tag }: { href: string; title: string; tag?: string })}
-	<div class="flex place-items-center gap-2 w-full">
+	<div class="flex w-full place-items-center gap-2">
 		<NavLink {href} {title} />
 		{#if tag}
-			<Badge class="text-brand-foreground bg-brand px-1 py-0 rounded-xl hover:bg-brand">{tag}</Badge>
+			<Badge class="rounded-xl bg-brand px-1 py-0 text-brand-foreground hover:bg-brand">{tag}</Badge
+			>
 		{/if}
 	</div>
 {/snippet}
