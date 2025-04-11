@@ -24,4 +24,4 @@
 	{...restProps}>
 	{@render children?.()}
 </pre>
-<CopyButton text={code} class={cn("absolute right-2 top-8 size-8")} />
+<CopyButton text={code} class={cn("absolute right-2 top-9 size-8")} />

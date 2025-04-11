@@ -45,7 +45,7 @@
 	const commandText = $derived(`${cmd?.command} ${cmd?.args.join(' ')}`);
 </script>
 
-<div class={cn(style({ variant }), className)}>
+<div class={cn(style({ variant }), className)} data-pm-command>
 	<div class="flex place-items-end justify-between border-b border-border px-2 pt-1 pb-0">
 		<div class="flex place-items-center gap-1">
 			{#each agents as pm (pm)}

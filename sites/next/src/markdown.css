@@ -34,6 +34,18 @@
 		@apply mt-6;
 	}
 
+	blockquote {
+		@apply bg-muted py-2 mt-6 px-4 border-l-2 border-l-brand text-muted-foreground;
+	}
+
+	[data-pm-command] {
+		@apply mt-4;
+	}
+
+	[data-snippet] {
+		@apply mt-4;
+	}
+
 	code:not([data-language]) {
 		@apply relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm text-nowrap;
 	}
