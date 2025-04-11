@@ -40,11 +40,11 @@
 							{title}
 						</span>
 						<ul class="flex flex-col font-light text-muted-foreground">
-							{#each docs as doc (doc.href)}
+							{#each docs as doc (doc.title)}
 								{@render navLink(doc)}
 								{#if doc.children}
 									<ul class="ml-1 flex flex-col border-l pl-4">
-										{#each doc.children as child (child.href)}
+										{#each doc.children as child (child.title)}
 											{@render navLink(child)}
 										{/each}
 									</ul>

@@ -17,7 +17,7 @@
 				{title}
 			</span>
 			<ul class="flex flex-col font-light text-muted-foreground">
-				{#each docs as doc (doc.href)}
+				{#each docs as doc (doc.title)}
 					{#if doc.children}
 						<Collapsible.Root class="group" open={true}>
 							<div class="flex place-items-center justify-between pr-2">
@@ -30,7 +30,7 @@
 							</div>
 							<Collapsible.Content>
 								<ul class="ml-1 flex flex-col border-l pl-4">
-									{#each doc.children as child (doc.href)}
+									{#each doc.children as child (child.title)}
 										{@render navLink(child)}
 									{/each}
 								</ul>
