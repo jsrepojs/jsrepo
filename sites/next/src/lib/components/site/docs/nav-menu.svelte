@@ -7,21 +7,31 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import { LightSwitch } from '$lib/components/ui/light-switch';
 	import * as Icons from '$lib/components/icons';
+	import { Dialog } from 'bits-ui';
+	import { IsMobile } from '$lib/hooks/is-mobile.svelte';
 
 	type Props = {
 		open?: boolean;
 	};
 
 	let { open = $bindable(false) }: Props = $props();
+
+	const isMobile = new IsMobile();
+
+	$effect(() => {
+		// close the dialog if we ever come out of mobile mode
+		if (!isMobile.current) {
+			open = false;
+		}
+	});
 </script>
 
-<div
+<Dialog.Content
 	class={cn(
-		'fixed left-0 top-[--header-height] z-50 hidden h-[calc(100svh-var(--header-height))] w-full flex-col bg-background',
-		{ 'flex md:hidden': open }
+		'fixed left-0 top-[--header-height] z-50 h-[calc(100svh-var(--header-height))] w-full bg-background'
 	)}
 >
-	<div class="overflow-y-auto h-[calc(100svh-var(--header-height)-69px)] px-8 pb-4">
+	<div class="h-[calc(100svh-var(--header-height)-69px)] overflow-y-auto px-8 pb-4">
 		{#if page.url.pathname.startsWith('/docs')}
 			<div class="flex flex-col gap-4">
 				{#each Object.entries(map) as [title, docs]}
@@ -46,7 +56,7 @@
 			</div>
 		{/if}
 	</div>
-	<div class="flex place-items-center gap-2 border-t py-4 mx-8">
+	<div class="mx-8 flex place-items-center gap-2 border-t py-4">
 		<LightSwitch class="size-9" />
 		<Button
 			target="_blank"
@@ -58,14 +68,15 @@
 			<Icons.GitHub />
 		</Button>
 	</div>
-</div>
+</Dialog.Content>
 
 {#snippet navLink({ href, title, tag }: { href: string; title: string; tag?: string })}
 	<div class="flex w-full place-items-center gap-2">
 		<NavLink {href} {title} onclick={() => (open = false)} />
 		{#if tag}
-			<Badge class="rounded-xl bg-brand px-1 py-0 text-brand-foreground hover:bg-brand">{tag}</Badge
-			>
+			<Badge class="rounded-xl bg-brand px-1 py-0 text-brand-foreground hover:bg-brand">
+				{tag}
+			</Badge>
 		{/if}
 	</div>
 {/snippet}

@@ -4,6 +4,7 @@
 	import StarButton from './star-button.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Menu, X } from '@lucide/svelte';
+	import { Dialog } from 'bits-ui';
 
 	let { stars }: { stars: Promise<number> } = $props();
 
@@ -24,17 +25,28 @@
 		</div>
 
 		<div class="flex place-items-center gap-2">
-			<StarButton {stars} class="hidden md:flex"/>
-			<LightSwitch class="size-9 hidden md:flex" />
-			<Button class="md:hidden" size="icon" variant="ghost" onclick={() => (menuOpen = !menuOpen)}>
-				{#if menuOpen}
-					<X />
-				{:else}
-					<Menu />
-				{/if}
-			</Button>
+			<StarButton {stars} class="hidden md:flex" />
+			<LightSwitch class="hidden size-9 md:flex" />
+			<Dialog.Root bind:open={menuOpen}>
+				<Dialog.Trigger>
+					{#snippet child({ props })}
+						<Button
+							{...props}
+							class="md:hidden"
+							size="icon"
+							variant="ghost"
+							onclick={() => (menuOpen = !menuOpen)}
+						>
+							{#if menuOpen}
+								<X />
+							{:else}
+								<Menu />
+							{/if}
+						</Button>
+					{/snippet}
+				</Dialog.Trigger>
+				<NavMenu bind:open={menuOpen} />
+			</Dialog.Root>
 		</div>
 	</div>
 </header>
-
-<NavMenu bind:open={menuOpen} />
