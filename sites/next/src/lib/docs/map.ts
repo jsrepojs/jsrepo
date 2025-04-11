@@ -17,7 +17,7 @@ type Doc = {
 };
 
 // name of the group mapped to a root doc with children
-const tempMap: Record<string, [TempDoc, TempDoc[]]> = {
+const tempMap: Record<string, [TempDoc, TempDoc[]] | [string, TempDoc[]]> = {
 	'Getting Started': [
 		{
 			title: 'Introduction',
@@ -35,10 +35,7 @@ const tempMap: Record<string, [TempDoc, TempDoc[]]> = {
 		]
 	],
 	CLI: [
-		{
-			title: 'Overview',
-			slug: 'cli'
-		},
+		'cli',
 		[
 			{
 				title: 'add',
@@ -119,6 +116,15 @@ const tempMap: Record<string, [TempDoc, TempDoc[]]> = {
 				slug: 'jsrepo-build-config-json'
 			}
 		]
+	],
+	Integrations: [
+		'integrations',
+		[
+			{
+				title: 'Raycast Extension',
+				slug: 'https://www.raycast.com/ieedan/jsrepo'
+			}
+		]
 	]
 };
 
@@ -130,11 +136,19 @@ function buildMap(initial: typeof tempMap): Record<string, Doc[]> {
 	for (const [title, value] of Object.entries(initial)) {
 		const [rootDoc, docs] = value;
 
-		const baseHref = u.join(BASE_ROUTE, rootDoc.slug);
+		if (typeof rootDoc === 'string') {
+			const baseHref = u.join(BASE_ROUTE, rootDoc);
 
-		const children = fillHref(baseHref, docs);
+			const children = fillHref(baseHref, docs);
 
-		result[title] = [{ ...rootDoc, href: baseHref, children: undefined }, ...(children ?? [])];
+			result[title] = children ?? [];
+		} else {
+			const baseHref = u.join(BASE_ROUTE, rootDoc.slug);
+
+			const children = fillHref(baseHref, docs);
+
+			result[title] = [{ ...rootDoc, href: baseHref, children: undefined }, ...(children ?? [])];
+		}
 	}
 
 	return result;
@@ -148,7 +162,12 @@ function fillHref(baseHref: string, docs: TempDoc[] | undefined): Doc[] | undefi
 	for (const doc of docs) {
 		const children = fillHref(u.join(baseHref, doc.slug), doc.children);
 
-		result.push({ ...doc, href: u.join(baseHref, doc.slug), children });
+		result.push({
+			...doc,
+			// external links are kept
+			href: doc.slug.startsWith('https://') ? doc.slug : u.join(baseHref, doc.slug),
+			children
+		});
 	}
 
 	return result;

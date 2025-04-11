@@ -17,34 +17,36 @@
 
 <div
 	class={cn(
-		'container fixed left-0 top-[--header-height] z-50 hidden h-[calc(100svh-var(--header-height))] w-full flex-col gap-4 bg-background',
+		'fixed left-0 top-[--header-height] z-50 hidden h-[calc(100svh-var(--header-height))] w-full flex-col bg-background',
 		{ 'flex md:hidden': open }
 	)}
 >
-	{#if page.url.pathname.startsWith('/docs')}
-		<div class="flex flex-col gap-4">
-			{#each Object.entries(map) as [title, docs]}
-				<div class="mt-4 flex flex-col gap-2">
-					<span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">
-						{title}
-					</span>
-					<ul class="flex flex-col font-light text-muted-foreground">
-						{#each docs as doc}
-							{@render navLink(doc)}
-							{#if doc.children}
-								<ul class="ml-1 flex flex-col border-l pl-4">
-									{#each doc.children as child}
-										{@render navLink(child)}
-									{/each}
-								</ul>
-							{/if}
-						{/each}
-					</ul>
-				</div>
-			{/each}
-		</div>
-	{/if}
-	<div class="flex place-items-center gap-2">
+	<div class="overflow-y-auto h-[calc(100svh-var(--header-height)-69px)] px-8 pb-4">
+		{#if page.url.pathname.startsWith('/docs')}
+			<div class="flex flex-col gap-4">
+				{#each Object.entries(map) as [title, docs]}
+					<div class="mt-4 flex flex-col gap-2">
+						<span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+							{title}
+						</span>
+						<ul class="flex flex-col font-light text-muted-foreground">
+							{#each docs as doc}
+								{@render navLink(doc)}
+								{#if doc.children}
+									<ul class="ml-1 flex flex-col border-l pl-4">
+										{#each doc.children as child}
+											{@render navLink(child)}
+										{/each}
+									</ul>
+								{/if}
+							{/each}
+						</ul>
+					</div>
+				{/each}
+			</div>
+		{/if}
+	</div>
+	<div class="flex place-items-center gap-2 border-t py-4 mx-8">
 		<LightSwitch class="size-9" />
 		<Button
 			target="_blank"
