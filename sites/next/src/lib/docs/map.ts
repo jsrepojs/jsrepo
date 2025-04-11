@@ -9,7 +9,7 @@ type TempDoc = {
 	children?: TempDoc[];
 };
 
-type Doc = {
+export type Doc = {
 	title: string;
 	href: string;
 	tag?: string;

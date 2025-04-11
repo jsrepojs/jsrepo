@@ -105,7 +105,7 @@ Hit `Accept` to immediately write the changes to the file, `Reject` to discard t
 
 If a file is unchanged it will simply be skipped.
 
-## Test
+### Test
 
 To test blocks you can run:
 
