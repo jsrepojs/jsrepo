@@ -94,8 +94,8 @@ const tempMap: Record<string, [TempDoc, TempDoc[]] | [string, TempDoc[]]> = {
 						slug: 'azure'
 					},
 					{
-						title: 'http',
-						slug: 'http'
+						title: 'Self Hosted',
+						slug: 'self-hosted'
 					}
 				]
 			},

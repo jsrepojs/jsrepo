@@ -3,9 +3,14 @@
 	import '@fontsource-variable/open-sans';
 	import '@fontsource-variable/jetbrains-mono';
 	import { ModeWatcher } from 'mode-watcher';
+	import Header from '$lib/components/site/header.svelte';
 
-	let { children } = $props();
+	let { data, children } = $props();
 </script>
 
 <ModeWatcher />
-{@render children()}
+<div class="container" style="--header-height: 64px; --aside-width: 14rem; --sidebar-width: 14rem;">
+	<Header stars={data.stars} />
+
+	{@render children()}
+</div>

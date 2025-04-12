@@ -9,6 +9,7 @@
 
 <svelte:head>
 	<title>jsrepo ~ {title}</title>
+	<meta name="description" content={description} />
 </svelte:head>
 
 <div class="py-6 md:px-8">

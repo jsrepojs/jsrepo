@@ -6,6 +6,7 @@
 	import { ChevronDown } from '@lucide/svelte';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import { Badge } from '$lib/components/ui/badge';
+	import SectionLabel from '../section-label.svelte';
 
 	let { class: className }: { class?: string } = $props();
 </script>
@@ -13,9 +14,9 @@
 <div class={cn('flex flex-col gap-4 overflow-y-auto border-r bg-background pb-4', className)}>
 	{#each Object.entries(map) as [title, docs] (title)}
 		<div class="mt-4 flex flex-col gap-2">
-			<span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+			<SectionLabel>
 				{title}
-			</span>
+			</SectionLabel>
 			<ul class="flex flex-col font-light text-muted-foreground">
 				{#each docs as doc (doc.title)}
 					{#if doc.children}
