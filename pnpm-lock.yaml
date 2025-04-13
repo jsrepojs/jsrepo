@@ -412,6 +412,9 @@ importers:
       rehype-slug:
         specifier: ^6.0.0
         version: 6.0.0
+      runed:
+        specifier: ^0.25.0
+        version: 0.25.0(svelte@5.25.12)
       shiki:
         specifier: ^3.2.2
         version: 3.2.2
@@ -9518,6 +9521,11 @@ snapshots:
     dependencies:
       esm-env: 1.2.2
       svelte: 5.25.6
+
+  runed@0.25.0(svelte@5.25.12):
+    dependencies:
+      esm-env: 1.2.2
+      svelte: 5.25.12
 
   runed@0.25.0(svelte@5.25.6):
     dependencies:

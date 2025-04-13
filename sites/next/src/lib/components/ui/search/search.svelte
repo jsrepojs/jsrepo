@@ -7,7 +7,6 @@
 	interface Props extends HTMLInputAttributes {
 		value?: string;
 		searching?: boolean;
-		searchingText?: string[];
 		placeholder?: string;
 		/** Debounce for the `oninput` event */
 		onDebounce?: (value: string) => void;
@@ -18,7 +17,6 @@
 	let {
 		value = $bindable(''),
 		searching = false,
-		searchingText,
 		placeholder,
 		class: className,
 		onDebounce,

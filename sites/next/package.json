@@ -53,6 +53,7 @@
 		"rehype-autolink-headings": "^7.1.0",
 		"rehype-pretty-code": "^0.14.1",
 		"rehype-slug": "^6.0.0",
+		"runed": "^0.25.0",
 		"shiki": "^3.2.2",
 		"svelte": "^5.25.12",
 		"svelte-check": "^4.0.0",

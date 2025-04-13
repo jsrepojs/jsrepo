@@ -1,37 +1,35 @@
 <script lang="ts">
 	import SectionLabel from '$lib/components/site/section-label.svelte';
 	import { Search } from '$lib/components/ui/search/index.js';
+	import * as Command from '$lib/components/ui/command';
+	import * as Popover from '$lib/components/ui/popover';
 	import { getIcon } from '$lib/ts/registry/client.js';
-	import { untrack } from 'svelte';
-	import { superForm } from 'sveltekit-superforms/client';
+	import type { RegistryResponse } from '../api/registries/types.js';
+	import { activeElement } from 'runed';
 
 	let { data } = $props();
 
-	const { form, submitting, enhance, errors } = superForm(data.form);
+	let search = $state('');
+	let searching = $state(false);
+	let completions: string[] = $state([]);
 
-	let invalid = $state(false);
-	let invalidTimeout = $state<ReturnType<typeof setTimeout>>();
+	async function searchRegistries(search: string) {
+		searching = true;
 
-	errors.subscribe((v) => {
-		if (invalidTimeout) {
-			clearTimeout(invalidTimeout);
+		try {
+			const response = await fetch(`/api/registries?limit=5&query=${search}`);
+
+			if (!response.ok) return;
+
+			const data = (await response.json()) as RegistryResponse;
+
+			completions = data.registries.map((r) => r.url);
+		} catch (err) {
+			console.error(err);
+		} finally {
+			searching = false;
 		}
-
-		// we do this after the below effect runs after submit
-		setTimeout(() => {
-			if (v.search) {
-				invalid = true;
-			}
-		}, 0);
-	});
-
-	// reset invalid once the user types
-	$effect(() => {
-		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-		$form.search;
-
-		untrack(() => (invalid = false));
-	});
+	}
 </script>
 
 <svelte:head>
@@ -46,16 +44,30 @@
 
 <main class="relative pt-[--header-height]">
 	<div class="mt-[25vh] flex flex-col place-items-center">
-		<form method="POST" class="w-full max-w-2xl" use:enhance>
-			<Search
-				placeholder="Search registries"
-				name="search"
-				autocomplete="off"
-				searching={$submitting}
-				bind:value={$form.search}
-			/>
-			<button type="submit" class="hidden"> Submit </button>
-		</form>
+		<Command.Root shouldFilter={false} class="w-full max-w-2xl">
+			<Popover.Root>
+				<Popover.Trigger class="outline-none">
+					<Command.Input
+						bind:value={search}
+						oninput={() => searchRegistries(search)}
+						class="h-12 rounded-lg border"
+					/>
+				</Popover.Trigger>
+				<Popover.Content
+					trapFocus={false}
+					class="w-[var(--bits-popover-anchor-width)] p-0"
+				>
+					<Command.List>
+						<Command.Group>
+							{#each completions.filter((c) => c.toLowerCase().includes(search)) as url (url)}
+								<Command.Item>{url}</Command.Item>
+							{/each}
+						</Command.Group>
+					</Command.List>
+				</Popover.Content>
+			</Popover.Root>
+		</Command.Root>
+
 		<div class="mt-36 grid w-full max-w-4xl grid-cols-1 gap-8 lg:grid-cols-2">
 			<div class="flex flex-col gap-2">
 				<SectionLabel>Most Popular</SectionLabel>
