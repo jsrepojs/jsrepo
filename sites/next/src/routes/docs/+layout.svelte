@@ -25,16 +25,16 @@
 </script>
 
 <div
-	class="relative grid md:grid-cols-[var(--sidebar-width)_1fr] lg:grid-cols-[var(--sidebar-width)_1fr_var(--aside-width)]"
+	class="relative grid-cols-1 grid md:grid-cols-[var(--sidebar-width)_1fr] lg:grid-cols-[var(--sidebar-width)_1fr_var(--aside-width)]"
 >
-	<div class="col-start-1 hidden md:block">
+	<div class="col-start-1 hidden md:block" data-sidebar-section>
 		<Sidebar
 			class="fixed top-[--header-height] z-10 flex h-[calc(100svh-var(--header-height))] w-[--sidebar-width]"
 		/>
 	</div>
-	<div class="relative col-start-2 max-w-full overflow-hidden pt-[--header-height]">
+	<div class="relative col-start-1 md:col-start-2 max-w-full overflow-hidden pt-[--header-height]">
 		{@render children()}
-		<div class="grid grid-cols-2 gap-2 px-8 pb-4">
+		<div class="grid grid-cols-2 gap-2 md:px-8 pb-4">
 			{#if paginated.previous}
 				{@const { href, title } = paginated.previous}
 				<Pagination.Previous {href} class="col-start-1">
@@ -49,7 +49,7 @@
 			{/if}
 		</div>
 	</div>
-	<div class="col-start-3 hidden lg:block">
+	<div class="col-start-3 hidden lg:block" data-aside-section>
 		<!-- make sure the TOC updates when we switch pages -->
 		{#key page.url.pathname}
 			<Aside

@@ -21,7 +21,8 @@ const prettyCodeOptions = {
 				import('shiki/langs/svelte.mjs'),
 				import('shiki/langs/sh.mjs'),
 				import('shiki/langs/jsonc.mjs'),
-				import('shiki/langs/json.mjs')
+				import('shiki/langs/json.mjs'),
+				import('shiki/langs/yaml.mjs'),
 			]
 		}),
 	keepBackground: false,

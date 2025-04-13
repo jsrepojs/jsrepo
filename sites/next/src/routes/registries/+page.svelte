@@ -5,7 +5,7 @@
 	import * as Popover from '$lib/components/ui/popover';
 	import { getIcon } from '$lib/ts/registry/client.js';
 	import type { RegistryResponse } from '../api/registries/types.js';
-	import { activeElement } from 'runed';
+	import { useQuery } from '$lib/hooks/use-query.svelte.js';
 
 	let { data } = $props();
 
@@ -13,11 +13,13 @@
 	let searching = $state(false);
 	let completions: string[] = $state([]);
 
-	async function searchRegistries(search: string) {
+	const { query } = useQuery(async ({ signal }) => {
 		searching = true;
 
 		try {
-			const response = await fetch(`/api/registries?limit=5&query=${search}`);
+			const response = await fetch(`/api/registries?limit=3&query=${search}`, {
+				signal
+			});
 
 			if (!response.ok) return;
 
@@ -29,7 +31,7 @@
 		} finally {
 			searching = false;
 		}
-	}
+	});
 </script>
 
 <svelte:head>
@@ -49,17 +51,17 @@
 				<Popover.Trigger class="outline-none">
 					<Command.Input
 						bind:value={search}
-						oninput={() => searchRegistries(search)}
+						oninput={() => query()}
 						class="h-12 rounded-lg border"
+						placeholder="Search registries..."
 					/>
 				</Popover.Trigger>
-				<Popover.Content
-					trapFocus={false}
-					class="w-[var(--bits-popover-anchor-width)] p-0"
-				>
+				<Popover.Content trapFocus={false} class="w-[var(--bits-popover-anchor-width)] p-0">
 					<Command.List>
 						<Command.Group>
-							{#each completions.filter((c) => c.toLowerCase().includes(search)) as url (url)}
+							{#each completions.filter((c) => c
+									.toLowerCase()
+									.includes(search.toLowerCase())) as url (url)}
 								<Command.Item>{url}</Command.Item>
 							{/each}
 						</Command.Group>
