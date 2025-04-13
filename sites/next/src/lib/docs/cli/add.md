@@ -77,7 +77,7 @@ jsrepo add --expand
 ```
 
 ### `--max-unchanged`
-Sets a limit on the maximum unchanged lines to display in a diff before it is collapsed. default: 3
+Sets a limit on the maximum unchanged lines to display in a diff before it is collapsed. (default: 3)
 
 #### Usage
 ```sh

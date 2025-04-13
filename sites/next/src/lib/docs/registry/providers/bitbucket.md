@@ -6,7 +6,7 @@ lastUpdated: 4-10-2025
 
 ## Branches and Tags
 
-jsrepo supports BitBucket so that you can just paste a link to the repo homepage and it will be handled correctly.
+**jsrepo** supports BitBucket so that you can just paste a link to the repo homepage and it will be handled correctly.
 
 Because of this all of the following paths work:
 
@@ -20,7 +20,7 @@ https://bitbucket.org/ieedan/std/src/next # branch reference
 
 Tags can be a great solution to ensuring remote tests and blocks stay on a consistent version.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"$schema": "https://unpkg.com/jsrepo@1.47.0/schemas/project-config.json",
 	// use a specific version tag
@@ -51,7 +51,7 @@ npx jsrepo add bitbucket/ieedan/std/src/main/utils/math
 
 In the `jsrepo.json`:
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"$schema": "https://unpkg.com/jsrepo@1.47.0/schemas/project-config.json",
 	// use bitbucket instead of https://bitbucket.org

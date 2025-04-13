@@ -10,7 +10,7 @@ jsrepo build
 
 ## Usage
 
-The build command builds the specified directories into a `jsrepo-manifest.json` file which jsrepo can use to locate blocks in your repository.
+The build command builds the specified directories into a `jsrepo-manifest.json` file which **jsrepo** can use to locate blocks in your repository.
 
 ```sh
 jsrepo build

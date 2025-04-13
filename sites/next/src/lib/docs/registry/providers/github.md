@@ -6,7 +6,7 @@ lastUpdated: 4-10-2025
 
 ## Branches and Tags
 
-jsrepo supports GitHub so that you can just paste a link to the repo homepage and it will be handled correctly.
+**jsrepo** supports GitHub so that you can just paste a link to the repo homepage and it will be handled correctly.
 
 Because of this all of the following paths work:
 
@@ -20,7 +20,7 @@ https://github.com/ieedan/std/tree/next # branch reference
 
 Tags can be a great solution to ensuring remote tests and blocks stay on a consistent version.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"$schema": "https://unpkg.com/jsrepo@1.47.0/schemas/project-config.json",
 	// use a specific version tag
@@ -51,7 +51,7 @@ npx jsrepo add github/ieedan/std/utils/math
 
 In the `jsrepo.json`:
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"$schema": "https://unpkg.com/jsrepo@1.47.0/schemas/project-config.json",
 	// use github instead of https://github.com
@@ -68,7 +68,7 @@ In the `jsrepo.json`:
 
 ## Rate Limiting
 
-If you are doing a lot of testing with jsrepo you may eventually get to a point where GitHub "cuts you off". At this point GitHub will start to return cached responses when trying to add, update, or test blocks.
+If you are doing a lot of testing with **jsrepo** you may eventually get to a point where GitHub "cuts you off". At this point GitHub will start to return cached responses when trying to add, update, or test blocks.
 
 You can get around this by supplying a PAT with the `auth` command.
 
@@ -78,7 +78,7 @@ If you are creating your own registry you may want to build the registry on a pu
 
 Workflow to build the manifest and create a pull request:
 
-```yaml
+```yaml showLineNumbers
 name: build-registry
 on:
   push:

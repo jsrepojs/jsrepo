@@ -30,7 +30,7 @@ You! Or someone else you know. Anyone can create a registry to be used by everyo
 Why would I use this instead of the shadcn cli?
 </Accordion.Trigger>
 <Accordion.Content>
-jsrepo has features like interactive updates and automated registry building that make extremely pleasant to work with!
+jsrepo has features like interactive updates and automated registry building that make it extremely pleasant to work with!
 </Accordion.Content>
 </Accordion.Item>
 </Accordion.Root>

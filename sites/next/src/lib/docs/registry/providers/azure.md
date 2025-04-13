@@ -22,7 +22,7 @@ azure/ieedan/std/std/heads/next # branch reference
 
 Tags can be a great solution to ensuring remote tests and blocks stay on a consistent version.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"$schema": "https://unpkg.com/jsrepo@1.47.0/schemas/project-config.json",
 	// use a specific version tag

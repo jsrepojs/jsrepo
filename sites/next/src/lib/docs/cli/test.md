@@ -25,7 +25,7 @@ jsrepo test --repo github/ieedan/std
 ```
 
 ### `-A, --allow`
-Allow jsrepo to download code from the provided repo. This skips the initial confirmation prompt when attempting to download a block from a registry not listed in the jsrepo.json file.
+Allow **jsrepo** to download code from the provided repo. This skips the initial confirmation prompt when attempting to download a block from a registry not listed in the `jsrepo.json` file.
 
 #### Usage
 ```sh

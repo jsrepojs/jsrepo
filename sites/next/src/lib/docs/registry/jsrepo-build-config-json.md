@@ -9,14 +9,14 @@ lastUpdated: 4-10-2025
 You can create a `jsrepo-build-config.json` by running the `init` command with the `--registry` flag:
 
 ```sh
-npx jsrepo init --registry
+jsrepo init --registry
 ```
 
 ### `$schema`
 
 `$schema` is tracked with the cli so you can use a specific version using unpkg:
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"$schema": "https://unpkg.com/jsrepo@1.47.0/schemas/registry-config.json"
 }
@@ -26,7 +26,7 @@ npx jsrepo init --registry
 
 `allowSubdirectories` allows subdirectories to be built.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"allowSubdirectories": false
 }
@@ -36,7 +36,7 @@ npx jsrepo init --registry
 
 `configFiles` allows you to specify files that the user may need in their project for the registry to function properly.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"configFiles": [
 		{
@@ -69,7 +69,7 @@ The path of the file in your registry.
 
 `dirs` is a list of the directories that contain your block categories.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"dirs": ["./src", "./blocks"]
 }
@@ -79,7 +79,7 @@ The path of the file in your registry.
 
 `doNotListBlocks` is a list of block names that shouldn't be listed when the user runs the `add` command.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"doNotListBlocks": ["utils"]
 }
@@ -89,7 +89,7 @@ The path of the file in your registry.
 
 `doNotListCategories` is a list of category names that shouldn't be listed when the user runs the `add` command.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"doNotListCategories": ["utils"]
 }
@@ -99,7 +99,7 @@ The path of the file in your registry.
 
 `excludeBlocks` allows you to prevent the specified blocks from being included in the manifest.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"excludeBlocks": ["domain"]
 }
@@ -109,7 +109,7 @@ The path of the file in your registry.
 
 `excludeCategories` allows you to prevent the specified categories from being included in the manifest.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"excludeCategories": ["INTERNAL"]
 }
@@ -119,7 +119,7 @@ The path of the file in your registry.
 
 `excludeDeps` allows you to prevent specified remote dependencies from being installed when the user adds/updates blocks. This is useful for framework specific API's like React or Svelte.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"excludeDeps": ["svelte", "react", "vue"]
 }
@@ -129,7 +129,7 @@ The path of the file in your registry.
 
 `includeBlocks` allows you to only include specified blocks in the final manifest file. Keep in mind that if these blocks are referenced by other blocks that are included then your build will break.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"includeBlocks": ["ui", "hooks"]
 }
@@ -139,7 +139,7 @@ The path of the file in your registry.
 
 `includeCategories` allows you to only include specified categories in the final manifest file. Keep in mind that if these categories are referenced by other categories that are included then your build will break.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"includeCategories": ["components", "utils"]
 }
@@ -149,7 +149,7 @@ The path of the file in your registry.
 
 `listBlocks` is a list of block names that should be listed when the user runs the `add` command.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"listBlocks": ["utils"]
 }
@@ -159,7 +159,7 @@ The path of the file in your registry.
 
 `listCategories` is a list of category names that should be listed when the user runs the `add` command.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"listCategories": ["utils"]
 }
@@ -169,7 +169,7 @@ The path of the file in your registry.
 
 `meta` allows you to provide optional information about the registry that can be displayed to users for better documentation.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"meta": {
 		"authors": ["Aidan Bleser"],
@@ -188,7 +188,7 @@ The path of the file in your registry.
 
 This is useful if you want to host the registry in a different location from where the code actually lives. (This should NOT be used when hosting your registry from a git repository)
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"outputDir": "./static/new-york"
 }
@@ -198,7 +198,7 @@ This is useful if you want to host the registry in a different location from whe
 
 `peerDependencies` allow you to warn users when they are missing dependencies that are required or are using dependency versions that are incompatible.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"peerDependencies": {
 		"svelte": {
@@ -222,7 +222,7 @@ The version or version range that is supported by your registry.
 
 `preview` displays a preview of the blocks list.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"preview": false
 }
@@ -234,7 +234,7 @@ The version or version range that is supported by your registry.
 
 Below are the default settings for each rule.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"rules": {
 		"no-category-index-file-dependency": "warn",

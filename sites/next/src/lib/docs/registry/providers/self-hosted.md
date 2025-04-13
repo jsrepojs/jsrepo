@@ -10,7 +10,7 @@ This also allows you to customize where and how things are served in ways that a
 
 - Serving multiple registries / registry variants
 - Branding for your registry 
-- Url shortening
+- URL shortening
 
 ## Setup
 
@@ -23,7 +23,7 @@ To get started you need a way to serve your registry. This can be done with most
 
 Once you know where your static folder is you can use the `--output-dir` flag or the corresponding `outputDir` option in your `jsrepo-build-config.json` to build the registry and output it so it can be served from your static folder.
 
-For this example lets host our registry on our site `example.com` at `/r`.
+For this example let's host our registry on our site `example.com` at `/r`.
 
 Build with flag:
 
@@ -33,7 +33,7 @@ jsrepo build --output-dir ./public/r
 
 or with config option:
 
-```jsonc
+```jsonc showLineNumbers
 {
     // ...
     "outputDir": "./public/r"
@@ -54,7 +54,7 @@ jsrepo add --repo https://example.com/r
 
 Since self hosting allows you to serve your registry from any path you can also serve multiple registries from the same domain.
 
-For example say you had a JavaScript and TypeScript variant of your registry. You may want to serve it them `example.com/r/ts` and `example.com/r/js` respectively.
+For example say you had a JavaScript and TypeScript variant of your registry. You may want to serve them from `example.com/r/ts` and `example.com/r/js` respectively.
 
 To do this you can adjust your build config to build each registry individually and pass a different path to the `--output-dir` flag for each registry.
 

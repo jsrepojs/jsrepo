@@ -44,7 +44,7 @@ jsrepo exec --repo github/ieedan/scripts
 
 ### `--`
 
-`--` is a special option that will cause any args after it to be passed to the script instead of jsrepo.
+`--` is a special option that will cause any args after it to be passed to the script instead of **jsrepo**.
 
 #### Usage
 
@@ -64,7 +64,7 @@ jsrepo exec --repo github/ieedan/scripts
 
 ### `-A, --allow`
 
-Allow jsrepo to download code from the provided repo. This skips the initial confirmation prompt when attempting to download a block from a registry not listed in the jsrepo.json file.
+Allow **jsrepo** to download code from the provided repo. This skips the initial confirmation prompt when attempting to download a block from a registry not listed in the `jsrepo.json` file.
 
 #### Usage
 

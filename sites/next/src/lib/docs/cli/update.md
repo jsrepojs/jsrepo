@@ -46,7 +46,7 @@ jsrepo update --expand
 
 ### `--max-unchanged`
 
-Sets a limit on the maximum unchanged lines to display in a diff before it is collapsed. default: 3
+Sets a limit on the maximum unchanged lines to display in a diff before it is collapsed. (default: 3)
 
 #### Usage
 
@@ -76,7 +76,7 @@ jsrepo update --repo github/ieedan/std
 
 ### `-A, --allow`
 
-Allow jsrepo to download code from the provided repo. This skips the initial confirmation prompt when attempting to download a block from a registry not listed in the jsrepo.json file.
+Allow **jsrepo** to download code from the provided repo. This skips the initial confirmation prompt when attempting to download a block from a registry not listed in the `jsrepo.json` file.
 
 #### Usage
 

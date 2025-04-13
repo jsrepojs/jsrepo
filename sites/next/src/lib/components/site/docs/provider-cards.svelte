@@ -27,7 +27,7 @@
 		{
 			name: 'Custom',
 			icon: Server,
-			href: '/docs/registry/providers/http'
+			href: '/docs/registry/providers/self-hosted'
 		}
 	];
 </script>

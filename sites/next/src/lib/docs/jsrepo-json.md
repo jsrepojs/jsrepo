@@ -4,21 +4,19 @@ description: The project config file for jsrepo.
 lastUpdated: 4-10-2025
 ---
 
-<script>
-    import { PMCommand } from "$lib/components/ui/pm-command"
-</script>
-
 The `jsrepo.json` allows you to configure how **jsrepo** installs blocks in your project.
 
 You can create a `jsrepo.json` by running the init command with the `--project` flag:
 
-<PMCommand command="execute" args={['jsrepo', 'init', '--project']}/>
+```sh
+jsrepo init --project
+```
 
 ## $schema
 
 `$schema` is tracked with the cli so you can use a specific version using unpkg:
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"$schema": "https://unpkg.com/jsrepo@1.47.0/schemas/project-config.json"
 }
@@ -28,7 +26,7 @@ You can create a `jsrepo.json` by running the init command with the `--project` 
 
 Where to add specific config files in your project.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"configFiles": {
 		"app.css": "./src/app.css"
@@ -40,7 +38,7 @@ Where to add specific config files in your project.
 
 The formatter to use when writing files in your project.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"formatter": "prettier" / "biome" / undefined
 }
@@ -52,7 +50,7 @@ jsrepo can format your files following your local config before adding them to y
 
 Whether or not to include test files when installing blocks.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"includeTests": false
 }
@@ -62,7 +60,7 @@ Whether or not to include test files when installing blocks.
 
 Where to add specific categories in your project.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"paths": {
 		"*": "./src/blocks",
@@ -76,7 +74,7 @@ Where to add specific categories in your project.
 
 `repos` allows you to specify different registries to install blocks from. All of the blocks from each registry will be listed when you run add.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"repos": ["gitlab/ieedan/std", "github/ieedan/shadcn-phone-input-svelte"]
 }
@@ -86,7 +84,7 @@ Where to add specific categories in your project.
 
 Whether or not to add a watermark to installed blocks.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"watermark": true
 }
