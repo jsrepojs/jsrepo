@@ -9,6 +9,7 @@
 	import { selectProvider, type Block, type Manifest } from 'jsrepo';
 	import * as array from '$lib/ts/array';
 	import { FileIcon } from '$lib/components/ui/file-icon';
+	import * as Tabs from '$lib/components/ui/tabs';
 
 	let { data } = $props();
 
@@ -100,7 +101,7 @@
 	<meta name="description" content="Documentation for {data.registryUrl}" />
 </svelte:head>
 
-<div class="grid grid-cols-1 md:grid-cols-[1fr_20rem]">
+<div class="grid grid-cols-1 md:grid-cols-[1fr_18rem]">
 	<div class="col-start-1">
 		<div class="flex flex-col gap-2 py-4">
 			<div>
@@ -109,17 +110,54 @@
 					{data.registryUrl}
 					<FileIcon extension={registryPrimaryLanguage} />
 				</h1>
-				<p class="text-lg text-muted-foreground">{data.manifest.meta?.description}</p>
+				{#if data.manifest.meta?.description}
+					<p class="text-muted-foreground md:text-lg">{data.manifest.meta?.description}</p>
+				{/if}
 			</div>
 			<Snippet text="jsrepo init {data.registryUrl}" class="w-fit" />
 		</div>
-		<div class="prose border-t py-4 md:pr-4">
-			{@html data.readme}
-		</div>
+		<Tabs.Root value="readme">
+			<Tabs.List class="max-w-full p-0 gap-1 overflow-x-auto bg-transparent">
+				<Tabs.Trigger
+					value="readme"
+					class="py-2 transition-all hover:bg-accent hover:text-foreground data-[state=active]:bg-accent"
+				>
+					README
+				</Tabs.Trigger>
+				<Tabs.Trigger
+					value="blocks"
+					class="py-2 transition-all hover:bg-accent hover:text-foreground data-[state=active]:bg-accent"
+				>
+					Blocks
+				</Tabs.Trigger>
+				<Tabs.Trigger
+					value="dependencies"
+					class="py-2 transition-all hover:bg-accent hover:text-foreground data-[state=active]:bg-accent"
+				>
+					Dependencies
+				</Tabs.Trigger>
+				<Tabs.Trigger
+					value="manifest"
+					class="py-2 transition-all hover:bg-accent hover:text-foreground data-[state=active]:bg-accent"
+				>
+					Manifest
+				</Tabs.Trigger>
+			</Tabs.List>
+			<Tabs.Content value="readme" class="border-t py-4 md:pr-4">
+				<div class="prose">
+					{@html data.readme}
+				</div>
+			</Tabs.Content>
+			<Tabs.Content value="blocks" class="border-t py-4 md:pr-4"></Tabs.Content>
+			<Tabs.Content value="dependencies" class="border-t py-4 md:pr-4"></Tabs.Content>
+			<Tabs.Content value="manifest" class="border-t py-4 md:pr-4"></Tabs.Content>
+		</Tabs.Root>
 	</div>
+
+	<!-- Aside -->
 	<div class="md:col-start-2">
 		<div
-			class="flex flex-col gap-4 border-t py-4 md:fixed md:h-[calc(100svh-var(--header-height)-64px)] md:border-l md:border-t-0 md:pl-4"
+			class="flex w-full max-w-[18rem] flex-col gap-4 border-t py-4 md:fixed md:h-[calc(100svh-var(--header-height)-64px)] md:border-l md:border-t-0 md:pl-4"
 		>
 			{#if data.manifest.meta?.tags && data.manifest.meta.tags.length > 0}
 				<div class="flex flex-wrap gap-2">
