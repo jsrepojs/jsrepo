@@ -5,6 +5,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Menu, X } from '@lucide/svelte';
 	import { Dialog } from 'bits-ui';
+	import { active } from '$lib/actions/active.svelte';
 
 	let { stars }: { stars: Promise<number> } = $props();
 
@@ -15,13 +16,36 @@
 	class="fixed left-0 top-0 z-10 flex h-[--header-height] w-full items-center border-b bg-background"
 >
 	<div class="container flex items-center justify-between">
-		<div>
+		<div class="flex place-items-center gap-6">
 			<a
 				href="/"
 				class="flex h-9 w-fit place-items-center justify-center bg-brand p-1 font-mono font-bold text-brand-foreground"
 			>
 				jsrepo
 			</a>
+			<div class="hidden md:flex place-content-center gap-4">
+				<a
+					href="/docs"
+					class="text-sm text-muted-foreground transition-all hover:text-foreground data-[active=true]:text-foreground"
+					use:active={{ activeForSubdirectories: true }}
+				>
+					Docs
+				</a>
+				<a
+					href="/registries"
+					class="text-sm text-muted-foreground transition-all hover:text-foreground data-[active=true]:text-foreground"
+					use:active={{ activeForSubdirectories: true }}
+				>
+					Registries
+				</a>
+				<a
+					href="/demos"
+					class="text-sm text-muted-foreground transition-all hover:text-foreground data-[active=true]:text-foreground"
+					use:active={{ activeForSubdirectories: true }}
+				>
+					Demos
+				</a>
+			</div>
 		</div>
 
 		<div class="flex place-items-center gap-2">
@@ -30,13 +54,7 @@
 			<Dialog.Root bind:open={menuOpen}>
 				<Dialog.Trigger>
 					{#snippet child({ props })}
-						<Button
-							{...props}
-							class="md:hidden"
-							size="icon"
-							variant="ghost"
-							onclick={() => (menuOpen = !menuOpen)}
-						>
+						<Button {...props} class="md:hidden" size="icon" variant="ghost">
 							{#if menuOpen}
 								<X />
 							{:else}

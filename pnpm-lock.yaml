@@ -304,10 +304,10 @@ importers:
       '@eslint/js':
         specifier: ^9.24.0
         version: 9.24.0
-      '@fontsource-variable/jetbrains-mono':
+      '@fontsource-variable/inter':
         specifier: ^5.2.5
         version: 5.2.5
-      '@fontsource-variable/open-sans':
+      '@fontsource-variable/jetbrains-mono':
         specifier: ^5.2.5
         version: 5.2.5
       '@lucide/svelte':
@@ -1038,9 +1038,6 @@ packages:
 
   '@fontsource-variable/jetbrains-mono@5.2.5':
     resolution: {integrity: sha512-G3sN1xq1moZd0JL+hFaA4MEdsiQS+JXC/z7m+EqA5/Fzn5CQlXGUaaNKFGQdDsFuLTnCfW0KOOSWHjygNfjEPw==}
-
-  '@fontsource-variable/open-sans@5.2.5':
-    resolution: {integrity: sha512-++xRfkZAxNP4e1Spm5W11iVcoYfXcNVTV5MDit60t7grRk10hy9C7XQd/jv+0TDFIfHbK9EzyBp3M3CHPesroA==}
 
   '@gcornut/valibot-json-schema@0.31.0':
     resolution: {integrity: sha512-3xGptCurm23e7nuPQkdrE5rEs1FeTPHhAUsBuwwqG4/YeZLwJOoYZv+fmsppUEfo5y9lzUwNQrNqLS/q7HMc7g==}
@@ -5668,8 +5665,6 @@ snapshots:
   '@fontsource-variable/inter@5.2.5': {}
 
   '@fontsource-variable/jetbrains-mono@5.2.5': {}
-
-  '@fontsource-variable/open-sans@5.2.5': {}
 
   '@gcornut/valibot-json-schema@0.31.0':
     dependencies:

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { map } from '$lib/docs/map';
-	import NavLink from './nav-link.svelte';
 	import { cn } from '$lib/utils';
 	import { Button } from '$lib/components/ui/button';
 	import { Badge } from '$lib/components/ui/badge';
@@ -9,6 +8,7 @@
 	import * as Icons from '$lib/components/icons';
 	import { Dialog } from 'bits-ui';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte';
+	import * as Nav from '$lib/components/site/nav';
 
 	type Props = {
 		open?: boolean;
@@ -24,6 +24,10 @@
 			open = false;
 		}
 	});
+
+	function closeMenu() {
+		open = false;
+	}
 </script>
 
 <Dialog.Content
@@ -32,29 +36,34 @@
 	)}
 >
 	<div class="h-[calc(100svh-var(--header-height)-69px)] overflow-y-auto px-8 pb-4">
-		{#if page.url.pathname.startsWith('/docs')}
-			<div class="flex flex-col gap-4">
+		<div class="flex flex-col gap-4">
+			<Nav.Group title="General">
+				<Nav.List>
+					<Nav.Link href="/" title="Home" onclick={closeMenu} />
+					<Nav.Link href="/docs" title="Docs" onclick={closeMenu} />
+					<Nav.Link href="/registries" title="Registries" onclick={closeMenu} />
+					<Nav.Link href="/demos" title="Demos" onclick={closeMenu} />
+				</Nav.List>
+			</Nav.Group>
+			{#if page.url.pathname.startsWith('/docs')}
 				{#each Object.entries(map) as [title, docs] (title)}
-					<div class="mt-4 flex flex-col gap-2">
-						<span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">
-							{title}
-						</span>
-						<ul class="flex flex-col font-light text-muted-foreground">
+					<Nav.Group {title}>
+						<Nav.List>
 							{#each docs as doc (doc.title)}
-								{@render navLink(doc)}
+								<Nav.Link {...doc} onclick={closeMenu} />
 								{#if doc.children}
-									<ul class="ml-1 flex flex-col border-l pl-4">
+									<Nav.List class="ml-1 flex flex-col border-l pl-4">
 										{#each doc.children as child (child.title)}
-											{@render navLink(child)}
+											<Nav.Link {...child} onclick={closeMenu} />
 										{/each}
-									</ul>
+									</Nav.List>
 								{/if}
 							{/each}
-						</ul>
-					</div>
+						</Nav.List>
+					</Nav.Group>
 				{/each}
-			</div>
-		{/if}
+			{/if}
+		</div>
 	</div>
 	<div class="mx-8 flex place-items-center gap-2 border-t py-4">
 		<LightSwitch class="size-9" />
@@ -69,14 +78,3 @@
 		</Button>
 	</div>
 </Dialog.Content>
-
-{#snippet navLink({ href, title, tag }: { href: string; title: string; tag?: string })}
-	<div class="flex w-full place-items-center gap-2">
-		<NavLink {href} {title} onclick={() => (open = false)} />
-		{#if tag}
-			<Badge class="rounded-xl bg-brand px-1 py-0 text-brand-foreground hover:bg-brand">
-				{tag}
-			</Badge>
-		{/if}
-	</div>
-{/snippet}
