@@ -3,7 +3,6 @@
 	import { map } from '$lib/docs/map';
 	import { cn } from '$lib/utils';
 	import { Button } from '$lib/components/ui/button';
-	import { Badge } from '$lib/components/ui/badge';
 	import { LightSwitch } from '$lib/components/ui/light-switch';
 	import * as Icons from '$lib/components/icons';
 	import { Dialog } from 'bits-ui';
@@ -50,11 +49,11 @@
 					<Nav.Group {title}>
 						<Nav.List>
 							{#each docs as doc (doc.title)}
-								<Nav.Link {...doc} onclick={closeMenu} />
+								<Nav.Link title={doc.title} href={doc.href} tag={doc.tag} onclick={closeMenu} />
 								{#if doc.children}
 									<Nav.List class="ml-1 flex flex-col border-l pl-4">
 										{#each doc.children as child (child.title)}
-											<Nav.Link {...child} onclick={closeMenu} />
+											<Nav.Link title={child.title} href={child.href} tag={child.tag} onclick={closeMenu} />
 										{/each}
 									</Nav.List>
 								{/if}

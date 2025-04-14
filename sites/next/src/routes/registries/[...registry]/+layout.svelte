@@ -5,7 +5,7 @@
 </script>
 
 <main class="pt-[--header-height]">
-	<div class="border-b py-2 fixed w-full bg-background h-16 z-10">
+	<div class="fixed z-10 h-16 w-full border-b bg-background py-2">
 		<div class="container">
 			<RegistrySearch class="max-w-none" />
 		</div>
