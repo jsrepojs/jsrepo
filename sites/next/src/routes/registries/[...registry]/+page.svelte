@@ -293,7 +293,7 @@
 			{#if data.manifest.meta?.homepage}
 				<div class="flex flex-col">
 					<Nav.Title>Homepage</Nav.Title>
-					<a href={data.manifest.meta.homepage} class="truncate hover:underline">
+					<a href={data.manifest.meta.homepage} target="_blank" class="truncate hover:underline">
 						{data.manifest.meta.homepage}
 						<ExternalLink class="inline size-3" />
 					</a>
@@ -303,7 +303,7 @@
 			{#if data.manifest.meta?.repository}
 				<div class="flex flex-col">
 					<Nav.Title>Repository</Nav.Title>
-					<a href={data.manifest.meta.repository} class="truncate hover:underline">
+					<a href={data.manifest.meta.repository} target="_blank" class="truncate hover:underline">
 						{data.manifest.meta.repository}
 						<ExternalLink class="inline size-3" />
 					</a>
@@ -312,7 +312,7 @@
 				{@const baseUrl = provider.baseUrl(data.registryUrl)}
 				<div class="flex flex-col">
 					<Nav.Title>Repository</Nav.Title>
-					<a href={baseUrl} class="truncate hover:underline">
+					<a href={baseUrl} target="_blank" class="truncate hover:underline">
 						{baseUrl}
 						<ExternalLink class="inline size-3" />
 					</a>
