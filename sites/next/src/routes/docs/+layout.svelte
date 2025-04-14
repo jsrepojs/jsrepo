@@ -17,9 +17,13 @@
 	function getPaginated(docs: Doc[], pathname: string): { next?: Doc; previous?: Doc } {
 		const index = docs.findIndex((d) => d.href === pathname);
 
+		const next = docs[index + 1];
+		const nextIsExternal = next.href.startsWith('https://')
+
 		return {
 			previous: docs[index - 1],
-			next: docs[index + 1]
+			// don't show external links in pagination
+			next: nextIsExternal ? undefined : next
 		};
 	}
 </script>

@@ -16,7 +16,7 @@ export type Doc = {
 	children?: Doc[];
 };
 
-// name of the group mapped to a root doc with children
+// Name of the group mapped to a root doc with children
 const tempMap: Record<string, [TempDoc, TempDoc[]] | [string, TempDoc[]]> = {
 	'Getting Started': [
 		{
@@ -69,7 +69,7 @@ const tempMap: Record<string, [TempDoc, TempDoc[]] | [string, TempDoc[]]> = {
 	],
 	'Create Your Registry': [
 		{
-			title: 'Introduction',
+			title: 'Getting Started',
 			slug: 'registry'
 		},
 		[
