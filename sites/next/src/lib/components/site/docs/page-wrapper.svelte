@@ -8,7 +8,7 @@
 </script>
 
 <svelte:head>
-	<title>jsrepo ~ {title}</title>
+	<title>jsrepo - {title}</title>
 	<meta name="description" content={description} />
 </svelte:head>
 

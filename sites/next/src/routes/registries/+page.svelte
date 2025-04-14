@@ -7,7 +7,7 @@
 </script>
 
 <svelte:head>
-	<title>jsrepo ~ Registries</title>
+	<title>jsrepo - Registries</title>
 	<meta name="description" content="Discover and search jsrepo registries" />
 </svelte:head>
 
@@ -30,7 +30,7 @@
 						<li class="relative rounded-lg border px-6 py-4 transition-colors hover:bg-accent/50">
 							<a
 								href="/registries/{registry.url}"
-								class="flex place-items-center gap-4 overflow-hidden"
+								class="flex place-items-center gap-4 truncate"
 							>
 								<span class="absolute inset-0"></span>
 								{@render registryIcon({ url: registry.url })}
@@ -48,7 +48,7 @@
 						<li class="relative rounded-lg border px-6 py-4 transition-colors hover:bg-accent/50">
 							<a
 								href="/registries/{registry.url}"
-								class="flex place-items-center gap-4 overflow-hidden"
+								class="flex place-items-center gap-4 truncate"
 							>
 								<span class="absolute inset-0"></span>
 								{@render registryIcon({ url: registry.url })}

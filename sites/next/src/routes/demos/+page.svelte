@@ -31,7 +31,7 @@
 </script>
 
 <svelte:head>
-	<title>jsrepo ~ Demos</title>
+	<title>jsrepo - Demos</title>
 	<meta name="description" content="jsrepo demos showing off the capabilities of the CLI." />
 </svelte:head>
 
