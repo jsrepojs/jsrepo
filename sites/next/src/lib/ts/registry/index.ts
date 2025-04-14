@@ -6,7 +6,7 @@ import {
 	type RegistryProvider,
 	type RegistryProviderState
 } from 'jsrepo';
-import { markdownIt } from '../markdown';
+import { rehype } from '../markdown';
 import DOMPurify from 'isomorphic-dompurify';
 import { GITHUB_TOKEN, GITLAB_TOKEN } from '$env/static/private';
 import { redis } from '$lib/backend/cache/redis-client';
@@ -98,9 +98,9 @@ export async function getRegistryData(
 	let readme: string | undefined = readmeResult;
 
 	if (readme != undefined) {
-		const md = await markdownIt();
+		const html = (await rehype(readme)).toString();
 
-		readme = DOMPurify.sanitize(md.render(readme));
+		readme = DOMPurify.sanitize(html);
 	}
 
 	return {

@@ -1,9 +1,14 @@
 .prose {
+	h1,
 	h2,
 	h3,
 	h3,
 	h4 {
 		@apply mt-4;
+	}
+
+	h1 {
+		@apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
 	}
 
 	h2 {
@@ -50,8 +55,28 @@
 		@apply relative text-nowrap rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono;
 	}
 
+	pre {
+		@apply mt-4 max-h-[650px] overflow-auto rounded-lg border py-4 bg-background;
+	}
+
 	:not(h1, h2, h3, h4, h5, h6) code:not([data-language]) {
 		@apply text-sm;
+	}
+
+	table {
+		@apply w-full mt-4;
+	}
+
+	tr {
+		@apply m-0 border-t p-0 even:bg-muted;
+	}
+
+	th {
+		@apply border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right;
+	}
+
+	td {
+		@apply border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right;
 	}
 }
 

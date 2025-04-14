@@ -2,11 +2,13 @@ import { createHighlighter } from 'shiki';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeSlug from 'rehype-slug';
 import rehypePrettyCode from 'rehype-pretty-code';
+import remarkGfm from 'remark-gfm';
+import rehypeExternalLinks from 'rehype-external-links';
 
 /**
  * @type {import('rehype-pretty-code').Options}
  */
-const prettyCodeOptions = {
+export const prettyCodeOptions = {
 	theme: {
 		dark: 'github-dark-default',
 		light: 'github-light-default'
@@ -22,7 +24,7 @@ const prettyCodeOptions = {
 				import('shiki/langs/sh.mjs'),
 				import('shiki/langs/jsonc.mjs'),
 				import('shiki/langs/json.mjs'),
-				import('shiki/langs/yaml.mjs'),
+				import('shiki/langs/yaml.mjs')
 			]
 		}),
 	keepBackground: false,
@@ -43,7 +45,13 @@ const prettyCodeOptions = {
 
 /** @type {import('mdsx').MDSXConfig} */
 const options = {
-	rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings, [rehypePrettyCode, prettyCodeOptions]],
+	remarkPlugins: [remarkGfm],
+	rehypePlugins: [
+		rehypeSlug,
+		rehypeAutolinkHeadings,
+		[rehypePrettyCode, prettyCodeOptions],
+		[rehypeExternalLinks, { target: '_blank' }]
+	],
 	extensions: ['.svx', '.md'],
 	blueprints: {
 		default: {

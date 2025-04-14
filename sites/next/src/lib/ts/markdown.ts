@@ -1,39 +1,24 @@
-import MarkdownIt from 'markdown-it';
-import { markdownItTable } from 'markdown-it-table';
-import { highlighter } from '$lib/components/ui/code/shiki';
-import { fromHighlighter } from '@shikijs/markdown-it/core';
+import { unified } from 'unified';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import rehypeSlug from 'rehype-slug';
+import rehypePrettyCode from 'rehype-pretty-code';
+import rehypeStringify from 'rehype-stringify';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import remarkGfm from 'remark-gfm';
+import rehypeExternalLinks from 'rehype-external-links';
+import { prettyCodeOptions } from '../../../mdsx.config';
 
-let md: MarkdownIt | null = null;
+const processor = unified()
+	.use(remarkParse)
+	.use(remarkGfm)
+	.use(remarkRehype)
+	.use(rehypeSlug)
+	.use(rehypeExternalLinks, { target: '_blank' })
+	.use(rehypeAutolinkHeadings)
+	.use(rehypePrettyCode, prettyCodeOptions)
+	.use(rehypeStringify);
 
-const markdownIt = async () => {
-	if (md != null) return md;
-
-	const newMd = MarkdownIt({ html: true });
-
-	const stripComments = (md: MarkdownIt) => {
-		md.core.ruler.before('normalize', 'strip_comments', function (state) {
-			state.src = state.src.replace(/<!--[\s\S]*?-->/g, '');
-		});
-	};
-
-	// plugins
-	newMd.use(stripComments);
-	newMd.use(markdownItTable);
-
-	const hl = await highlighter;
-
-	newMd.use(
-		fromHighlighter(hl, {
-			themes: {
-				light: 'github-light-default',
-				dark: 'github-dark-default'
-			}
-		})
-	);
-
-	md = newMd;
-
-	return md;
-};
-
-export { markdownIt };
+export async function rehype(md: string) {
+	return processor.process(md);
+}
