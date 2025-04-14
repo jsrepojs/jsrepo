@@ -25,7 +25,7 @@
 </script>
 
 <div
-	class="relative grid-cols-1 grid md:grid-cols-[var(--sidebar-width)_1fr] lg:grid-cols-[var(--sidebar-width)_1fr_var(--aside-width)]"
+	class="container relative grid-cols-1 grid md:grid-cols-[var(--sidebar-width)_1fr] lg:grid-cols-[var(--sidebar-width)_1fr_var(--aside-width)]"
 >
 	<div class="col-start-1 hidden md:block" data-sidebar-section>
 		<Sidebar

@@ -9,7 +9,7 @@
 </script>
 
 <ModeWatcher />
-<div class="container" style="--header-height: 64px; --aside-width: 14rem; --sidebar-width: 14rem;">
+<div style="--header-height: 64px; --aside-width: 14rem; --sidebar-width: 14rem;">
 	<Header stars={data.stars} />
 
 	{@render children()}
