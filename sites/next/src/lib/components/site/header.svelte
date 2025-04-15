@@ -23,7 +23,7 @@
 			>
 				jsrepo
 			</a>
-			<div class="hidden md:flex place-content-center gap-4">
+			<div class="hidden place-content-center gap-4 md:flex">
 				<a
 					href="/docs"
 					class="text-sm text-muted-foreground transition-all hover:text-foreground data-[active=true]:text-foreground"

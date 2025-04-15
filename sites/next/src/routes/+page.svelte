@@ -4,7 +4,6 @@
 	import * as Icons from '$lib/components/icons';
 	import * as Terminal from '$lib/components/ui/terminal';
 	import { Window } from '$lib/components/ui/window';
-	import { ArrowRight } from '@lucide/svelte';
 </script>
 
 <svelte:head>
