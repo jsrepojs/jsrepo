@@ -239,6 +239,12 @@ You can include these files by configuring them in the `jsrepo-build-config.json
 
 When users initialize your registry they will be prompted to add or update these config files.
 
+## Metadata
+
+You can view your registry on the **jsrepo** site by navigating to `https://jsrepo.dev/registries/<your-registry-url>` this page uses information from the manifest to display information like how many categories / blocks your registry has or it's dependencies.
+
+However if you configure the `meta` key in the `jsrepo-build-config.json` you can add more information like a description, a homepage, and tags. 
+
 ## Live Examples
 
 - [github/ieedan/std](https://github.com/ieedan/std)
