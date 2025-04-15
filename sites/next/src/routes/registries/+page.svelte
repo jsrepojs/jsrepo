@@ -17,7 +17,7 @@
 	<Icon class="size-5 shrink-0" />
 {/snippet}
 
-<main class="relative pt-[--header-height] pb-4">
+<main class="relative pt-[--header-height] pb-4 container">
 	<div class="mt-[25vh] flex flex-col place-items-center">
 		<h1 class="py-8 text-5xl font-bold sm:text-7xl">Registries</h1>
 

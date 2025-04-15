@@ -1,16 +1,16 @@
-export function useQuery(fn: (opts: { signal: AbortSignal, isAborted: (err: unknown) => boolean }) => void) {
-	let controller: AbortController;
+export class UseQuery {
+	controller: AbortController | undefined = undefined;
 
-	const query = $derived.by(() => {
+	constructor(
+		readonly fn: (opts: { signal: AbortSignal; isAborted: (err: unknown) => boolean }) => void
+	) {}
+
+	query = $derived.by(() => {
 		return async () => {
-			controller?.abort?.('aborted');
-			controller = new AbortController();
+			this.controller?.abort?.('aborted');
+			this.controller = new AbortController();
 
-			fn({ signal: controller.signal, isAborted: (err) => err === "aborted" });
+			this.fn({ signal: this.controller.signal, isAborted: (err) => err === 'aborted' });
 		};
 	});
-
-	return {
-		query
-	};
 }

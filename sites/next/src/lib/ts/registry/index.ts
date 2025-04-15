@@ -97,8 +97,12 @@ export async function getRegistryData(
 
 	let readme: string | undefined = readmeResult;
 
+	console.log(readme)
+
 	if (readme != undefined) {
 		const html = (await rehype(readme)).toString();
+
+		console.log(html)
 
 		readme = DOMPurify.sanitize(html);
 	}

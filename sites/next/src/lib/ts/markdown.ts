@@ -7,12 +7,14 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import remarkGfm from 'remark-gfm';
 import rehypeExternalLinks from 'rehype-external-links';
+import rehypeRaw from 'rehype-raw'
 import { prettyCodeOptions } from '../../../mdsx.config';
 
 const processor = unified()
 	.use(remarkParse)
 	.use(remarkGfm)
-	.use(remarkRehype)
+	.use(remarkRehype, { allowDangerousHtml: true })
+	.use(rehypeRaw)
 	.use(rehypeSlug)
 	.use(rehypeExternalLinks, { target: '_blank' })
 	.use(rehypeAutolinkHeadings)
