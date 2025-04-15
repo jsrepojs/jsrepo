@@ -18,8 +18,8 @@
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",
 		"@eslint/js": "^9.24.0",
-		"@fontsource-variable/inter": "^5.2.5",
 		"@fontsource-variable/jetbrains-mono": "^5.2.5",
+		"@fontsource-variable/oxanium": "^5.2.5",
 		"@lucide/svelte": "^0.486.0",
 		"@lukulent/svelte-umami": "^0.0.4",
 		"@shikijs/langs": "^3.2.1",

@@ -19,7 +19,7 @@
 		<div class="flex place-items-center gap-6">
 			<a
 				href="/"
-				class="flex h-9 w-fit place-items-center justify-center bg-brand p-1 font-mono font-bold text-brand-foreground"
+				class="flex h-9 w-fit place-items-center justify-center bg-primary p-1 font-mono font-bold text-primary-foreground"
 			>
 				jsrepo
 			</a>

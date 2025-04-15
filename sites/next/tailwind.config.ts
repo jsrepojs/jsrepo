@@ -15,10 +15,6 @@ const config: Config = {
 		},
 		extend: {
 			colors: {
-				brand: {
-					DEFAULT: 'hsl(var(--brand) / <alpha-value>)',
-					foreground: 'hsl(var(--brand-foreground) / <alpha-value>)'
-				},
 				border: 'hsl(var(--border) / <alpha-value>)',
 				input: 'hsl(var(--input) / <alpha-value>)',
 				ring: 'hsl(var(--ring) / <alpha-value>)',
@@ -70,7 +66,7 @@ const config: Config = {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			fontFamily: {
-				sans: ['Inter Variable', 'sans-serif'],
+				sans: ['Oxanium Variable', 'sans-serif'],
 				mono: ['JetBrains Mono Variable', 'monospace']
 			},
 			keyframes: {

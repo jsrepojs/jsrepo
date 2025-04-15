@@ -14,7 +14,7 @@
 <a
 	{href}
 	class={cn(
-		'group flex w-full place-items-center gap-2 rounded-md border border-border px-2 py-3 text-xl font-thin transition-all hover:border-brand hover:bg-card',
+		'group flex w-full place-items-center gap-2 rounded-md border border-border px-2 py-3 text-xl font-thin transition-all hover:bg-accent hover:text-accent-foreground',
 		{
 			'justify-end text-end': variant === 'next',
 			'justify-start text-start': variant === 'previous'
@@ -24,9 +24,9 @@
 >
 	{#if variant === 'next'}
 		{@render children()}
-		<ChevronRight class="transition-all group-hover:text-brand" />
+		<ChevronRight class="transition-all" />
 	{:else}
-		<ChevronLeft class="transition-all group-hover:text-brand" />
+		<ChevronLeft class="transition-all" />
 		{@render children()}
 	{/if}
 </a>

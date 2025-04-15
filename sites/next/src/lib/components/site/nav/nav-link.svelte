@@ -32,7 +32,7 @@
 		{/if}
 	</a>
 	{#if tag}
-		<Badge class="rounded-xl bg-brand px-1 py-0 text-brand-foreground hover:bg-brand">
+		<Badge class="rounded-xl bg-primary px-1 py-0 text-primary-foreground hover:bg-primary">
 			{tag}
 		</Badge>
 	{/if}

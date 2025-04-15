@@ -13,7 +13,7 @@
 	let { children, class: className }: Props = $props();
 </script>
 
-<div class={cn('aspect-video w-full rounded-lg border border-border bg-background', className)}>
+<div class={cn('aspect-video w-full overflow-hidden rounded-lg border border-border bg-card shadow-lg', className)}>
 	<div class="border-b border-inherit p-4">
 		<div class="flex items-center gap-2">
 			<div class="size-2 rounded-full bg-[#ef4444]"></div>
@@ -21,7 +21,7 @@
 			<div class="size-2 rounded-full bg-[#22c55e]"></div>
 		</div>
 	</div>
-	<div class="p-4">
+	<div class="p-4 overflow-auto max-w-full max-h-full h-full">
 		{@render children?.()}
 	</div>
 </div>

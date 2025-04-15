@@ -280,7 +280,7 @@
 	<!-- Aside -->
 	<div class="md:col-start-2">
 		<div
-			class="flex w-full flex-col gap-4 border-t py-4 md:fixed md:h-[calc(100svh-var(--header-height)-64px)] md:max-w-[18rem] md:border-l md:border-t-0 md:pl-4"
+			class="flex w-full flex-col gap-4 border-t py-4 md:sticky md:top-[calc(var(--header-height)+64px)] md:h-[calc(100svh-var(--header-height))] md:max-w-[18rem] md:border-l md:border-t-0 md:pl-4"
 		>
 			{#if data.manifest.meta?.tags && data.manifest.meta.tags.length > 0}
 				<div class="flex flex-wrap gap-2">

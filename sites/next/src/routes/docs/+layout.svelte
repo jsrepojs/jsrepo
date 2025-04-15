@@ -33,10 +33,10 @@
 >
 	<div class="col-start-1 hidden md:block" data-sidebar-section>
 		<Sidebar
-			class="fixed top-[--header-height] z-10 flex h-[calc(100svh-var(--header-height))] w-[--sidebar-width]"
+			class="sticky top-[--header-height] z-10 flex h-[calc(100svh-var(--header-height))] w-[--sidebar-width]"
 		/>
 	</div>
-	<div class="relative col-start-1 md:col-start-2 max-w-full overflow-hidden pt-[--header-height]">
+	<div class="relative col-start-1 md:col-start-2 max-w-full overflow-hidden pt-[--header-height] min-h-svh">
 		{@render children()}
 		<div class="grid grid-cols-2 gap-2 md:px-8 pb-4">
 			{#if paginated.previous}
@@ -57,7 +57,7 @@
 		<!-- make sure the TOC updates when we switch pages -->
 		{#key page.url.pathname}
 			<Aside
-				class="fixed top-[--header-height] z-10 flex h-[calc(100svh-var(--header-height))] w-[--aside-width]"
+				class="sticky top-[--header-height] z-10 flex h-[calc(100svh-var(--header-height))] w-[--aside-width]"
 			/>
 		{/key}
 	</div>

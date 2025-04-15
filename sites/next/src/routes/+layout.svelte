@@ -1,11 +1,12 @@
 <script lang="ts">
 	import '../app.css';
-	import '@fontsource-variable/inter';
+	import '@fontsource-variable/oxanium';
 	import '@fontsource-variable/jetbrains-mono';
 	import { UmamiAnalytics } from '@lukulent/svelte-umami';
 	import { ModeWatcher } from 'mode-watcher';
 	import Header from '$lib/components/site/header.svelte';
 	import { dev } from '$app/environment';
+	import Footer from '$lib/components/site/footer.svelte';
 
 	let { data, children } = $props();
 </script>
@@ -22,6 +23,8 @@
 <div style="--header-height: 64px; --aside-width: 14rem; --sidebar-width: 14rem;">
 	{@render children()}
 
+	<Footer/>
+	
 	<!-- fun markup ordering sh*t -->
 	<Header stars={data.stars} />
 </div>

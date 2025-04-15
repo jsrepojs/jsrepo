@@ -17,7 +17,7 @@
 	<Icon class="size-5 shrink-0" />
 {/snippet}
 
-<main class="relative pt-[--header-height] pb-4 container">
+<main class="container relative pb-4 pt-[--header-height] min-h-svh">
 	<div class="mt-[25vh] flex flex-col place-items-center">
 		<h1 class="py-8 text-5xl font-bold sm:text-7xl">Registries</h1>
 
@@ -29,13 +29,17 @@
 				<ol class="col-start-1 flex flex-col gap-2">
 					{#await data.popular}
 						{#each { length: 5 } as _, i (i)}
-							<li class="flex h-14 place-items-center justify-center rounded-lg border px-6 py-4">
+							<li
+								class="flex h-14 place-items-center justify-center rounded-lg border bg-card px-6 py-4"
+							>
 								<Skeleton class="h-4 w-full" />
 							</li>
 						{/each}
 					{:then popular}
 						{#each popular as registry (registry.url)}
-							<li class="relative rounded-lg border px-6 py-4 transition-colors hover:bg-accent/50">
+							<li
+								class="relative rounded-lg border bg-card px-6 py-4 transition-colors hover:bg-accent/50"
+							>
 								<a href="/registries/{registry.url}" class="flex place-items-center gap-4 truncate">
 									<span class="absolute inset-0"></span>
 									{@render registryIcon({ url: registry.url })}
@@ -52,13 +56,17 @@
 				<ol class="col-start-2 flex flex-col gap-2">
 					{#await data.featured}
 						{#each { length: 5 } as _, i (i)}
-							<li class="flex h-14 place-items-center justify-center rounded-lg border px-6 py-4">
+							<li
+								class="flex h-14 place-items-center justify-center rounded-lg border bg-card px-6 py-4"
+							>
 								<Skeleton class="h-4 w-full" />
 							</li>
 						{/each}
 					{:then featured}
 						{#each featured as registry (registry.url)}
-							<li class="relative rounded-lg border px-6 py-4 transition-colors hover:bg-accent/50">
+							<li
+								class="relative rounded-lg border bg-card px-6 py-4 transition-colors hover:bg-accent/50"
+							>
 								<a href="/registries/{registry.url}" class="flex place-items-center gap-4 truncate">
 									<span class="absolute inset-0"></span>
 									{@render registryIcon({ url: registry.url })}

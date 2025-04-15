@@ -35,10 +35,10 @@
 	<meta name="description" content="jsrepo demos showing off the capabilities of the CLI." />
 </svelte:head>
 
-<main class="flex justify-center px-4 pt-[--header-height]" style="min-height: calc(100svh - 56px);">
+<main class="flex justify-center px-4 pt-[--header-height] min-h-svh">
 	<div class="grid md:grid-cols-2 py-8 gap-5 flex-col h-fit">
 		{#each videos as { title, description, src } (title)}
-			<div class="border border-border rounded-lg max-w-[500px] overflow-hidden">
+			<div class="border border-border rounded-lg max-w-[500px] overflow-hidden bg-card">
 				<iframe
 					class="aspect-video w-full"
 					{src}
