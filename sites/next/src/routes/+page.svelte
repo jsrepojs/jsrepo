@@ -31,25 +31,20 @@
 				</div>
 			</div>
 		</div>
-		<div class="h-full w-full overflow-hidden lg:col-start-2">
-			<Window class="h-[460px] pb-4"
+		<div class="h-full w-full lg:col-start-2 overflow-hidden">
+			<Window class="h-[405px] pb-4 text-sm"
 				><pre><span class="text-muted-foreground"
 						>{'       + 18 more unchanged (-E to expand)'}</span
-					>{`
-   19                           link: 'text-primary underline-offset-4 hover:underline'
-   20                   },
-   21                   size: {
-   22                           default: 'h-10 px-`}<span class="bg-red-400">3</span><span
-						class="bg-green-400">4</span
-					>{` py-2',
-   23                           sm: 'h-9 rounded-md px-3',
-   24                           lg: 'h-11 rounded-md px-`}<span class="bg-red-400">7</span><span
-						class="bg-green-400">8</span
-					>{`',
-   25                           icon: 'h-10 w-10'
-   26                   }
-   27           },`}
-<span class="text-muted-foreground">{'       + 58 more unchanged (-E to expand)'}</span>{`
+					>
+{` 21      		switch (country) {
+ 22					case "US":
+ 23						return \`Hello, {name}!\`;`}
+{' 24'}<span class="text-green-400">{` 				case "ES":`}</span>
+{' 24'}<span class="text-green-400">{`						return \`Hola, {name}!\`;`}</span>
+{` 26			    }
+ 27      }
+ 28
+ `}<span class="text-muted-foreground">{'       + 58 more unchanged (-E to expand)'}</span>{`
  
    Accept changes?
    ○ Accept
