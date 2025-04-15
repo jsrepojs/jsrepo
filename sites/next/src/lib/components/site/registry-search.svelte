@@ -97,13 +97,6 @@
 		id="search-registries"
 		bind:value={search}
 		oninput={() => debouncedQuery()}
-		onkeydown={(e) => {
-			// DO NOT SHIP THIS SHIT
-			if (e.key === 'Enter' && search.length > 0) {
-				console.log('entered')
-				goto(`/registries/search?query=${search}`)
-			}
-		}}
 		class="h-12 rounded-lg border"
 		placeholder="Search registries..."
 		disabled={adding}

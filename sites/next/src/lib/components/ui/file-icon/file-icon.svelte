@@ -12,29 +12,29 @@
 </script>
 
 {#if extension === '.svelte'}
-	<Icons.Svelte class="size-4" />
+	<Icons.Svelte class="size-4 shrink-0" />
 {:else if extension === '.ts'}
-	<Icons.TypeScript class="size-3" />
+	<Icons.TypeScript class="size-3 shrink-0" />
 {:else if extension === '.js'}
-	<Icons.JavaScript class="size-3" />
+	<Icons.JavaScript class="size-3 shrink-0" />
 {:else if extension === '.jsx'}
-	<Icons.React class="size-4 text-[#f7df1e]" />
+	<Icons.React class="size-4 text-[#f7df1e] shrink-0" />
 {:else if extension === '.tsx'}
-	<Icons.React class="size-4" />
+	<Icons.React class="size-4 shrink-0" />
 {:else if extension === '.vue'}
-	<Icons.Vue class="size-3" />
+	<Icons.Vue class="size-3 shrink-0" />
 {:else if extension === '.html'}
-	<Icons.HTML class="size-3" />
+	<Icons.HTML class="size-3 shrink-0" />
 {:else if extension === '.json' || extension === '.jsonc'}
-	<Braces class="size-4 text-primary" />
+	<Braces class="size-4 text-primary shrink-0" />
 {:else if extension === '.yml' || extension === '.yaml'}
-	<Icons.Yaml class="size-4" />
+	<Icons.Yaml class="size-4 shrink-0" />
 {:else if extension === '.css'}
-	<Icons.CSS class="size-3" />
+	<Icons.CSS class="size-3 shrink-0" />
 {:else if extension === '.sass' || extension === 'scss'}
-	<Icons.SASS class="size-4" />
+	<Icons.SASS class="size-4 shrink-0" />
 {:else if extension === '.svg'}
-	<Icons.Svg class="size-4" />
+	<Icons.Svg class="size-4 shrink-0" />
 {:else}
 	{@render fallback?.()}
 {/if}

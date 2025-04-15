@@ -6,7 +6,7 @@ export async function load({ url, fetch }) {
 
 	if (query === null) redirect(303, '/registries');
 
-	const limit = 10;
+	const limit = 15;
 	const offset = parseInt(url.searchParams.get('offset') ?? '0');
 	const order = url.searchParams.get('order') ?? 'asc';
 	let orderBy = url.searchParams.get('order_by') ?? 'alphabetical';

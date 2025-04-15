@@ -44,13 +44,13 @@
 			blocks: manifest.categories.flatMap((c) => c.blocks).length,
 			dependencies: Array.from(dependencies)
 		};
-	};
+	}
 
 	function parseFileExtension(file: string) {
 		const index = file.lastIndexOf('.');
 
 		return file.slice(index);
-	};
+	}
 
 	function determinePrimaryLanguage(...blocks: Block[]) {
 		const langMap = new Map<string, number>();
@@ -93,7 +93,7 @@
 			.toSorted((a, b) => b.value - a.value);
 
 		return arr[0].key;
-	};
+	}
 
 	const registryPrimaryLanguage = $derived(
 		determinePrimaryLanguage(...data.manifest.categories.flatMap((c) => c.blocks))
@@ -109,12 +109,14 @@
 
 <div class="grid grid-cols-1 md:grid-cols-[1fr_18rem]">
 	<div class="col-start-1">
-		<div class="flex flex-col gap-2 py-4">
+		<div class="flex flex-col gap-2 py-4 md:pr-4">
 			<div>
-				<h1 class="flex place-items-center gap-2 text-2xl font-medium">
-					<Icon class="size-5" />
+				<h1 class="flex place-items-center gap-2 truncate text-2xl font-medium">
+					<Icon class="hidden size-5 shrink-0 sm:block" />
 					{data.registryUrl}
-					<FileIcon extension={registryPrimaryLanguage} />
+					<span class="hidden sm:inline">
+						<FileIcon extension={registryPrimaryLanguage} />
+					</span>
 				</h1>
 				{#if data.manifest.meta?.description}
 					<p class="text-muted-foreground md:text-lg">{data.manifest.meta?.description}</p>
@@ -259,7 +261,9 @@
 							{@const pkg = parsePackageName(dep).unwrap()}
 							<Table.Row>
 								<Table.Cell>
-									{pkg.name}
+									<a href="https://npmjs.com/package/{pkg.name}" target="_blank">
+										{pkg.name}
+									</a>
 								</Table.Cell>
 								<Table.Cell>
 									{pkg.version}
@@ -270,10 +274,10 @@
 				</Table.Root>
 			</Tabs.Content>
 			<Tabs.Content value="manifest" class="border-t py-4 md:pr-4">
-                <div class="md:max-w-[calc(100vw-18rem-4rem-1rem)]">
-                    <Code lang="json" code={JSON.stringify(data.manifest, null, '\t')} class="max-h-none" />
-                </div>
-            </Tabs.Content>
+				<div class="md:max-w-[calc(100vw-18rem-4rem-1rem)]">
+					<Code lang="json" code={JSON.stringify(data.manifest, null, '\t')} class="max-h-none" />
+				</div>
+			</Tabs.Content>
 		</Tabs.Root>
 	</div>
 

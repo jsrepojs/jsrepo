@@ -95,7 +95,7 @@ export async function GET({ url }) {
 
 	return json({
 		registries: result,
-		hasMore: total > limit,
+		hasMore: total > limit + offset,
 		total
 	} satisfies RegistryResponse);
 }

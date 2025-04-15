@@ -1,6 +1,5 @@
 <script lang="ts">
 	import RegistrySearch from '$lib/components/site/registry-search.svelte';
-	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Select from '$lib/components/ui/select';
 	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
 	import { Toggle } from '$lib/components/ui/toggle';
@@ -17,9 +16,15 @@
 	let search = $state($params.query);
 
 	let currentPage = $state(($params.offset ?? 0) / data.limit + 1);
+	let orderBy = $state<'alphabetical' | 'views'>($params['order_by'] ?? 'alphabetical');
 
 	const asc = $derived(!$params.order || $params.order === 'asc');
 </script>
+
+<svelte:head>
+	<title>{$params.query} - jsrepo search</title>
+	<meta name="description" content="Search jsrepo registries" />
+</svelte:head>
 
 <main class="min-h-svh pt-[--header-height]">
 	<div class="fixed top-[--header-height] z-10 h-16 w-full border-b bg-background py-2">
@@ -51,9 +56,13 @@
 							<SortDesc />
 						{/if}
 					</Toggle>
-					<Select.Root type="single" bind:value={$params.orderBy}>
+					<Select.Root
+						type="single"
+						bind:value={orderBy}
+						onValueChange={(v) => ($params['order_by'] = v)}
+					>
 						<Select.Trigger class="w-fit">
-							Sort By: {casing.kebabToPascal($params.orderBy)}
+							Sort By: {casing.kebabToPascal(orderBy)}
 						</Select.Trigger>
 						<Select.Content align="end">
 							<Select.Item value="alphabetical">Alphabetical</Select.Item>
@@ -99,33 +108,35 @@
 							perPage={data.limit}
 						>
 							{#snippet children({ pages, currentPage })}
-								<Pagination.Content>
-									<Pagination.Item>
-										<Pagination.PrevButton>
-											<ChevronLeft class="size-4" />
-											<span class="hidden sm:block">Previous</span>
-										</Pagination.PrevButton>
-									</Pagination.Item>
-									{#each pages as page (page.key)}
-										{#if page.type === 'ellipsis'}
-											<Pagination.Item>
-												<Pagination.Ellipsis />
-											</Pagination.Item>
-										{:else}
-											<Pagination.Item>
-												<Pagination.Link {page} isActive={currentPage === page.value}>
-													{page.value}
-												</Pagination.Link>
-											</Pagination.Item>
-										{/if}
-									{/each}
-									<Pagination.Item>
-										<Pagination.NextButton>
-											<span class="hidden sm:block">Next</span>
-											<ChevronRight class="size-4" />
-										</Pagination.NextButton>
-									</Pagination.Item>
-								</Pagination.Content>
+								{#if pages.length > 1}
+									<Pagination.Content>
+										<Pagination.Item>
+											<Pagination.PrevButton>
+												<ChevronLeft class="size-4" />
+												<span class="hidden sm:block">Previous</span>
+											</Pagination.PrevButton>
+										</Pagination.Item>
+										{#each pages as page (page.key)}
+											{#if page.type === 'ellipsis'}
+												<Pagination.Item>
+													<Pagination.Ellipsis />
+												</Pagination.Item>
+											{:else}
+												<Pagination.Item>
+													<Pagination.Link {page} isActive={currentPage === page.value}>
+														{page.value}
+													</Pagination.Link>
+												</Pagination.Item>
+											{/if}
+										{/each}
+										<Pagination.Item>
+											<Pagination.NextButton>
+												<span class="hidden sm:block">Next</span>
+												<ChevronRight class="size-4" />
+											</Pagination.NextButton>
+										</Pagination.Item>
+									</Pagination.Content>
+								{/if}
 							{/snippet}
 						</Pagination.Root>
 					{/if}
