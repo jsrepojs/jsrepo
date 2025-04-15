@@ -31,7 +31,7 @@
 		searching = true;
 
 		try {
-			const response = await fetch(`/api/registries?limit=3&query=${search}`, {
+			const response = await fetch(`/api/registries?limit=3&query=${search}&with_data=false`, {
 				signal
 			});
 
@@ -90,6 +90,14 @@
 			adding = false;
 		}
 	}
+
+	const isFocused = $derived(activeElement.current?.id === 'search-registries');
+
+	const canShowList = $derived(
+		isFocused &&
+			search.length > 0 &&
+			(filteredCompletions.length > 0 || selectProvider(search) !== undefined)
+	);
 </script>
 
 <Command.Root shouldFilter={false} class={cn('relative w-full max-w-2xl', className)}>
@@ -102,7 +110,7 @@
 		disabled={adding}
 		searching={searching || adding}
 	/>
-	{#if activeElement?.current?.id === 'search-registries' && search.length > 0}
+	{#if canShowList}
 		<Command.List
 			class="absolute left-0 top-[3.25rem] z-10 w-full rounded-lg border border-border bg-popover"
 		>
@@ -111,7 +119,7 @@
 					{#each filteredCompletions as url (url)}
 						{@const Icon = getIcon(url)}
 						<Command.Item onSelect={() => goto(`/registries/${url}`)}>
-							<Icon/>
+							<Icon />
 							{url}
 						</Command.Item>
 					{/each}
