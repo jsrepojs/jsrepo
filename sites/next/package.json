@@ -66,6 +66,7 @@
 		"shiki": "^3.2.2",
 		"svelte": "^5.25.12",
 		"svelte-check": "^4.0.0",
+		"sveltekit-search-params": "^3.0.0",
 		"sveltekit-superforms": "^2.24.1",
 		"tailwind-merge": "^2.6.0",
 		"tailwind-variants": "^0.3.1",

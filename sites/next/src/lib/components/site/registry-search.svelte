@@ -7,21 +7,27 @@
 	import type { RegistryResponse } from '../../../routes/api/registries/types';
 	import { cn } from '$lib/utils';
 	import { selectProvider } from 'jsrepo';
-	import { Plus, Search } from '@lucide/svelte';
+	import { Plus } from '@lucide/svelte';
 	import { untrack } from 'svelte';
 	import { getIcon } from '$lib/ts/registry/client';
 
 	type Props = {
 		class?: string;
+		search?: string;
 	};
 
-	let { class: className }: Props = $props();
+	let { search = $bindable(''), class: className }: Props = $props();
 
-	let search = $state('');
 	let searching = $state(false);
 	let completions: string[] = $state([]);
 
 	const query = new UseQuery(async ({ signal, isAborted }) => {
+		if (search === '') {
+			searching = false;
+			completions = [];
+			return;
+		}
+
 		searching = true;
 
 		try {
@@ -91,6 +97,13 @@
 		id="search-registries"
 		bind:value={search}
 		oninput={() => debouncedQuery()}
+		onkeydown={(e) => {
+			// DO NOT SHIP THIS SHIT
+			if (e.key === 'Enter' && search.length > 0) {
+				console.log('entered')
+				goto(`/registries/search?query=${search}`)
+			}
+		}}
 		class="h-12 rounded-lg border"
 		placeholder="Search registries..."
 		disabled={adding}

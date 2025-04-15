@@ -5,4 +5,5 @@ export type RegistryResponse = {
 		| (RegistryInfo & { url: string; provider: string })[]
 		| { url: string; provider: string }[];
 	hasMore: boolean;
+	total: number;
 };

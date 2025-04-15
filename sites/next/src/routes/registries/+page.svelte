@@ -12,12 +12,7 @@
 	<meta name="description" content="Discover and search jsrepo registries" />
 </svelte:head>
 
-{#snippet registryIcon({ url }: { url: string })}
-	{@const Icon = getIcon(url)}
-	<Icon class="size-5 shrink-0" />
-{/snippet}
-
-<main class="container relative pb-4 pt-[--header-height] min-h-svh">
+<main class="container relative min-h-svh pb-4 pt-[--header-height]">
 	<div class="mt-[25vh] flex flex-col place-items-center">
 		<h1 class="py-8 text-5xl font-bold sm:text-7xl">Registries</h1>
 
@@ -37,12 +32,13 @@
 						{/each}
 					{:then popular}
 						{#each popular as registry (registry.url)}
+							{@const Icon = getIcon(registry.url)}
 							<li
 								class="relative rounded-lg border bg-card px-6 py-4 transition-colors hover:bg-accent/50"
 							>
 								<a href="/registries/{registry.url}" class="flex place-items-center gap-4 truncate">
 									<span class="absolute inset-0"></span>
-									{@render registryIcon({ url: registry.url })}
+									<Icon class="size-5 shrink-0" />
 									<span class="text-nowrap">{registry.url}</span>
 								</a>
 							</li>
@@ -64,12 +60,13 @@
 						{/each}
 					{:then featured}
 						{#each featured as registry (registry.url)}
+							{@const Icon = getIcon(registry.url)}
 							<li
 								class="relative rounded-lg border bg-card px-6 py-4 transition-colors hover:bg-accent/50"
 							>
 								<a href="/registries/{registry.url}" class="flex place-items-center gap-4 truncate">
 									<span class="absolute inset-0"></span>
-									{@render registryIcon({ url: registry.url })}
+									<Icon class="size-5 shrink-0" />
 									<span class="text-nowrap">{registry.url}</span>
 								</a>
 							</li>
