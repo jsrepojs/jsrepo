@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { Docs } from '$content/index';
 
-	type Props = Omit<Docs, 'path'> & { children: Snippet<[]> };
+	type Props = Docs & { children: Snippet<[]> };
 
 	let { title, description, children }: Props = $props();
 </script>

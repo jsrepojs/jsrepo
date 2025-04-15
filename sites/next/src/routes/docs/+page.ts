@@ -10,6 +10,7 @@ export async function load() {
 
 	return {
         ...doc.metadata,
+        path: '/',
         component: doc.default
     };
 }

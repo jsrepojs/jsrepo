@@ -70,11 +70,11 @@ From here allow **jsrepo** to create the `jsrepo-build-config.json` file and ste
 ◇  Created `jsrepo-build-config.json`
 │
 ├  Next Steps ────────────────────────────────────────────────┐
-│                                                         │
-│  1. Add categories to `./src`.                          │
-│  2. Run `npm run build:registry` to build the registry. │
-│                                                         │
-├──────────────────────────────────────────────────────────────┘
+│                                                             │
+│  1. Add categories to `./src`.                              │
+│  2. Run `npm run build:registry` to build the registry.     │
+│                                                             │
+├─────────────────────────────────────────────────────────────┘
 │
 └  All done!
 ```
