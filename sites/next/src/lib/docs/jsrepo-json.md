@@ -92,7 +92,7 @@ Whether or not to add a watermark to installed blocks.
 
 When true jsrepo adds a watermark to each block that includes the registry that it was added from from.
 
-```ts
+```ts showLineNumbers
 /*
 	Installed from github/ieedan/std
 */

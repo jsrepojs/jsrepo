@@ -87,7 +87,7 @@ jsrepo build
 
 **jsrepo** will then output a `jsrepo-manifest.json` that looks like this:
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"categories": [
 		{
@@ -126,7 +126,7 @@ Let's see how **jsrepo** handles that...
 
 Create a new file `print.ts` under `/utils` and paste the following code:
 
-```ts
+```ts showLineNumbers
 import color from 'chalk';
 import { add } from './add';
 
@@ -139,7 +139,7 @@ export function printSum(a: number, b: number) {
 
 Now if you build your `jsrepo-manifest.json` should look like this:
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"categories": [
 		{
@@ -189,7 +189,7 @@ jsrepo build --exclude-deps
 
 Option:
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"excludeDeps": ["react"]
 }
@@ -207,7 +207,7 @@ Peer dependencies all you to warn your users when they are using unsupported ver
 
 An example of this could be your project using TailwindCSS v3 while waiting to migrate to v4. In the meantime you can setup peer dependencies to warn users that v4 is not yet fully supported.
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"peerDependencies": {
 		"tailwindcss": {
@@ -224,7 +224,7 @@ For some registries you will need the user to have config files such as a `tailw
 
 You can include these files by configuring them in the `jsrepo-build-config.json`:
 
-```jsonc
+```jsonc showLineNumbers
 {
 	"configFiles": [
 		{
