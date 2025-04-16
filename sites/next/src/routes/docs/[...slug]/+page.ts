@@ -5,7 +5,7 @@ export async function load({ params }) {
 	const doc = await getDoc(params.slug);
 
 	if (!doc) {
-		error(404)
+		error(404);
 	}
 
 	return doc;

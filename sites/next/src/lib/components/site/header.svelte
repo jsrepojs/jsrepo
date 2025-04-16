@@ -10,7 +10,6 @@
 	import { shortcut } from '$lib/actions/shortcut.svelte';
 	import Search from './docs/search/search.svelte';
 	import { Kbd } from '../ui/kbd';
-	import { url } from 'valibot';
 	import { page } from '$app/state';
 
 	let { stars }: { stars: Promise<number> } = $props();

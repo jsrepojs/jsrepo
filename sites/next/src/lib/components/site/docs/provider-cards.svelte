@@ -35,12 +35,14 @@
 <div class="mt-4 grid w-full grid-cols-2 gap-2">
 	{#each providers as provider (provider.href)}
 		<Card.Root>
-			<Card.Content class="flex relative hover:bg-accent/50 transition-all aspect-video flex-col place-items-center justify-center gap-2">
+			<Card.Content
+				class="relative flex aspect-video flex-col place-items-center justify-center gap-2 transition-all hover:bg-accent/50"
+			>
 				<provider.icon class="size-12" />
-				<a href={provider.href} class="text-muted-foreground !no-underline !font-normal">
-                    <span class="absolute inset-0"></span>
-                    {provider.name}
-                </a>
+				<a href={provider.href} class="!font-normal text-muted-foreground !no-underline">
+					<span class="absolute inset-0"></span>
+					{provider.name}
+				</a>
 			</Card.Content>
 		</Card.Root>
 	{/each}

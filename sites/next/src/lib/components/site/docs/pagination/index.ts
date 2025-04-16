@@ -1,4 +1,4 @@
-import Next from "./next.svelte";
-import Previous from "./previous.svelte";
+import Next from './next.svelte';
+import Previous from './previous.svelte';
 
-export { Next, Previous }
+export { Next, Previous };

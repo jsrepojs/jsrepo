@@ -56,7 +56,7 @@
 	}
 
 	pre {
-		@apply mt-4 max-h-[650px] overflow-auto rounded-lg border py-4 bg-background;
+		@apply mt-4 max-h-[650px] overflow-auto rounded-lg border bg-background py-4;
 	}
 
 	:not(h1, h2, h3, h4, h5, h6) code:not([data-language]) {
@@ -64,7 +64,7 @@
 	}
 
 	table {
-		@apply w-full mt-4;
+		@apply mt-4 w-full;
 	}
 
 	tr {

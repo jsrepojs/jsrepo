@@ -11,23 +11,23 @@ let index: Index;
 let content: Map<number, IndexEntry>;
 
 export function createIndex(searchIndex: { docs: IndexEntry[] }) {
-    content = new Map();
+	content = new Map();
 
-    index = new Index({
-        tokenize: 'forward',
-        resolution: 9, 
-    });
+	index = new Index({
+		tokenize: 'forward',
+		resolution: 9
+	});
 
-    for (const entry of searchIndex.docs) {
-        index.add(entry.id, entry.content);
-        content.set(entry.id, entry);
-    }
+	for (const entry of searchIndex.docs) {
+		index.add(entry.id, entry.content);
+		content.set(entry.id, entry);
+	}
 }
 
 export function searchIndex(query: string): IndexEntry[] {
-    if (!index) return [];
+	if (!index) return [];
 
-    const results = index.search(query, { suggest: true }) as number[];
+	const results = index.search(query, { suggest: true }) as number[];
 
-    return results.map((index: number) => content.get(index)!)
+	return results.map((index: number) => content.get(index)!);
 }

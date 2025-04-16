@@ -63,7 +63,7 @@
 								<div>
 									<Label>Preview</Label>
 									<div
-										class="rounded-md border-border border h-10 flex place-items-center justify-center"
+										class="flex h-10 place-items-center justify-center rounded-md border border-border"
 									>
 										{#if registry !== ''}
 											{#key debounced.current}

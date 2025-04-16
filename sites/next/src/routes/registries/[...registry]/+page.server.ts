@@ -1,9 +1,9 @@
-import { dev } from "$app/environment";
-import { functions } from "$lib/backend/db";
-import { getProviderState, getRegistryData } from "$lib/ts/registry";
-import { action } from "$lib/ts/server-actions/search-registries/server";
-import { error, redirect } from "@sveltejs/kit";
-import { selectProvider } from "jsrepo";
+import { dev } from '$app/environment';
+import { functions } from '$lib/backend/db';
+import { getProviderState, getRegistryData } from '$lib/ts/registry';
+import { action } from '$lib/ts/server-actions/search-registries/server';
+import { error, redirect } from '@sveltejs/kit';
+import { selectProvider } from 'jsrepo';
 
 export async function load({ params }) {
 	const registryUrl = params.registry;

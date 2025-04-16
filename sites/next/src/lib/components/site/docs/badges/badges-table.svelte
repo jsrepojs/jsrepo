@@ -2,7 +2,7 @@
 	import * as Table from '$lib/components/ui/table';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { Check, Copy, Ellipsis } from '@lucide/svelte';
+	import { Check, Copy } from '@lucide/svelte';
 	import { scale } from 'svelte/transition';
 
 	const badges = [

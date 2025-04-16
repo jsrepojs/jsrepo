@@ -19,7 +19,7 @@ const config = {
 		}
 	},
 
-	extensions: ['.svelte', '.svx', '.md'],
+	extensions: ['.svelte', '.svx', '.md']
 };
 
 export default config;

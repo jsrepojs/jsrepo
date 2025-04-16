@@ -1,4 +1,4 @@
-import type { RegistryInfo } from "$lib/ts/registry";
+import type { RegistryInfo } from '$lib/ts/registry';
 
 export type RegistryResponse = {
 	registries:

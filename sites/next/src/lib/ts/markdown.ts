@@ -7,7 +7,7 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import remarkGfm from 'remark-gfm';
 import rehypeExternalLinks from 'rehype-external-links';
-import rehypeRaw from 'rehype-raw'
+import rehypeRaw from 'rehype-raw';
 import { prettyCodeOptions } from '../../../mdsx.config';
 
 const processor = unified()

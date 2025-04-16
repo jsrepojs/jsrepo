@@ -159,7 +159,7 @@
 	<Icons.HTML height={size} />
 {/snippet}
 
-<Table.Root class="w-fit mt-4">
+<Table.Root class="mt-4 w-fit">
 	<Table.Header>
 		<Table.Row>
 			<Table.Head>Language</Table.Head>
@@ -176,7 +176,7 @@
 						{#if logo}
 							{@render logo({ size: 18 })}
 						{/if}
-                        <code>{name}</code>
+						<code>{name}</code>
 					</div>
 				</Table.Cell>
 				<Table.Cell>{dependencyResolutionStatus}</Table.Cell>

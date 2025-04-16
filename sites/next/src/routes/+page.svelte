@@ -30,7 +30,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="h-full w-full lg:col-start-2 overflow-hidden">
+		<div class="h-full w-full overflow-hidden lg:col-start-2">
 			<Window class="h-[405px] pb-4 text-sm"
 				><pre><span class="text-muted-foreground"
 						>{'       + 18 more unchanged (-E to expand)'}</span

@@ -53,7 +53,12 @@
 								{#if doc.children}
 									<Nav.List class="ml-1 flex flex-col border-l pl-4">
 										{#each doc.children as child (child.title)}
-											<Nav.Link title={child.title} href={child.href} tag={child.tag} onclick={closeMenu} />
+											<Nav.Link
+												title={child.title}
+												href={child.href}
+												tag={child.tag}
+												onclick={closeMenu}
+											/>
 										{/each}
 									</Nav.List>
 								{/if}

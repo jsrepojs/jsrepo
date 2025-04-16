@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { page } from '$app/state';
+	import { page } from '$app/state';
 </script>
 
 <!-- TODO make this better -->
 <h1>
-    {page.error.message}
+	{page.error.message}
 </h1>

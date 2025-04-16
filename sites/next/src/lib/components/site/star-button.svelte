@@ -17,14 +17,20 @@
 	stars.then((s) => starCount.set(s));
 </script>
 
-<Button target="_blank" href="https://github.com/ieedan/jsrepo" variant="outline" class="h-9 px-2" {...rest}>
+<Button
+	target="_blank"
+	href="https://github.com/ieedan/jsrepo"
+	variant="outline"
+	class="h-9 px-2"
+	{...rest}
+>
 	<span class="sr-only">GitHub</span>
 	<Icons.GitHub />
-	<div class="hidden sm:flex place-items-center gap-1.5 h-full">
+	<div class="hidden h-full place-items-center gap-1.5 sm:flex">
 		<Separator orientation="vertical" />
-		<div class="flex place-items-center gap-1 w-12">
+		<div class="flex w-12 place-items-center gap-1">
 			<Star class="inline-flex size-3 text-yellow-300" />
-			<span class="text-sm text-muted-foreground font-mono text-right p-0">
+			<span class="p-0 text-right font-mono text-sm text-muted-foreground">
 				{starCount.current.toFixed(0)}
 			</span>
 		</div>

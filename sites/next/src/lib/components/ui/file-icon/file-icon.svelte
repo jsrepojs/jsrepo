@@ -18,7 +18,7 @@
 {:else if extension === '.js'}
 	<Icons.JavaScript class="size-3 shrink-0" />
 {:else if extension === '.jsx'}
-	<Icons.React class="size-4 text-[#f7df1e] shrink-0" />
+	<Icons.React class="size-4 shrink-0 text-[#f7df1e]" />
 {:else if extension === '.tsx'}
 	<Icons.React class="size-4 shrink-0" />
 {:else if extension === '.vue'}
@@ -26,7 +26,7 @@
 {:else if extension === '.html'}
 	<Icons.HTML class="size-3 shrink-0" />
 {:else if extension === '.json' || extension === '.jsonc'}
-	<Braces class="size-4 text-primary shrink-0" />
+	<Braces class="size-4 shrink-0 text-primary" />
 {:else if extension === '.yml' || extension === '.yaml'}
 	<Icons.Yaml class="size-4 shrink-0" />
 {:else if extension === '.css'}

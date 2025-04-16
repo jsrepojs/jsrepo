@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Component from "./component.svelte";
-	import type { Props } from "./types";
+	import Component from './component.svelte';
+	import type { Props } from './types';
 
-    let { ...props }: Props = $props()
+	let { ...props }: Props = $props();
 </script>
 
-<Component variant="previous" {...props}/>
+<Component variant="previous" {...props} />

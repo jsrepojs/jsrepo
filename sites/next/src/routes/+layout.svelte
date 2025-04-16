@@ -27,8 +27,8 @@
 <div style="--header-height: 64px; --aside-width: 14rem; --sidebar-width: 14rem;">
 	{@render children()}
 
-	<Footer/>
-	
+	<Footer />
+
 	<!-- fun markup ordering sh*t -->
 	<Header stars={data.stars} />
 </div>

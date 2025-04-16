@@ -115,4 +115,4 @@ jsrepo test # test all blocks
 jsrepo test ts/math # test a specific block
 ```
 
-**jsrepo** will then pull the tests from the source registry and run them with [vitest](https://vitest.dev/) locally. 
+**jsrepo** will then pull the tests from the source registry and run them with [vitest](https://vitest.dev/) locally.

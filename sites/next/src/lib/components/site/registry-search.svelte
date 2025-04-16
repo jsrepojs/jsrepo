@@ -61,6 +61,7 @@
 
 	// resets when search changes
 	$effect(() => {
+		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 		search;
 
 		untrack(() => {
@@ -211,9 +212,7 @@
 				</div>
 			{/if}
 			{#if error}
-				<div class="flex size-full w-12 place-items-center justify-center text-red-400">
-					!
-				</div>
+				<div class="flex size-full w-12 place-items-center justify-center text-red-400">!</div>
 			{/if}
 		</div>
 		{#if canShowList}

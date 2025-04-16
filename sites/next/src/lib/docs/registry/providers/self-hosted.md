@@ -9,12 +9,12 @@ You can host your registry on your own domain by serving it's assets statically.
 This also allows you to customize where and how things are served in ways that aren't possible when serving from a git provider. Here's a few situations that self hosting makes sense:
 
 - Serving multiple registries / registry variants
-- Branding for your registry 
+- Branding for your registry
 - URL shortening
 
 ## Setup
 
-To get started you need a way to serve your registry. This can be done with most web application frameworks by just serving the registry out of the corresponding static folder. 
+To get started you need a way to serve your registry. This can be done with most web application frameworks by just serving the registry out of the corresponding static folder.
 
 - SvelteKit - `/static`
 - Next.js - `/public`
@@ -35,8 +35,8 @@ or with config option:
 
 ```jsonc showLineNumbers
 {
-    // ...
-    "outputDir": "./public/r"
+	// ...
+	"outputDir": "./public/r"
 }
 ```
 

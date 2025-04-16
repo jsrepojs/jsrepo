@@ -288,7 +288,7 @@
 		>
 			{#if data.manifest.meta?.tags && data.manifest.meta.tags.length > 0}
 				<div class="flex flex-wrap gap-2">
-					{#each data.manifest.meta.tags as tag}
+					{#each data.manifest.meta.tags as tag, i (i)}
 						<Badge>{tag}</Badge>
 					{/each}
 				</div>

@@ -29,7 +29,5 @@
 		"./velite.config.js",
 		".velite/**/*"
 	],
-	"exclude": [
-		"./node_modules/**",
-	]
+	"exclude": ["./node_modules/**"]
 }

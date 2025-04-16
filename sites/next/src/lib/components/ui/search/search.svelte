@@ -45,24 +45,24 @@
 <search
 	aria-disabled={disabled}
 	class={cn(
-		'relative aria-disabled:cursor-not-allowed aria-disabled:opacity-90 border border-border rounded-xl flex place-items-center gap-2 pl-2 h-12 w-full focus-within:ring-2 ring-offset-2 ring-offset-background focus-within:ring-primary transition-all',
+		'relative flex h-12 w-full place-items-center gap-2 rounded-xl border border-border pl-2 ring-offset-2 ring-offset-background transition-all focus-within:ring-2 focus-within:ring-primary aria-disabled:cursor-not-allowed aria-disabled:opacity-90',
 		className
 	)}
 >
-	<Search class="text-muted-foreground size-5 shrink-0" />
+	<Search class="size-5 shrink-0 text-muted-foreground" />
 	<input
 		{...rest}
 		type="text"
 		bind:value
-		class="grow w-full disabled:cursor-not-allowed bg-transparent outline-none focus:outline-none h-full placeholder:text-muted-foreground"
+		class="h-full w-full grow bg-transparent outline-none placeholder:text-muted-foreground focus:outline-none disabled:cursor-not-allowed"
 		{placeholder}
 		{disabled}
 		oninput={debounce}
 	/>
-	<div class="absolute right-0 top-0 h-12 flex place-items-center gap-2">
+	<div class="absolute right-0 top-0 flex h-12 place-items-center gap-2">
 		{#if searching}
-			<div class="flex place-items-center justify-center size-full w-12">
-				<LoaderCircle class="size-5 shrink-0 text-muted-foreground animate-spin" />
+			<div class="flex size-full w-12 place-items-center justify-center">
+				<LoaderCircle class="size-5 shrink-0 animate-spin text-muted-foreground" />
 			</div>
 		{/if}
 	</div>

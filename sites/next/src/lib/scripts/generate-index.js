@@ -4,20 +4,20 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 /** Remove markdown syntax
- * 
- * @param {string} md 
- * @returns 
+ *
+ * @param {string} md
+ * @returns
  */
 function removeMarkdown(md) {
 	return removeMd(md, { gfm: true, replaceLinksWithURL: true, useImgAltText: true });
 }
 
 export function generateIndex() {
-    console.log('[scripts/generate-index.ts] Generating `/docs` index...');
+	console.log('[scripts/generate-index.ts] Generating `/docs` index...');
 
-    const docsIndex = generateDocsIndex();
+	const docsIndex = generateDocsIndex();
 
-    console.log('[scripts/generate-index.ts] Generated `/docs` index');
+	console.log('[scripts/generate-index.ts] Generated `/docs` index');
 
 	const index = {
 		docs: docsIndex
@@ -29,10 +29,10 @@ export function generateIndex() {
 }
 
 function generateDocsIndex() {
-    const docsIndex = [];
+	const docsIndex = [];
 	const basePath = path.resolve(import.meta.dirname, '../src/lib/docs');
 
-	console.log(basePath)
+	console.log(basePath);
 
 	for (let i = 0; i < docs.length; i++) {
 		const doc = docs[i];
@@ -64,5 +64,5 @@ function generateDocsIndex() {
 		});
 	}
 
-    return docsIndex
+	return docsIndex;
 }
