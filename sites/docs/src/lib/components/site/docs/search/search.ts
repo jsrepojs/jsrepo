@@ -1,4 +1,4 @@
-import { Index } from 'flexsearch';
+import FlexSearch from 'flexsearch';
 
 export type IndexEntry = {
 	id: number;
@@ -7,13 +7,13 @@ export type IndexEntry = {
 	content: string;
 };
 
-let index: Index;
+let index: FlexSearch.Index;
 let content: Map<number, IndexEntry>;
 
 export function createIndex(searchIndex: { docs: IndexEntry[] }) {
 	content = new Map();
 
-	index = new Index({
+	index = new FlexSearch.Index({
 		tokenize: 'forward',
 		resolution: 9
 	});

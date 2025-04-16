@@ -42,7 +42,7 @@
 		"eslint": "^9.24.0",
 		"eslint-config-prettier": "^10.1.2",
 		"eslint-plugin-svelte": "^3.5.1",
-		"flexsearch": "^0.8.157",
+		"flexsearch": "^0.7.43",
 		"globals": "^16.0.0",
 		"isomorphic-dompurify": "^2.23.0",
 		"jsrepo": "^1.47.0",

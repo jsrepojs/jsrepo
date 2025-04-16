@@ -214,8 +214,8 @@ importers:
         specifier: ^3.5.1
         version: 3.5.1(eslint@9.24.0(jiti@1.21.7))(svelte@5.25.12)
       flexsearch:
-        specifier: ^0.8.157
-        version: 0.8.157
+        specifier: ^0.7.43
+        version: 0.7.43
       globals:
         specifier: ^16.0.0
         version: 16.0.0
@@ -2807,8 +2807,8 @@ packages:
   flatted@3.3.2:
     resolution: {integrity: sha512-AiwGJM8YcNOaobumgtng+6NHuOqC3A7MixFeDafM3X9cIUM+xUXoS5Vfgf+OihAYe20fxqNM9yPBXJzRtZ/4eA==}
 
-  flexsearch@0.8.157:
-    resolution: {integrity: sha512-dome4uFqI5PiXb4oMvmqXV1y072xfmGeVH7gRxLe+dEiT7hNE3zx/+6Wm5012i4MSgL3LFfkz/+Asv4JtUpivQ==}
+  flexsearch@0.7.43:
+    resolution: {integrity: sha512-c5o/+Um8aqCSOXGcZoqZOm+NqtVwNsvVpWv6lfmSclU954O3wvQKxxK8zj74fPaSJbXpSLTs4PRhh+wnoCXnKg==}
 
   foreground-child@3.3.1:
     resolution: {integrity: sha512-gIXjKqtFuWEgzFRJA9WCQeSJLZDjgJUOMCMzxtvFq/37KojM1BFGufqsCy0r4qSQmYLsZYMeyRqzIWOMup03sw==}
@@ -7382,7 +7382,7 @@ snapshots:
 
   flatted@3.3.2: {}
 
-  flexsearch@0.8.157: {}
+  flexsearch@0.7.43: {}
 
   foreground-child@3.3.1:
     dependencies:
