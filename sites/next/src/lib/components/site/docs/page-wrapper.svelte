@@ -14,7 +14,7 @@
 
 <div class="py-6 md:px-8">
 	<h1 class="text-4xl font-bold">{title}</h1>
-	<p class="mb-6 text-lg text-muted-foreground">{description}</p>
+	<p class="mb-4 text-lg text-muted-foreground">{description}</p>
 	<div class="prose flex max-w-full flex-col">
 		{@render children()}
 	</div>

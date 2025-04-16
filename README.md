@@ -1,7 +1,7 @@
 <p align="center">
   <a href="https://jsrepo.dev">
     <picture>
-      <img src="https://github.com/user-attachments/assets/f1c70c20-3a4c-4d36-a21e-4d87cdf4f203">
+      <img src="https://github.com/user-attachments/assets/fb4b84c3-8f81-4e1d-a049-ed909c3dae68">
     </picture>
     <h1 align="center">jsrepo</h1>
   </a>
@@ -17,8 +17,8 @@
 
 ## Getting Started
 
-- [Create a registry](https://jsrepo.dev/docs/setup/registry)
-- [Download your blocks](https://jsrepo.dev/docs/setup/project)
+- [Create a registry](https://jsrepo.dev/docs/registry)
+- [Download your blocks](https://jsrepo.dev/docs/setup)
 
 ## Demos
 

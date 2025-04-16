@@ -21,7 +21,9 @@ To get started with **jsrepo** we recommend installing it globally.
 
 Now run:
 
-<Snippet text="jsrepo init github/ieedan/std"/>
+```sh
+jsrepo init github/ieedan/std
+```
 
 This will start the setup for `github/ieedan/std`.
 
