@@ -18,4 +18,4 @@
 <pre bind:this={preNode} class={cn('', className)} {...restProps}>
 	{@render children?.()}
 </pre>
-<CopyButton text={code} class={cn('absolute right-2 top-7 size-8')} />
+<CopyButton text={code} class={cn('absolute right-3 top-3 size-8')} />
