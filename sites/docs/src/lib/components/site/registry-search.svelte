@@ -93,7 +93,11 @@
 		}
 	}
 
-	const isFocused = $derived(activeElement.current?.id === 'search-registries');
+	let selectedIndex = $state<number>();
+
+	const isFocused = $derived(
+		activeElement.current?.id === 'search-registries' || selectedIndex !== undefined
+	);
 	const canAdd = $derived(filteredCompletions.length === 0 && !searching && search.length > 0);
 
 	const canShowList = $derived(
@@ -101,8 +105,6 @@
 			search.length > 0 &&
 			(filteredCompletions.length > 0 || selectProvider(search) !== undefined)
 	);
-
-	let selectedIndex = $state<number>();
 
 	function handleKeydown(e: KeyboardEvent & { currentTarget: HTMLInputElement }) {
 		let length = filteredCompletions.length;
@@ -152,6 +154,8 @@
 
 	async function handleSubmit() {
 		if (selectedIndex === undefined) {
+			if (search.trim().length === 0) return;
+
 			if (onSearch !== undefined) {
 				onSearch(search);
 			} else {
@@ -184,6 +188,19 @@
 	}
 </script>
 
+<svelte:window
+	onclick={(e) => {
+		// if we click outside make sure we clear the selected index
+		const target = e.target as HTMLElement | null;
+
+		if (!target) return;
+
+		if (!target.hasAttribute('data-search-item')) {
+			selectedIndex = undefined;
+		}
+	}}
+/>
+
 <form
 	onsubmit={(e) => {
 		e.preventDefault();
@@ -199,6 +216,7 @@
 			id="search-registries"
 			bind:value={search}
 			autocomplete="off"
+			onclick={() => (selectedIndex = undefined)}
 			oninput={() => debouncedQuery()}
 			onkeydown={handleKeydown}
 			class="h-full w-full min-w-0 bg-transparent py-3 outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
@@ -223,28 +241,38 @@
 				<div class="overflow-hidden p-1 text-foreground">
 					{#each filteredCompletions as url, i (url)}
 						{@const Icon = getIcon(url)}
-						<div
-							class="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
+						<!-- svelte-ignore a11y_mouse_events_have_key_events -->
+						<!-- svelte-ignore a11y_role_supports_aria_props_implicit -->
+						<button
+							type="submit"
+							class="relative flex w-full cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
 							aria-selected={selectedIndex === i}
+							onmouseover={() => (selectedIndex = i)}
+							tabindex={-1}
 							data-search-item
 							data-index={i}
 							data-url={url}
 						>
 							<Icon />
 							{url}
-						</div>
+						</button>
 					{/each}
 					{#if filteredCompletions.length === 0 && !searching && search.length > 0}
 						{#if selectProvider(search) !== undefined}
-							<div
-								class="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
+							<!-- svelte-ignore a11y_mouse_events_have_key_events -->
+							<!-- svelte-ignore a11y_role_supports_aria_props_implicit -->
+							<button
+								type="submit"
+								class="relative flex w-full cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
 								aria-selected={selectedIndex === 0}
+								onmouseover={() => (selectedIndex = 0)}
 								data-search-item
+								tabindex={-1}
 								data-index={0}
 							>
 								<Plus />
 								Add {search}
-							</div>
+							</button>
 						{/if}
 					{/if}
 				</div>
