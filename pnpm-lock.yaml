@@ -370,6 +370,9 @@ importers:
       eslint-plugin-svelte:
         specifier: ^3.5.1
         version: 3.5.1(eslint@9.24.0(jiti@1.21.7))(svelte@5.25.12)
+      flexsearch:
+        specifier: ^0.8.157
+        version: 0.8.157
       globals:
         specifier: ^16.0.0
         version: 16.0.0
@@ -436,6 +439,9 @@ importers:
       remark-rehype:
         specifier: ^11.1.2
         version: 11.1.2
+      remove-markdown:
+        specifier: ^0.6.0
+        version: 0.6.0
       runed:
         specifier: ^0.25.0
         version: 0.25.0(svelte@5.25.12)
@@ -3166,6 +3172,9 @@ packages:
   flatted@3.3.2:
     resolution: {integrity: sha512-AiwGJM8YcNOaobumgtng+6NHuOqC3A7MixFeDafM3X9cIUM+xUXoS5Vfgf+OihAYe20fxqNM9yPBXJzRtZ/4eA==}
 
+  flexsearch@0.8.157:
+    resolution: {integrity: sha512-dome4uFqI5PiXb4oMvmqXV1y072xfmGeVH7gRxLe+dEiT7hNE3zx/+6Wm5012i4MSgL3LFfkz/+Asv4JtUpivQ==}
+
   foreground-child@3.3.1:
     resolution: {integrity: sha512-gIXjKqtFuWEgzFRJA9WCQeSJLZDjgJUOMCMzxtvFq/37KojM1BFGufqsCy0r4qSQmYLsZYMeyRqzIWOMup03sw==}
     engines: {node: '>=14'}
@@ -4369,6 +4378,9 @@ packages:
 
   remark-stringify@11.0.0:
     resolution: {integrity: sha512-1OSmLd3awB/t8qdoEOMazZkNsfVTeY4fTsgzcQFdXNq8ToTN4ZGwrMnlda4K6smTFKD+GRV6O48i6Z4iKgPPpw==}
+
+  remove-markdown@0.6.0:
+    resolution: {integrity: sha512-B9g8yo5Zp1wXfZ77M1RLpqI7xrBBERkp7+3/Btm9N/uZV5xhXZjzIxDbCKz7CSj141lWDuCnQuH12DKLUv4Ghw==}
 
   require-directory@2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}
@@ -8123,6 +8135,8 @@ snapshots:
 
   flatted@3.3.2: {}
 
+  flexsearch@0.8.157: {}
+
   foreground-child@3.3.1:
     dependencies:
       cross-spawn: 7.0.6
@@ -9802,6 +9816,8 @@ snapshots:
       '@types/mdast': 4.0.4
       mdast-util-to-markdown: 2.1.2
       unified: 11.0.5
+
+  remove-markdown@0.6.0: {}
 
   require-directory@2.1.1: {}
 

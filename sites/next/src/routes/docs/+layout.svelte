@@ -18,7 +18,7 @@
 		const index = docs.findIndex((d) => d.href === pathname);
 
 		const next = docs[index + 1];
-		const nextIsExternal = next.href.startsWith('https://')
+		const nextIsExternal = next.href.startsWith('https://');
 
 		return {
 			previous: docs[index - 1],
@@ -29,16 +29,18 @@
 </script>
 
 <div
-	class="container relative grid-cols-1 grid md:grid-cols-[var(--sidebar-width)_1fr] lg:grid-cols-[var(--sidebar-width)_1fr_var(--aside-width)]"
+	class="container relative grid grid-cols-1 md:grid-cols-[var(--sidebar-width)_1fr] lg:grid-cols-[var(--sidebar-width)_1fr_var(--aside-width)]"
 >
 	<div class="col-start-1 hidden md:block" data-sidebar-section>
 		<Sidebar
 			class="sticky top-[--header-height] z-10 flex h-[calc(100svh-var(--header-height))] w-[--sidebar-width]"
 		/>
 	</div>
-	<div class="relative col-start-1 md:col-start-2 max-w-full overflow-hidden pt-[--header-height] min-h-svh">
+	<div
+		class="relative col-start-1 min-h-svh max-w-full overflow-hidden pt-[--header-height] md:col-start-2"
+	>
 		{@render children()}
-		<div class="grid grid-cols-2 gap-2 md:px-8 pb-4">
+		<div class="grid grid-cols-2 gap-2 pb-4 md:px-8">
 			{#if paginated.previous}
 				{@const { href, title } = paginated.previous}
 				<Pagination.Previous {href} class="col-start-1">

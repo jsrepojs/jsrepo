@@ -1,4 +1,5 @@
 import { defineConfig, s } from 'velite';
+import { generateIndex } from '$lib/scripts/generate-index.js';
 
 export default defineConfig({
 	root: './src/lib/docs',
@@ -13,5 +14,6 @@ export default defineConfig({
 				path: s.path()
 			})
 		}
-	}
+	},
+	complete: generateIndex
 });

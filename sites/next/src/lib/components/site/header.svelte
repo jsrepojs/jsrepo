@@ -6,11 +6,23 @@
 	import { Menu, X } from '@lucide/svelte';
 	import { Dialog } from 'bits-ui';
 	import { active } from '$lib/actions/active.svelte';
+	import { commandContext } from '$lib/context';
+	import { shortcut } from '$lib/actions/shortcut.svelte';
+	import Search from './docs/search/search.svelte';
+	import { Kbd } from '../ui/kbd';
+	import { url } from 'valibot';
+	import { page } from '$app/state';
 
 	let { stars }: { stars: Promise<number> } = $props();
 
 	let menuOpen = $state(false);
+
+	const commandState = commandContext.get();
 </script>
+
+<svelte:window use:shortcut={{ key: 'k', ctrl: true, callback: commandState.setTrue }} />
+
+<Search />
 
 <header
 	class="fixed left-0 top-0 z-10 flex h-[--header-height] w-full items-center border-b bg-background"
@@ -47,6 +59,19 @@
 				</a>
 			</div>
 		</div>
+
+		{#if page.url.pathname.startsWith('/docs')}
+			<div class="hidden lg:block">
+				<Button
+					variant="outline"
+					class="flex place-items-center gap-8 bg-popover px-2 text-muted-foreground"
+					size="sm"
+					onclick={commandState.setTrue}
+				>
+					Search documentation... <Kbd size="xs" class="bg-popover">⌘ K</Kbd>
+				</Button>
+			</div>
+		{/if}
 
 		<div class="flex place-items-center gap-2">
 			<StarButton {stars} class="hidden h-9 md:flex" />

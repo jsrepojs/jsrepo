@@ -6,7 +6,7 @@
 	import type { RegistryResponse } from '../../../routes/api/registries/types';
 	import { cn } from '$lib/utils';
 	import { selectProvider } from 'jsrepo';
-	import { LoaderCircle, Plus, Search, X } from '@lucide/svelte';
+	import { LoaderCircle, Plus, Search } from '@lucide/svelte';
 	import { untrack } from 'svelte';
 	import { getIcon } from '$lib/ts/registry/client';
 

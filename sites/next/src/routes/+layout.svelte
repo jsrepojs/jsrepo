@@ -7,8 +7,12 @@
 	import Header from '$lib/components/site/header.svelte';
 	import { dev } from '$app/environment';
 	import Footer from '$lib/components/site/footer.svelte';
+	import { commandContext } from '$lib/context';
+	import { UseBoolean } from '$lib/hooks/use-boolean.svelte';
 
 	let { data, children } = $props();
+
+	commandContext.set(new UseBoolean(false));
 </script>
 
 <!-- only inject analytics in production -->
