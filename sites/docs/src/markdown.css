@@ -56,7 +56,7 @@
 	}
 
 	pre {
-		@apply  max-h-[650px] overflow-auto rounded-lg border bg-background py-4;
+		@apply max-h-[650px] overflow-auto rounded-lg border bg-background py-4;
 	}
 
 	:not(h1, h2, h3, h4, h5, h6) code:not([data-language]) {

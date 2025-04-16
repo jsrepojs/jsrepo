@@ -1,4 +1,3 @@
-import { docs } from '$content/index';
 import removeMd from 'remove-markdown';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -12,10 +11,13 @@ function removeMarkdown(md) {
 	return removeMd(md, { gfm: true, replaceLinksWithURL: true, useImgAltText: true });
 }
 
-export function generateIndex() {
+/**
+ * @param {any} docs
+ */
+export function generateIndex(docs) {
 	console.log('[scripts/generate-index.ts] Generating `/docs` index...');
 
-	const docsIndex = generateDocsIndex();
+	const docsIndex = generateDocsIndex(docs);
 
 	console.log('[scripts/generate-index.ts] Generated `/docs` index');
 
@@ -28,7 +30,10 @@ export function generateIndex() {
 	fs.writeFileSync(targetPath, JSON.stringify(index));
 }
 
-function generateDocsIndex() {
+/**
+ * @param {any[]} docs
+ */
+function generateDocsIndex(docs) {
 	const docsIndex = [];
 	const basePath = path.resolve(import.meta.dirname, '../src/lib/docs');
 

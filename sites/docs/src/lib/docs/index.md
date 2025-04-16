@@ -8,7 +8,7 @@ lastUpdated: 4-10-2025
     import * as Accordion from '$lib/components/ui/accordion'
 </script>
 
-**jsrepo** is a CLI that takes inspiration from the way that [shadcn/ui](https://ui.shadcn.com) allows you install portable blocks of code. 
+**jsrepo** is a CLI that takes inspiration from the way that [shadcn/ui](https://ui.shadcn.com) allows you install portable blocks of code.
 
 The goal of **jsrepo** is to make this method of distributing code simpler and more maintainable.
 
