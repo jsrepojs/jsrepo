@@ -31,16 +31,14 @@ export function generateIndex(docs) {
 }
 
 /**
- * @param {any[]} docs
+ * @param {any} docs
  */
 function generateDocsIndex(docs) {
 	const docsIndex = [];
 	const basePath = path.resolve(import.meta.dirname, '../src/lib/docs');
 
-	console.log(basePath);
-
-	for (let i = 0; i < docs.length; i++) {
-		const doc = docs[i];
+	for (let i = 0; i < docs.docs.length; i++) {
+		const doc = docs.docs[i];
 
 		let docPath = path.join(basePath, `${doc.path}.md`);
 		const isIndex = !fs.existsSync(docPath) || doc.path === 'index';
