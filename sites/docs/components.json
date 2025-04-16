@@ -1,9 +1,9 @@
 {
 	"$schema": "https://next.shadcn-svelte.com/schema.json",
-	"style": "default",
+	"style": "new-york",
 	"tailwind": {
 		"config": "tailwind.config.ts",
-		"css": "src\\app.css",
+		"css": "src/app.css",
 		"baseColor": "zinc"
 	},
 	"aliases": {

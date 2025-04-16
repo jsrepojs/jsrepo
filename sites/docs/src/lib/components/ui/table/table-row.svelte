@@ -3,26 +3,18 @@
 	import type { WithElementRef } from 'bits-ui';
 	import { cn } from '$lib/utils.js';
 
-	type Props = {
-		active?: boolean;
-	};
-
 	let {
 		ref = $bindable(null),
 		class: className,
-		active = false,
 		children,
 		...restProps
-	}: Props & WithElementRef<HTMLAttributes<HTMLTableRowElement>> = $props();
+	}: WithElementRef<HTMLAttributes<HTMLTableRowElement>> = $props();
 </script>
 
 <tr
 	bind:this={ref}
 	class={cn(
-		'data-[state=selected]:bg-muted border-b transition-colors',
-		{
-			'hover:bg-muted/50': active
-		},
+		'border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted',
 		className
 	)}
 	{...restProps}

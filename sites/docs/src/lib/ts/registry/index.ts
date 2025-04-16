@@ -6,10 +6,10 @@ import {
 	type RegistryProvider,
 	type RegistryProviderState
 } from 'jsrepo';
-import { markdownIt } from '../markdown';
+import { rehype } from '../markdown';
 import DOMPurify from 'isomorphic-dompurify';
 import { GITHUB_TOKEN, GITLAB_TOKEN } from '$env/static/private';
-import { redis } from '../redis-client';
+import { redis } from '$lib/backend/cache/redis-client';
 
 const REGISTRY_STATE_CACHE_PREFIX = 'registry:state';
 
@@ -32,11 +32,11 @@ export function getStateKey(registryUrl: string) {
  * @param param2
  * @returns
  */
-export const getProviderState = async (
+export async function getProviderState(
 	registryUrl: string,
 	provider: RegistryProvider,
 	{ cache = true }: { cache?: boolean } = {}
-): Promise<RegistryProviderState> => {
+): Promise<RegistryProviderState> {
 	const normalizedUrl = provider.parse(registryUrl, { fullyQualified: false }).url;
 
 	const stateKey = getStateKey(normalizedUrl);
@@ -81,11 +81,11 @@ export const getProviderState = async (
 	}
 
 	return state;
-};
+}
 
-export const getRegistryData = async (
+export async function getRegistryData(
 	providerState: RegistryProviderState
-): Promise<RegistryInfo | undefined> => {
+): Promise<RegistryInfo | undefined> {
 	const [manifestResult, readmeResult] = await Promise.all([
 		fetchManifest(providerState, { token: getProviderToken(providerState.provider) }),
 		fetchReadme(providerState)
@@ -98,19 +98,19 @@ export const getRegistryData = async (
 	let readme: string | undefined = readmeResult;
 
 	if (readme != undefined) {
-		const md = await markdownIt();
+		const html = (await rehype(readme)).toString();
 
-		readme = DOMPurify.sanitize(md.render(readme));
+		readme = DOMPurify.sanitize(html);
 	}
 
 	return {
 		manifest,
 		readme
 	};
-};
+}
 
 /** Gets the readme for the registry (if it exists) */
-export const fetchReadme = async (state: RegistryProviderState): Promise<string | undefined> => {
+export async function fetchReadme(state: RegistryProviderState): Promise<string | undefined> {
 	const url = await state.provider.resolveRaw(state, 'README.md');
 
 	try {
@@ -139,9 +139,9 @@ export const fetchReadme = async (state: RegistryProviderState): Promise<string 
 	} catch {
 		return undefined;
 	}
-};
+}
 
-export const getProviderToken = (provider: RegistryProvider): string | undefined => {
+export function getProviderToken(provider: RegistryProvider): string | undefined {
 	switch (provider.name) {
 		case github.name:
 			return GITHUB_TOKEN;
@@ -151,4 +151,4 @@ export const getProviderToken = (provider: RegistryProvider): string | undefined
 	}
 
 	return undefined;
-};
+}

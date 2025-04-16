@@ -1,30 +1,55 @@
+<!--
+	Installed from github/SikandarJODD/cnblocks
+-->
+
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
-	import * as Icons from '$lib/components/icons';
-	import { LightSwitch } from '$lib/components/ui/light-switch';
-	import Version from './version.svelte';
+	import { ArrowUpRight } from '@lucide/svelte';
 
-	type Props = {
-		version: Promise<string>;
-	};
-
-	let { version }: Props = $props();
+	const links = [
+		{
+			title: 'Home',
+			href: '/'
+		},
+		{
+			title: 'Docs',
+			href: '/docs'
+		},
+		{
+			title: 'Registries',
+			href: '/registries'
+		},
+		{
+			title: 'Demos',
+			href: '/demos'
+		},
+		{
+			title: 'GitHub',
+			href: 'https://github.com/ieedan/jsrepo'
+		}
+	];
 </script>
 
-<footer class="border-border border-t flex place-items-center justify-center px-6 w-full">
-	<div class="w-full max-w-screen-2xl flex justify-between place-items-center h-full">
-		<div class="flex justify-center py-8">
-			<div class="flex place-items-center gap-2">
-				<Icons.Jsrepo class="h-8" />
-				<span class="text-sm text-muted-foreground">v<Version {version} /></span>
+<footer class="border-t py-12 dark:bg-transparent">
+	<div class="container">
+		<div class="flex flex-wrap justify-between gap-6">
+			<span class="order-last block text-center text-sm text-muted-foreground md:order-first">
+				© 2025 jsrepo, All rights reserved
+			</span>
+			<div class="order-first flex flex-wrap justify-center gap-6 text-sm md:order-last">
+				{#each links as link (link.href)}
+					{@const isExternal = link.href.startsWith('https://')}
+					<a
+						href={link.href}
+						target={isExternal ? '_blank' : undefined}
+						class="flex place-items-center gap-0.5 text-muted-foreground duration-150 hover:text-foreground"
+					>
+						<span>{link.title}</span>
+						{#if isExternal}
+							<ArrowUpRight class="size-4" />
+						{/if}
+					</a>
+				{/each}
 			</div>
-		</div>
-		<div class="flex place-items-center gap-1">
-			<Button target="_blank" href="https://github.com/ieedan/jsrepo" variant="ghost" size="icon">
-				<span class="sr-only">GitHub</span>
-				<Icons.GitHub />
-			</Button>
-			<LightSwitch />
 		</div>
 	</div>
 </footer>

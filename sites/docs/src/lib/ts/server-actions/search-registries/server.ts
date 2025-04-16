@@ -21,13 +21,12 @@ export const action = async (event: RequestEvent) => {
 
 	const registryUrl = form.data.search;
 
-	// this prevents infinite loading state if you are already on the same page
-	if (event.url.pathname === '/registry' && event.url.searchParams.get('url') === registryUrl) {
+	if (event.url.pathname === `/registries/${registryUrl}}`) {
 		return message(form, 'You are already there!');
 	}
 
 	// just gets the state and sets the cache
 	await getProviderState(registryUrl, provider, { cache: true });
 
-	throw redirect(303, `/registry?url=${registryUrl}`);
+	throw redirect(303, `/registries/${registryUrl}`);
 };

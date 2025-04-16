@@ -1,34 +1,52 @@
+<!--
+	Installed from github/ieedan/shadcn-svelte-extras
+-->
+
 <script lang="ts">
-	import type { Command } from 'package-manager-detector';
-	import { resolveCommand } from 'package-manager-detector/commands';
-	import { cn } from '$lib/utils';
+	import { cn } from '$lib/utils/utils';
+	import { tv, type VariantProps } from 'tailwind-variants';
 	import { CopyButton } from '$lib/components/ui/copy-button';
-	import { pmContext } from '$lib/ts/context';
+
+	const style = tv({
+		base: 'relative w-full max-w-full rounded-md border bg-background py-2.5 pl-3 pr-12',
+		variants: {
+			variant: {
+				default: 'border-border',
+				secondary: 'border-border bg-accent',
+				destructive: 'border-destructive bg-destructive',
+				primary: 'border-primary bg-primary text-primary-foreground'
+			}
+		}
+	});
+
+	type Variant = VariantProps<typeof style>['variant'];
 
 	type Props = {
-		command: Command;
-		args: string[];
+		variant?: Variant;
+		text: string | string[];
 		class?: string;
+		onCopy?: () => void;
 	};
 
-	let { command, args, class: className }: Props = $props();
-
-	const pm = pmContext.get();
-
-	const cmd = $derived(resolveCommand($pm, command, args));
-
-	const text = $derived(`${cmd?.command} ${cmd?.args.join(' ')}`);
+	let { text, variant = 'default', onCopy, class: className }: Props = $props();
 </script>
 
-<div
-	class={cn(
-		'border border-border relative bg-card rounded-md px-4 py-3 w-full text-sm font-mono text-muted-foreground flex justify-between place-items-center',
-		className
-	)}
->
-	<div class="text-nowrap max-w-full overflow-x-auto scrollbar-hide">
-		<span class="text-foreground dark:text-primary">{cmd?.command}</span>
-		<span>{cmd?.args.join(' ')}</span>
-	</div>
-	<CopyButton {text} class="size-6 absolute top-1/2 -translate-y-1/2 right-2" />
+<div class={cn(style({ variant, className: className }))} data-snippet>
+	{#if typeof text == 'string'}
+		<pre class={cn('overflow-y-auto whitespace-nowrap text-left font-mono text-sm')}>
+			{text}
+		</pre>
+	{:else}
+		{#each text as line, i (i)}
+			<pre class={cn('overflow-y-auto whitespace-nowrap text-left font-mono text-sm')}>
+			{line}
+		</pre>
+		{/each}
+	{/if}
+
+	<CopyButton
+		class="absolute right-2 top-1/2 size-7 -translate-y-1/2 transition-opacity ease-in-out hover:bg-transparent hover:text-opacity-80"
+		text={typeof text === 'string' ? text : text.join('\n')}
+		{onCopy}
+	/>
 </div>

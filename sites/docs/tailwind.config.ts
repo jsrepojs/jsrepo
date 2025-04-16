@@ -1,10 +1,9 @@
 import type { Config } from 'tailwindcss';
 import tailwindcssAnimate from 'tailwindcss-animate';
-import typography from '@tailwindcss/typography';
 
 const config: Config = {
 	darkMode: ['class'],
-	content: ['./src/**/*.{html,js,svelte,ts}'],
+	content: ['./src/**/*.{html,js,svelte,ts,md,svx}'],
 	safelist: ['dark'],
 	theme: {
 		container: {
@@ -67,7 +66,7 @@ const config: Config = {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			fontFamily: {
-				sans: ['Inter Variable', 'sans-serif'],
+				sans: ['Oxanium Variable', 'sans-serif'],
 				mono: ['JetBrains Mono Variable', 'monospace']
 			},
 			keyframes: {
@@ -83,11 +82,6 @@ const config: Config = {
 					'0%,70%,100%': { opacity: '1' },
 					'20%,50%': { opacity: '0' }
 				},
-				gradient: {
-					to: {
-						'background-position': '200% center'
-					}
-				},
 				marquee: {
 					from: { transform: 'translateX(0)' },
 					to: { transform: 'translateX(calc(-100% - var(--gap)))' }
@@ -101,13 +95,12 @@ const config: Config = {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'caret-blink': 'caret-blink 1.25s ease-out infinite',
-				gradient: 'gradient 8s linear infinite',
 				marquee: 'marquee var(--duration) linear infinite',
 				'marquee-vertical': 'marquee-vertical var(--duration) linear infinite'
 			}
 		}
 	},
-	plugins: [tailwindcssAnimate, typography]
+	plugins: [tailwindcssAnimate]
 };
 
 export default config;

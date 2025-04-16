@@ -13,7 +13,7 @@
     "build:docs": "pnpm -F docs build",
     "ci:release": "pnpm build:cli && changeset publish",
     "changeset": "changeset",
-    "dev": "pnpm -F next dev",
+    "dev": "pnpm -F docs dev",
     "build:cli-docs": "pnpm -F jsrepo build:docs"
   },
   "keywords": [],

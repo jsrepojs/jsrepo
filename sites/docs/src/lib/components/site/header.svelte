@@ -1,89 +1,94 @@
 <script lang="ts">
-	import LightSwitch from '$lib/components/ui/light-switch/light-switch.svelte';
-	import { Command, Search } from '@lucide/svelte';
-	import { active } from '$lib/actions/active.svelte';
-	import { StarButton } from '$lib/components/ui/github';
+	import { LightSwitch } from '$lib/components/ui/light-switch';
+	import NavMenu from './docs/nav-menu.svelte';
+	import StarButton from './star-button.svelte';
 	import { Button } from '$lib/components/ui/button';
-	import { Kbd } from '$lib/components/ui/kbd';
-	import { commandContext } from '$lib/ts/context';
-	import { IsMobile } from '$lib/hooks/is-mobile.svelte';
-	import Version from './version.svelte';
+	import { Menu, X } from '@lucide/svelte';
+	import { Dialog } from 'bits-ui';
+	import { active } from '$lib/actions/active.svelte';
+	import { commandContext } from '$lib/context';
+	import { shortcut } from '$lib/actions/shortcut.svelte';
+	import Search from './docs/search/search.svelte';
+	import { Kbd } from '../ui/kbd';
+	import { page } from '$app/state';
 
-	type Props = {
-		version: Promise<string>;
-		stars: Promise<number>;
-	};
+	let { stars }: { stars: Promise<number> } = $props();
 
-	let { version, stars }: Props = $props();
+	let menuOpen = $state(false);
 
-	const commandOpen = commandContext.get();
-
-	const isMobile = new IsMobile();
+	const commandState = commandContext.get();
 </script>
 
+<svelte:window use:shortcut={{ key: 'k', ctrl: true, callback: commandState.setTrue }} />
+
+<Search />
+
 <header
-	class="py-2 px-4 flex place-items-center justify-center border-b border-border h-14 sticky top-0 bg-background z-40"
+	class="fixed left-0 top-0 z-10 flex h-[--header-height] w-full items-center border-b bg-background"
 >
-	<div class="flex place-items-center justify-between w-full">
+	<div class="container flex items-center justify-between">
 		<div class="flex place-items-center gap-6">
-			{#if isMobile.current}
-				<div id="sidebar-trigger-portal-target"></div>
-			{:else}
-				<a href="/" class="flex place-items-center gap-2">
-					<h1 class="bg-primary text-primary-foreground text-lg font-mono font-bold p-1 w-fit">
-						jsrepo
-					</h1>
-					<span class="text-base font-mono text-muted-foreground">v<Version {version} /></span>
-				</a>
-				<nav class="place-items-center gap-4 flex">
-					<a
-						href="/"
-						class="hover:dark:text-primary hover:text-foreground text-muted-foreground transition-all data-[active=true]:text-foreground data-[active=true]:dark:text-primary"
-						use:active={{
-							activeForSubdirectories: false
-						}}
-					>
-						Home
-					</a>
-					<a
-						href="/docs"
-						class="hover:dark:text-primary hover:text-foreground text-muted-foreground transition-all data-[active=true]:text-foreground data-[active=true]:dark:text-primary"
-						use:active={{
-							activeForSubdirectories: true
-						}}
-					>
-						Docs
-					</a>
-					<a
-						href="/demos"
-						class="hover:dark:text-primary hover:text-foreground text-muted-foreground transition-all data-[active=true]:text-foreground data-[active=true]:dark:text-primary"
-						use:active={{
-							activeForSubdirectories: true
-						}}
-					>
-						Demos
-					</a>
-				</nav>
-			{/if}
-		</div>
-		<div class="flex place-items-center gap-1">
-			<Button
-				variant="outline"
-				class="flex place-items-center justify-between min-w-48 sm:min-w-56"
-				onclick={() => ($commandOpen = true)}
+			<a
+				href="/"
+				class="flex h-9 w-fit place-items-center justify-center bg-primary p-1 font-mono font-bold text-primary-foreground"
 			>
-				<span class="text-muted-foreground flex place-items-center gap-2">
-					<Search class="size-4" />
-					Search
-				</span>
-				<div class="flex place-items-center gap-1">
-					<Kbd class="px-2">
-						<Command class="size-4 pr-1" />K
-					</Kbd>
-				</div>
-			</Button>
-			<StarButton {stars} />
-			<LightSwitch />
+				jsrepo
+			</a>
+			<div class="hidden place-content-center gap-4 md:flex">
+				<a
+					href="/docs"
+					class="text-sm text-muted-foreground transition-all hover:text-foreground data-[active=true]:text-foreground"
+					use:active={{ activeForSubdirectories: true }}
+				>
+					Docs
+				</a>
+				<a
+					href="/registries"
+					class="text-sm text-muted-foreground transition-all hover:text-foreground data-[active=true]:text-foreground"
+					use:active={{ activeForSubdirectories: true }}
+				>
+					Registries
+				</a>
+				<a
+					href="/demos"
+					class="text-sm text-muted-foreground transition-all hover:text-foreground data-[active=true]:text-foreground"
+					use:active={{ activeForSubdirectories: true }}
+				>
+					Demos
+				</a>
+			</div>
+		</div>
+
+		{#if page.url.pathname.startsWith('/docs')}
+			<div class="hidden lg:block">
+				<Button
+					variant="outline"
+					class="flex place-items-center gap-8 bg-popover px-2 text-muted-foreground"
+					size="sm"
+					onclick={commandState.setTrue}
+				>
+					Search documentation... <Kbd size="xs" class="bg-popover">⌘ K</Kbd>
+				</Button>
+			</div>
+		{/if}
+
+		<div class="flex place-items-center gap-2">
+			<StarButton {stars} class="hidden h-9 md:flex" />
+			<LightSwitch class="hidden size-9 md:flex" />
+			<Dialog.Root bind:open={menuOpen}>
+				<Dialog.Trigger>
+					{#snippet child({ props })}
+						<Button {...props} class="md:hidden" size="icon" variant="ghost">
+							{#if menuOpen}
+								<X />
+							{:else}
+								<Menu />
+							{/if}
+						</Button>
+					{/snippet}
+				</Dialog.Trigger>
+				<NavMenu bind:open={menuOpen} />
+			</Dialog.Root>
 		</div>
 	</div>
 </header>

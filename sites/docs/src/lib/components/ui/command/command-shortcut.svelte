@@ -12,9 +12,9 @@
 </script>
 
 <span
-	bind:this={ref}
-	class={cn('text-muted-foreground ml-auto text-xs tracking-widest', className)}
+	class={cn('ml-auto text-xs tracking-widest text-muted-foreground', className)}
 	{...restProps}
+	bind:this={ref}
 >
 	{@render children?.()}
 </span>
