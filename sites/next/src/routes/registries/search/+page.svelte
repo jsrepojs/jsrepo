@@ -29,7 +29,7 @@
 <main class="min-h-svh pt-[--header-height]">
 	<div class="fixed top-[--header-height] z-10 h-16 w-full border-b bg-background py-2">
 		<div class="container">
-			<RegistrySearch class="max-w-none" bind:search />
+			<RegistrySearch class="max-w-none" bind:search onSearch={(search) => $params.query = search}/>
 		</div>
 	</div>
 

@@ -16,7 +16,7 @@
 	<div class="mt-[25vh] flex flex-col place-items-center">
 		<h1 class="py-8 text-5xl font-bold sm:text-7xl">Registries</h1>
 
-		<RegistrySearch />
+		<RegistrySearch class="max-w-2xl"/>
 
 		<div class="mt-36 grid w-full max-w-4xl grid-cols-1 gap-8 lg:grid-cols-2">
 			<div class="flex flex-col gap-2">
