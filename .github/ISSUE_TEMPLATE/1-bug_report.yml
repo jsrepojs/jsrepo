@@ -42,7 +42,7 @@ body:
       attributes:
           label: Reproduction Link
           description: Link to the reproduction.
-          placeholder: https://github.com/ieedan/jsrepo-repro
+          placeholder: https://github.com/jsrepojs/jsrepo-repro
       validations:
           required: true
     - type: textarea

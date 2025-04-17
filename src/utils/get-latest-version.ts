@@ -44,7 +44,7 @@ export async function getLatestVersion({
 		}, 1000);
 
 		const response = await nodeFetch(
-			'https://raw.githubusercontent.com/ieedan/jsrepo/refs/heads/main/packages/cli/package.json',
+			'https://raw.githubusercontent.com/jsrepojs/jsrepo/refs/heads/main/packages/cli/package.json',
 			{
 				signal: controller.signal,
 			}

@@ -10,10 +10,10 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/ieedan/jsrepo"
+		"url": "git+https://github.com/jsrepojs/jsrepo"
 	},
 	"bugs": {
-		"url": "https://github.com/ieedan/jsrepo/issues"
+		"url": "https://github.com/jsrepojs/jsrepo/issues"
 	},
 	"keywords": ["repo", "cli", "svelte", "vue", "typescript", "javascript", "shadcn", "registry"],
 	"type": "module",

@@ -140,10 +140,10 @@ async function newerVersionAvailable(name: string, oldVersion: string, newVersio
 
 	const text: string[] = [
 		`Update available! ${color.redBright(oldVersion)} -> ${color.greenBright(newVersion)}`,
-		`${color.cyan('Changelog')}: https://github.com/ieedan/jsrepo/releases/tag/${name}@${newVersion}`,
+		`${color.cyan('Changelog')}: https://github.com/jsrepojs/jsrepo/releases/tag/${name}@${newVersion}`,
 		`Run ${color.cyan(`${installCommand?.command} ${installCommand?.args.join(' ')}`)} to update!`,
 		'',
-		`${color.yellowBright('Star')} on GitHub for updates: https://github.com/ieedan/jsrepo`,
+		`${color.yellowBright('Star')} on GitHub for updates: https://github.com/jsrepojs/jsrepo`,
 	];
 
 	const box = boxen(text.join('\n'), {
