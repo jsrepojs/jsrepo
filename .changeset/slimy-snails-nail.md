@@ -2,5 +2,5 @@
 "jsrepo": patch
 ---
 
-chore: Update `package.json` links for repo move.
+chore: Update `package.json` links for repo move
   
