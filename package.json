@@ -46,7 +46,8 @@
 		"lint": "biome lint --write",
 		"check": "biome check && pnpm check:types",
 		"test": "vitest",
-		"check:types": "tsc"
+		"check:types": "tsc",
+		"ci:release": "pnpm build && changeset publish"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
