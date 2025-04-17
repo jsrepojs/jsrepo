@@ -1,5 +1,10 @@
 # jsrepo
 
+## 1.47.1
+### Patch Changes
+
+- 45357a2: chore: Update `package.json` links for repo move.
+
 ## 1.47.0
 ### Minor Changes
 
