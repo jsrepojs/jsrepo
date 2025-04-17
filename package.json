@@ -1,33 +1,85 @@
 {
-  "name": "jsrepo-monorepo",
-  "packageManager": "pnpm@10.8.1",
-  "version": "0.0.0",
-  "description": "A monorepo for jsrepo",
-  "scripts": {
-    "ci:publish": "changeset publish",
-    "format": "pnpm -F jsrepo format && pnpm -F docs format",
-    "lint": "pnpm -F jsrepo check && pnpm -F docs lint",
-    "test": "pnpm -F jsrepo test",
-    "build": "pnpm build:cli && pnpm build:cli-docs && pnpm build:docs",
-    "build:cli": "pnpm -F jsrepo build",
-    "build:docs": "pnpm -F docs build",
-    "ci:release": "pnpm build:cli && changeset publish",
-    "changeset": "changeset",
-    "dev": "pnpm -F docs dev",
-    "build:cli-docs": "pnpm -F jsrepo build:docs"
-  },
-  "keywords": [],
-  "author": "Aidan Bleser",
-  "license": "MIT",
-  "devDependencies": {
-    "@changesets/cli": "^2.28.1",
-    "pkg-pr-new": "^0.0.42"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@biomejs/biome",
-      "esbuild",
-      "sharp"
-    ]
-  }
+	"name": "jsrepo",
+	"description": "A CLI to add shared code from remote repositories.",
+	"version": "1.47.0",
+	"license": "MIT",
+	"homepage": "https://jsrepo.dev",
+	"author": {
+		"name": "Aidan Bleser",
+		"url": "https://github.com/ieedan"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/jsrepojs/jsrepo"
+	},
+	"bugs": {
+		"url": "https://github.com/jsrepojs/jsrepo/issues"
+	},
+	"keywords": ["repo", "cli", "svelte", "vue", "typescript", "javascript", "shadcn", "registry"],
+	"type": "module",
+	"packageManager": "pnpm@10.8.1",
+	"exports": {
+		".": {
+			"types": "./dist/api/index.d.ts",
+			"default": "./dist/api/index.js"
+		}
+	},
+	"bin": "./dist/index.js",
+	"main": "./dist/index.js",
+	"files": ["./schemas/**/*", "dist/**/*"],
+	"scripts": {
+		"start": "tsup --silent && node ./dist/index.js",
+		"build": "tsup",
+		"format": "biome format --write",
+		"lint": "biome lint --write",
+		"check": "biome check && pnpm check:types",
+		"test": "vitest",
+		"check:types": "tsc"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@changesets/cli": "^2.29.2",
+		"@types/diff": "^7.0.2",
+		"@types/node": "^22.14.0",
+		"@types/semver": "^7.7.0",
+		"@types/validate-npm-package-name": "^4.0.2",
+		"pkg-pr-new": "^0.0.42",
+		"tsup": "^8.4.0",
+		"typescript": "^5.8.3",
+		"vitest": "^3.1.1"
+	},
+	"dependencies": {
+		"@anthropic-ai/sdk": "^0.39.0",
+		"@biomejs/js-api": "^0.7.1",
+		"@biomejs/wasm-nodejs": "^1.9.4",
+		"@clack/prompts": "^0.10.1",
+		"boxen": "^8.0.1",
+		"chalk": "^5.4.1",
+		"commander": "^13.1.0",
+		"conf": "^13.1.0",
+		"css-dependency": "^0.0.3",
+		"diff": "^7.0.0",
+		"escape-string-regexp": "^5.0.0",
+		"estree-walker": "^3.0.3",
+		"execa": "^9.5.2",
+		"get-tsconfig": "^4.10.0",
+		"ignore": "^7.0.3",
+		"is-unicode-supported": "^2.1.0",
+		"node-fetch": "^3.3.2",
+		"octokit": "^4.1.2",
+		"ollama": "^0.5.14",
+		"openai": "^4.93.0",
+		"oxc-parser": "^0.64.0",
+		"package-manager-detector": "^1.1.0",
+		"parse5": "^7.2.1",
+		"pathe": "^2.0.3",
+		"prettier": "^3.5.3",
+		"prettier-plugin-svelte": "^3.3.3",
+		"semver": "^7.7.1",
+		"sisteransi": "^1.0.5",
+		"svelte": "^5.25.9",
+		"valibot": "1.0.0",
+		"validate-npm-package-name": "^6.0.0",
+		"vue": "^3.5.13"
+	}
 }

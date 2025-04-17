@@ -1,1 +1,7 @@
 node_modules
+
+# out
+dist
+
+# testing
+temp-test
