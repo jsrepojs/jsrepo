@@ -3,8 +3,12 @@ node_modules
 # Output
 .output
 .vercel
+.velite
+.netlify
+.wrangler
 /.svelte-kit
 /build
+/static/search.json
 
 # OS
 .DS_Store

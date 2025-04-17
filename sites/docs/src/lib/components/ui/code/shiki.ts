@@ -12,11 +12,7 @@ const bundledLanguages = {
 	javascript: () => import('@shikijs/langs/javascript'),
 	json: () => import('@shikijs/langs/json'),
 	svelte: () => import('@shikijs/langs/svelte'),
-	typescript: () => import('@shikijs/langs/typescript'),
-	yaml: () => import('@shikijs/langs/yaml'),
-	vue: () => import('@shikijs/langs/vue'),
-	tsx: () => import('@shikijs/langs/tsx'),
-	jsx: () => import('@shikijs/langs/jsx')
+	typescript: () => import('@shikijs/langs/typescript')
 };
 
 /** The languages configured for the highlighter */

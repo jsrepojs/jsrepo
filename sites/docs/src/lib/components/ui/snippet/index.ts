@@ -1,4 +1,7 @@
-import Snippet from './snippet.svelte';
-import JsrepoSnippet from './jsrepo-snippet.svelte';
+/*
+	Installed from github/ieedan/shadcn-svelte-extras
+*/
 
-export { Snippet, JsrepoSnippet };
+import Snippet from './snippet.svelte';
+
+export { Snippet };

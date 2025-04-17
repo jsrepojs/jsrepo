@@ -1,0 +1,144 @@
+.prose {
+	h1,
+	h2,
+	h3,
+	h3,
+	h4 {
+		@apply mt-4;
+	}
+
+	h1 {
+		@apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
+	}
+
+	h2 {
+		@apply scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0;
+	}
+
+	h3 {
+		@apply scroll-m-20 text-2xl font-semibold tracking-tight;
+	}
+
+	h4 {
+		@apply scroll-m-20 text-xl font-semibold tracking-tight;
+	}
+
+	p {
+		@apply leading-7 [&:not(:first-child)]:mt-4;
+	}
+
+	a {
+		@apply font-medium underline underline-offset-4;
+	}
+
+	ul {
+		@apply ml-4 mt-4 list-disc [&>li]:mt-2;
+	}
+
+	hr {
+		@apply mt-4;
+	}
+
+	blockquote {
+		@apply mt-4 border-l-2 border-l-primary bg-muted/50 px-4 py-2 text-muted-foreground;
+	}
+
+	[data-pm-command] {
+		@apply [&:not(:first-child)]:mt-4;
+	}
+
+	[data-snippet] {
+		@apply [&:not(:first-child)]:mt-4;
+	}
+
+	code:not([data-language]) {
+		@apply relative text-nowrap rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono;
+	}
+
+	pre {
+		@apply max-h-[650px] overflow-auto rounded-lg border bg-background py-4;
+	}
+
+	:not(h1, h2, h3, h4, h5, h6) code:not([data-language]) {
+		@apply text-sm;
+	}
+
+	table {
+		@apply mt-4 w-full;
+	}
+
+	tr {
+		@apply m-0 border-t p-0 even:bg-muted/50;
+	}
+
+	th {
+		@apply border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right;
+	}
+
+	td {
+		@apply border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right;
+	}
+}
+
+[data-theme*='github-dark-default'] {
+	@apply flex flex-col;
+}
+
+[data-rehype-pretty-code-figure] {
+	@apply relative font-mono text-sm [&:not(:first-child)]:mt-4;
+}
+
+[data-rehype-pretty-code-figure] code {
+	display: grid;
+	min-width: 100%;
+	border-radius: 0;
+	background: transparent;
+	padding: 0;
+	border: 0;
+	counter-reset: line;
+	box-decoration-break: clone;
+}
+
+[data-rehype-pretty-code-figure] [data-line] {
+	@apply inline-block w-full;
+
+	min-height: 1.5rem;
+	padding: 2px 1rem;
+}
+
+[data-rehype-pretty-code-figure] [data-line-numbers] [data-line] {
+	padding: 0 0.5rem;
+}
+
+[data-rehype-pretty-code-figure] [data-line-numbers] > [data-line]::before {
+	@apply inline-block text-right text-muted-foreground;
+
+	counter-increment: line;
+	content: counter(line);
+	width: 1.8rem;
+	margin-right: 1.4rem;
+}
+
+[data-rehype-pretty-code-figure] .line--highlighted {
+	@apply !bg-accent;
+}
+
+[data-rehype-pretty-code-figure] .line-highlighted span {
+	@apply relative;
+}
+
+[data-rehype-pretty-code-figure] .chars--highlighted {
+	@apply rounded-md bg-accent p-1;
+}
+
+code[data-theme*='github-light-default'],
+code[data-theme*='github-light-default'] span {
+	color: var(--shiki-light);
+	background-color: var(--shiki-light-bg);
+}
+
+.dark code[data-theme*='github-dark-default'],
+.dark code[data-theme*='github-dark-default'] span {
+	color: var(--shiki-dark);
+	background-color: var(--shiki-dark-bg);
+}

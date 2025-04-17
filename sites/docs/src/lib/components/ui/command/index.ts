@@ -11,7 +11,8 @@ import Separator from './command-separator.svelte';
 import Shortcut from './command-shortcut.svelte';
 import LinkItem from './command-link-item.svelte';
 
-const Loading = CommandPrimitive.Loading;
+const Loading: typeof CommandPrimitive.Loading = CommandPrimitive.Loading;
+const Viewport: typeof CommandPrimitive.Viewport = CommandPrimitive.Viewport;
 
 export {
 	Root,
@@ -25,6 +26,7 @@ export {
 	Separator,
 	Shortcut,
 	Loading,
+	Viewport,
 	//
 	Root as Command,
 	Dialog as CommandDialog,
@@ -36,5 +38,6 @@ export {
 	List as CommandList,
 	Separator as CommandSeparator,
 	Shortcut as CommandShortcut,
-	Loading as CommandLoading
+	Loading as CommandLoading,
+	Viewport as CommandViewport
 };

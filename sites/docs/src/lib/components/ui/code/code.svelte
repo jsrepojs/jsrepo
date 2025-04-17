@@ -12,11 +12,11 @@
 	import { CopyButton } from '$lib/components/ui/copy-button';
 
 	const style = tv({
-		base: 'not-prose relative h-fit max-h-[650px] overflow-auto rounded-lg',
+		base: 'not-prose relative h-full max-h-[650px] overflow-auto rounded-lg border',
 		variants: {
 			variant: {
-				default: 'bg-background',
-				secondary: 'bg-secondary/50'
+				default: 'border-border bg-background',
+				secondary: 'border-transparent bg-secondary/50'
 			}
 		}
 	});
@@ -59,7 +59,7 @@
 
 	let {
 		variant = 'default',
-		lang = 'diff',
+		lang = 'typescript',
 		code,
 		copyButtonContainerClass = undefined,
 		class: className = undefined,
@@ -131,7 +131,7 @@
 	}
 
 	:global(pre.shiki) {
-		@apply overflow-auto rounded-lg border border-border bg-inherit py-4 text-sm;
+		@apply overflow-auto rounded-lg bg-inherit py-4 text-sm;
 		max-height: min(100%, 650px);
 		-ms-overflow-style: none; /* IE and Edge */
 		scrollbar-width: none; /* Firefox */

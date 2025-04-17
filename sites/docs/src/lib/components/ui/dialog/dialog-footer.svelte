@@ -1,11 +1,7 @@
-<!--
-	Installed from github/ieedan/shadcn-svelte-extras
--->
-
 <script lang="ts">
 	import type { WithElementRef } from 'bits-ui';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { cn } from '$lib/utils/utils.js';
+	import { cn } from '$lib/utils.js';
 
 	let {
 		ref = $bindable(null),

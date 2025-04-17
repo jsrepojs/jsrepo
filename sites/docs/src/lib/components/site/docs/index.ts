@@ -1,8 +1,8 @@
-import DocHeader from './doc-header.svelte';
-import Jsrepo from './jsrepo.svelte';
-import Link from './link.svelte';
-import SubHeading from './sub-heading.svelte';
-import CodeSpan from './code-span.svelte';
-import Blockquote from './blockquote.svelte';
+import PageWrapper from './page-wrapper.svelte';
+import Sidebar from './sidebar.svelte';
+import Aside from './aside.svelte';
+import NavMenu from './nav-menu.svelte';
+import ProviderCards from './provider-cards.svelte';
+import LanguageSupport from './language-support.svelte';
 
-export { DocHeader, Jsrepo, Link, SubHeading, CodeSpan, Blockquote };
+export { PageWrapper, Sidebar, Aside, NavMenu, ProviderCards, LanguageSupport };

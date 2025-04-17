@@ -1,18 +1,12 @@
-import { getProviderState, getRegistryData, type RegistryInfo } from '$lib/ts/registry';
+import { getProviderState, getRegistryData } from '$lib/ts/registry';
 import { error, json } from '@sveltejs/kit';
 import { selectProvider } from 'jsrepo';
 import * as array from '$lib/ts/array.js';
-import { db, functions } from '$lib/db/index.js';
-import { registries } from '$lib/db/schema.js';
-import { desc, isNotNull, ilike } from 'drizzle-orm';
+import { db, functions } from '$lib/backend/db/index.js';
+import { registries } from '$lib/backend/db/schema.js';
+import { desc, isNotNull, ilike, count } from 'drizzle-orm';
 import type { PgColumn } from 'drizzle-orm/pg-core';
-
-type RegistryResponse = {
-	registries:
-		| (RegistryInfo & { url: string; provider: string })[]
-		| { url: string; provider: string }[];
-	hasMore: boolean;
-};
+import type { RegistryResponse } from './types';
 
 export async function GET({ url }) {
 	// limit the maximum possible retrieved rows to 100
@@ -34,13 +28,19 @@ export async function GET({ url }) {
 			break;
 	}
 
-	const urls = await db
-		.select()
-		.from(registries)
-		.where(query !== null ? ilike(registries.url, `%${query}%`) : isNotNull(registries.url)) // isNotNull is to say always match
-		.orderBy(descending ? desc(orderByColumn) : orderByColumn)
-		.offset(offset)
-		.limit(limit);
+	const [registryCount, urls] = await Promise.all([
+		db
+			.select({ count: count() })
+			.from(registries)
+			.where(query !== null ? ilike(registries.url, `%${query}%`) : isNotNull(registries.url)), // isNotNull is to say always match
+		db
+			.select()
+			.from(registries)
+			.where(query !== null ? ilike(registries.url, `%${query}%`) : isNotNull(registries.url)) // isNotNull is to say always match
+			.orderBy(descending ? desc(orderByColumn) : orderByColumn)
+			.offset(offset)
+			.limit(limit)
+	]);
 
 	const registryData = await Promise.all(
 		urls.map(async ({ url }, i) => {
@@ -91,9 +91,12 @@ export async function GET({ url }) {
 		.sort((a, b) => a.order - b.order)
 		.map((r) => ({ ...r, order: undefined }));
 
+	const total = registryCount[0].count;
+
 	return json({
 		registries: result,
-		hasMore: urls.length > limit
+		hasMore: total > limit + offset,
+		total
 	} satisfies RegistryResponse);
 }
 

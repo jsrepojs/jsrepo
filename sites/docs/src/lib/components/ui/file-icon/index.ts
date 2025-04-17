@@ -1,3 +1,1 @@
-import FileIcon from './file-icon.svelte';
-
-export { FileIcon };
+export { default as FileIcon } from './file-icon.svelte';
