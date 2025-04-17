@@ -15,16 +15,7 @@
 	"bugs": {
 		"url": "https://github.com/jsrepojs/jsrepo/issues"
 	},
-	"keywords": [
-		"repo",
-		"cli",
-		"svelte",
-		"vue",
-		"typescript",
-		"javascript",
-		"shadcn",
-		"registry"
-	],
+	"keywords": ["repo", "cli", "svelte", "vue", "typescript", "javascript", "shadcn", "registry"],
 	"type": "module",
 	"packageManager": "pnpm@10.8.1",
 	"exports": {
@@ -35,10 +26,7 @@
 	},
 	"bin": "./dist/index.js",
 	"main": "./dist/index.js",
-	"files": [
-		"./schemas/**/*",
-		"dist/**/*"
-	],
+	"files": ["./schemas/**/*", "dist/**/*"],
 	"scripts": {
 		"start": "tsup --silent && node ./dist/index.js",
 		"build": "tsup",
@@ -46,7 +34,8 @@
 		"lint": "biome lint --write",
 		"check": "biome check && pnpm check:types",
 		"test": "vitest",
-		"check:types": "tsc"
+		"check:types": "tsc",
+		"ci:release": "pnpm build && changeset publish"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
