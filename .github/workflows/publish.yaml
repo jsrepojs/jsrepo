@@ -10,7 +10,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
     release:
         name: Build & Publish Release
-        if: github.repository == 'ieedan/jsrepo'
+        if: github.repository == 'jsrepojs/jsrepo'
         runs-on: ubuntu-latest
 
         steps:

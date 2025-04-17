@@ -18,8 +18,8 @@ jobs:
           run: pnpm install
 
         - name: Build
-          run: pnpm build:cli
+          run: pnpm build
 
         - name: publish preview
           # run: |
-          run: pnpm pkg-pr-new publish './packages/cli' --bin --packageManager=pnpm
+          run: pnpm pkg-pr-new publish --bin --packageManager=pnpm
