@@ -7,9 +7,10 @@ import { type BitBucketProviderState, bitbucket } from './bitbucket';
 import { type GitHubProviderState, github } from './github';
 import { type GitLabProviderState, gitlab } from './gitlab';
 import { http } from './http';
+import { type JsrepoProviderState, jsrepo } from './jsrepo';
 import type { RegistryProvider, RegistryProviderState } from './types';
 
-export const providers = [github, gitlab, bitbucket, azure, http];
+export const providers = [jsrepo, github, gitlab, bitbucket, azure, http];
 
 export function selectProvider(url: string): RegistryProvider | undefined {
 	const provider = providers.find((p) => p.matches(url));
@@ -76,11 +77,13 @@ export async function fetchManifest(
 export * from './types';
 
 export {
+	jsrepo,
 	github,
 	gitlab,
 	bitbucket,
 	azure,
 	http,
+	type JsrepoProviderState,
 	type AzureProviderState,
 	type GitHubProviderState,
 	type GitLabProviderState,

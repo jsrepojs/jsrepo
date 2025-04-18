@@ -164,7 +164,11 @@ export async function _exec(s: string | undefined, options: Options, command: an
 		}
 	);
 
-	const blocksMap = (await registry.fetchBlocks(...resolvedRepos)).match(
+	const blocksMap = (
+		await registry.fetchBlocks(resolvedRepos, {
+			verbose: options.verbose ? verbose : undefined,
+		})
+	).match(
 		(val) => val,
 		({ repo, message }) => {
 			loading.stop(`Failed fetching scripts from ${color.cyan(repo)}`);

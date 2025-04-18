@@ -2,6 +2,22 @@
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"type": "object",
 	"properties": {
+		"name": {
+			"type": "string",
+			"description": "The name of the registry on jsrepo.com.",
+			"examples": ["@ieedan/std", "@shadcn/ui"]
+		},
+		"version": {
+			"type": "string",
+			"description": "A semver compatible version of the registry on jsrepo.com",
+			"format": "semver",
+			"examples": ["1.0.0"]
+		},
+		"private": {
+			"type": "boolean",
+			"description": "Should this registry be kept private when publishing on jsrepo.com for the first time",
+			"default": false
+		},
 		"meta": {
 			"description": "Optional metadata to include in the manifest file.",
 			"type": "object",

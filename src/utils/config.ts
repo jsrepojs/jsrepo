@@ -55,6 +55,9 @@ export type Formatter = v.InferOutput<typeof formatterSchema>;
 
 export const registryConfigSchema = v.object({
 	$schema: v.string(),
+	name: v.optional(v.string()),
+	version: v.optional(v.string()),
+	private: v.optional(v.boolean(), false),
 	meta: v.optional(manifestMeta),
 	peerDependencies: v.optional(peerDependencySchema),
 	configFiles: v.optional(v.array(configFileSchema)),

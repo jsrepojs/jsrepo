@@ -8,6 +8,7 @@ import {
 	fetchRaw,
 	github,
 	gitlab,
+	jsrepo,
 	providers,
 	selectProvider,
 } from '.';
@@ -146,13 +147,14 @@ export async function forEachPathGetProviderState(
  * @returns
  */
 export async function fetchBlocks(
-	...repos: RegistryProviderState[]
+	repos: RegistryProviderState[],
+	{ verbose }: { verbose?: (msg: string) => void } = {}
 ): Promise<Result<Map<string, RemoteBlock>, { message: string; repo: string }>> {
 	const blocksMap = new Map<string, RemoteBlock>();
 
 	const errors = await Promise.all(
 		repos.map(async (state) => {
-			const getManifestResult = await internalFetchManifest(state);
+			const getManifestResult = await internalFetchManifest(state, { verbose });
 
 			if (getManifestResult.isErr()) {
 				return Err({ message: getManifestResult.unwrapErr(), repo: state.url });
@@ -210,13 +212,14 @@ export type FetchManifestResult = {
  * @returns
  */
 export async function fetchManifests(
-	...repos: RegistryProviderState[]
+	repos: RegistryProviderState[],
+	{ verbose }: { verbose?: (msg: string) => void } = {}
 ): Promise<Result<FetchManifestResult[], { message: string; repo: string }>> {
 	const manifests: FetchManifestResult[] = [];
 
 	const errors = await Promise.all(
 		repos.map(async (state) => {
-			const getManifestResult = await internalFetchManifest(state);
+			const getManifestResult = await internalFetchManifest(state, { verbose });
 
 			if (getManifestResult.isErr()) {
 				return Err({ message: getManifestResult.unwrapErr(), repo: state.url });
@@ -243,6 +246,7 @@ export {
 	github,
 	gitlab,
 	http,
+	jsrepo,
 	providers,
 	internalFetchManifest as fetchManifest,
 	internalFetchRaw as fetchRaw,

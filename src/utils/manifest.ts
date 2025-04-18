@@ -26,6 +26,7 @@ export function parseManifest(json: string): Result<Manifest, string> {
 		}
 
 		return Ok({
+			private: false,
 			categories: validated.output,
 		});
 	}

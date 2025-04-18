@@ -94,6 +94,7 @@ async function _build(options: Options) {
 			if (val === null) {
 				return {
 					$schema: '',
+					private: false,
 					dirs: options.dirs ?? [],
 					outputDir: options.outputDir,
 					doNotListBlocks: options.doNotListBlocks ?? [],
@@ -316,6 +317,9 @@ export function createManifest(
 	config: RegistryConfig
 ) {
 	const manifest: Manifest = {
+		name: config.name,
+		version: config.version,
+		private: config.private,
 		meta: config.meta,
 		peerDependencies: config.peerDependencies,
 		configFiles,
