@@ -13,7 +13,11 @@
   </a> 
 </p>
 
-**jsrepo** is a CLI to build and distribute your code.
+**jsrepo** is a CLI to build and distribute your code. It takes inspiration from the way that [shadcn/ui](https://ui.shadcn.com/) allows you install portable blocks of code.
+
+The goal of jsrepo is to make this method of distributing code easier and more maintainable.
+
+It does this by unifying the tooling it takes to build a registry, with the tooling it takes to distribute it. As well as providing a rich feature set to make maintaining that code much easier.
 
 ## Getting Started
 
