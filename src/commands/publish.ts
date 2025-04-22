@@ -1,14 +1,25 @@
-import { cancel, confirm, isCancel, log, outro, password, select, text } from '@clack/prompts';
-import color from 'chalk';
-import { Command } from 'commander';
-import * as v from 'valibot';
-import { intro, spinner } from '../utils/prompts';
-import path from 'pathe';
-import * as tar from 'tar';
 import fs from 'node:fs';
+import { log, outro } from '@clack/prompts';
+import color from 'chalk';
+import { Command, program } from 'commander';
+import ignore from 'ignore';
 import fetch from 'node-fetch';
+import path from 'pathe';
+import semver from 'semver';
+import * as tar from 'tar';
+import * as v from 'valibot';
+import type { Category } from '../types';
+import * as ascii from '../utils/ascii';
+import { buildBlocksDirectory, buildConfigFiles, pruneUnused } from '../utils/build';
+import { runRules } from '../utils/build/check';
+import { IGNORED_DIRS, getRegistryConfig } from '../utils/config';
+import { createManifest } from '../utils/manifest';
+import { intro, spinner } from '../utils/prompts';
+import * as jsrepo from '../utils/registry-providers/jsrepo';
 
 const schema = v.object({
+	dryRun: v.boolean(),
+	verbose: v.boolean(),
 	cwd: v.string(),
 });
 
@@ -16,6 +27,8 @@ type Options = v.InferInput<typeof schema>;
 
 export const publish = new Command('publish')
 	.description('Publish a registry to jsrepo.com.')
+	.option('--dry-run', "Test the publish but don't list on jsrepo.com", false)
+	.option('--verbose', 'Include debug logs.', false)
 	.option('--cwd <path>', 'The current working directory.', process.cwd())
 	.action(async (opts) => {
 		const options = v.parse(schema, opts);
@@ -28,20 +41,223 @@ export const publish = new Command('publish')
 	});
 
 async function _publish(options: Options) {
-	const dest = 'jsrepo-package.tar.gz';
+	const verbose = (msg: string) => {
+		if (options.verbose) {
+			console.info(`${ascii.INFO} ${msg}`);
+		}
+	};
 
-	const files = fs.readdirSync(path.resolve(options.cwd, 'temp-registry'));
+	const loading = spinner({ verbose: options.verbose ? verbose : undefined });
+
+	const config = getRegistryConfig(options.cwd).match(
+		(val) => {
+			if (val === null) {
+				program.error(
+					color.red(`Publishing to ${color.bold('jsrepo.com')} requires a config.`)
+				);
+			}
+
+			return val;
+		},
+		(err) => program.error(color.red(err))
+	);
+
+	// check name
+	if (config.name !== undefined) {
+		try {
+			const [scope, registryName, ...rest] = config.name.split('/');
+
+			if (rest.length > 0) {
+				throw new Error();
+			}
+
+			if (!scope.startsWith('@')) {
+				throw new Error();
+			}
+
+			if (!scope.slice(1).match(jsrepo.NAME_REGEX)) {
+				throw new Error();
+			}
+
+			if (!registryName.match(jsrepo.NAME_REGEX)) {
+				throw new Error();
+			}
+		} catch {
+			program.error(
+				color.red(
+					`\`${config.name}\` is not a valid name. The name should be provided as \`@<scope>/<registry>\``
+				)
+			);
+		}
+	} else {
+		program.error(
+			color.red(
+				`To publish to ${color.bold('jsrepo.com')} you need to provide the \`name\` field in the \`jsrepo-build-config.json\``
+			)
+		);
+	}
+
+	// check version
+	if (config.version !== undefined) {
+		const valid = semver.valid(config.version);
+
+		if (!valid) {
+			program.error(`\`${config.version}\` is not a valid semver version.`);
+		}
+	} else {
+		program.error(
+			color.red(
+				`To publish to ${color.bold('jsrepo.com')} you need to provide the \`version\` field in the \`jsrepo-build-config.json\``
+			)
+		);
+	}
+
+	// build into temp dir
+	const categories: Category[] = [];
+
+	const ig = ignore();
+
+	try {
+		const ignoreFile = fs.readFileSync(path.join(options.cwd, '.gitignore')).toString();
+
+		ig.add(ignoreFile);
+	} catch {
+		// just continue on
+	}
+
+	ig.add(IGNORED_DIRS);
+
+	for (const dir of config.dirs) {
+		const dirPath = path.join(options.cwd, dir);
+
+		loading.start(`Building ${color.cyan(dirPath)}`);
+
+		const builtCategories = buildBlocksDirectory(dirPath, {
+			cwd: options.cwd,
+			ignore: ig,
+			config,
+		});
+
+		for (const category of builtCategories) {
+			if (categories.find((cat) => cat.name === category.name) !== undefined) {
+				console.warn(
+					`${ascii.VERTICAL_LINE}  ${ascii.WARN} Skipped adding \`${color.cyan(`${dir}/${category.name}`)}\` because a category with the same name already exists!`
+				);
+				continue;
+			}
+
+			categories.push(category);
+		}
+
+		loading.stop(`Built ${color.cyan(dirPath)}`);
+	}
+
+	const configFiles = buildConfigFiles(config, { cwd: options.cwd });
+
+	const manifest = createManifest(categories, configFiles, config);
+
+	loading.start('Checking manifest');
+
+	const { warnings, errors } = runRules(manifest, config, options.cwd, config.rules);
+
+	loading.stop('Completed checking manifest.');
+
+	// add gap for errors
+	if (warnings.length > 0 || errors.length > 0) {
+		console.log(ascii.VERTICAL_LINE);
+	}
+
+	for (const warning of warnings) {
+		console.log(warning);
+	}
+
+	if (errors.length > 0) {
+		for (const error of errors) {
+			console.log(error);
+		}
+
+		program.error(
+			color.red(
+				`Completed checking manifest with ${color.bold(`${errors.length} error(s)`)} and ${color.bold(`${warnings.length} warning(s)`)}`
+			)
+		);
+	}
+
+	// removes any unused blocks or categories
+	const [prunedCategories, count] = pruneUnused(manifest.categories);
+
+	manifest.categories = prunedCategories;
+
+	if (count > 0) {
+		log.step(`Removed ${count} unused block${count > 1 ? 's' : ''}.`);
+	}
+
+	loading.start(`Packaging ${color.cyan(manifest.name)}...`);
+
+	const tempOutDir = path.resolve(options.cwd, `jsrepo-publish-temp-${Date.now()}`);
+
+	fs.mkdirSync(tempOutDir, { recursive: true });
+
+	fs.writeFileSync(path.resolve(tempOutDir, 'jsrepo-manifest.json'), JSON.stringify(manifest));
+
+	// copy config files to output directory
+	if (manifest.configFiles) {
+		for (const file of manifest.configFiles) {
+			const originalPath = path.join(options.cwd, file.path);
+			const destPath = path.join(tempOutDir, file.path);
+
+			const containing = path.join(destPath, '../');
+
+			if (!fs.existsSync(containing)) {
+				fs.mkdirSync(containing, { recursive: true });
+			}
+
+			fs.copyFileSync(originalPath, destPath);
+		}
+	}
+
+	// copy the files for each block in each category
+	for (const category of manifest.categories) {
+		for (const block of category.blocks) {
+			const originalPath = path.join(options.cwd, block.directory);
+			const newDirPath = path.join(tempOutDir, block.directory);
+
+			for (const file of block.files) {
+				const containing = path.join(newDirPath, file, '../');
+
+				if (!fs.existsSync(containing)) {
+					fs.mkdirSync(containing, { recursive: true });
+				}
+
+				fs.copyFileSync(path.join(originalPath, file), path.join(newDirPath, file));
+			}
+		}
+	}
+
+	const dest = path.resolve(options.cwd, `${config.name.replace('/', '_')}-package.tar.gz`);
+
+	const files = fs.readdirSync(tempOutDir);
 
 	await tar.create(
 		{
 			z: true,
-			cwd: path.resolve(options.cwd, 'temp-registry'),
+			cwd: tempOutDir,
 			file: dest,
 		},
 		files
 	);
 
-	const tarBuffer = fs.readFileSync(path.resolve(options.cwd, dest));
+	// remove temp directory
+	fs.rmSync(tempOutDir, { force: true, recursive: true });
+
+	loading.stop(`Created package ${color.cyan(dest)}...`);
+
+	loading.start(`Publishing to ${ascii.JSREPO_DOT_COM}...`);
+
+	const tarBuffer = fs.readFileSync(dest);
+
+	// remove archive file
+	fs.rmSync(dest, { force: true, recursive: true });
 
 	const response = await fetch('http://localhost:5173/api/registries/publish', {
 		body: tarBuffer,
@@ -49,15 +265,40 @@ async function _publish(options: Options) {
 			'content-type': 'application/gzip',
 			'content-encoding': 'gzip',
 			'x-api-key': 'PLSvimGZbGqeHpbahhUDKgGQkYFpBpyiHHcKkEjZDxeDOqkxKvcHyFSnOYwpJaya',
+			'x-dry-run': options.dryRun ? '1' : '0',
 		},
 		method: 'POST',
 	});
 
+	loading.stop(`Got response from ${ascii.JSREPO_DOT_COM}.`);
+
 	if (!response.ok) {
 		const res = (await response.json()) as { message: string };
 
-		console.error(`${response.status} ${res.message}`);
+		program.error(
+			color.red(`${color.bold('[jsrepo.com]')} ${color.bold(response.status)} ${res.message}`)
+		);
 	} else {
-		console.log('Completed publish!');
+		const res = (await response.json()) as PublishResponse;
+
+		if (res.status === 'dry-run') {
+			log.success(`${color.hex('#f7df1e').bold('[jsrepo.com]')} Completed dry run!`);
+		} else {
+			log.success(
+				`${color.hex('#f7df1e').bold('[jsrepo.com]')} published ${color.greenBright(`@${res.scope}`)}/${res.registry}${color.greenBright(`@${res.version}`)}!`
+			);
+		}
 	}
 }
+
+type PublishResponse =
+	| {
+			status: 'published';
+			scope: string;
+			registry: string;
+			version: string;
+			tag: string | null;
+	  }
+	| {
+			status: 'dry-run';
+	  };

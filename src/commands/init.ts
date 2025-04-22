@@ -694,6 +694,7 @@ const _initRegistry = async (options: Options) => {
 	if (!config) {
 		config = {
 			$schema: '',
+			private: false,
 			dirs: [],
 			doNotListBlocks: [],
 			doNotListCategories: [],

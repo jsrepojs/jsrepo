@@ -28,3 +28,4 @@ export const INFO = color.bgBlueBright.white(' INFO ');
 export const ERROR = color.bgRedBright.white(' ERROR ');
 
 export const JSREPO = color.hex('#f7df1e')('jsrepo');
+export const JSREPO_DOT_COM = color.hex('#f7df1e').bold('jsrepo.com');

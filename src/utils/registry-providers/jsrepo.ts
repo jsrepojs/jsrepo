@@ -1,6 +1,27 @@
 import color from 'chalk';
 import type { ParseOptions, RegistryProvider, RegistryProviderState } from './types';
 
+/** Regex for scopes and registry names.
+ * Names that don't match this regex will be rejected.
+ *
+ * ### Valid
+ * ```txt
+ * console
+ * console0
+ * console-0
+ * ```
+ *
+ * ### Invalid
+ * ```txt
+ * Console
+ * 0console
+ * -console
+ * console-
+ * console--0
+ * ```
+ */
+export const NAME_REGEX = /^(?![-0-9])(?!.*--)[a-z0-9]*(?:-[a-z0-9]+)*$/gi;
+
 export const BASE_URL = 'http://localhost:5173';
 
 export interface JsrepoProviderState extends RegistryProviderState {
@@ -69,7 +90,7 @@ ${color.bold(error)}`;
 	},
 };
 
-function parseUrl(
+export function parseUrl(
 	url: string,
 	{ fullyQualified }: ParseOptions
 ): {

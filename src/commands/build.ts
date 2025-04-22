@@ -10,12 +10,9 @@ import type { Category, Manifest } from '../types';
 import * as ascii from '../utils/ascii';
 import { buildBlocksDirectory, buildConfigFiles, pruneUnused } from '../utils/build';
 import { DEFAULT_CONFIG, runRules } from '../utils/build/check';
-import { type RegistryConfig, getRegistryConfig } from '../utils/config';
-import { parseManifest } from '../utils/manifest';
+import { IGNORED_DIRS, type RegistryConfig, getRegistryConfig } from '../utils/config';
+import { createManifest, parseManifest } from '../utils/manifest';
 import { intro, spinner } from '../utils/prompts';
-
-// sensible defaults for ignored directories
-const IGNORED_DIRS = ['.git', 'node_modules'] as const;
 
 const schema = v.object({
 	dirs: v.optional(v.array(v.string())),
@@ -309,24 +306,6 @@ async function _build(options: Options) {
 
 		loading.stop(`Wrote output to \`${color.cyan(manifestOut)}\``);
 	}
-}
-
-export function createManifest(
-	categories: Category[],
-	configFiles: Manifest['configFiles'],
-	config: RegistryConfig
-) {
-	const manifest: Manifest = {
-		name: config.name,
-		version: config.version,
-		private: config.private,
-		meta: config.meta,
-		peerDependencies: config.peerDependencies,
-		configFiles,
-		categories,
-	};
-
-	return manifest;
 }
 
 export { build };
