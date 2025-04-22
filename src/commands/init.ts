@@ -33,6 +33,7 @@ import { packageJson } from '../utils/context';
 import { formatFile, matchJSDescendant, tryGetTsconfig } from '../utils/files';
 import { loadFormatterConfig } from '../utils/format';
 import { json } from '../utils/language-support';
+import type { PackageJson } from '../utils/package';
 import { checkPreconditions } from '../utils/preconditions';
 import {
 	type Task,
@@ -52,7 +53,8 @@ const schema = v.object({
 	formatter: v.optional(formatterSchema),
 	project: v.optional(v.boolean()),
 	registry: v.optional(v.boolean()),
-	script: v.string(),
+	buildScript: v.string(),
+	publishScript: v.string(),
 	expand: v.boolean(),
 	maxUnchanged: v.number(),
 	yes: v.boolean(),
@@ -80,9 +82,14 @@ const init = new Command('init')
 	.option('-P, --project', 'Takes you through the steps to initialize a project.')
 	.option('-R, --registry', 'Takes you through the steps to initialize a registry.')
 	.option(
-		'--script <name>',
+		'--build-script <name>',
 		'The name of the build script. (For Registry setup)',
 		'build:registry'
+	)
+	.option(
+		'--publish-script <name>',
+		'The name of the publish script. (For Registry setup)',
+		'release:registry'
 	)
 	.option('-E, --expand', 'Expands the diff so you see the entire file.', false)
 	.option(
@@ -689,11 +696,11 @@ const _initRegistry = async (options: Options) => {
 		(err) => program.error(color.red(err))
 	);
 
-	const noConfig = config === null;
-
 	if (!config) {
 		config = {
 			$schema: '',
+			name: undefined,
+			version: undefined,
 			readme: 'README.md',
 			dirs: [],
 			doNotListBlocks: [],
@@ -746,103 +753,82 @@ const _initRegistry = async (options: Options) => {
 
 	const pkg = JSON.parse(fs.readFileSync(packagePath).toString());
 
-	// continue asking until the user either chooses to overwrite or inputs a script that doesn't exist yet
-	while (!options.yes && pkg.scripts && pkg.scripts[options.script]) {
-		const response = await confirm({
-			message: `The \`${color.cyan(options.script)}\` already exists overwrite?`,
-			initialValue: false,
+	let configurePublish = !options.yes;
+
+	if (!options.yes) {
+		const confirmResult = await confirm({
+			message: `Configure to publish to ${ascii.JSREPO_DOT_COM}?`,
+			initialValue: true,
 		});
 
-		if (isCancel(response)) {
+		if (isCancel(confirmResult)) {
 			cancel('Canceled!');
 			process.exit(0);
 		}
 
-		if (!response) {
-			const response = await text({
-				message: 'What would you like to call the script?',
-				placeholder: 'build:registry',
+		configurePublish = confirmResult;
+	}
+
+	if (configurePublish) {
+		if (!config.name) {
+			const nameResponse = await text({
+				message: "What's the name of your registry?",
+				placeholder: '@ieedan/std',
 				validate: (val) => {
 					if (val.trim().length === 0) return 'Please provide a value!';
 				},
 			});
 
-			if (isCancel(response)) {
+			if (isCancel(nameResponse)) {
 				cancel('Canceled!');
 				process.exit(0);
 			}
 
-			options.script = response;
-		} else {
-			break;
+			config.name = nameResponse;
 		}
+
+		if (!config.version) {
+			config.version = '0.0.1';
+		}
+
+		options.publishScript = await promptForScriptKey(
+			options.publishScript,
+			pkg,
+			options,
+			'release:registry'
+		);
+	} else {
+		options.buildScript = await promptForScriptKey(
+			options.buildScript,
+			pkg,
+			options,
+			'build:registry'
+		);
 	}
 
 	const alreadyInstalled = pkg.devDependencies && pkg.devDependencies.jsrepo !== undefined;
 
-	let installAsDevDependency = options.yes || alreadyInstalled;
-
-	if (!options.yes && !alreadyInstalled) {
-		const response = await confirm({
-			message: `Add ${ascii.JSREPO} as a dev dependency?`,
-			initialValue: true,
-		});
-
-		if (isCancel(response)) {
-			cancel('Canceled!');
-			process.exit(0);
-		}
-
-		installAsDevDependency = response;
-	}
-
-	let jsonConfig = !noConfig;
-
-	if (!options.yes && noConfig) {
-		const response = await confirm({
-			message: `Create a \`${color.cyan(REGISTRY_CONFIG_NAME)}\` file?`,
-			initialValue: true,
-		});
-
-		if (isCancel(response)) {
-			cancel('Canceled!');
-			process.exit(0);
-		}
-
-		jsonConfig = response;
-	}
-
 	const pm = (await detect({ cwd: 'cwd' }))?.agent ?? 'npm';
 
-	let buildScript = '';
-
-	if (installAsDevDependency) {
-		buildScript += 'jsrepo build';
-	} else {
-		const command = resolveCommand(pm, 'execute', ['jsrepo', 'build']);
-
-		if (!command) program.error(color.red(`Error resolving execute command for ${pm}`));
-
-		buildScript += `${command.command} ${command.args.join(' ')} `;
-	}
-
-	// if we aren't using a config file configure the command with the correct flags
-	if (!jsonConfig) {
-		buildScript += ` --dirs ${config.dirs.join(' ')} `;
-	}
+	const buildScript = 'jsrepo build';
+	const publishScript = 'jsrepo publish';
 
 	// ensure we are adding to an object that exists
 	if (pkg.scripts === undefined) {
 		pkg.scripts = {};
 	}
 
-	pkg.scripts[options.script] = buildScript;
+	if (configurePublish) {
+		pkg.scripts[options.publishScript] = publishScript;
+	} else {
+		pkg.scripts[options.buildScript] = buildScript;
+	}
 
 	const tasks: Task[] = [];
 
 	tasks.push({
-		loadingMessage: `Adding \`${color.cyan(options.script)}\` to scripts in package.json`,
-		completedMessage: `Added \`${color.cyan(options.script)}\` to scripts in package.json`,
+		loadingMessage: 'Adding script to package.json',
+		completedMessage: 'Added script to package.json',
 		run: async () => {
 			try {
 				fs.writeFileSync(packagePath, JSON.stringify(pkg, null, '\t'));
@@ -854,29 +840,27 @@ const _initRegistry = async (options: Options) => {
 		},
 	});
 
-	if (jsonConfig) {
-		tasks.push({
-			loadingMessage: `Writing config to \`${color.cyan(REGISTRY_CONFIG_NAME)}\``,
-			completedMessage: `Wrote config to \`${color.cyan(REGISTRY_CONFIG_NAME)}\``,
-			run: async () => {
-				const configPath = path.join(options.cwd, REGISTRY_CONFIG_NAME);
+	tasks.push({
+		loadingMessage: `Writing config to \`${color.cyan(REGISTRY_CONFIG_NAME)}\``,
+		completedMessage: `Wrote config to \`${color.cyan(REGISTRY_CONFIG_NAME)}\``,
+		run: async () => {
+			const configPath = path.join(options.cwd, REGISTRY_CONFIG_NAME);
 
-				try {
-					fs.writeFileSync(path.join(configPath), JSON.stringify(config, null, '\t'));
-				} catch (err) {
-					program.error(
-						color.red(`Error writing to \`${color.bold(configPath)}\`. Error: ${err}`)
-					);
-				}
-			},
-		});
-	}
+			try {
+				fs.writeFileSync(path.join(configPath), JSON.stringify(config, null, '\t'));
+			} catch (err) {
+				program.error(
+					color.red(`Error writing to \`${color.bold(configPath)}\`. Error: ${err}`)
+				);
+			}
+		},
+	});
 
 	await runTasks(tasks, { loading });
 
 	let installed = alreadyInstalled;
 
-	if (installAsDevDependency && !alreadyInstalled) {
+	if (!alreadyInstalled) {
 		const installedResult = await promptInstallDependencies(new Set(), new Set(['jsrepo']), {
 			cwd: options.cwd,
 			pm,
@@ -888,7 +872,7 @@ const _initRegistry = async (options: Options) => {
 
 	let steps: string[] = [];
 
-	if (!installed && installAsDevDependency) {
+	if (!installed) {
 		const cmd = resolveCommand(pm, 'add', ['jsrepo', '-D']);
 
 		steps.push(
@@ -898,11 +882,19 @@ const _initRegistry = async (options: Options) => {
 
 	steps.push(`Add categories to \`${color.cyan(config.dirs.join(', '))}\`.`);
 
-	const runScript = resolveCommand(pm, 'run', [options.script]);
+	if (configurePublish) {
+		const runScript = resolveCommand(pm, 'run', [options.publishScript]);
 
-	steps.push(
-		`Run \`${color.cyan(`${runScript?.command} ${runScript?.args.join(' ')}`)}\` to build the registry.`
-	);
+		steps.push(
+			`Run \`${color.cyan(`${runScript?.command} ${runScript?.args.join(' ')}`)}\` to publish the registry.`
+		);
+	} else {
+		const runScript = resolveCommand(pm, 'run', [options.buildScript]);
+
+		steps.push(
+			`Run \`${color.cyan(`${runScript?.command} ${runScript?.args.join(' ')}`)}\` to build the registry.`
+		);
+	}
 
 	// put steps with numbers above here
 	steps = steps.map((step, i) => `${i + 1}. ${step}`);
@@ -911,5 +903,48 @@ const _initRegistry = async (options: Options) => {
 
 	process.stdout.write(next);
 };
+
+async function promptForScriptKey(
+	scriptKey: string,
+	pkg: PackageJson,
+	options: Options,
+	placeholder: string
+) {
+	let key = scriptKey;
+
+	// continue asking until the user either chooses to overwrite or inputs a script that doesn't exist yet
+	while (!options.yes && pkg.scripts && pkg.scripts[key]) {
+		const response = await confirm({
+			message: `The \`${color.cyan(key)}\` already exists overwrite?`,
+			initialValue: false,
+		});
+
+		if (isCancel(response)) {
+			cancel('Canceled!');
+			process.exit(0);
+		}
+
+		if (!response) {
+			const response = await text({
+				message: 'What would you like to call the script?',
+				placeholder,
+				validate: (val) => {
+					if (val.trim().length === 0) return 'Please provide a value!';
+				},
+			});
+
+			if (isCancel(response)) {
+				cancel('Canceled!');
+				process.exit(0);
+			}
+
+			key = response;
+		} else {
+			break;
+		}
+	}
+
+	return key;
+}
 
 export { init };
