@@ -60,7 +60,7 @@ export const registryConfigSchema = v.object({
 	$schema: v.string(),
 	name: v.optional(v.string()),
 	version: v.optional(v.string()),
-	private: v.optional(v.boolean(), false),
+	readme: v.optional(v.string(), 'README.md'),
 	meta: v.optional(manifestMeta),
 	peerDependencies: v.optional(peerDependencySchema),
 	configFiles: v.optional(v.array(configFileSchema)),

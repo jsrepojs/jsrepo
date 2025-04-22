@@ -6,7 +6,7 @@ import ignore from 'ignore';
 import path from 'pathe';
 import * as v from 'valibot';
 import { MANIFEST_FILE } from '../constants';
-import type { Category, Manifest } from '../types';
+import type { Category } from '../types';
 import * as ascii from '../utils/ascii';
 import { buildBlocksDirectory, buildConfigFiles, pruneUnused } from '../utils/build';
 import { DEFAULT_CONFIG, runRules } from '../utils/build/check';
@@ -91,7 +91,7 @@ async function _build(options: Options) {
 			if (val === null) {
 				return {
 					$schema: '',
-					private: false,
+					readme: 'README.md',
 					dirs: options.dirs ?? [],
 					outputDir: options.outputDir,
 					doNotListBlocks: options.doNotListBlocks ?? [],

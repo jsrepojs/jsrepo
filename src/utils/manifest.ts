@@ -49,7 +49,6 @@ export function createManifest(
 	const manifest: Manifest = {
 		name: config.name,
 		version: config.version,
-		private: config.private,
 		meta: config.meta,
 		peerDependencies: config.peerDependencies,
 		configFiles,

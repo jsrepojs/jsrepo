@@ -694,7 +694,7 @@ const _initRegistry = async (options: Options) => {
 	if (!config) {
 		config = {
 			$schema: '',
-			private: false,
+			readme: 'README.md',
 			dirs: [],
 			doNotListBlocks: [],
 			doNotListCategories: [],

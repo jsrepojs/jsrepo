@@ -13,10 +13,11 @@
 			"format": "semver",
 			"examples": ["1.0.0"]
 		},
-		"private": {
-			"type": "boolean",
-			"description": "Should this registry be kept private when publishing on jsrepo.com for the first time",
-			"default": false
+		"readme": {
+			"type": "string",
+			"description": "Path to the README file that will be packaged with the registry.",
+			"default": "README.md",
+			"examples": ["README.md"]
 		},
 		"meta": {
 			"description": "Optional metadata to include in the manifest file.",

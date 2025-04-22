@@ -15,7 +15,16 @@ const schema = v.object({
 
 type Options = v.InferInput<typeof schema>;
 
-const services = ['Anthropic', 'Azure', 'BitBucket', 'GitHub', 'GitLab', 'OpenAI', 'http'].sort();
+const services = [
+	'Anthropic',
+	'Azure',
+	'BitBucket',
+	'GitHub',
+	'GitLab',
+	'jsrepo',
+	'OpenAI',
+	'http',
+].sort();
 
 export const auth = new Command('auth')
 	.description('Provide a token for access to private repositories.')

@@ -60,7 +60,6 @@ export const manifestConfigFileSchema = v.object({
 export const manifestSchema = v.object({
 	name: v.optional(v.string()),
 	version: v.optional(v.string()),
-	private: v.optional(v.boolean(), false),
 	meta: v.optional(manifestMeta),
 	peerDependencies: v.optional(peerDependencySchema),
 	configFiles: v.optional(v.array(manifestConfigFileSchema)),

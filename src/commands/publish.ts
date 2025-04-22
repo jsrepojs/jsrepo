@@ -16,8 +16,10 @@ import { IGNORED_DIRS, getRegistryConfig } from '../utils/config';
 import { createManifest } from '../utils/manifest';
 import { intro, spinner } from '../utils/prompts';
 import * as jsrepo from '../utils/registry-providers/jsrepo';
+import { TokenManager } from '../utils/token-manager';
 
 const schema = v.object({
+	private: v.boolean(),
 	dryRun: v.boolean(),
 	verbose: v.boolean(),
 	cwd: v.string(),
@@ -27,7 +29,12 @@ type Options = v.InferInput<typeof schema>;
 
 export const publish = new Command('publish')
 	.description('Publish a registry to jsrepo.com.')
-	.option('--dry-run', "Test the publish but don't list on jsrepo.com", false)
+	.option(
+		'--private',
+		'When publishing the first version of the registry make it private.',
+		false
+	)
+	.option('--dry-run', "Test the publish but don't list on jsrepo.com.", false)
 	.option('--verbose', 'Include debug logs.', false)
 	.option('--cwd <path>', 'The current working directory.', process.cwd())
 	.action(async (opts) => {
@@ -61,6 +68,12 @@ async function _publish(options: Options) {
 		},
 		(err) => program.error(color.red(err))
 	);
+
+	if (options.dryRun) {
+		log.warn(color.bgYellow.black(' DRY RUN '));
+	}
+
+	// -- pre-flights --
 
 	// check name
 	if (config.name !== undefined) {
@@ -109,6 +122,14 @@ async function _publish(options: Options) {
 			color.red(
 				`To publish to ${color.bold('jsrepo.com')} you need to provide the \`version\` field in the \`jsrepo-build-config.json\``
 			)
+		);
+	}
+
+	const apiKey = new TokenManager().get('jsrepo');
+
+	if (apiKey === undefined) {
+		program.error(
+			color.red(`To publish to ${color.bold('jsrepo.com')} you need an access token.`)
 		);
 	}
 
@@ -198,7 +219,17 @@ async function _publish(options: Options) {
 
 	fs.mkdirSync(tempOutDir, { recursive: true });
 
+	// write manifest
 	fs.writeFileSync(path.resolve(tempOutDir, 'jsrepo-manifest.json'), JSON.stringify(manifest));
+
+	// try copy readme
+	const readmePath = path.resolve(options.cwd, config.readme);
+
+	try {
+		fs.copyFileSync(readmePath, path.join(tempOutDir, 'README.md'));
+	} catch {
+		// do nothing it's okay
+	}
 
 	// copy config files to output directory
 	if (manifest.configFiles) {
@@ -252,7 +283,7 @@ async function _publish(options: Options) {
 
 	loading.stop(`Created package ${color.cyan(dest)}...`);
 
-	loading.start(`Publishing to ${ascii.JSREPO_DOT_COM}...`);
+	loading.start(`Publishing ${color.bold(manifest.name)} to ${ascii.JSREPO_DOT_COM}...`);
 
 	const tarBuffer = fs.readFileSync(dest);
 
@@ -264,8 +295,9 @@ async function _publish(options: Options) {
 		headers: {
 			'content-type': 'application/gzip',
 			'content-encoding': 'gzip',
-			'x-api-key': 'PLSvimGZbGqeHpbahhUDKgGQkYFpBpyiHHcKkEjZDxeDOqkxKvcHyFSnOYwpJaya',
+			'x-api-key': apiKey,
 			'x-dry-run': options.dryRun ? '1' : '0',
+			'x-private': options.private ? '1' : '0',
 		},
 		method: 'POST',
 	});
@@ -298,6 +330,7 @@ type PublishResponse =
 			registry: string;
 			version: string;
 			tag: string | null;
+			private: boolean;
 	  }
 	| {
 			status: 'dry-run';
