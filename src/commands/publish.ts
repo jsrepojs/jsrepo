@@ -259,7 +259,7 @@ async function _publish(options: Options) {
 	// remove archive file
 	fs.rmSync(dest, { force: true, recursive: true });
 
-	const response = await fetch('http://localhost:5173/api/registries/publish', {
+	const response = await fetch('http://localhost:5173/api/publish', {
 		body: tarBuffer,
 		headers: {
 			'content-type': 'application/gzip',

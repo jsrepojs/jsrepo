@@ -1623,12 +1623,12 @@ describe('jsrepo', () => {
 			{
 				url: '@ieedan/std',
 				expected:
-					'https://jsrepo.com/api/registries/@ieedan/std/v/latest/files/jsrepo-manifest.json',
+					'https://jsrepo.com/api/scopes/@ieedan/std/v/latest/files/jsrepo-manifest.json',
 			},
 			{
 				url: '@ieedan/std@1.0.0',
 				expected:
-					'https://jsrepo.com/api/registries/@ieedan/std/v/1.0.0/files/jsrepo-manifest.json',
+					'https://jsrepo.com/api/scopes/@ieedan/std/v/1.0.0/files/jsrepo-manifest.json',
 			},
 		];
 

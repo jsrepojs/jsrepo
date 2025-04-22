@@ -77,7 +77,7 @@ export const jsrepo: RegistryProvider = {
 		const { scope, registryName, version } = state as JsrepoProviderState;
 
 		return new URL(
-			`${BASE_URL}/api/registries/${scope}/${registryName}/v/${version}/files/${resourcePath}`
+			`${BASE_URL}/api/scopes/${scope}/${registryName}/v/${version}/files/${resourcePath}`
 		);
 	},
 
