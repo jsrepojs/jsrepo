@@ -25,8 +25,14 @@ const TEST_SUFFIXES = [
 	'_stories.tsx',
 ] as const;
 
+const DOC_SUFFIXES = ['.md', '.mdx', '_doc.md', '_doc.mdx', '-doc.md', '-doc.mdx'] as const;
+
 export function isTestFile(file: string): boolean {
 	return TEST_SUFFIXES.find((suffix) => file.endsWith(suffix)) !== undefined;
+}
+
+export function isDocFile(file: string): boolean {
+	return DOC_SUFFIXES.find((suffix) => file.endsWith(suffix)) !== undefined;
 }
 
 type Options = {
@@ -83,6 +89,7 @@ export function buildBlocksDirectory(
 
 			if (fs.statSync(blockDir).isFile()) {
 				if (isTestFile(file)) continue;
+				if (isDocFile(file)) continue;
 
 				const name = transformBlockName(file);
 
@@ -106,6 +113,11 @@ export function buildBlocksDirectory(
 				// tries to find a test file with the same name as the file
 				const testsPath = files.find((f) =>
 					TEST_SUFFIXES.find((suffix) => f === `${name}${suffix}`)
+				);
+
+				// tries to find a doc file with the same name as the file
+				const docPath = files.find((f) =>
+					DOC_SUFFIXES.find((suffix) => f === `${name}${suffix}`)
 				);
 
 				const { dependencies, devDependencies, local, imports } = lang
@@ -140,6 +152,11 @@ export function buildBlocksDirectory(
 				// if test file exists add the file
 				if (testsPath !== undefined) {
 					block.files.push(testsPath);
+				}
+
+				// if doc file exists add the file
+				if (docPath !== undefined) {
+					block.files.push(docPath);
 				}
 
 				category.blocks.push(block);
