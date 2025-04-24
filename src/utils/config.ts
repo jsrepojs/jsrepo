@@ -71,6 +71,7 @@ export const registryConfigSchema = v.object({
 	excludeDeps: v.optional(v.array(v.string()), []),
 	allowSubdirectories: v.optional(v.boolean()),
 	preview: v.optional(v.boolean()),
+	includeDocs: v.optional(v.boolean()),
 	rules: v.optional(ruleConfigSchema),
 });
 
