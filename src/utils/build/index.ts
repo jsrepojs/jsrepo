@@ -6,7 +6,7 @@ import path from 'pathe';
 import * as v from 'valibot';
 import { type Block, type Category, type Manifest, categorySchema } from '../../types';
 import * as ascii from '../ascii';
-import type { RegistryConfig } from '../config';
+import { type RegistryConfig } from '../config';
 import { languages } from '../language-support';
 import { isDependedOn } from './check';
 
@@ -25,8 +25,14 @@ const TEST_SUFFIXES = [
 	'_stories.tsx',
 ] as const;
 
+const DOC_SUFFIXES = ['.md', '.mdx'] as const;
+
 export function isTestFile(file: string): boolean {
 	return TEST_SUFFIXES.find((suffix) => file.endsWith(suffix)) !== undefined;
+}
+
+export function isDocFile(file: string): boolean {
+	return DOC_SUFFIXES.find((suffix) => file.endsWith(suffix)) !== undefined;
 }
 
 type Options = {
@@ -83,6 +89,7 @@ export function buildBlocksDirectory(
 
 			if (fs.statSync(blockDir).isFile()) {
 				if (isTestFile(file)) continue;
+				if (config.includeDocs && isDocFile(file)) continue;
 
 				const name = transformBlockName(file);
 
@@ -136,6 +143,23 @@ export function buildBlocksDirectory(
 					dependencies,
 					devDependencies,
 				};
+
+				if (config.includeDocs) {
+					// tries to find a doc file with the same name as the file
+					const docPath = files.find((f) =>
+						DOC_SUFFIXES.find((suffix) => f === `${name}${suffix}`)
+					);
+
+					// if doc file exists add the file
+					if (docPath !== undefined) {
+						block.files.push(docPath);
+						console.log(
+							color.green(
+								`${ascii.VERTICAL_LINE} ${ascii.S_SUCCESS} Added documentation file: ${docPath}`
+							)
+						);
+					}
+				}
 
 				// if test file exists add the file
 				if (testsPath !== undefined) {
@@ -402,4 +426,24 @@ export function pruneUnused(categories: Category[]): [Category[], number] {
 
 export function readCategories(outputFilePath: string): Category[] {
 	return v.parse(v.array(categorySchema), JSON.parse(fs.readFileSync(outputFilePath).toString()));
+}
+
+export function documentationCoverage(categories: Category[]) {
+	const totalBlocks = categories.reduce((sum, cat) => sum + cat.blocks.length, 0);
+	const documentedBlocks = categories.reduce((sum, cat) => {
+		return (
+			sum +
+			cat.blocks.reduce((blockSum, block) => {
+				return blockSum + (block.files.some((f) => isDocFile(f)) ? 1 : 0);
+			}, 0)
+		);
+	}, 0);
+
+	const percentage = totalBlocks === 0 ? 0 : Math.round((documentedBlocks / totalBlocks) * 100);
+
+	return {
+		totalBlocks,
+		documentedBlocks,
+		percentage,
+	};
 }

@@ -49,6 +49,7 @@ const schema = v.object({
 	repos: v.optional(v.array(v.string())),
 	watermark: v.boolean(),
 	tests: v.optional(v.boolean()),
+	docs: v.optional(v.boolean()),
 	formatter: v.optional(formatterSchema),
 	project: v.optional(v.boolean()),
 	registry: v.optional(v.boolean()),
@@ -224,7 +225,6 @@ const _initProject = async (registries: string[], options: Options) => {
 			options.formatter = response as Formatter;
 		}
 	}
-
 	const repos = Array.from(
 		new Set([
 			...registries,
@@ -691,6 +691,16 @@ const _initRegistry = async (options: Options) => {
 
 	const noConfig = config === null;
 
+	const includeDocs = await confirm({
+		message: `Include documentation files in build?`,
+		initialValue: false,
+	});
+
+	if (isCancel(includeDocs)) {
+		cancel('Canceled!');
+		process.exit(0);
+	}
+
 	if (!config) {
 		config = {
 			$schema: '',
@@ -705,6 +715,7 @@ const _initRegistry = async (options: Options) => {
 			excludeBlocks: [],
 			excludeCategories: [],
 			preview: false,
+			includeDocs: includeDocs,
 		};
 	}
 

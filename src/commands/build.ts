@@ -8,7 +8,12 @@ import * as v from 'valibot';
 import { MANIFEST_FILE } from '../constants';
 import type { Category, Manifest } from '../types';
 import * as ascii from '../utils/ascii';
-import { buildBlocksDirectory, buildConfigFiles, pruneUnused } from '../utils/build';
+import {
+	buildBlocksDirectory,
+	buildConfigFiles,
+	pruneUnused,
+	documentationCoverage,
+} from '../utils/build';
 import { DEFAULT_CONFIG, runRules } from '../utils/build/check';
 import { type RegistryConfig, getRegistryConfig } from '../utils/config';
 import { parseManifest } from '../utils/manifest';
@@ -34,6 +39,7 @@ const schema = v.object({
 	output: v.boolean(),
 	verbose: v.boolean(),
 	cwd: v.string(),
+	includeDocs: v.optional(v.boolean()),
 });
 
 type Options = v.InferInput<typeof schema>;
@@ -63,6 +69,7 @@ const build = new Command('build')
 		'Do not list the categories with these names.'
 	)
 	.option('--exclude-deps [deps...]', 'Dependencies that should not be added.')
+	.option('--include-docs', 'Include documentation files in the output.')
 	.option('--allow-subdirectories', 'Allow subdirectories to be built.')
 	.option('--preview', 'Display a preview of the blocks list.')
 	.option('--no-output', `Do not output a \`${MANIFEST_FILE}\` file.`)
@@ -107,6 +114,7 @@ async function _build(options: Options) {
 					excludeCategories: options.excludeCategories ?? [],
 					allowSubdirectories: options.allowSubdirectories,
 					preview: options.preview,
+					includeDocs: options.includeDocs,
 				} satisfies RegistryConfig;
 			}
 
@@ -129,6 +137,7 @@ async function _build(options: Options) {
 			if (options.allowSubdirectories !== undefined)
 				mergedVal.allowSubdirectories = options.allowSubdirectories;
 			if (options.preview !== undefined) mergedVal.preview = options.preview;
+			if (options.includeDocs !== undefined) mergedVal.includeDocs = options.includeDocs;
 
 			mergedVal.rules = { ...DEFAULT_CONFIG, ...mergedVal.rules };
 
@@ -302,11 +311,19 @@ async function _build(options: Options) {
 		}
 
 		loading.start(`Writing output to \`${color.cyan(manifestOut)}\``);
-
 		// write manifest
 		fs.writeFileSync(manifestOut, JSON.stringify(manifest, null, '\t'));
-
 		loading.stop(`Wrote output to \`${color.cyan(manifestOut)}\``);
+
+		if (config.includeDocs) {
+			const coverage = documentationCoverage(manifest.categories);
+			const percentage = coverage.percentage;
+			const textColor =
+				percentage >= 80 ? color.green : percentage >= 50 ? color.yellow : color.red;
+			log.step(
+				`Documentation coverage: ${textColor(percentage)}% (${coverage.documentedBlocks}/${coverage.totalBlocks} blocks)`
+			);
+		}
 	}
 }
 
