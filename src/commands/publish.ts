@@ -3,7 +3,6 @@ import { log, outro } from '@clack/prompts';
 import color from 'chalk';
 import { Command, program } from 'commander';
 import ignore from 'ignore';
-import fetch from 'node-fetch';
 import path from 'pathe';
 import semver from 'semver';
 import * as tar from 'tar';
@@ -13,6 +12,7 @@ import * as ascii from '../utils/ascii';
 import { buildBlocksDirectory, buildConfigFiles, pruneUnused } from '../utils/build';
 import { runRules } from '../utils/build/check';
 import { IGNORED_DIRS, getRegistryConfig } from '../utils/config';
+import { iFetch } from '../utils/fetch';
 import { createManifest } from '../utils/manifest';
 import { intro, spinner } from '../utils/prompts';
 import * as jsrepo from '../utils/registry-providers/jsrepo';
@@ -290,7 +290,7 @@ async function _publish(options: Options) {
 	// remove archive file
 	fs.rmSync(dest, { force: true, recursive: true });
 
-	const response = await fetch('http://localhost:5173/api/publish', {
+	const response = await iFetch('http://localhost:5173/api/publish', {
 		body: tarBuffer,
 		headers: {
 			'content-type': 'application/gzip',

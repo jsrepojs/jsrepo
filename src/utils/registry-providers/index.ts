@@ -20,7 +20,7 @@ export function selectProvider(url: string): RegistryProvider | undefined {
 
 export type FetchOptions = {
 	token: string;
-	/** Override the fetch method. If you are using this in a node environment you will want to pass `node-fetch` */
+	/** Override the fetch method. */
 	fetch?: typeof fetch;
 	verbose: (str: string) => void;
 };

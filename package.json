@@ -15,16 +15,7 @@
 	"bugs": {
 		"url": "https://github.com/jsrepojs/jsrepo/issues"
 	},
-	"keywords": [
-		"repo",
-		"cli",
-		"svelte",
-		"vue",
-		"typescript",
-		"javascript",
-		"shadcn",
-		"registry"
-	],
+	"keywords": ["repo", "cli", "svelte", "vue", "typescript", "javascript", "shadcn", "registry"],
 	"type": "module",
 	"packageManager": "pnpm@10.8.1",
 	"exports": {
@@ -35,13 +26,11 @@
 	},
 	"bin": "./dist/index.js",
 	"main": "./dist/index.js",
-	"files": [
-		"./schemas/**/*",
-		"dist/**/*"
-	],
+	"files": ["./schemas/**/*", "dist/**/*"],
 	"scripts": {
 		"start": "tsup --silent && node ./dist/index.js",
 		"build": "tsup",
+		"run:dev": "node ./dist/index.js",
 		"format": "biome format --write",
 		"lint": "biome lint --write",
 		"check": "biome check && pnpm check:types",
@@ -53,6 +42,7 @@
 		"@biomejs/biome": "1.9.4",
 		"@changesets/cli": "^2.29.2",
 		"@types/diff": "^7.0.2",
+		"@types/make-fetch-happen": "^10.0.4",
 		"@types/node": "^22.14.0",
 		"@types/semver": "^7.7.0",
 		"@types/validate-npm-package-name": "^4.0.2",
@@ -78,7 +68,7 @@
 		"get-tsconfig": "^4.10.0",
 		"ignore": "^7.0.3",
 		"is-unicode-supported": "^2.1.0",
-		"node-fetch": "^3.3.2",
+		"make-fetch-happen": "^14.0.3",
 		"octokit": "^4.1.2",
 		"ollama": "^0.5.14",
 		"openai": "^4.93.0",

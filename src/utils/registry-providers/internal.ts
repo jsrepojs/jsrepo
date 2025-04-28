@@ -1,5 +1,4 @@
 import color from 'chalk';
-import nodeFetch from 'node-fetch';
 import {
 	http,
 	azure,
@@ -15,13 +14,14 @@ import {
 import type { Block, Manifest } from '../../types';
 import { Err, Ok, type Result } from '../blocks/ts/result';
 import * as u from '../blocks/ts/url';
+import { iFetch } from '../fetch';
 import * as persisted from '../persisted';
 import { TokenManager } from '../token-manager';
 import type { RegistryProvider, RegistryProviderState } from './types';
 
 export type RemoteBlock = Block & { sourceRepo: RegistryProviderState };
 
-/** Wraps the basic implementation to inject `node-fetch` and the correct token. */
+/** Wraps the basic implementation to inject our internal fetch method and the correct token. */
 export async function internalFetchRaw(
 	state: RegistryProviderState,
 	resourcePath: string,
@@ -29,21 +29,21 @@ export async function internalFetchRaw(
 ) {
 	return await fetchRaw(state, resourcePath, {
 		verbose,
-		// @ts-expect-error but it does work
-		fetch: nodeFetch,
+		// @ts-expect-error it's fine
+		fetch: iFetch,
 		token: getProviderToken(state.provider, state.url),
 	});
 }
 
-/** Wraps the basic implementation to inject `node-fetch` and the correct token. */
+/** Wraps the basic implementation to inject internal fetch method and the correct token. */
 export async function internalFetchManifest(
 	state: RegistryProviderState,
 	{ verbose }: { verbose?: (msg: string) => void } = {}
 ) {
 	return await fetchManifest(state, {
 		verbose,
-		// @ts-expect-error but it does work
-		fetch: nodeFetch,
+		// @ts-expect-error it's fine
+		fetch: iFetch,
 		token: getProviderToken(state.provider, state.url),
 	});
 }
@@ -91,7 +91,7 @@ export async function getProviderState(
 		const state = await provider.state(repo, {
 			token: getProviderToken(provider, parsed.url),
 			// @ts-expect-error but it does work
-			fetch: nodeFetch,
+			fetch: iFetch,
 		});
 
 		// only cache git providers

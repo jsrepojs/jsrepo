@@ -1,8 +1,8 @@
 import { assert, describe, expect, it } from 'vitest';
 import { MANIFEST_FILE } from '../src/constants';
 import * as registry from '../src/utils/registry-providers/internal';
-import type { ParseOptions, ParseResult } from '../src/utils/registry-providers/types';
 import { BASE_URL as JSREPO_BASE_URL } from '../src/utils/registry-providers/jsrepo';
+import type { ParseOptions, ParseResult } from '../src/utils/registry-providers/types';
 
 type ParseTestCase = {
 	url: string;
@@ -1623,13 +1623,11 @@ describe('jsrepo', () => {
 		const cases: StringTestCase[] = [
 			{
 				url: '@ieedan/std',
-				expected:
-					`${JSREPO_BASE_URL}/api/scopes/@ieedan/std/v/latest/files/jsrepo-manifest.json`,
+				expected: `${JSREPO_BASE_URL}/api/scopes/@ieedan/std/v/latest/files/jsrepo-manifest.json`,
 			},
 			{
 				url: '@ieedan/std@1.0.0',
-				expected:
-					`${JSREPO_BASE_URL}/api/scopes/@ieedan/std/v/1.0.0/files/jsrepo-manifest.json`,
+				expected: `${JSREPO_BASE_URL}/api/scopes/@ieedan/std/v/1.0.0/files/jsrepo-manifest.json`,
 			},
 		];
 
@@ -1671,6 +1669,6 @@ describe('jsrepo', () => {
 		// this way we just get the text and skip the schema validation
 		const content = await registry.fetchRaw(providerState.unwrap(), 'jsrepo-manifest.json');
 
-		expect(content.isOk()).toBe(true)
+		expect(content.isOk()).toBe(true);
 	});
 });

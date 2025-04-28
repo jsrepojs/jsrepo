@@ -84,7 +84,9 @@ export const jsrepo: RegistryProvider = {
 	authHeader: (token) => ['x-api-key', token],
 
 	formatFetchError: (state, filePath, error) => {
-		return `There was an error fetching ${color.bold(new URL(filePath, state.url).toString())}
+		const { scope, registryName, version } = state as JsrepoProviderState;
+
+		return `There was an error fetching ${filePath} from ${scope}/${registryName}@${version}
 	
 ${color.bold(error)}`;
 	},
