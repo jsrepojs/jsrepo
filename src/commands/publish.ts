@@ -14,6 +14,7 @@ import { DEFAULT_CONFIG, runRules } from '../utils/build/check';
 import { IGNORED_DIRS, type RegistryConfig, getRegistryConfig } from '../utils/config';
 import { iFetch } from '../utils/fetch';
 import { createManifest } from '../utils/manifest';
+import type { PackageJson } from '../utils/package';
 import { intro, spinner } from '../utils/prompts';
 import * as jsrepo from '../utils/registry-providers/jsrepo';
 import { TokenManager } from '../utils/token-manager';
@@ -181,6 +182,19 @@ async function _publish(options: Options) {
 
 	// check version
 	if (config.version !== undefined) {
+		// use version from package.json
+		if (config.version === 'package') {
+			const packagePath = path.join(options.cwd, 'package.json');
+
+			if (!fs.existsSync(packagePath)) {
+				program.error(color.red(`Couldn't find your ${color.bold('package.json')}!`));
+			}
+
+			const { version } = JSON.parse(fs.readFileSync(packagePath).toString()) as PackageJson;
+
+			config.version = version;
+		}
+
 		const valid = semver.valid(config.version);
 
 		if (!valid) {

@@ -9,9 +9,9 @@
 		},
 		"version": {
 			"type": "string",
-			"description": "A semver compatible version of the registry on jsrepo.com",
+			"description": "A semver compatible version of the registry on jsrepo.com or `package` to use the version from the `package.json`",
 			"format": "semver",
-			"examples": ["1.0.0"]
+			"examples": ["1.0.0", "package"]
 		},
 		"readme": {
 			"type": "string",
