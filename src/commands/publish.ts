@@ -300,7 +300,11 @@ async function _publish(options: Options) {
 
 	const tempOutDir = path.resolve(options.cwd, `jsrepo-publish-temp-${Date.now()}`);
 
+	verbose(`Creating temp dir: ${tempOutDir}`);
+
 	fs.mkdirSync(tempOutDir, { recursive: true });
+
+	verbose('Writing manifest to temp dir');
 
 	// write manifest
 	fs.writeFileSync(path.resolve(tempOutDir, 'jsrepo-manifest.json'), JSON.stringify(manifest));
@@ -309,13 +313,20 @@ async function _publish(options: Options) {
 	const readmePath = path.resolve(options.cwd, config.readme);
 
 	try {
+		verbose('Attempting to copy readme');
+
 		fs.copyFileSync(readmePath, path.join(tempOutDir, 'README.md'));
+
+		verbose('Copied readme');
 	} catch {
 		// do nothing it's okay
+		verbose('No readme found.');
 	}
 
 	// copy config files to output directory
 	if (manifest.configFiles) {
+		verbose('Copying config files');
+
 		for (const file of manifest.configFiles) {
 			const originalPath = path.join(options.cwd, file.path);
 			const destPath = path.join(tempOutDir, file.path);
@@ -328,7 +339,11 @@ async function _publish(options: Options) {
 
 			fs.copyFileSync(originalPath, destPath);
 		}
+
+		verbose('Copied config files');
 	}
+
+	verbose('Copying registry files');
 
 	// copy the files for each block in each category
 	for (const category of manifest.categories) {
@@ -348,9 +363,13 @@ async function _publish(options: Options) {
 		}
 	}
 
+	verbose('Copied registry files');
+
 	const dest = path.resolve(options.cwd, `${config.name.replace('/', '_')}-package.tar.gz`);
 
 	const files = fs.readdirSync(tempOutDir);
+
+	verbose('Creating archive file');
 
 	await tar.create(
 		{
@@ -361,8 +380,14 @@ async function _publish(options: Options) {
 		files
 	);
 
+	verbose('Created archive file');
+
+	verbose('Removing temp directory');
+
 	// remove temp directory
 	fs.rmSync(tempOutDir, { force: true, recursive: true });
+
+	verbose('Removed temp directory');
 
 	loading.stop(`Created package ${color.cyan(dest)}...`);
 
@@ -370,10 +395,16 @@ async function _publish(options: Options) {
 
 	const tarBuffer = fs.readFileSync(dest);
 
+	verbose('Removing archive file');
+
 	// remove archive file
 	fs.rmSync(dest, { force: true, recursive: true });
 
-	const response = await iFetch('http://localhost:5173/api/publish', {
+	verbose('Removed archive file');
+
+	verbose(`Publishing to ${`${jsrepo.BASE_URL}/api/publish`}`);
+
+	const response = await iFetch(`${jsrepo.BASE_URL}/api/publish`, {
 		body: tarBuffer,
 		headers: {
 			'content-type': 'application/gzip',
