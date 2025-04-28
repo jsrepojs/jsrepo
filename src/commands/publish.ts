@@ -24,7 +24,6 @@ const schema = v.object({
 	name: v.optional(v.string()),
 	ver: v.optional(v.string()),
 	dirs: v.optional(v.array(v.string())),
-	outputDir: v.optional(v.string()),
 	includeBlocks: v.optional(v.array(v.string())),
 	includeCategories: v.optional(v.array(v.string())),
 	excludeBlocks: v.optional(v.array(v.string())),
@@ -52,10 +51,6 @@ export const publish = new Command('publish')
 	.option('--name <name>', 'The name of the registry. i.e. @ieedan/std')
 	.option('--ver <version>', 'The version of the registry. i.e. 0.0.1')
 	.option('--dirs [dirs...]', 'The directories containing the blocks.')
-	.option(
-		'--output-dir <dir>',
-		'The directory to output the registry to. (Copies jsrepo-manifest.json + all required files)'
-	)
 	.option('--include-blocks [blockNames...]', 'Include only the blocks with these names.')
 	.option(
 		'--include-categories [categoryNames...]',
@@ -103,7 +98,6 @@ async function _publish(options: Options) {
 					$schema: '',
 					readme: 'README.md',
 					dirs: options.dirs ?? [],
-					outputDir: options.outputDir,
 					doNotListBlocks: options.doNotListBlocks ?? [],
 					doNotListCategories: options.doNotListCategories ?? [],
 					listBlocks: options.listBlocks ?? [],
@@ -124,7 +118,6 @@ async function _publish(options: Options) {
 			if (options.name) mergedVal.name = options.name;
 			if (options.ver) mergedVal.version = options.ver;
 			if (options.dirs) mergedVal.dirs = options.dirs;
-			if (options.outputDir) mergedVal.outputDir = options.outputDir;
 			if (options.doNotListBlocks) mergedVal.doNotListBlocks = options.doNotListBlocks;
 			if (options.doNotListCategories)
 				mergedVal.doNotListCategories = options.doNotListCategories;
