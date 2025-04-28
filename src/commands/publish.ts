@@ -10,8 +10,8 @@ import * as v from 'valibot';
 import type { Category } from '../types';
 import * as ascii from '../utils/ascii';
 import { buildBlocksDirectory, buildConfigFiles, pruneUnused } from '../utils/build';
-import { runRules } from '../utils/build/check';
-import { IGNORED_DIRS, getRegistryConfig } from '../utils/config';
+import { DEFAULT_CONFIG, runRules } from '../utils/build/check';
+import { IGNORED_DIRS, type RegistryConfig, getRegistryConfig } from '../utils/config';
 import { iFetch } from '../utils/fetch';
 import { createManifest } from '../utils/manifest';
 import { intro, spinner } from '../utils/prompts';
@@ -21,6 +21,20 @@ import { TokenManager } from '../utils/token-manager';
 const schema = v.object({
 	private: v.boolean(),
 	dryRun: v.boolean(),
+	name: v.optional(v.string()),
+	ver: v.optional(v.string()),
+	dirs: v.optional(v.array(v.string())),
+	outputDir: v.optional(v.string()),
+	includeBlocks: v.optional(v.array(v.string())),
+	includeCategories: v.optional(v.array(v.string())),
+	excludeBlocks: v.optional(v.array(v.string())),
+	excludeCategories: v.optional(v.array(v.string())),
+	excludeDeps: v.optional(v.array(v.string())),
+	listBlocks: v.optional(v.array(v.string())),
+	listCategories: v.optional(v.array(v.string())),
+	doNotListBlocks: v.optional(v.array(v.string())),
+	doNotListCategories: v.optional(v.array(v.string())),
+	allowSubdirectories: v.optional(v.boolean()),
 	verbose: v.boolean(),
 	cwd: v.string(),
 });
@@ -35,6 +49,32 @@ export const publish = new Command('publish')
 		false
 	)
 	.option('--dry-run', "Test the publish but don't list on jsrepo.com.", false)
+	.option('--name <name>', 'The name of the registry. i.e. @ieedan/std')
+	.option('--ver <version>', 'The version of the registry. i.e. 0.0.1')
+	.option('--dirs [dirs...]', 'The directories containing the blocks.')
+	.option(
+		'--output-dir <dir>',
+		'The directory to output the registry to. (Copies jsrepo-manifest.json + all required files)'
+	)
+	.option('--include-blocks [blockNames...]', 'Include only the blocks with these names.')
+	.option(
+		'--include-categories [categoryNames...]',
+		'Include only the categories with these names.'
+	)
+	.option('--exclude-blocks [blockNames...]', 'Do not include the blocks with these names.')
+	.option(
+		'--exclude-categories [categoryNames...]',
+		'Do not include the categories with these names.'
+	)
+	.option('--list-blocks [blockNames...]', 'List only the blocks with these names.')
+	.option('--list-categories [categoryNames...]', 'List only the categories with these names.')
+	.option('--do-not-list-blocks [blockNames...]', 'Do not list the blocks with these names.')
+	.option(
+		'--do-not-list-categories [categoryNames...]',
+		'Do not list the categories with these names.'
+	)
+	.option('--exclude-deps [deps...]', 'Dependencies that should not be added.')
+	.option('--allow-subdirectories', 'Allow subdirectories to be built.')
 	.option('--verbose', 'Include debug logs.', false)
 	.option('--cwd <path>', 'The current working directory.', process.cwd())
 	.action(async (opts) => {
@@ -56,15 +96,51 @@ async function _publish(options: Options) {
 
 	const loading = spinner({ verbose: options.verbose ? verbose : undefined });
 
-	const config = getRegistryConfig(options.cwd).match(
+	const config: RegistryConfig = getRegistryConfig(options.cwd).match(
 		(val) => {
 			if (val === null) {
-				program.error(
-					color.red(`Publishing to ${color.bold('jsrepo.com')} requires a config.`)
-				);
+				return {
+					$schema: '',
+					readme: 'README.md',
+					dirs: options.dirs ?? [],
+					outputDir: options.outputDir,
+					doNotListBlocks: options.doNotListBlocks ?? [],
+					doNotListCategories: options.doNotListCategories ?? [],
+					listBlocks: options.listBlocks ?? [],
+					listCategories: options.listCategories ?? [],
+					excludeDeps: options.excludeDeps ?? [],
+					includeBlocks: options.includeBlocks ?? [],
+					includeCategories: options.includeCategories ?? [],
+					excludeBlocks: options.excludeBlocks ?? [],
+					excludeCategories: options.excludeCategories ?? [],
+					allowSubdirectories: options.allowSubdirectories,
+				} satisfies RegistryConfig;
 			}
 
-			return val;
+			const mergedVal = val;
+
+			// overwrites config with flag values
+
+			if (options.name) mergedVal.name = options.name;
+			if (options.ver) mergedVal.version = options.ver;
+			if (options.dirs) mergedVal.dirs = options.dirs;
+			if (options.outputDir) mergedVal.outputDir = options.outputDir;
+			if (options.doNotListBlocks) mergedVal.doNotListBlocks = options.doNotListBlocks;
+			if (options.doNotListCategories)
+				mergedVal.doNotListCategories = options.doNotListCategories;
+			if (options.listBlocks) mergedVal.listBlocks = options.listBlocks;
+			if (options.listCategories) mergedVal.listCategories = options.listCategories;
+			if (options.includeBlocks) mergedVal.includeBlocks = options.includeBlocks;
+			if (options.includeCategories) mergedVal.includeCategories = options.includeCategories;
+			if (options.excludeBlocks) mergedVal.excludeBlocks = options.excludeBlocks;
+			if (options.excludeCategories) mergedVal.excludeCategories = options.excludeCategories;
+			if (options.excludeDeps) mergedVal.excludeDeps = options.excludeDeps;
+			if (options.allowSubdirectories !== undefined)
+				mergedVal.allowSubdirectories = options.allowSubdirectories;
+
+			mergedVal.rules = { ...DEFAULT_CONFIG, ...mergedVal.rules };
+
+			return mergedVal;
 		},
 		(err) => program.error(color.red(err))
 	);
