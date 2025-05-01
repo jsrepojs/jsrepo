@@ -129,6 +129,9 @@ importers:
       '@types/validate-npm-package-name':
         specifier: ^4.0.2
         version: 4.0.2
+      node-machine-id:
+        specifier: ^1.1.12
+        version: 1.1.12
       pkg-pr-new:
         specifier: ^0.0.42
         version: 0.0.42
@@ -1683,6 +1686,9 @@ packages:
     peerDependenciesMeta:
       encoding:
         optional: true
+
+  node-machine-id@1.1.12:
+    resolution: {integrity: sha512-QNABxbrPa3qEIfrE6GOJ7BYIuignnJw7iQ2YPbc3Nla1HzRJjXzZOiikfF8m7eAMfichLt3M4VgLOetqgDmgGQ==}
 
   npm-run-path@6.0.0:
     resolution: {integrity: sha512-9qny7Z9DsQU8Ou39ERsPU4OZQlSTP47ShQzuKZ6PRXpYLtIFgl/DEBYEXKlvcEa+9tHVcK8CF81Y2V72qaZhWA==}
@@ -3924,6 +3930,8 @@ snapshots:
       whatwg-url: 5.0.0
     optionalDependencies:
       encoding: 0.1.13
+
+  node-machine-id@1.1.12: {}
 
   npm-run-path@6.0.0:
     dependencies:

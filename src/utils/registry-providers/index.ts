@@ -35,15 +35,16 @@ export async function fetchRaw(
 	verbose?.(`Trying to fetch from ${url}`);
 
 	try {
-		const headers = new Headers();
+		// having headers as a record covers more fetch implementations
+		const headers: Record<string, string> = {};
 
 		if (token !== undefined && state.provider.authHeader) {
 			const [key, value] = state.provider.authHeader(token);
 
-			headers.append(key, value);
+			headers[key] = value;
 		}
 
-		const response = await f(url, { headers });
+		const response = await f(url.toString(), { headers });
 
 		verbose?.(`Got a response from ${url} ${response.status} ${response.statusText}`);
 

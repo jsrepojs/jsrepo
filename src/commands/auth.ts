@@ -1,10 +1,13 @@
-import { cancel, confirm, isCancel, log, outro, password, select, text } from '@clack/prompts';
+import { cancel, confirm, isCancel, log, outro } from '@clack/prompts';
 import color from 'chalk';
-import { Argument, Command } from 'commander';
+import { Command, program } from 'commander';
+import nodeMachineId from 'node-machine-id';
 import * as v from 'valibot';
-import { getProjectConfig } from '../utils/config';
-import { intro } from '../utils/prompts';
-import { http } from '../utils/registry-providers';
+import * as ASCII from '../utils/ascii';
+import { sleep } from '../utils/blocks/ts/sleep';
+import { iFetch } from '../utils/fetch';
+import { intro, spinner } from '../utils/prompts';
+import * as jsrepo from '../utils/registry-providers/jsrepo';
 import { TokenManager } from '../utils/token-manager';
 
 const schema = v.object({
@@ -15,217 +18,110 @@ const schema = v.object({
 
 type Options = v.InferInput<typeof schema>;
 
-const services = [
-	'Anthropic',
-	'Azure',
-	'BitBucket',
-	'GitHub',
-	'GitLab',
-	'jsrepo',
-	'OpenAI',
-	'http',
-].sort();
-
 export const auth = new Command('auth')
-	.description('Provide a token for access to private repositories.')
-	.addArgument(
-		new Argument('service', 'The service you want to authenticate to.')
-			.choices(services.map((s) => s.toLowerCase()))
-			.argOptional()
-	)
+	.description('Authenticate to jsrepo.com')
 	.option('--logout', 'Execute the logout flow.', false)
 	.option('--token <token>', 'The token to use for authenticating to this service.')
 	.option('--cwd <path>', 'The current working directory.', process.cwd())
-	.action(async (service, opts) => {
+	.action(async (opts) => {
 		const options = v.parse(schema, opts);
 
 		await intro();
 
-		await _auth(service, options);
+		await _auth(options);
 
 		outro(color.green('All done!'));
 	});
 
-async function _auth(service: string | undefined, options: Options) {
-	const configuredRegistries: string[] = getProjectConfig(options.cwd).match(
-		(v) => v.repos.filter(http.matches),
-		() => []
-	);
+async function _auth(options: Options) {
+	const tokenManager = new TokenManager();
 
-	let selectedService = services.find((s) => s.toLowerCase() === service?.toLowerCase());
-
-	const storage = new TokenManager();
-
-	// logout flow
 	if (options.logout) {
-		if (selectedService !== undefined) {
-			if (selectedService === 'http') {
-				await promptHttpLogout(storage);
-
-				return;
-			}
-
-			storage.delete(selectedService);
-			log.success(`Logged out of ${selectedService}.`);
-			return;
-		}
-
-		for (const serviceName of services) {
-			if (serviceName === 'http') {
-				await promptHttpLogout(storage);
-				continue;
-			}
-
-			if (storage.get(serviceName) === undefined) {
-				log.step(color.gray(`Already logged out of ${color.bold(serviceName)}.`));
-				continue;
-			}
-
-			const response = await confirm({
-				message: `Logout of ${color.bold(serviceName)}?`,
-				initialValue: true,
-			});
-
-			if (isCancel(response)) {
-				cancel('Canceled!');
-				process.exit(0);
-			}
-
-			if (!response) continue;
-
-			storage.delete(serviceName);
-		}
-
+		tokenManager.delete('jsrepo');
+		log.success(`Logged out of ${ASCII.JSREPO_DOT_COM}!`);
 		return;
 	}
 
-	// login flow
-	if (selectedService === undefined) {
-		const response = await select({
-			message: 'Which service do you want to authenticate to?',
-			options: services.map((serviceName) => ({
-				label: serviceName,
-				value: serviceName,
-			})),
-			initialValue: services[0],
+	if (options.token !== undefined) {
+		tokenManager.set('jsrepo', options.token);
+		log.success(`Logged into ${ASCII.JSREPO_DOT_COM}!`);
+		return;
+	}
+
+	if (tokenManager.get('jsrepo') !== undefined) {
+		const result = await confirm({
+			message: 'You are currently signed into jsrepo do you want to sign out?',
+			initialValue: false,
 		});
 
-		if (isCancel(response)) {
+		if (isCancel(result) || !result) {
 			cancel('Canceled!');
 			process.exit(0);
 		}
-
-		selectedService = response;
-
-		if (selectedService === 'http') {
-			let selectedRegistry = 'Other';
-
-			if (configuredRegistries.length > 0) {
-				configuredRegistries.push('Other');
-
-				const response = await select({
-					message: 'Which registry do you want to authenticate to?',
-					options: configuredRegistries.map((serviceName) => ({
-						label: serviceName,
-						value: serviceName,
-					})),
-					initialValue: services[0],
-				});
-
-				if (isCancel(response)) {
-					cancel('Canceled!');
-					process.exit(0);
-				}
-
-				selectedRegistry = new URL(response).origin;
-			}
-
-			// prompt for registry
-			if (selectedRegistry === 'Other') {
-				const response = await text({
-					message: 'Please enter the registry url you want to authenticate to:',
-					placeholder: 'https://example.com',
-					validate(value) {
-						if (value.trim() === '') return 'Please provide a value';
-
-						try {
-							// try to parse the url
-							new URL(value);
-						} catch {
-							// if parsing fails return the error
-							return 'Please provide a valid url';
-						}
-					},
-				});
-
-				if (isCancel(response)) {
-					cancel('Canceled!');
-					process.exit(0);
-				}
-
-				selectedRegistry = new URL(response).origin;
-			}
-
-			selectedService = `http-${selectedRegistry}`;
-		}
 	}
 
-	let serviceName = selectedService;
+	const hardwareId = nodeMachineId.machineIdSync();
 
-	if (serviceName.startsWith('http')) {
-		serviceName = serviceName.slice(5);
-	}
+	let anonSessionId: string;
 
-	if (options.token === undefined) {
-		const response = await password({
-			message: `Paste your token for ${color.bold(serviceName)}:`,
-			validate(value) {
-				if (value.trim() === '') return 'Please provide a value';
-			},
+	try {
+		const response = await iFetch(`${jsrepo.BASE_URL}/api/login/device`, {
+			method: 'POST',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify({ hardwareId }),
 		});
 
-		if (isCancel(response) || !response) {
-			cancel('Canceled!');
-			process.exit(0);
+		if (!response.ok) {
+			throw new Error('There was an error creating the session');
 		}
 
-		options.token = response;
+		const res = await response.json();
+
+		anonSessionId = res.id;
+	} catch (err) {
+		program.error(color.red(err));
 	}
 
-	storage.set(selectedService, options.token);
+	log.step(`Sign in at ${color.cyan(`${jsrepo.BASE_URL}/login/device/${anonSessionId}`)}`);
 
-	log.success(`Logged into ${color.bold(serviceName)}.`);
-}
+	const timeout = 1000 * 60 * 60 * 15; // 15 minutes
 
-async function promptHttpLogout(storage: TokenManager) {
-	// list all providers for logout
-	const registries = storage.getHttpRegistriesWithTokens();
+	const loading = spinner();
 
-	if (registries.length === 0) {
-		log.step(color.gray(`Already logged out of ${color.bold('http')}.`));
-	}
+	const pollingTimeout = setTimeout(() => {
+		loading.stop('You never signed in.');
 
-	for (const registry of registries) {
-		let registryUrl: URL;
+		program.error(color.red('Session timed out try again!'));
+	}, timeout);
+
+	loading.start('Waiting for you to sign in...');
+
+	while (true) {
+		// wait initially cause c'mon ain't no way
+		await sleep(5000); // wait 5 seconds
+
+		const endpoint = `${jsrepo.BASE_URL}/api/login/device/${anonSessionId}`;
 
 		try {
-			registryUrl = new URL(registry);
+			const response = await iFetch(endpoint, {
+				method: 'PATCH',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ hardwareId }),
+			});
+
+			if (!response.ok) continue;
+
+			clearTimeout(pollingTimeout);
+
+			const key = await response.text();
+
+			tokenManager.set('jsrepo', key);
+
+			loading.stop(`Logged into ${ASCII.JSREPO_DOT_COM}!`);
+
+			break;
 		} catch {
-			continue;
+			// continue
 		}
-
-		const response = await confirm({
-			message: `Logout of ${color.bold(registryUrl.origin)}?`,
-			initialValue: true,
-		});
-
-		if (isCancel(response)) {
-			cancel('Canceled!');
-			process.exit(0);
-		}
-
-		if (!response) continue;
-
-		storage.delete(`http-${registryUrl.origin}`);
 	}
 }

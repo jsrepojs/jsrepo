@@ -22,7 +22,7 @@ import type { ParseOptions, RegistryProvider, RegistryProviderState } from './ty
  */
 export const NAME_REGEX = /^(?![-0-9])(?!.*--)[a-z0-9]*(?:-[a-z0-9]+)*$/gi;
 
-export const BASE_URL = 'https://platform-jsrepo.vercel.app';
+export const BASE_URL = 'http://localhost:5173';
 
 export interface JsrepoProviderState extends RegistryProviderState {
 	scope: string;

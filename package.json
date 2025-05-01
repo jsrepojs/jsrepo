@@ -69,6 +69,7 @@
 		"ignore": "^7.0.3",
 		"is-unicode-supported": "^2.1.0",
 		"make-fetch-happen": "^14.0.3",
+		"node-machine-id": "^1.1.12",
 		"octokit": "^4.1.2",
 		"ollama": "^0.5.14",
 		"openai": "^4.93.0",
