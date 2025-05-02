@@ -60,7 +60,7 @@ async function _auth(options: Options) {
 		}
 	}
 
-	const hardwareId = nodeMachineId.machineIdSync();
+	const hardwareId = nodeMachineId.machineIdSync(true);
 
 	let anonSessionId: string;
 
