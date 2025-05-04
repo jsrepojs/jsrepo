@@ -212,7 +212,9 @@ async function _publish(options: Options) {
 
 	if (apiKey === undefined) {
 		program.error(
-			color.red(`Please authenticate with ${color.cyan('jsrepo auth')} to publish to ${ascii.JSREPO_DOT_COM}.`)
+			color.red(
+				`Please authenticate with ${color.cyan('jsrepo auth')} to publish to ${ascii.JSREPO_DOT_COM}.`
+			)
 		);
 	}
 
