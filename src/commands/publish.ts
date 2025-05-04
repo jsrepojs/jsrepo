@@ -212,7 +212,7 @@ async function _publish(options: Options) {
 
 	if (apiKey === undefined) {
 		program.error(
-			color.red(`To publish to ${color.bold('jsrepo.com')} you need an access token.`)
+			color.red(`Please authenticate with ${color.cyan('jsrepo auth')} to publish to ${ascii.JSREPO_DOT_COM}.`)
 		);
 	}
 
