@@ -1,5 +1,4 @@
 import color from 'chalk';
-import { Octokit } from 'octokit';
 import { startsWithOneOf } from '../blocks/ts/strings';
 import type { ParseOptions, RegistryProvider, RegistryProviderState } from './types';
 
@@ -8,7 +7,6 @@ const DEFAULT_BRANCH = 'main';
 export interface GitHubProviderState extends RegistryProviderState {
 	owner: string;
 	repoName: string;
-	refs: 'tags' | 'heads';
 	ref: string;
 }
 
@@ -43,45 +41,28 @@ export const github: RegistryProvider = {
 	state: async (url, { token } = {}) => {
 		let { url: normalizedUrl, owner, repoName, ref } = parseUrl(url, { fullyQualified: false });
 
-		const octokit = new Octokit({ auth: token });
-
-		// checks if the type of the ref is tags or heads
-		let refs: 'heads' | 'tags' = 'heads';
-
 		// fetch default branch if ref was not provided
 		if (ref === undefined) {
 			try {
-				const { data: repo } = await octokit.rest.repos.get({ owner, repo: repoName });
+				const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}`, {
+					headers: { Authorization: `Bearer ${token}` },
+				});
 
-				ref = repo.default_branch;
+				if (response.ok) {
+					const res = await response.json();
+
+					ref = res.default_branch as string;
+				} else {
+					ref = DEFAULT_BRANCH;
+				}
 			} catch {
 				// we just want to continue on blissfully unaware the user will get an error later
 				ref = DEFAULT_BRANCH;
-			}
-		} else {
-			// no need to check if ref is main
-
-			// this isn't a double case it's possible that DEFAULT_BRANCH and repo.default_branch are not equal
-			if (ref !== DEFAULT_BRANCH) {
-				try {
-					const { data: tags } = await octokit.rest.git.listMatchingRefs({
-						owner,
-						repo: repoName,
-						ref: 'tags',
-					});
-
-					if (tags.some((tag) => tag.ref === `refs/tags/${ref}`)) {
-						refs = 'tags';
-					}
-				} catch {
-					refs = 'heads';
-				}
 			}
 		}
 
 		return {
 			owner,
-			refs,
 			ref,
 			repoName,
 			url: normalizedUrl,
@@ -97,12 +78,9 @@ export const github: RegistryProvider = {
 			);
 		}
 
-		const { owner, repoName, refs, ref } = state as GitHubProviderState;
+		const { owner, repoName, ref } = state as GitHubProviderState;
 
-		return new URL(
-			resourcePath,
-			`https://raw.githubusercontent.com/${owner}/${repoName}/refs/${refs}/${ref}/`
-		);
+		return new URL(resourcePath, `https://ungh.cc/repos/${owner}/${repoName}/files/${ref}/`);
 	},
 
 	authHeader: (token) => ['Authorization', `token ${token}`],
