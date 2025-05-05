@@ -149,6 +149,24 @@ describe('add', () => {
 		assertFilesExist(blockBaseDir, ...expectedFiles);
 	});
 
+	it('adds from jsrepo.com', async () => {
+		await addBlock('@ieedan/std', 'ts/math');
+
+		const blockBaseDir = './src/ts/math';
+
+		const expectedFiles = [
+			'circle.ts',
+			'conversions.ts',
+			'fractions.ts',
+			'gcf.ts',
+			'index.ts',
+			'triangles.ts',
+			'types.ts',
+		];
+
+		assertFilesExist(blockBaseDir, ...expectedFiles);
+	});
+
 	it('adds with zero-config without interaction', async () => {
 		await addBlockZeroConfig('github/ieedan/std', 'ts/is-letter');
 

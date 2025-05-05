@@ -49,6 +49,7 @@ describe('build', () => {
 			meta: {
 				authors: ['Aidan Bleser'],
 			},
+			readme: 'README',
 			configFiles: [
 				{
 					name: 'Global CSS File',
@@ -370,6 +371,7 @@ export const highlighter = createHighlighterCore({
 
 const defaultConfig = {
 	$schema: '',
+	readme: 'README',
 	dirs: [],
 	doNotListBlocks: [],
 	doNotListCategories: [],

@@ -1671,4 +1671,17 @@ describe('jsrepo', () => {
 
 		expect(content.isOk()).toBe(true);
 	});
+
+	it('Fetches the manifest from version', async () => {
+		const repoURL = '@ieedan/std@5.0.1';
+
+		const providerState = await registry.getProviderState(repoURL);
+
+		assert(providerState.isOk());
+
+		// this way we just get the text and skip the schema validation
+		const content = await registry.fetchRaw(providerState.unwrap(), 'jsrepo-manifest.json');
+
+		expect(content.isOk()).toBe(true);
+	});
 });
