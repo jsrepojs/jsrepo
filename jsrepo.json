@@ -1,6 +1,6 @@
 {
-	"$schema": "https://unpkg.com/jsrepo@1.43.0/schemas/project-config.json",
-	"repos": ["github/ieedan/std"],
+	"$schema": "https://unpkg.com/jsrepo@1.47.1/schemas/project-config.json",
+	"repos": ["@ieedan/std"],
 	"includeTests": false,
 	"watermark": true,
 	"formatter": "biome",

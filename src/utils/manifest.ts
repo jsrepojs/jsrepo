@@ -1,6 +1,7 @@
 import * as v from 'valibot';
-import { type Manifest, categorySchema, manifestSchema } from '../types';
+import { type Category, type Manifest, categorySchema, manifestSchema } from '../types';
 import { Err, Ok, type Result } from './blocks/ts/result';
+import type { RegistryConfig } from './config';
 
 /** Parses the json string (if it can be) into a manifest.
  *
@@ -26,6 +27,7 @@ export function parseManifest(json: string): Result<Manifest, string> {
 		}
 
 		return Ok({
+			private: false,
 			categories: validated.output,
 		});
 	}
@@ -37,4 +39,21 @@ export function parseManifest(json: string): Result<Manifest, string> {
 	}
 
 	return Ok(validated.output);
+}
+
+export function createManifest(
+	categories: Category[],
+	configFiles: Manifest['configFiles'],
+	config: RegistryConfig
+) {
+	const manifest: Manifest = {
+		name: config.name,
+		version: config.version,
+		meta: config.meta,
+		peerDependencies: config.peerDependencies,
+		configFiles,
+		categories,
+	};
+
+	return manifest;
 }

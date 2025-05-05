@@ -1,6 +1,7 @@
 import { assert, describe, expect, it } from 'vitest';
 import { MANIFEST_FILE } from '../src/constants';
 import * as registry from '../src/utils/registry-providers/internal';
+import { BASE_URL as JSREPO_BASE_URL } from '../src/utils/registry-providers/jsrepo';
 import type { ParseOptions, ParseResult } from '../src/utils/registry-providers/types';
 
 type ParseTestCase = {
@@ -1573,5 +1574,101 @@ describe('http', () => {
 		]
 	}
 ]`);
+	});
+});
+
+describe('jsrepo', () => {
+	it('correctly parses urls', () => {
+		const cases: ParseTestCase[] = [
+			{
+				url: '@ieedan/std',
+				opts: { fullyQualified: false },
+				expected: {
+					url: '@ieedan/std',
+					specifier: undefined,
+				},
+			},
+			{
+				url: '@ieedan/std@1.0.0',
+				opts: { fullyQualified: false },
+				expected: {
+					url: '@ieedan/std@1.0.0',
+					specifier: undefined,
+				},
+			},
+			{
+				url: '@ieedan/std/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: '@ieedan/std',
+					specifier: 'utils/math',
+				},
+			},
+			{
+				url: '@ieedan/std@1.0.0/utils/math',
+				opts: { fullyQualified: true },
+				expected: {
+					url: '@ieedan/std@1.0.0',
+					specifier: 'utils/math',
+				},
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.jsrepo.parse(c.url, c.opts)).toStrictEqual(c.expected);
+		}
+	});
+
+	it('correctly resolves url', async () => {
+		const cases: StringTestCase[] = [
+			{
+				url: '@ieedan/std',
+				expected: `${JSREPO_BASE_URL}/api/scopes/@ieedan/std/v/latest/files/jsrepo-manifest.json`,
+			},
+			{
+				url: '@ieedan/std@1.0.0',
+				expected: `${JSREPO_BASE_URL}/api/scopes/@ieedan/std/v/1.0.0/files/jsrepo-manifest.json`,
+			},
+		];
+
+		for (const c of cases) {
+			const state = await registry.getProviderState(c.url);
+
+			assert(!state.isErr());
+
+			expect(
+				await state.unwrap().provider.resolveRaw(state.unwrap(), MANIFEST_FILE)
+			).toStrictEqual(new URL(c.expected));
+		}
+	});
+
+	it('correctly parses base url', () => {
+		const cases: StringTestCase[] = [
+			{
+				url: '@ieedan/std',
+				expected: `${JSREPO_BASE_URL}/@ieedan/std/v/latest`,
+			},
+			{
+				url: '@ieedan/std@1.0.0',
+				expected: `${JSREPO_BASE_URL}/@ieedan/std/v/1.0.0`,
+			},
+		];
+
+		for (const c of cases) {
+			expect(registry.jsrepo.baseUrl(c.url)).toBe(c.expected);
+		}
+	});
+
+	it('Fetches the manifest', async () => {
+		const repoURL = '@ieedan/std';
+
+		const providerState = await registry.getProviderState(repoURL);
+
+		assert(providerState.isOk());
+
+		// this way we just get the text and skip the schema validation
+		const content = await registry.fetchRaw(providerState.unwrap(), 'jsrepo-manifest.json');
+
+		expect(content.isOk()).toBe(true);
 	});
 });

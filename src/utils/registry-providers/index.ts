@@ -7,9 +7,10 @@ import { type BitBucketProviderState, bitbucket } from './bitbucket';
 import { type GitHubProviderState, github } from './github';
 import { type GitLabProviderState, gitlab } from './gitlab';
 import { http } from './http';
+import { type JsrepoProviderState, jsrepo } from './jsrepo';
 import type { RegistryProvider, RegistryProviderState } from './types';
 
-export const providers = [github, gitlab, bitbucket, azure, http];
+export const providers = [jsrepo, github, gitlab, bitbucket, azure, http];
 
 export function selectProvider(url: string): RegistryProvider | undefined {
 	const provider = providers.find((p) => p.matches(url));
@@ -19,7 +20,7 @@ export function selectProvider(url: string): RegistryProvider | undefined {
 
 export type FetchOptions = {
 	token: string;
-	/** Override the fetch method. If you are using this in a node environment you will want to pass `node-fetch` */
+	/** Override the fetch method. */
 	fetch?: typeof fetch;
 	verbose: (str: string) => void;
 };
@@ -34,15 +35,16 @@ export async function fetchRaw(
 	verbose?.(`Trying to fetch from ${url}`);
 
 	try {
-		const headers = new Headers();
+		// having headers as a record covers more fetch implementations
+		const headers: Record<string, string> = {};
 
 		if (token !== undefined && state.provider.authHeader) {
 			const [key, value] = state.provider.authHeader(token);
 
-			headers.append(key, value);
+			headers[key] = value;
 		}
 
-		const response = await f(url, { headers });
+		const response = await f(url.toString(), { headers });
 
 		verbose?.(`Got a response from ${url} ${response.status} ${response.statusText}`);
 
@@ -76,11 +78,13 @@ export async function fetchManifest(
 export * from './types';
 
 export {
+	jsrepo,
 	github,
 	gitlab,
 	bitbucket,
 	azure,
 	http,
+	type JsrepoProviderState,
 	type AzureProviderState,
 	type GitHubProviderState,
 	type GitLabProviderState,

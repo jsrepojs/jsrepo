@@ -2,6 +2,23 @@
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"type": "object",
 	"properties": {
+		"name": {
+			"type": "string",
+			"description": "The name of the registry on jsrepo.com.",
+			"examples": ["@ieedan/std", "@shadcn/ui"]
+		},
+		"version": {
+			"type": "string",
+			"description": "A semver compatible version of the registry on jsrepo.com or `package` to use the version from the `package.json`",
+			"format": "semver",
+			"examples": ["1.0.0", "package"]
+		},
+		"readme": {
+			"type": "string",
+			"description": "Path to the README file that will be packaged with the registry.",
+			"default": "README.md",
+			"examples": ["README.md"]
+		},
 		"meta": {
 			"description": "Optional metadata to include in the manifest file.",
 			"type": "object",

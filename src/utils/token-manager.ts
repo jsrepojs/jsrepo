@@ -17,7 +17,13 @@ export class TokenManager {
 	get(name: string): string | undefined {
 		const key = this.getKey(name);
 
-		return this.#storage.get(key, undefined) as string | undefined;
+		const token = this.#storage.get(key, undefined) as string | undefined;
+
+		if (name === 'jsrepo') {
+			return token ?? process.env.JSREPO_TOKEN;
+		}
+
+		return token;
 	}
 
 	set(name: string, secret: string) {

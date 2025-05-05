@@ -11,7 +11,9 @@ const cli = program
 	.addCommand(commands.build)
 	.addCommand(commands.exec)
 	.addCommand(commands.init)
+	.addCommand(commands.publish)
 	.addCommand(commands.test)
+	.addCommand(commands.tokens)
 	.addCommand(commands.update);
 
 export { cli };

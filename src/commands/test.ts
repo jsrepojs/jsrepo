@@ -96,8 +96,10 @@ async function _test(blockNames: string[], options: Options) {
 
 	verbose(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
 
-	const blocksMap: Map<string, registry.RemoteBlock> = (
-		await registry.fetchBlocks(...resolvedRepos)
+	const blocksMap = (
+		await registry.fetchBlocks(resolvedRepos, {
+			verbose: options.verbose ? verbose : undefined,
+		})
 	).match(
 		(val) => val,
 		({ repo, message }) => {
@@ -176,7 +178,7 @@ async function _test(blockNames: string[], options: Options) {
 				(err) => program.error(color.red(err))
 			);
 
-			const map = (await registry.fetchBlocks(providerState)).match(
+			const map = (await registry.fetchBlocks([providerState])).match(
 				(val) => val,
 				(err) => program.error(color.red(err))
 			);

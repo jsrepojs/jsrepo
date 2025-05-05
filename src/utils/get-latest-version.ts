@@ -1,5 +1,5 @@
-import nodeFetch from 'node-fetch';
 import { Err, Ok, type Result } from './blocks/ts/result';
+import { iFetch } from './fetch';
 import type { Package } from './parse-package-name';
 import * as persisted from './persisted';
 
@@ -35,22 +35,12 @@ export async function getLatestVersion({
 			}
 		}
 
-		// we abort the request after a second
-		// because it really just isn't worth it if it's going to take that long
-		const controller = new AbortController();
-
-		const timeout = setTimeout(() => {
-			controller.abort();
-		}, 1000);
-
-		const response = await nodeFetch(
+		const response = await iFetch(
 			'https://raw.githubusercontent.com/jsrepojs/jsrepo/refs/heads/main/packages/cli/package.json',
 			{
-				signal: controller.signal,
+				timeout: 1000,
 			}
 		);
-
-		clearTimeout(timeout);
 
 		if (!response.ok) {
 			return Err('Error getting version');

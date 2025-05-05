@@ -266,7 +266,11 @@ async function _add(blockNames: string[], options: Options) {
 
 	verbose(`Fetching blocks from ${color.cyan(repoPaths.join(', '))}`);
 
-	const manifests = (await registry.fetchManifests(...resolvedRepos)).match(
+	const manifests = (
+		await registry.fetchManifests(resolvedRepos, {
+			verbose: options.verbose ? verbose : undefined,
+		})
+	).match(
 		(v) => v,
 		({ repo, message }) => {
 			loading.stop(`Failed fetching blocks from ${color.cyan(repo)}`);

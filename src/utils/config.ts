@@ -8,6 +8,9 @@ import { Err, Ok, type Result } from './blocks/ts/result';
 import { ruleConfigSchema } from './build/check';
 import { tryGetTsconfig } from './files';
 
+/** sensible defaults for ignored directories */
+export const IGNORED_DIRS = ['.git', 'node_modules'] as const;
+
 export const PROJECT_CONFIG_NAME = 'jsrepo.json';
 export const REGISTRY_CONFIG_NAME = 'jsrepo-build-config.json';
 
@@ -55,6 +58,9 @@ export type Formatter = v.InferOutput<typeof formatterSchema>;
 
 export const registryConfigSchema = v.object({
 	$schema: v.string(),
+	name: v.optional(v.string()),
+	version: v.optional(v.string()),
+	readme: v.optional(v.string(), 'README.md'),
 	meta: v.optional(manifestMeta),
 	peerDependencies: v.optional(peerDependencySchema),
 	configFiles: v.optional(v.array(configFileSchema)),
