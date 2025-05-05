@@ -1,5 +1,11 @@
 # jsrepo
 
+## 2.0.1
+### Patch Changes
+
+- f946ccf: chore: bump deps
+- f946ccf: chore: remove octokit
+
 ## 2.0.0
 ### Major Changes
 
