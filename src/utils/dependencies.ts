@@ -1,8 +1,8 @@
 import color from 'chalk';
 import { program } from 'commander';
-import { execa } from 'execa';
 import { type Agent, resolveCommand } from 'package-manager-detector';
 import path from 'pathe';
+import { x } from 'tinyexec';
 import { flags } from './blocks/package-managers/flags';
 import type { ProjectConfig } from './config';
 import { taskLog } from './prompts';
@@ -49,17 +49,11 @@ export async function installDependencies({
 	const task = taskLog(`Installing dependencies with ${pm}...`);
 
 	try {
-		const proc = execa(add.command, [...add.args], { cwd });
+		const proc = x(add.command, [...add.args], { nodeOptions: { cwd } });
 
-		proc.stdout.on('data', (data) => {
-			task.text = data;
-		});
-
-		proc.stderr.on('data', (data) => {
-			task.text = data;
-		});
-
-		await proc;
+		for await (const line of proc) {
+			task.text = `${line}\n`;
+		}
 
 		task.success(`Installed ${color.cyan(deps.join(', '))}`);
 	} catch {

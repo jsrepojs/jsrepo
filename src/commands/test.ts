@@ -3,11 +3,11 @@ import { cancel, confirm, isCancel, outro } from '@clack/prompts';
 import color from 'chalk';
 import { Argument, Command, program } from 'commander';
 import escapeStringRegexp from 'escape-string-regexp';
-import { execa } from 'execa';
 import oxc from 'oxc-parser';
 import { resolveCommand } from 'package-manager-detector/commands';
 import { detect } from 'package-manager-detector/detect';
 import path from 'pathe';
+import { x } from 'tinyexec';
 import * as v from 'valibot';
 import * as ascii from '../utils/ascii';
 import { getInstalled } from '../utils/blocks';
@@ -308,11 +308,11 @@ async function _test(blockNames: string[], options: Options) {
 	verbose(`Running ${color.cyan(testCommand)} on ${color.cyan(options.cwd)}`);
 
 	try {
-		await execa(resolved.command, resolved.args, {
-			cwd: options.cwd,
-			stdin: process.stdin,
-			stdout: process.stdout,
-		});
+		const proc = x(resolved.command, resolved.args, { nodeOptions: { cwd: options.cwd } });
+
+		for await (const line of proc) {
+			process.stdout.write(`${line}\n`);
+		}
 
 		cleanUp();
 	} catch (err) {

@@ -64,7 +64,6 @@
 		"diff": "^7.0.0",
 		"escape-string-regexp": "^5.0.0",
 		"estree-walker": "^3.0.3",
-		"execa": "^9.5.2",
 		"get-tsconfig": "^4.10.0",
 		"ignore": "^7.0.4",
 		"is-unicode-supported": "^2.1.0",
@@ -81,6 +80,7 @@
 		"sisteransi": "^1.0.5",
 		"svelte": "^5.28.2",
 		"tar": "^7.4.3",
+		"tinyexec": "^1.0.1",
 		"valibot": "1.0.0",
 		"validate-npm-package-name": "^6.0.0",
 		"vue": "^3.5.13"

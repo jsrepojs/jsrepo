@@ -1,6 +1,6 @@
 import fs from 'node:fs';
-import { execa } from 'execa';
 import path from 'pathe';
+import { x } from 'tinyexec';
 import { afterAll, beforeAll, describe, it } from 'vitest';
 import { cli } from '../src/cli';
 import * as u from '../src/utils/blocks/ts/url';
@@ -58,7 +58,7 @@ describe('add', () => {
 		process.chdir(testDir);
 
 		// create package.json
-		await execa`pnpm init`;
+		await x('pnpm', ['init']);
 	});
 
 	afterAll(() => {
