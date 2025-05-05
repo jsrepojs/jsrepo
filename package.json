@@ -15,16 +15,7 @@
 	"bugs": {
 		"url": "https://github.com/jsrepojs/jsrepo/issues"
 	},
-	"keywords": [
-		"repo",
-		"cli",
-		"svelte",
-		"vue",
-		"typescript",
-		"javascript",
-		"shadcn",
-		"registry"
-	],
+	"keywords": ["repo", "cli", "svelte", "vue", "typescript", "javascript", "shadcn", "registry"],
 	"type": "module",
 	"packageManager": "pnpm@10.8.1",
 	"exports": {
@@ -35,10 +26,7 @@
 	},
 	"bin": "./dist/index.js",
 	"main": "./dist/index.js",
-	"files": [
-		"./schemas/**/*",
-		"dist/**/*"
-	],
+	"files": ["./schemas/**/*", "dist/**/*"],
 	"scripts": {
 		"start": "tsup --silent && node ./dist/index.js",
 		"build": "tsup",
@@ -76,7 +64,6 @@
 		"diff": "^7.0.0",
 		"escape-string-regexp": "^5.0.0",
 		"estree-walker": "^3.0.3",
-		"execa": "^9.5.2",
 		"get-tsconfig": "^4.10.0",
 		"ignore": "^7.0.4",
 		"is-unicode-supported": "^2.1.0",
@@ -89,11 +76,11 @@
 		"parse5": "^7.3.0",
 		"pathe": "^2.0.3",
 		"prettier": "^3.5.3",
-		"prettier-plugin-svelte": "^3.3.3",
 		"semver": "^7.7.1",
 		"sisteransi": "^1.0.5",
 		"svelte": "^5.28.2",
 		"tar": "^7.4.3",
+		"tinyexec": "^1.0.1",
 		"valibot": "1.0.0",
 		"validate-npm-package-name": "^6.0.0",
 		"vue": "^3.5.13"

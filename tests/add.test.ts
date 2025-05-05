@@ -1,6 +1,6 @@
 import fs from 'node:fs';
-import { execa } from 'execa';
 import path from 'pathe';
+import { x } from 'tinyexec';
 import { afterAll, beforeAll, describe, it } from 'vitest';
 import { cli } from '../src/cli';
 import * as u from '../src/utils/blocks/ts/url';
@@ -58,7 +58,7 @@ describe('add', () => {
 		process.chdir(testDir);
 
 		// create package.json
-		await execa`pnpm init`;
+		await x('pnpm', ['init']);
 	});
 
 	afterAll(() => {
@@ -135,6 +135,24 @@ describe('add', () => {
 		await addBlock('https://jsrepo-http.vercel.app/', 'utils/math');
 
 		const blockBaseDir = './src/utils/math';
+
+		const expectedFiles = [
+			'circle.ts',
+			'conversions.ts',
+			'fractions.ts',
+			'gcf.ts',
+			'index.ts',
+			'triangles.ts',
+			'types.ts',
+		];
+
+		assertFilesExist(blockBaseDir, ...expectedFiles);
+	});
+
+	it('adds from jsrepo.com', async () => {
+		await addBlock('@ieedan/std', 'ts/math');
+
+		const blockBaseDir = './src/ts/math';
 
 		const expectedFiles = [
 			'circle.ts',

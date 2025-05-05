@@ -2,10 +2,10 @@ import fs from 'node:fs';
 import { cancel, confirm, isCancel, select } from '@clack/prompts';
 import color from 'chalk';
 import { Argument, Command, program } from 'commander';
-import { execa } from 'execa';
 import { resolveCommand } from 'package-manager-detector/commands';
 import { detect } from 'package-manager-detector/detect';
 import path from 'pathe';
+import { x } from 'tinyexec';
 import * as v from 'valibot';
 import * as ascii from '../utils/ascii';
 import { resolveTree } from '../utils/blocks';
@@ -384,11 +384,11 @@ export async function _exec(s: string | undefined, options: Options, command: an
 	}
 
 	try {
-		await execa(cmd.command, cmd.args, {
-			cwd: process.cwd(),
-			stdin: process.stdin,
-			stdout: process.stdout,
-		});
+		const proc = x(cmd.command, cmd.args, { nodeOptions: { cwd: process.cwd() } });
+
+		for await (const line of proc) {
+			process.stdout.write(`${line}\n`);
+		}
 	} finally {
 		fs.rmSync(path.join(process.cwd(), tempDirBase), { recursive: true, force: true });
 	}
