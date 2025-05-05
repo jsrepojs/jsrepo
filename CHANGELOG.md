@@ -1,5 +1,17 @@
 # jsrepo
 
+## 2.0.0
+### Major Changes
+
+- 3900102: breaking: original `auth` command is now `tokens` and `auth` command is now just for jsrepo.com.
+- 3900102: feat: Support jsrepo as a registry provider 🎉
+
+### Minor Changes
+
+- 3900102: feat: Allow for caching using `make-fetch-happen`
+- 3900102: feat: Setup registry for publish on jsrepo.com during init
+- 3900102: feat: Always install jsrepo as a dev dependency when initializing a new registry
+
 ## 1.47.1
 ### Patch Changes
 
