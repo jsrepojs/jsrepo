@@ -1,5 +1,11 @@
 # jsrepo
 
+## 2.0.2
+### Patch Changes
+
+- 06d814d: chore: remove `prettier-plugin-svelte` (unnecessary)
+- 06d814d: chore: change over from `execa` to `tinyexec`
+
 ## 2.0.1
 ### Patch Changes
 
