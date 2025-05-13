@@ -1,4 +1,4 @@
-import * as v from "valibot";
+import * as v from 'valibot';
 
 export const blockSchema = v.object({
 	name: v.string(),
@@ -57,7 +57,11 @@ export const manifestConfigFileSchema = v.object({
 	devDependencies: v.optional(v.array(v.string())),
 });
 
-export const accessLevel = v.union([v.literal("public"), v.literal("private"), v.literal("marketplace")]);
+export const accessLevel = v.union([
+	v.literal('public'),
+	v.literal('private'),
+	v.literal('marketplace'),
+]);
 
 export const manifestSchema = v.object({
 	name: v.optional(v.string()),

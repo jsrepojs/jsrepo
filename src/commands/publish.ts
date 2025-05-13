@@ -117,7 +117,7 @@ async function _publish(options: Options) {
 
 			// overwrites config with flag values
 
-			if (options.private) mergedVal.access = "private";
+			if (options.private) mergedVal.access = 'private';
 			if (options.name) mergedVal.name = options.name;
 			if (options.ver) mergedVal.version = options.ver;
 			if (options.dirs) mergedVal.dirs = options.dirs;

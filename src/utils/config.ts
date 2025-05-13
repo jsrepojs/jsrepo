@@ -1,24 +1,30 @@
-import fs from "node:fs";
-import color from "chalk";
-import { createPathsMatcher } from "get-tsconfig";
-import path from "pathe";
-import * as v from "valibot";
-import { accessLevel, type Block, configFileSchema, manifestMeta, peerDependencySchema } from "../types";
-import { Err, Ok, type Result } from "./blocks/ts/result";
-import { ruleConfigSchema } from "./build/check";
-import { tryGetTsconfig } from "./files";
+import fs from 'node:fs';
+import color from 'chalk';
+import { createPathsMatcher } from 'get-tsconfig';
+import path from 'pathe';
+import * as v from 'valibot';
+import {
+	accessLevel,
+	type Block,
+	configFileSchema,
+	manifestMeta,
+	peerDependencySchema,
+} from '../types';
+import { Err, Ok, type Result } from './blocks/ts/result';
+import { ruleConfigSchema } from './build/check';
+import { tryGetTsconfig } from './files';
 
 /** sensible defaults for ignored directories */
-export const IGNORED_DIRS = [".git", "node_modules"] as const;
+export const IGNORED_DIRS = ['.git', 'node_modules'] as const;
 
-export const PROJECT_CONFIG_NAME = "jsrepo.json";
-export const REGISTRY_CONFIG_NAME = "jsrepo-build-config.json";
+export const PROJECT_CONFIG_NAME = 'jsrepo.json';
+export const REGISTRY_CONFIG_NAME = 'jsrepo-build-config.json';
 
-export const formatterSchema = v.union([v.literal("prettier"), v.literal("biome")]);
+export const formatterSchema = v.union([v.literal('prettier'), v.literal('biome')]);
 
 export const pathsSchema = v.objectWithRest(
 	{
-		"*": v.string(),
+		'*': v.string(),
 	},
 	v.string()
 );
@@ -37,7 +43,7 @@ export const projectConfigSchema = v.object({
 
 export function getProjectConfig(cwd: string): Result<ProjectConfig, string> {
 	if (!fs.existsSync(path.join(cwd, PROJECT_CONFIG_NAME))) {
-		return Err("Could not find your configuration file! Please run `init`.");
+		return Err('Could not find your configuration file! Please run `init`.');
 	}
 
 	const config = v.safeParse(
@@ -60,7 +66,7 @@ export const registryConfigSchema = v.object({
 	$schema: v.string(),
 	name: v.optional(v.string()),
 	version: v.optional(v.string()),
-	readme: v.optional(v.string(), "README.md"),
+	readme: v.optional(v.string(), 'README.md'),
 	access: v.optional(accessLevel),
 	meta: v.optional(manifestMeta),
 	peerDependencies: v.optional(peerDependencySchema),
@@ -106,17 +112,17 @@ export function resolvePaths(paths: Paths, cwd: string): Result<Paths, string> {
 
 	const matcher = config ? createPathsMatcher(config) : null;
 
-	const newPaths: Paths = { "*": "" };
+	const newPaths: Paths = { '*': '' };
 
 	for (const [category, p] of Object.entries(paths)) {
-		if (p.startsWith("./")) {
+		if (p.startsWith('./')) {
 			newPaths[category] = path.relative(cwd, path.join(path.resolve(cwd), p));
 			continue;
 		}
 
 		if (matcher === null) {
 			return Err(
-				`Cannot resolve ${color.bold(`\`"${category}": "${p}"\``)} from paths because we couldn't find a tsconfig! If you intended to use a relative path ensure that your path starts with ${color.bold("`./`")}.`
+				`Cannot resolve ${color.bold(`\`"${category}": "${p}"\``)} from paths because we couldn't find a tsconfig! If you intended to use a relative path ensure that your path starts with ${color.bold('`./`')}.`
 			);
 		}
 
@@ -124,7 +130,7 @@ export function resolvePaths(paths: Paths, cwd: string): Result<Paths, string> {
 
 		if (!resolved) {
 			return Err(
-				`Cannot resolve ${color.bold(`\`"${category}": "${p}"\``)} from paths because we couldn't find a matching alias in the tsconfig. If you intended to use a relative path ensure that your path starts with ${color.bold("`./`")}.`
+				`Cannot resolve ${color.bold(`\`"${category}": "${p}"\``)} from paths because we couldn't find a matching alias in the tsconfig. If you intended to use a relative path ensure that your path starts with ${color.bold('`./`')}.`
 			);
 		}
 
@@ -157,7 +163,7 @@ export function getPathForBlock(block: Block, resolvedPaths: Paths, cwd: string)
 	if (resolvedPaths[block.category] !== undefined) {
 		directory = path.join(cwd, resolvedPaths[block.category]);
 	} else {
-		directory = path.join(cwd, resolvedPaths["*"], block.category);
+		directory = path.join(cwd, resolvedPaths['*'], block.category);
 	}
 
 	return directory;
