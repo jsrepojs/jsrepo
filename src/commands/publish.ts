@@ -397,7 +397,7 @@ async function _publish(options: Options) {
 
 	const access = config.access ?? 'public';
 
-	log.info(`Publishing to jsrepo with access of ${color.cyan(access)}`);
+	log.info(`Publishing to jsrepo with the access set to ${color.cyan(access)}`);
 
 	loading.start(`Publishing ${color.bold(manifest.name)} to ${ascii.JSREPO_DOT_COM}...`);
 
