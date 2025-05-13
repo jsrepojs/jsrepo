@@ -395,6 +395,10 @@ async function _publish(options: Options) {
 
 	loading.stop(`Created package ${color.cyan(dest)}...`);
 
+	const access = config.access ?? 'public';
+
+	log.info(`Publishing to jsrepo with access of ${color.cyan(access)}`);
+
 	loading.start(`Publishing ${color.bold(manifest.name)} to ${ascii.JSREPO_DOT_COM}...`);
 
 	const tarBuffer = fs.readFileSync(dest);
@@ -415,6 +419,7 @@ async function _publish(options: Options) {
 			'content-encoding': 'gzip',
 			'x-api-key': apiKey,
 			'x-dry-run': options.dryRun ? '1' : '0',
+			'x-access': access
 		},
 		method: 'POST',
 	});
