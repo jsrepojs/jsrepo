@@ -419,7 +419,7 @@ async function _publish(options: Options) {
 			'content-encoding': 'gzip',
 			'x-api-key': apiKey,
 			'x-dry-run': options.dryRun ? '1' : '0',
-			'x-access': access
+			'x-access': access,
 		},
 		method: 'POST',
 	});
