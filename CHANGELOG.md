@@ -1,5 +1,10 @@
 # jsrepo
 
+## 2.0.3
+### Patch Changes
+
+- bbe6009: feat: Support jsrepo.com marketplace
+
 ## 2.0.2
 ### Patch Changes
 
