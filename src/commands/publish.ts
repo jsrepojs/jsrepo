@@ -97,6 +97,7 @@ async function _publish(options: Options) {
 			if (val === null) {
 				return {
 					$schema: '',
+					access: 'public',
 					readme: 'README.md',
 					dirs: options.dirs ?? [],
 					doNotListBlocks: options.doNotListBlocks ?? [],
@@ -116,6 +117,7 @@ async function _publish(options: Options) {
 
 			// overwrites config with flag values
 
+			if (options.private) mergedVal.access = 'private';
 			if (options.name) mergedVal.name = options.name;
 			if (options.ver) mergedVal.version = options.ver;
 			if (options.dirs) mergedVal.dirs = options.dirs;
@@ -393,6 +395,10 @@ async function _publish(options: Options) {
 
 	loading.stop(`Created package ${color.cyan(dest)}...`);
 
+	const access = config.access ?? 'public';
+
+	log.info(`Publishing to jsrepo with the access set to ${color.cyan(access)}`);
+
 	loading.start(`Publishing ${color.bold(manifest.name)} to ${ascii.JSREPO_DOT_COM}...`);
 
 	const tarBuffer = fs.readFileSync(dest);
@@ -413,7 +419,7 @@ async function _publish(options: Options) {
 			'content-encoding': 'gzip',
 			'x-api-key': apiKey,
 			'x-dry-run': options.dryRun ? '1' : '0',
-			'x-private': options.private ? '1' : '0',
+			'x-access': access,
 		},
 		method: 'POST',
 	});

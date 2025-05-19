@@ -19,6 +19,12 @@
 			"default": "README.md",
 			"examples": ["README.md"]
 		},
+		"access": {
+			"description": "Who has access to your registry on jsrepo.com.",
+			"type": "string",
+			"default": "public",
+			"enum": ["public", "private", "marketplace"]
+		},
 		"meta": {
 			"description": "Optional metadata to include in the manifest file.",
 			"type": "object",
