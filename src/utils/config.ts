@@ -4,8 +4,8 @@ import { createPathsMatcher } from 'get-tsconfig';
 import path from 'pathe';
 import * as v from 'valibot';
 import {
-	accessLevel,
 	type Block,
+	accessLevel,
 	configFileSchema,
 	manifestMeta,
 	peerDependencySchema,
