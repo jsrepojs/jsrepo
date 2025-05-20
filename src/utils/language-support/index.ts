@@ -222,13 +222,24 @@ function resolveLocalImport(
 		return Ok(parsePath(modPath.slice(fullDir.length), dropExtension));
 	}
 
+	const absPath = path.resolve(modPath);
+
+	// Here we try and find the most specific directory that matches the module.
+	// This fixes issues where there are 2 nested directories that both
+	// contain the module by simply choosing the more specific path.
+	let longestMatch: string | null = null;
 	for (const dir of dirs) {
 		const containingPath = path.resolve(path.join(cwd, dir));
-		const absPath = path.resolve(modPath);
 
 		if (absPath.startsWith(containingPath)) {
-			return Ok(parsePath(absPath.slice(containingPath.length + 1), dropExtension));
+			if (longestMatch === null || longestMatch.length < containingPath.length) {
+				longestMatch = containingPath;
+			}
 		}
+	}
+
+	if (longestMatch !== null) {
+		return Ok(parsePath(absPath.slice(longestMatch.length + 1), dropExtension));
 	}
 
 	return Err(
