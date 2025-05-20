@@ -36,6 +36,7 @@
 		"check": "biome check && pnpm check:types",
 		"test": "vitest",
 		"check:types": "tsc",
+		"changeset:version": "changeset version && pnpm format",
 		"ci:release": "pnpm build && changeset publish"
 	},
 	"devDependencies": {

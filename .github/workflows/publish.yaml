@@ -30,6 +30,7 @@ jobs:
               with:
                   commit: "chore(release): version package"
                   title: "chore(release): version package"
+                  version: pnpm changeset:version
                   publish: pnpm ci:release
               env:
                   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
