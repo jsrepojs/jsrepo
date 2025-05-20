@@ -8,18 +8,46 @@ importers:
 
   .:
     dependencies:
-      '@anthropic-ai/sdk':
-        specifier: ^0.40.1
-        version: 0.40.1(encoding@0.1.13)
       '@biomejs/js-api':
         specifier: ^0.7.1
         version: 0.7.1(@biomejs/wasm-nodejs@1.9.4)
       '@biomejs/wasm-nodejs':
         specifier: ^1.9.4
         version: 1.9.4
+      oxc-parser:
+        specifier: ^0.68.1
+        version: 0.68.1
+      vue:
+        specifier: ^3.5.13
+        version: 3.5.13(typescript@5.8.3)
+    devDependencies:
+      '@anthropic-ai/sdk':
+        specifier: ^0.40.1
+        version: 0.40.1(encoding@0.1.13)
+      '@biomejs/biome':
+        specifier: 1.9.4
+        version: 1.9.4
+      '@changesets/cli':
+        specifier: ^2.29.3
+        version: 2.29.3
       '@clack/prompts':
         specifier: ^0.10.1
         version: 0.10.1
+      '@types/diff':
+        specifier: ^7.0.2
+        version: 7.0.2
+      '@types/make-fetch-happen':
+        specifier: ^10.0.4
+        version: 10.0.4
+      '@types/node':
+        specifier: ^22.15.6
+        version: 22.15.6
+      '@types/semver':
+        specifier: ^7.7.0
+        version: 7.7.0
+      '@types/validate-npm-package-name':
+        specifier: ^4.0.2
+        version: 4.0.2
       boxen:
         specifier: ^8.0.1
         version: 8.0.1
@@ -65,9 +93,6 @@ importers:
       openai:
         specifier: ^4.97.0
         version: 4.97.0(encoding@0.1.13)(zod@3.24.3)
-      oxc-parser:
-        specifier: ^0.68.1
-        version: 0.68.1
       package-manager-detector:
         specifier: ^1.3.0
         version: 1.3.0
@@ -77,6 +102,9 @@ importers:
       pathe:
         specifier: ^2.0.3
         version: 2.0.3
+      pkg-pr-new:
+        specifier: ^0.0.43
+        version: 0.0.43
       prettier:
         specifier: ^3.5.3
         version: 3.5.3
@@ -95,46 +123,18 @@ importers:
       tinyexec:
         specifier: ^1.0.1
         version: 1.0.1
-      valibot:
-        specifier: 1.0.0
-        version: 1.0.0(typescript@5.8.3)
-      validate-npm-package-name:
-        specifier: ^6.0.0
-        version: 6.0.0
-      vue:
-        specifier: ^3.5.13
-        version: 3.5.13(typescript@5.8.3)
-    devDependencies:
-      '@biomejs/biome':
-        specifier: 1.9.4
-        version: 1.9.4
-      '@changesets/cli':
-        specifier: ^2.29.3
-        version: 2.29.3
-      '@types/diff':
-        specifier: ^7.0.2
-        version: 7.0.2
-      '@types/make-fetch-happen':
-        specifier: ^10.0.4
-        version: 10.0.4
-      '@types/node':
-        specifier: ^22.15.6
-        version: 22.15.6
-      '@types/semver':
-        specifier: ^7.7.0
-        version: 7.7.0
-      '@types/validate-npm-package-name':
-        specifier: ^4.0.2
-        version: 4.0.2
-      pkg-pr-new:
-        specifier: ^0.0.43
-        version: 0.0.43
       tsup:
         specifier: ^8.4.0
         version: 8.4.0(postcss@8.5.3)(typescript@5.8.3)
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
+      valibot:
+        specifier: 1.0.0
+        version: 1.0.0(typescript@5.8.3)
+      validate-npm-package-name:
+        specifier: ^6.0.0
+        version: 6.0.0
       vitest:
         specifier: ^3.1.3
         version: 3.1.3(@types/node@22.15.6)
