@@ -1,5 +1,10 @@
 # jsrepo
 
+## 2.0.4
+### Patch Changes
+
+- 7f7657e: fix: Always resolve to local dependencies to most specific path
+
 ## 2.0.3
 ### Patch Changes
 
