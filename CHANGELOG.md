@@ -1,5 +1,10 @@
 # jsrepo
 
+## 2.1.0
+### Minor Changes
+
+- 0bba0db: feat: Add `info` command.
+
 ## 2.0.4
 ### Patch Changes
 
