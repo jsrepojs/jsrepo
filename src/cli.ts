@@ -10,6 +10,7 @@ const cli = program
 	.addCommand(commands.auth)
 	.addCommand(commands.build)
 	.addCommand(commands.exec)
+	.addCommand(commands.info)
 	.addCommand(commands.init)
 	.addCommand(commands.publish)
 	.addCommand(commands.test)
