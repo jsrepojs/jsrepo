@@ -2,6 +2,8 @@
 	Installed from github/ieedan/std
 */
 
+import { stripVTControlCharacters } from 'node:util';
+
 /** Maps the provided map into an array using the provided mapping function.
  *
  * @param map Map to be entered into an array
@@ -77,4 +79,17 @@ export function toMap<T, K, V>(
 	}
 
 	return map;
+}
+
+export function maxLength(arr: string[]): number {
+	let max = 0;
+
+	for (const item of arr) {
+		const str = stripVTControlCharacters(item);
+		if (str.length > max) {
+			max = str.length;
+		}
+	}
+
+	return max;
 }
