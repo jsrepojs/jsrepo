@@ -93,12 +93,13 @@ function formattedOutput(registryInfo: RegistryInfoResponse) {
 ${blockTitles
 	.map((b, i) => {
 		const isMultipleOfThree = multipleOfThree(i + 1);
+		const isLast = i + 1 >= blockTitles.length;
 
 		if (isMultipleOfThree) {
 			return `${b}\n`;
 		}
 
-		return pad.rightPadMin(b, minBlockTitleLength, ' ');
+		return `${pad.rightPadMin(b, minBlockTitleLength, ' ')}${isLast ? '\n' : ''}`;
 	})
 	.join('')}
 `;
