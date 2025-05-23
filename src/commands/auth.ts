@@ -15,7 +15,7 @@ import { intro, spinner } from '../utils/prompts';
 import * as jsrepo from '../utils/registry-providers/jsrepo';
 import { AccessTokenManager } from '../utils/token-manager';
 
-const LISTEN_TIMEOUT = 1000 * 60 * 60 * 10; // 10 minutes (the same as in the recommended oidc spec)
+const LISTEN_TIMEOUT = 1000 * 60 * 60 * 10; // 10 minutes (the same as recommended in the oidc spec)
 
 const schema = v.object({
 	token: v.optional(v.string()),
