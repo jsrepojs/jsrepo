@@ -38,6 +38,8 @@ export const auth = new Command('auth')
 		await _auth(options);
 
 		outro(color.green('All done!'));
+
+		process.exit(0);
 	});
 
 async function _auth(options: Options) {
