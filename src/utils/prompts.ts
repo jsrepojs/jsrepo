@@ -3,7 +3,6 @@ import type { PartialConfiguration } from '@biomejs/wasm-nodejs';
 import { cancel, confirm, intro, isCancel, log, select, spinner, text } from '@clack/prompts';
 import boxen from 'boxen';
 import color from 'chalk';
-import { program } from 'commander';
 import { diffLines } from 'diff';
 import { type Agent, detect, resolveCommand } from 'package-manager-detector';
 import type * as prettier from 'prettier';
@@ -11,12 +10,14 @@ import semver from 'semver';
 import { cursor, erase } from 'sisteransi';
 import { type Message, type ModelName, models } from './ai';
 import * as ascii from './ascii';
+import { immediate } from './blocks/ts/promises';
 import type { ProjectConfig } from './config';
 import { packageJson } from './context';
 import { installDependencies } from './dependencies';
 import { formatDiff } from './diff';
 import { formatFile } from './files';
 import { getLatestVersion } from './get-latest-version';
+import { refreshToken } from './http';
 import { returnShouldInstall } from './package';
 import * as persisted from './persisted';
 
@@ -156,8 +157,15 @@ async function newerVersionAvailable(name: string, oldVersion: string, newVersio
 	return box;
 }
 
-async function _intro() {
+type IntroOptions = {
+	/** Should we try to refresh the jsrepo.com access token before continuing */
+	refresh: boolean;
+};
+
+async function _intro({ refresh = true }: Partial<IntroOptions> = {}) {
 	console.clear();
+
+	const refreshPromise = refresh ? refreshToken() : immediate(undefined);
 
 	const latestVersion = await getLatestVersion();
 
@@ -172,6 +180,8 @@ async function _intro() {
 			);
 		}
 	}
+
+	await refreshPromise;
 
 	intro(
 		`${color.bgHex('#f7df1e').black(` ${packageJson.name} `)}${color.gray(` v${packageJson.version} `)}`

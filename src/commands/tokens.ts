@@ -5,7 +5,7 @@ import * as v from 'valibot';
 import { getProjectConfig } from '../utils/config';
 import { intro } from '../utils/prompts';
 import { http } from '../utils/registry-providers';
-import { TokenManager } from '../utils/token-manager';
+import { AccessTokenManager } from '../utils/token-manager';
 
 const schema = v.object({
 	token: v.optional(v.string()),
@@ -30,7 +30,7 @@ export const tokens = new Command('tokens')
 	.action(async (service, opts) => {
 		const options = v.parse(schema, opts);
 
-		await intro();
+		await intro({ refresh: false });
 
 		await _tokens(service, options);
 
@@ -45,7 +45,7 @@ async function _tokens(service: string | undefined, options: Options) {
 
 	let selectedService = services.find((s) => s.toLowerCase() === service?.toLowerCase());
 
-	const storage = new TokenManager();
+	const storage = new AccessTokenManager();
 
 	// logout flow
 	if (options.logout) {
@@ -183,12 +183,12 @@ async function _tokens(service: string | undefined, options: Options) {
 		options.token = response;
 	}
 
-	storage.set(selectedService, options.token);
+	storage.set(selectedService, { type: 'api', accessToken: options.token });
 
 	log.success(`Logged into ${color.bold(serviceName)}.`);
 }
 
-async function promptHttpLogout(storage: TokenManager) {
+async function promptHttpLogout(storage: AccessTokenManager) {
 	// list all providers for logout
 	const registries = storage.getHttpRegistriesWithTokens();
 

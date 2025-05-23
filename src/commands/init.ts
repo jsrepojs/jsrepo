@@ -44,7 +44,7 @@ import {
 	runTasks,
 } from '../utils/prompts';
 import * as registry from '../utils/registry-providers/internal';
-import { TokenManager } from '../utils/token-manager';
+import { AccessTokenManager } from '../utils/token-manager';
 
 const schema = v.object({
 	repos: v.optional(v.array(v.string())),
@@ -428,7 +428,7 @@ async function promptForRegistryConfig({
 }> {
 	const loading = spinner();
 
-	const storage = new TokenManager();
+	const storage = new AccessTokenManager();
 
 	const provider = registry.selectProvider(url);
 
@@ -478,7 +478,7 @@ async function promptForRegistryConfig({
 				process.exit(0);
 			}
 
-			storage.set(tokenKey, response);
+			storage.set(tokenKey, { type: 'api', accessToken: response });
 		}
 	}
 

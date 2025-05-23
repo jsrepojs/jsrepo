@@ -17,7 +17,7 @@ import { createManifest } from '../utils/manifest';
 import type { PackageJson } from '../utils/package';
 import { intro, spinner } from '../utils/prompts';
 import * as jsrepo from '../utils/registry-providers/jsrepo';
-import { TokenManager } from '../utils/token-manager';
+import { AccessTokenManager } from '../utils/token-manager';
 
 const schema = v.object({
 	private: v.boolean(),
@@ -210,12 +210,14 @@ async function _publish(options: Options) {
 		);
 	}
 
-	const apiKey = new TokenManager().get('jsrepo');
+	const tokenManager = new AccessTokenManager();
 
-	if (apiKey === undefined) {
+	const token = tokenManager.get('jsrepo');
+
+	if (token === undefined) {
 		program.error(
 			color.red(
-				`Please authenticate with ${color.cyan('jsrepo auth')} to publish to ${ascii.JSREPO_DOT_COM}.`
+				`Please authenticate with ${color.bold('jsrepo auth')} or provide the ${color.bold('JSREPO_TOKEN')} environment variable to publish to ${ascii.JSREPO_DOT_COM}.`
 			)
 		);
 	}
@@ -399,9 +401,9 @@ async function _publish(options: Options) {
 
 	log.info(`Publishing to jsrepo with the access set to ${color.cyan(access)}`);
 
-	loading.start(`Publishing ${color.bold(manifest.name)} to ${ascii.JSREPO_DOT_COM}...`);
-
 	const tarBuffer = fs.readFileSync(dest);
+
+	loading.start(`Publishing ${color.bold(manifest.name)} to ${ascii.JSREPO_DOT_COM}...`);
 
 	verbose('Removing archive file');
 
@@ -412,15 +414,22 @@ async function _publish(options: Options) {
 
 	verbose(`Publishing to ${`${jsrepo.BASE_URL}/api/publish`}`);
 
+	const headers: Record<string, string> = {
+		'content-type': 'application/gzip',
+		'content-encoding': 'gzip',
+		'x-dry-run': options.dryRun ? '1' : '0',
+		'x-access': access,
+	};
+
+	if (token.type === 'api') {
+		headers['x-api-key'] = token.accessToken;
+	} else {
+		headers.authorization = `Bearer ${token.accessToken}`;
+	}
+
 	const response = await iFetch(`${jsrepo.BASE_URL}/api/publish`, {
 		body: tarBuffer,
-		headers: {
-			'content-type': 'application/gzip',
-			'content-encoding': 'gzip',
-			'x-api-key': apiKey,
-			'x-dry-run': options.dryRun ? '1' : '0',
-			'x-access': access,
-		},
+		headers,
 		method: 'POST',
 	});
 

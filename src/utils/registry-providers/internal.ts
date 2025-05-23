@@ -16,8 +16,8 @@ import { Err, Ok, type Result } from '../blocks/ts/result';
 import * as u from '../blocks/ts/url';
 import { iFetch } from '../fetch';
 import * as persisted from '../persisted';
-import { TokenManager } from '../token-manager';
-import type { RegistryProvider, RegistryProviderState } from './types';
+import { AccessTokenManager } from '../token-manager';
+import type { AccessToken, RegistryProvider, RegistryProviderState } from './types';
 
 export type RemoteBlock = Block & { sourceRepo: RegistryProviderState };
 
@@ -49,8 +49,8 @@ export async function internalFetchManifest(
 }
 
 /** Gets the locally stored token for the given provider */
-export function getProviderToken(provider: RegistryProvider, url: string): string | undefined {
-	const storage = new TokenManager();
+export function getProviderToken(provider: RegistryProvider, url: string): AccessToken | undefined {
+	const storage = new AccessTokenManager();
 
 	// there isn't an auth implementation for http
 	if (provider.name === 'http') {

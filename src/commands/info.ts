@@ -6,7 +6,7 @@ import type { Category, Manifest } from '../types';
 import * as array from '../utils/blocks/ts/array';
 import * as pad from '../utils/blocks/ts/pad';
 import * as jsrepo from '../utils/registry-providers/jsrepo';
-import { TokenManager } from '../utils/token-manager';
+import { AccessTokenManager } from '../utils/token-manager';
 
 const schema = v.object({
 	json: v.boolean(),
@@ -25,7 +25,7 @@ export const info = new Command('info')
 	});
 
 async function _info(registry: string, options: Options) {
-	const tokenManager = new TokenManager();
+	const tokenManager = new AccessTokenManager();
 
 	const token = tokenManager.get(jsrepo.jsrepo.name);
 

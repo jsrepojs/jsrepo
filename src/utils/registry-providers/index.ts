@@ -8,7 +8,7 @@ import { type GitHubProviderState, github } from './github';
 import { type GitLabProviderState, gitlab } from './gitlab';
 import { http } from './http';
 import { type JsrepoProviderState, jsrepo } from './jsrepo';
-import type { RegistryProvider, RegistryProviderState } from './types';
+import type { AccessToken, RegistryProvider, RegistryProviderState } from './types';
 
 export const providers = [jsrepo, github, gitlab, bitbucket, azure, http];
 
@@ -19,7 +19,7 @@ export function selectProvider(url: string): RegistryProvider | undefined {
 }
 
 export type FetchOptions = {
-	token: string;
+	token: AccessToken;
 	/** Override the fetch method. */
 	fetch?: typeof fetch;
 	verbose: (str: string) => void;

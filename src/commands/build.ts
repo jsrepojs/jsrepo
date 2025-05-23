@@ -68,7 +68,7 @@ const build = new Command('build')
 	.action(async (opts) => {
 		const options = v.parse(schema, opts);
 
-		await intro();
+		await intro({ refresh: false });
 
 		await _build(options);
 

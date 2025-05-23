@@ -121,7 +121,7 @@ export const gitlab: RegistryProvider = {
 		);
 	},
 
-	authHeader: (token) => ['PRIVATE-TOKEN', token],
+	authHeader: (token) => ['PRIVATE-TOKEN', token.accessToken],
 
 	formatFetchError: (state, filePath, error) => {
 		return `There was an error fetching \`${color.bold(filePath)}\` from ${color.bold(state.url)}: ${error}.

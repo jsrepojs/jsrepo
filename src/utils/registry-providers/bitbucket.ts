@@ -101,7 +101,7 @@ export const bitbucket: RegistryProvider = {
 		);
 	},
 
-	authHeader: (token) => ['Authorization', `Bearer ${token}`],
+	authHeader: (token) => ['Authorization', `Bearer ${token.accessToken}`],
 
 	formatFetchError: (state, filePath) => {
 		return `There was an error fetching \`${color.bold(filePath)}\` from ${color.bold(state.url)}.

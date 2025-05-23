@@ -1,4 +1,5 @@
 import color from 'chalk';
+import { iFetch } from '../fetch';
 import type { ParseOptions, RegistryProvider, RegistryProviderState } from './types';
 
 /** Regex for scopes and registry names.
@@ -22,7 +23,7 @@ import type { ParseOptions, RegistryProvider, RegistryProviderState } from './ty
  */
 export const NAME_REGEX = /^(?![-0-9])(?!.*--)[a-z0-9]*(?:-[a-z0-9]+)*$/gi;
 
-export const BASE_URL = 'https://www.jsrepo.com';
+export const BASE_URL = 'http://localhost:5173';
 
 export interface JsrepoProviderState extends RegistryProviderState {
 	scope: string;
@@ -81,7 +82,13 @@ export const jsrepo: RegistryProvider = {
 		);
 	},
 
-	authHeader: (token) => ['x-api-key', token],
+	authHeader: (token) => {
+		if (token.type === 'api') {
+			return ['x-api-key', token.accessToken];
+		}
+
+		return ['authorization', `Bearer ${token.accessToken}`];
+	},
 
 	formatFetchError: (state, filePath, error) => {
 		const { scope, registryName, version } = state as JsrepoProviderState;
@@ -121,4 +128,48 @@ export function parseUrl(
 		registryName,
 		version: version ?? 'latest',
 	};
+}
+
+export type AuthTokenResponse =
+	| {
+			error: never;
+			error_description: never;
+			access_token: string;
+			refresh_token: string;
+			id_token: string;
+			token_type: string;
+			expires_in: number;
+	  }
+	| {
+			error: string;
+			error_description: string;
+			access_token: never;
+			refresh_token: never;
+			id_token: never;
+			token_type: never;
+			expires_in: never;
+	  };
+
+export type GetAuthTokenOptions =
+	| {
+			grant_type: 'authorization_code';
+			code_verifier: string;
+			code: string;
+			client_id: string;
+			redirect_uri: string;
+	  }
+	| {
+			grant_type: 'refresh_token';
+			client_id: string;
+			refresh_token: string;
+	  };
+
+export async function getAuthToken(opts: GetAuthTokenOptions): Promise<AuthTokenResponse> {
+	const tokenResponse = await iFetch(`${BASE_URL}/api/auth/oauth2/token`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+		body: new URLSearchParams(opts),
+	});
+
+	return await tokenResponse.json();
 }

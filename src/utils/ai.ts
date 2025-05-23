@@ -3,7 +3,8 @@ import { cancel, isCancel, password, type spinner } from '@clack/prompts';
 import ollama from 'ollama';
 import OpenAI from 'openai';
 import * as lines from './blocks/ts/lines';
-import { TokenManager } from './token-manager';
+import type { AccessToken } from './registry-providers';
+import { AccessTokenManager } from './token-manager';
 
 type File = {
 	path: string;
@@ -158,9 +159,9 @@ async function getNextCompletionOpenAI({
 	messages?: Message[];
 	maxTokens: number;
 	model: OpenAI.Chat.ChatModel;
-	apiKey: string;
+	apiKey: AccessToken;
 }): Promise<string | null> {
-	const openai = new OpenAI({ apiKey });
+	const openai = new OpenAI({ apiKey: apiKey.accessToken });
 
 	const msg = await openai.chat.completions.create({
 		model,
@@ -196,9 +197,9 @@ async function getNextCompletionAnthropic({
 	messages?: Message[];
 	maxTokens: number;
 	model: Anthropic.Messages.Model;
-	apiKey: string;
+	apiKey: AccessToken;
 }): Promise<string | null> {
-	const anthropic = new Anthropic({ apiKey });
+	const anthropic = new Anthropic({ apiKey: apiKey.accessToken });
 
 	// didn't want to do it this way but I couldn't get `.map` to work
 	const history: Anthropic.Messages.MessageParam[] = [];
@@ -324,8 +325,8 @@ export function unwrapCodeFromQuotes(quoted: string): string {
  * @param name
  * @returns
  */
-async function getApiKey(name: 'OpenAI' | 'Anthropic'): Promise<string> {
-	const storage = new TokenManager();
+async function getApiKey(name: 'OpenAI' | 'Anthropic'): Promise<AccessToken> {
+	const storage = new AccessTokenManager();
 
 	let apiKey = storage.get(name);
 
@@ -343,7 +344,7 @@ async function getApiKey(name: 'OpenAI' | 'Anthropic'): Promise<string> {
 			process.exit(0);
 		}
 
-		apiKey = result;
+		apiKey = { type: 'api', accessToken: result };
 	}
 
 	storage.set(name, apiKey);

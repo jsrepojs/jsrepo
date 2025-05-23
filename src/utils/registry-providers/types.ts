@@ -1,3 +1,11 @@
+export type AccessToken = {
+	type: 'default' | 'api';
+	accessToken: string;
+	refreshToken?: string;
+	idToken?: string;
+	expires?: number;
+};
+
 export interface RegistryProvider {
 	/** Short name for the provider that will be used when it is displayed to the user */
 	name: string;
@@ -43,7 +51,7 @@ export interface RegistryProvider {
 	 * @param token
 	 * @returns
 	 */
-	authHeader?: (token: string) => [string, string];
+	authHeader?: (token: AccessToken) => [string, string];
 	/** Returns a formatted error for a fetch error giving possible reasons for failure */
 	formatFetchError: (state: RegistryProviderState, filePath: string, error: unknown) => string;
 }
@@ -61,7 +69,7 @@ export type ParseResult = {
 };
 
 export type StateOptions = {
-	token?: string;
+	token?: AccessToken;
 	/** Override the fetch method. */
 	fetch?: typeof fetch;
 };

@@ -1,32 +1,34 @@
 import type Conf from 'conf';
 import * as persisted from './persisted';
+import type { AccessToken } from './registry-providers';
 
 const HTTP_REGISTRY_LIST_KEY = 'http-registries-w-tokens';
 
-export class TokenManager {
-	#storage: Conf;
-
-	constructor(storage?: Conf) {
-		this.#storage = storage ?? persisted.get();
-	}
+export class AccessTokenManager {
+	private version = 1;
+	private static storage: Conf = persisted.get();
 
 	private getKey(name: string) {
-		return `${name}-token`.toLowerCase();
+		return `v${this.version}-${name}-token`.toLowerCase();
 	}
 
-	get(name: string): string | undefined {
+	get(name: string): AccessToken | undefined {
 		const key = this.getKey(name);
 
-		const token = this.#storage.get(key, undefined) as string | undefined;
+		const token = (AccessTokenManager.storage.get(key, undefined) as AccessToken) ?? undefined;
 
 		if (name === 'jsrepo') {
-			return token ?? process.env.JSREPO_TOKEN;
+			const apiToken = process.env.JSREPO_TOKEN
+				? { type: 'api', token: process.env.JSREPO_TOKEN }
+				: undefined;
+
+			return token ?? apiToken;
 		}
 
 		return token;
 	}
 
-	set(name: string, secret: string) {
+	set(name: string, token: AccessToken) {
 		if (name.startsWith('http')) {
 			let registries = this.getHttpRegistriesWithTokens();
 
@@ -38,12 +40,12 @@ export class TokenManager {
 
 			if (!registries.includes(registry)) registries.push(registry);
 
-			this.#storage.set(HTTP_REGISTRY_LIST_KEY, registries);
+			AccessTokenManager.storage.set(HTTP_REGISTRY_LIST_KEY, registries);
 		}
 
 		const key = this.getKey(name);
 
-		this.#storage.set(key, secret);
+		AccessTokenManager.storage.set(key, token);
 	}
 
 	delete(name: string) {
@@ -58,16 +60,16 @@ export class TokenManager {
 				registries = [...registries.slice(0, index), ...registries.slice(index + 1)];
 			}
 
-			this.#storage.set(HTTP_REGISTRY_LIST_KEY, registries);
+			AccessTokenManager.storage.set(HTTP_REGISTRY_LIST_KEY, registries);
 		}
 
 		const key = this.getKey(name);
 
-		this.#storage.delete(key);
+		AccessTokenManager.storage.delete(key);
 	}
 
 	getHttpRegistriesWithTokens(): string[] {
-		const registries = this.#storage.get(HTTP_REGISTRY_LIST_KEY);
+		const registries = AccessTokenManager.storage.get(HTTP_REGISTRY_LIST_KEY);
 
 		if (!registries) return [];
 
