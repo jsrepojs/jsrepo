@@ -23,27 +23,9 @@ const listComponentsTool: Tool = {
 		'Lists all available components for the registries defined in the jsrepo.json file.',
 	inputSchema: {
 		type: 'object',
-		properties: {
-			registry: {
-				type: 'string',
-				description:
-					'Registry to list components from. (If not provided will return all for the current config file.)',
-				examples: [
-					'@ieedan/std',
-					'github/ieedan/std',
-					'gitlab/ieedan/std',
-					'bitbucket/ieedan/std',
-					'azure/ieedan/std/std',
-					'https://example.com/r',
-				],
-			},
-		},
+		properties: {},
 	},
 };
-
-interface ListComponentsArgs {
-	registry?: string;
-}
 
 async function listComponents(registries: string[]) {
 	const states = (await registry.forEachPathGetProviderState(registries)).match(
@@ -256,32 +238,36 @@ export async function connectServer({ cwd }: { cwd: string }) {
 		try {
 			switch (request.params.name) {
 				case 'list-components': {
-					const args = request.params.arguments as unknown as ListComponentsArgs;
-
 					const registries: string[] = [];
 
-					if (args.registry) {
-						registries.push(args.registry);
-					} else {
-						try {
-							const content = fs
-								.readFileSync(path.join(cwd, PROJECT_CONFIG_NAME))
-								.toString();
+					try {
+						const content = fs
+							.readFileSync(path.join(cwd, PROJECT_CONFIG_NAME))
+							.toString();
 
-							const config = v.parse(projectConfigSchema, JSON.parse(content));
+						const config = v.parse(projectConfigSchema, JSON.parse(content));
 
-							if (config.repos.length === 0) {
-								throw new Error(
-									"Your config file doesn't have any `repos` configured. Please provide the `registry` argument or initialize a registry to your config file with `jsrepo init`"
-								);
-							}
-
-							registries.push(...config.repos);
-						} catch {
-							throw new Error(
-								`Couldn't find a config file in the cwd (${cwd}). Please provide the 'registry' argument.`
-							);
+						if (config.repos.length === 0) {
+							return {
+								content: [
+									{
+										type: 'text',
+										text: JSON.stringify({ components: [] }),
+									},
+								],
+							};
 						}
+
+						registries.push(...config.repos);
+					} catch {
+						return {
+							content: [
+								{
+									type: 'text',
+									text: JSON.stringify({ components: [] }),
+								},
+							],
+						};
 					}
 
 					const response = await listComponents(registries);
