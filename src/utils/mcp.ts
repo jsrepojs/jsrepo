@@ -1,4 +1,3 @@
-import fs from 'node:fs';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
@@ -8,24 +7,42 @@ import {
 	type Tool,
 } from '@modelcontextprotocol/sdk/types.js';
 import color from 'chalk';
-import path from 'pathe';
-import * as v from 'valibot';
 import { preloadBlocks } from './blocks';
 import * as array from './blocks/ts/array';
 import * as url from './blocks/ts/url';
-import { PROJECT_CONFIG_NAME, projectConfigSchema } from './config';
 import { packageJson } from './context';
 import * as registry from './registry-providers/internal';
 
 const listComponentsTool: Tool = {
 	name: 'list-components',
-	description:
-		'Lists all available components for the registries defined in the jsrepo.json file.',
+	description: 'Lists all available components / utilities for the provided registries.',
 	inputSchema: {
 		type: 'object',
-		properties: {},
+		properties: {
+			registries: {
+				type: 'array',
+				description:
+					'Registries to list the components / utilities from. User may have defined them in a jsrepo.json file in the `repos` key in the root of their project.',
+				items: {
+					type: 'string',
+					examples: [
+						'@ieedan/std',
+						'github/ieedan/std',
+						'gitlab/ieedan/std',
+						'bitbucket/ieedan/std',
+						'azure/ieedan/std/std',
+						'https://example.com/r',
+					],
+				},
+			},
+		},
+		required: ['registries'],
 	},
 };
+
+interface ListComponentsArgs {
+	registries: string[];
+}
 
 async function listComponents(registries: string[]) {
 	const states = (await registry.forEachPathGetProviderState(registries)).match(
@@ -220,7 +237,7 @@ async function getConfigFiles({ registry: repo, requiredOnly = false }: GetConfi
 	};
 }
 
-export async function connectServer({ cwd }: { cwd: string }) {
+export async function connectServer() {
 	const server = new Server(
 		{
 			name: 'jsrepo',
@@ -238,39 +255,9 @@ export async function connectServer({ cwd }: { cwd: string }) {
 		try {
 			switch (request.params.name) {
 				case 'list-components': {
-					const registries: string[] = [];
+					const args = request.params.arguments as unknown as ListComponentsArgs;
 
-					try {
-						const content = fs
-							.readFileSync(path.join(cwd, PROJECT_CONFIG_NAME))
-							.toString();
-
-						const config = v.parse(projectConfigSchema, JSON.parse(content));
-
-						if (config.repos.length === 0) {
-							return {
-								content: [
-									{
-										type: 'text',
-										text: JSON.stringify({ components: [] }),
-									},
-								],
-							};
-						}
-
-						registries.push(...config.repos);
-					} catch {
-						return {
-							content: [
-								{
-									type: 'text',
-									text: JSON.stringify({ components: [] }),
-								},
-							],
-						};
-					}
-
-					const response = await listComponents(registries);
+					const response = await listComponents(args.registries);
 
 					return {
 						content: [
