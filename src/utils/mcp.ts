@@ -11,7 +11,9 @@ import { preloadBlocks } from './blocks';
 import * as array from './blocks/ts/array';
 import * as url from './blocks/ts/url';
 import { packageJson } from './context';
+import { iFetch } from './fetch';
 import * as registry from './registry-providers/internal';
+import * as jsrepo from './registry-providers/jsrepo';
 
 const listComponentsTool: Tool = {
 	name: 'list-components',
@@ -229,6 +231,57 @@ async function getConfigFiles({ registry: repo, requiredOnly = false }: GetConfi
 	};
 }
 
+const discoverRegistriesTool: Tool = {
+	name: 'discover-registries',
+	description:
+		'Searches jsrepo.com for registries that could include components the user needs in their project.',
+	inputSchema: {
+		type: 'object',
+		properties: {
+			primaryLanguage: {
+				type: 'string',
+				description:
+					'File extension of the primary language of the registry. i.e. TypeScript -> ts, React -> tsx/jsx',
+			},
+		},
+		required: ['primaryLanguage'],
+	},
+};
+
+interface DiscoverRegistriesArgs {
+	primaryLanguage: string;
+}
+
+async function discoverRegistries({ primaryLanguage }: DiscoverRegistriesArgs) {
+	const response = await iFetch(`${jsrepo.BASE_URL}/api/registries?lang=${primaryLanguage}`);
+
+	if (!response.ok) return [];
+
+	const { data } = await response.json();
+
+	return {
+		// @ts-expect-error shut up
+		registries: data.map((r) => {
+			const name = `@${r.scope.name}/${r.name}`;
+			return {
+				name,
+				description: r.metaDescription,
+				repository: r.metaRepository,
+				keywords: r.metaTags,
+				homepage: r.metaHomepage,
+				rating: r.rating,
+				primaryLanguage: r.metaPrimaryLanguage,
+				monthlyDownloads: r.monthlyFetches,
+				latestVersion: r.latestVersion,
+				access: r.access,
+				commands: {
+					init: `jsrepo init ${name}`,
+				},
+			};
+		}),
+	};
+}
+
 export async function connectServer() {
 	const server = new Server(
 		{
@@ -288,6 +341,20 @@ export async function connectServer() {
 						],
 					};
 				}
+				case 'discover-registries': {
+					const args = request.params.arguments as unknown as DiscoverRegistriesArgs;
+
+					const response = await discoverRegistries(args);
+
+					return {
+						content: [
+							{
+								type: 'text',
+								text: JSON.stringify(response),
+							},
+						],
+					};
+				}
 			}
 
 			throw new Error(`Invalid tool ${request.params.name}`);
@@ -311,7 +378,12 @@ export async function connectServer() {
 	server.setRequestHandler(ListToolsRequestSchema, async () => {
 		console.error('Received ListToolsRequest');
 		return {
-			tools: [listComponentsTool, getComponentCodeTool, getConfigFilesTool],
+			tools: [
+				listComponentsTool,
+				getComponentCodeTool,
+				getConfigFilesTool,
+				discoverRegistriesTool,
+			],
 		};
 	});
 
