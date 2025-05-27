@@ -15,24 +15,16 @@ import * as registry from './registry-providers/internal';
 
 const listComponentsTool: Tool = {
 	name: 'list-components',
-	description: 'Lists all available components / utilities for the provided registries.',
+	description: 'Lists all available components/utilities for the provided registries.',
 	inputSchema: {
 		type: 'object',
 		properties: {
 			registries: {
 				type: 'array',
 				description:
-					'Registries to list the components / utilities from. User may have defined them in a jsrepo.json file in the `repos` key in the root of their project.',
+					"Registries from the user's jsrepo.json `repos` key or any well-known jsrepo registry.",
 				items: {
 					type: 'string',
-					examples: [
-						'@ieedan/std',
-						'github/ieedan/std',
-						'gitlab/ieedan/std',
-						'bitbucket/ieedan/std',
-						'azure/ieedan/std/std',
-						'https://example.com/r',
-					],
 				},
 			},
 		},
