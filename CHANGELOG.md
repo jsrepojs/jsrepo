@@ -1,5 +1,15 @@
 # jsrepo
 
+## 2.2.0
+### Minor Changes
+
+- b885eaf: feat: Add non-interactive path for project initialization
+- b885eaf: feat: 🎉 `mcp` command
+
+### Patch Changes
+
+- b885eaf: feat: Generate CLI reference on new version
+
 ## 2.1.0
 ### Minor Changes
 
