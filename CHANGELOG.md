@@ -1,5 +1,10 @@
 # jsrepo
 
+## 2.2.1
+### Patch Changes
+
+- b0394f4: fix: Remove resources from mcp server capabilities
+
 ## 2.2.0
 ### Minor Changes
 
