@@ -3,10 +3,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import {
 	type CallToolRequest,
 	CallToolRequestSchema,
-	ListResourcesRequestSchema,
 	ListToolsRequestSchema,
-	ReadResourceRequestSchema,
-	type Resource,
 	type Tool,
 } from '@modelcontextprotocol/sdk/types.js';
 import color from 'chalk';
@@ -17,6 +14,7 @@ import { packageJson } from './context';
 import { iFetch } from './fetch';
 import * as registry from './registry-providers/internal';
 import * as jsrepo from './registry-providers/jsrepo';
+import { cli } from '../cli';
 
 const listComponentsTool: Tool = {
 	name: 'list-components',
@@ -279,12 +277,31 @@ async function discoverRegistries({ primaryLanguage }: DiscoverRegistriesArgs) {
 	};
 }
 
-const cliReferenceResource: Resource = {
-	uri: 'https://jsrepo.dev/docs/cli/llms.txt',
-	name: 'CLI Reference',
+const cliReferenceTool: Tool = {
+	name: 'cli-reference',
 	description: 'A reference for the usage of the jsrepo CLI.',
-	mimeType: 'text/plain',
+	inputSchema: {
+		type: 'object',
+	},
 };
+
+function cliReference() {
+	return {
+		name: cli.name(),
+		description: cli.description(),
+		version: cli.version(),
+		commands: cli.commands.map((c) => ({
+			name: c.name(),
+			description: c.description(),
+			usage: c.usage(),
+			options: c.options.map((o) => ({
+				flags: o.flags,
+				description: o.description,
+				defaultValue: o.defaultValue,
+			})),
+		})),
+	};
+}
 
 export async function connectServer() {
 	const server = new Server(
@@ -360,6 +377,18 @@ export async function connectServer() {
 						],
 					};
 				}
+				case 'cli-reference': {
+					const response = cliReference();
+
+					return {
+						content: [
+							{
+								type: 'text',
+								text: JSON.stringify(response),
+							},
+						],
+					};
+				}
 			}
 
 			throw new Error(`Invalid tool ${request.params.name}`);
@@ -388,56 +417,9 @@ export async function connectServer() {
 				getComponentCodeTool,
 				getConfigFilesTool,
 				discoverRegistriesTool,
+				cliReferenceTool,
 			],
 		};
-	});
-
-	server.setRequestHandler(ListResourcesRequestSchema, async () => {
-		return {
-			resources: [cliReferenceResource],
-		};
-	});
-
-	server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-		try {
-			switch (request.params.uri) {
-				case cliReferenceResource.uri: {
-					const response = await iFetch(request.params.uri);
-
-					if (!response.ok) {
-						throw new Error(
-							`Error fetching ${request.params.uri} Error: ${response.status}: ${response.statusText}`
-						);
-					}
-
-					return {
-						contents: [
-							{
-								uri: request.params.uri,
-								mimeType: 'text/plain',
-								text: await response.text(),
-							},
-						],
-					};
-				}
-			}
-
-			throw new Error(`Unknown resource ${request.params.uri}`);
-		} catch (err) {
-			console.error(
-				color.red(`Error executing tool ${color.bold(request.params.name)}: ${err}`)
-			);
-			return {
-				content: [
-					{
-						type: 'text',
-						text: JSON.stringify({
-							error: err instanceof Error ? err.message : String(err),
-						}),
-					},
-				],
-			};
-		}
 	});
 
 	const transport = new StdioServerTransport();
