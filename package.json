@@ -30,14 +30,16 @@
 	"scripts": {
 		"start": "tsup --silent && node ./dist/index.js",
 		"build": "tsup",
+		"generate:reference": "pnpm dlx tsx ./scripts/generate-reference.ts ",
 		"run:dev": "node ./dist/index.js",
 		"format": "biome format --write",
 		"lint": "biome lint --write",
 		"check": "biome check && pnpm check:types",
 		"test": "vitest",
 		"check:types": "tsc",
-		"changeset:version": "changeset version && pnpm format",
-		"ci:release": "pnpm build && changeset publish"
+		"changeset:version": "pnpm generate:reference && changeset version && pnpm format",
+		"ci:release": "pnpm build && changeset publish",
+		"mcp:inspector": "pnpm build && pnpm dlx @modelcontextprotocol/inspector node ./dist/index.js mcp"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
@@ -57,6 +59,7 @@
 		"@biomejs/js-api": "^0.7.1",
 		"@biomejs/wasm-nodejs": "^1.9.4",
 		"@clack/prompts": "^0.10.1",
+		"@modelcontextprotocol/sdk": "^1.12.0",
 		"boxen": "^8.0.1",
 		"chalk": "^5.4.1",
 		"commander": "^13.1.0",

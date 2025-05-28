@@ -148,7 +148,7 @@ type PreloadedBlock = {
  */
 export function preloadBlocks(
 	blocks: registry.RemoteBlock[],
-	config: ProjectConfig
+	config: Pick<ProjectConfig, 'includeTests'>
 ): PreloadedBlock[] {
 	const preloaded: PreloadedBlock[] = [];
 

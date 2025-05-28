@@ -12,6 +12,7 @@ const cli = program
 	.addCommand(commands.exec)
 	.addCommand(commands.info)
 	.addCommand(commands.init)
+	.addCommand(commands.mcp)
 	.addCommand(commands.publish)
 	.addCommand(commands.test)
 	.addCommand(commands.tokens)

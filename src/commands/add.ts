@@ -14,7 +14,6 @@ import * as url from '../utils/blocks/ts/url';
 import {
 	type Formatter,
 	type ProjectConfig,
-	formatterSchema,
 	getProjectConfig,
 	projectConfigSchema,
 	resolvePaths,
