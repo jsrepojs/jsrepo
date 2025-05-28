@@ -312,7 +312,6 @@ export async function connectServer() {
 		{
 			capabilities: {
 				tools: {},
-				resources: {},
 			},
 		}
 	);
