@@ -282,6 +282,7 @@ async function discoverRegistries({ primaryLanguage }: DiscoverRegistriesArgs) {
 const cliReferenceResource: Resource = {
 	uri: 'https://jsrepo.dev/docs/cli/llms.txt',
 	name: 'CLI Reference',
+	description: 'A reference for the usage of the jsrepo CLI.',
 	mimeType: 'text/plain',
 };
 
