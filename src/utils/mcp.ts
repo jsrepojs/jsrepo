@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
@@ -7,6 +8,7 @@ import {
 	type Tool,
 } from '@modelcontextprotocol/sdk/types.js';
 import color from 'chalk';
+import path from 'pathe';
 import { cli } from '../cli';
 import { preloadBlocks } from './blocks';
 import * as array from './blocks/ts/array';
@@ -269,6 +271,7 @@ async function discoverRegistries({ primaryLanguage }: DiscoverRegistriesArgs) {
 				monthlyDownloads: r.monthlyFetches,
 				latestVersion: r.latestVersion,
 				access: r.access,
+				purchaseRequired: r.access === 'marketplace',
 				commands: {
 					init: `jsrepo init ${name}`,
 				},
@@ -279,7 +282,8 @@ async function discoverRegistries({ primaryLanguage }: DiscoverRegistriesArgs) {
 
 const cliReferenceTool: Tool = {
 	name: 'cli-reference',
-	description: 'A reference for the usage of the jsrepo CLI.',
+	description:
+		'A reference for the usage of the jsrepo CLI. It returns instantly so try this before hallucinating CLI commands to the user.',
 	inputSchema: {
 		type: 'object',
 	},
@@ -300,6 +304,71 @@ function cliReference() {
 				defaultValue: o.defaultValue,
 			})),
 		})),
+	};
+}
+
+const addComponentTool: Tool = {
+	name: 'add-component',
+	description: 'Adds a component to the users project.',
+	inputSchema: {
+		type: 'object',
+		properties: {
+			component: {
+				type: 'string',
+				description:
+					'The component to get the code for. Format: <registry>/<category>/<block>',
+			},
+			includeTests: {
+				type: 'boolean',
+				description: 'Should tests be included with the component code.',
+				default: false,
+			},
+			cwd: {
+				type: 'string',
+				description: 'The current working directory of the users project.',
+			},
+		},
+		required: ['component', 'cwd'],
+	},
+};
+
+interface AddComponentArgs {
+	component: string;
+	includeTests?: boolean;
+	cwd: string;
+}
+
+async function addComponent({ component, cwd }: AddComponentArgs) {
+	const provider = registry.selectProvider(component);
+
+	if (!provider) {
+		throw new Error(
+			`${component} is not valid! Expected a category and block proceeded by the registry url i.e. @ieedan/std/<category>/<block>`
+		);
+	}
+
+	const { specifier } = provider.parse(component, { fullyQualified: true });
+
+	if (!specifier) {
+		throw new Error(
+			`${component} is not valid! Expected a category and block proceeded by the registry url i.e. @ieedan/std/<category>/<block>`
+		);
+	}
+
+	let paths: Record<string, string> = {};
+
+	try {
+		const config = JSON.parse(fs.readFileSync(path.join(cwd, 'jsrepo.json')).toString());
+
+		paths = config.paths;
+
+		await cli.parseAsync(['node', 'jsrepo', 'add', component, '-y', '-A', '--cwd', cwd]);
+	} catch (err) {
+		throw new Error(`[jsrepo cli] Error adding component: ${err}`);
+	}
+
+	return {
+		addedToPath: paths[specifier.split('/')[0]] || paths['*'],
 	};
 }
 
@@ -388,6 +457,20 @@ export async function connectServer() {
 						],
 					};
 				}
+				case 'add-component': {
+					const args = request.params.arguments as unknown as AddComponentArgs;
+
+					const response = await addComponent(args);
+
+					return {
+						content: [
+							{
+								type: 'text',
+								text: JSON.stringify(response),
+							},
+						],
+					};
+				}
 			}
 
 			throw new Error(`Invalid tool ${request.params.name}`);
@@ -417,6 +500,7 @@ export async function connectServer() {
 				getConfigFilesTool,
 				discoverRegistriesTool,
 				cliReferenceTool,
+				addComponentTool,
 			],
 		};
 	});
