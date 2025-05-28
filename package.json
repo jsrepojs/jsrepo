@@ -30,13 +30,14 @@
 	"scripts": {
 		"start": "tsup --silent && node ./dist/index.js",
 		"build": "tsup",
+		"generate:reference": "pnpm dlx tsx ./scripts/generate-reference.ts ",
 		"run:dev": "node ./dist/index.js",
 		"format": "biome format --write",
 		"lint": "biome lint --write",
 		"check": "biome check && pnpm check:types",
 		"test": "vitest",
 		"check:types": "tsc",
-		"changeset:version": "changeset version && pnpm format",
+		"changeset:version": "pnpm generate:reference && changeset version && pnpm format",
 		"ci:release": "pnpm build && changeset publish",
 		"mcp:inspector": "pnpm build && pnpm dlx @modelcontextprotocol/inspector node ./dist/index.js mcp"
 	},

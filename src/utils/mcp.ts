@@ -3,7 +3,10 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import {
 	type CallToolRequest,
 	CallToolRequestSchema,
+	ListResourcesRequestSchema,
 	ListToolsRequestSchema,
+	ReadResourceRequestSchema,
+	type Resource,
 	type Tool,
 } from '@modelcontextprotocol/sdk/types.js';
 import color from 'chalk';
@@ -276,6 +279,12 @@ async function discoverRegistries({ primaryLanguage }: DiscoverRegistriesArgs) {
 	};
 }
 
+const cliReferenceResource: Resource = {
+	uri: 'https://jsrepo.dev/docs/cli/llms.txt',
+	name: 'CLI Reference',
+	mimeType: 'text/plain',
+};
+
 export async function connectServer() {
 	const server = new Server(
 		{
@@ -285,6 +294,7 @@ export async function connectServer() {
 		{
 			capabilities: {
 				tools: {},
+				resources: {},
 			},
 		}
 	);
@@ -379,6 +389,54 @@ export async function connectServer() {
 				discoverRegistriesTool,
 			],
 		};
+	});
+
+	server.setRequestHandler(ListResourcesRequestSchema, async () => {
+		return {
+			resources: [cliReferenceResource],
+		};
+	});
+
+	server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+		try {
+			switch (request.params.uri) {
+				case cliReferenceResource.uri: {
+					const response = await iFetch(request.params.uri);
+
+					if (!response.ok) {
+						throw new Error(
+							`Error fetching ${request.params.uri} Error: ${response.status}: ${response.statusText}`
+						);
+					}
+
+					return {
+						contents: [
+							{
+								uri: request.params.uri,
+								mimeType: 'text/plain',
+								text: await response.text(),
+							},
+						],
+					};
+				}
+			}
+
+			throw new Error(`Unknown resource ${request.params.uri}`);
+		} catch (err) {
+			console.error(
+				color.red(`Error executing tool ${color.bold(request.params.name)}: ${err}`)
+			);
+			return {
+				content: [
+					{
+						type: 'text',
+						text: JSON.stringify({
+							error: err instanceof Error ? err.message : String(err),
+						}),
+					},
+				],
+			};
+		}
 	});
 
 	const transport = new StdioServerTransport();

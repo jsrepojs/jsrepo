@@ -18,8 +18,8 @@ import { detect, resolveCommand } from 'package-manager-detector';
 import path from 'pathe';
 import * as v from 'valibot';
 import * as ascii from '../utils/ascii';
+import { parseRecord } from '../utils/blocks/commander/parsers';
 import * as u from '../utils/blocks/ts/url';
-import { parseMapArgs } from '../utils/cli';
 import {
 	type Formatter,
 	PROJECT_CONFIG_NAME,
@@ -83,13 +83,16 @@ const init = new Command('init')
 		).choices(['prettier', 'biome'])
 	)
 	.addOption(
-		new Option('--paths <category:path>', 'The paths to install the blocks to.')
-			.argParser(parseMapArgs)
+		new Option('--paths <category=path>,<category=path>', 'The paths to install the blocks to.')
+			.argParser(parseRecord)
 			.default({})
 	)
 	.addOption(
-		new Option('--config-files <configFile:path>', 'The paths to install the config files to.')
-			.argParser(parseMapArgs)
+		new Option(
+			'--config-files <configFile=path>,<configFile=path>',
+			'The paths to install the config files to.'
+		)
+			.argParser(parseRecord)
 			.default({})
 	)
 	.option('-P, --project', 'Takes you through the steps to initialize a project.')
