@@ -368,6 +368,7 @@ async function addComponent({ component, cwd }: AddComponentArgs) {
 	}
 
 	return {
+		// this just lets the agent know where the component was added
 		addedToPath: paths[specifier.split('/')[0]] || paths['*'],
 	};
 }
