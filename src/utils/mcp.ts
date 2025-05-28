@@ -7,6 +7,7 @@ import {
 	type Tool,
 } from '@modelcontextprotocol/sdk/types.js';
 import color from 'chalk';
+import { cli } from '../cli';
 import { preloadBlocks } from './blocks';
 import * as array from './blocks/ts/array';
 import * as url from './blocks/ts/url';
@@ -14,7 +15,6 @@ import { packageJson } from './context';
 import { iFetch } from './fetch';
 import * as registry from './registry-providers/internal';
 import * as jsrepo from './registry-providers/jsrepo';
-import { cli } from '../cli';
 
 const listComponentsTool: Tool = {
 	name: 'list-components',
