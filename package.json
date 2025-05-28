@@ -37,7 +37,7 @@
 		"check": "biome check && pnpm check:types",
 		"test": "vitest",
 		"check:types": "tsc",
-		"changeset:version": "pnpm generate:reference && changeset version && pnpm format",
+		"changeset:version": "changeset version && pnpm generate:reference && pnpm format",
 		"ci:release": "pnpm build && changeset publish",
 		"mcp:inspector": "pnpm build && pnpm dlx @modelcontextprotocol/inspector node ./dist/index.js mcp"
 	},
