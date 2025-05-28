@@ -19,6 +19,7 @@ import path from 'pathe';
 import * as v from 'valibot';
 import * as ascii from '../utils/ascii';
 import * as u from '../utils/blocks/ts/url';
+import { parseMapArgs } from '../utils/cli';
 import {
 	type Formatter,
 	PROJECT_CONFIG_NAME,
@@ -51,6 +52,8 @@ const schema = v.object({
 	watermark: v.boolean(),
 	tests: v.optional(v.boolean()),
 	formatter: v.optional(formatterSchema),
+	paths: v.optional(v.record(v.string(), v.string())),
+	configFiles: v.optional(v.record(v.string(), v.string())),
 	project: v.optional(v.boolean()),
 	registry: v.optional(v.boolean()),
 	buildScript: v.string(),
@@ -78,6 +81,16 @@ const init = new Command('init')
 			'--formatter <formatter>',
 			'What formatter to use when adding or updating blocks.'
 		).choices(['prettier', 'biome'])
+	)
+	.addOption(
+		new Option('--paths <category:path>', 'The paths to install the blocks to.')
+			.argParser(parseMapArgs)
+			.default({})
+	)
+	.addOption(
+		new Option('--config-files <configFile:path>', 'The paths to install the config files to.')
+			.argParser(parseMapArgs)
+			.default({})
 	)
 	.option('-P, --project', 'Takes you through the steps to initialize a project.')
 	.option('-R, --registry', 'Takes you through the steps to initialize a registry.')
@@ -161,43 +174,59 @@ const _initProject = async (registries: string[], options: Options) => {
 
 	const tsconfigResult = tryGetTsconfig(options.cwd).unwrapOr(null);
 
-	const defaultPathResult = await text({
-		message: 'Please enter a default path to install the blocks',
-		validate(value) {
-			if (value.trim() === '') return 'Please provide a value';
+	let defaultPath =
+		options.paths?.['*'] ??
+		(initialConfig.isOk() ? initialConfig.unwrap().paths['*'] : undefined);
 
-			if (!value.startsWith('./')) {
-				const error =
-					'Invalid path alias! If you are intending to use a relative path make sure it starts with `./`';
+	if (options.yes && defaultPath === undefined) {
+		program.error(
+			color.red('You must provide a default path to install the blocks when using --yes.')
+		);
+	}
 
-				if (tsconfigResult === null) {
-					return error;
+	if (defaultPath === undefined) {
+		const defaultPathResult = await text({
+			message: 'Please enter a default path to install the blocks',
+			validate(value) {
+				if (value.trim() === '') return 'Please provide a value';
+
+				if (!value.startsWith('./')) {
+					const error =
+						'Invalid path alias! If you are intending to use a relative path make sure it starts with `./`';
+
+					if (tsconfigResult === null) {
+						return error;
+					}
+
+					const matcher = createPathsMatcher(tsconfigResult);
+
+					if (matcher) {
+						const found = matcher(value);
+
+						if (found.length === 0) return error;
+					}
 				}
+			},
+			placeholder: './src/blocks',
+			initialValue: defaultPath,
+		});
 
-				const matcher = createPathsMatcher(tsconfigResult);
+		if (isCancel(defaultPathResult)) {
+			cancel('Canceled!');
+			process.exit(0);
+		}
 
-				if (matcher) {
-					const found = matcher(value);
-
-					if (found.length === 0) return error;
-				}
-			}
-		},
-		placeholder: './src/blocks',
-		initialValue: initialConfig.isOk() ? initialConfig.unwrap().paths['*'] : undefined,
-	});
-
-	if (isCancel(defaultPathResult)) {
-		cancel('Canceled!');
-		process.exit(0);
+		defaultPath = defaultPathResult;
 	}
 
 	if (initialConfig.isOk()) {
-		paths = { ...initialConfig.unwrap().paths, '*': defaultPathResult };
+		paths = { ...initialConfig.unwrap().paths, '*': defaultPath };
 		configFiles = initialConfig.unwrap().configFiles ?? {};
 	} else {
-		paths = { '*': defaultPathResult };
+		paths = { '*': defaultPath };
 	}
+
+	paths = { ...paths, ...options.paths };
 
 	// configure formatter
 	if (!options.formatter) {
@@ -292,17 +321,21 @@ const _initProject = async (registries: string[], options: Options) => {
 	}
 
 	while (true) {
-		const confirmResult = await confirm({
-			message: `Add ${repos.length > 0 ? 'another' : 'a'} repo?`,
-			initialValue: repos.length === 0, // default to yes for first repo
-		});
+		if (!options.yes) {
+			const confirmResult = await confirm({
+				message: repos.length > 0 ? 'Add another repo?' : 'Add a repo?',
+				initialValue: repos.length === 0, // default to yes for first repo
+			});
 
-		if (isCancel(confirmResult)) {
-			cancel('Canceled!');
-			process.exit(0);
+			if (isCancel(confirmResult)) {
+				cancel('Canceled!');
+				process.exit(0);
+			}
+
+			if (!confirmResult) break;
+		} else {
+			break;
 		}
-
-		if (!confirmResult) break;
 
 		const result = await text({
 			message: 'Where should we download the blocks from?',
@@ -528,22 +561,34 @@ async function promptForRegistryConfig({
 
 			// get the path to the file from the user
 			if (!configFiles[file.name]) {
-				const result = await text({
-					message: `Where is your ${file.name} file?`,
-					defaultValue: file.expectedPath,
-					initialValue: file.expectedPath,
-					placeholder: file.expectedPath,
-					validate(value) {
-						if (value.trim() === '') return 'Please provide a value';
-					},
-				});
+				if (options.configFiles?.[file.name]) {
+					configFiles[file.name] = options.configFiles[file.name];
+				} else if (!options.yes) {
+					const result = await text({
+						message: `Where is your ${file.name} file?`,
+						defaultValue: file.expectedPath,
+						initialValue: file.expectedPath,
+						placeholder: file.expectedPath,
+						validate(value) {
+							if (value.trim() === '') return 'Please provide a value';
+						},
+					});
 
-				if (isCancel(result)) {
-					cancel('Canceled!');
-					process.exit(0);
+					if (isCancel(result)) {
+						cancel('Canceled!');
+						process.exit(0);
+					}
+
+					configFiles[file.name] = result;
+				} else {
+					if (!file.expectedPath) {
+						program.error(
+							color.red(`You must provide a path for ${file.name} when using --yes!`)
+						);
+					}
+
+					configFiles[file.name] = file.expectedPath;
 				}
-
-				configFiles[file.name] = result;
 			}
 
 			let fullFilePath = path.join(options.cwd, configFiles[file.name]);

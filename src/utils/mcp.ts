@@ -81,14 +81,8 @@ const getComponentCodeTool: Tool = {
 		properties: {
 			component: {
 				type: 'string',
-				description: 'The component to get the code for.',
-				examples: [
-					'@ieedan/std/ts/math',
-					'github/ieedan/std/ts/math',
-					'gitlab/ieedan/std/ts/math',
-					'azure/ieedan/std/std',
-					'https://example.com/r/ts/math',
-				],
+				description:
+					'The component to get the code for. Format: <registry>/<category>/<block>',
 			},
 			includeTests: {
 				type: 'boolean',
