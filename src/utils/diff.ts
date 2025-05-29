@@ -226,7 +226,12 @@ function formatDiff({
 				// adds some spaces to make sure that you can see the change
 				result += `${lines.join(lines.get(colorCharChange(change)), {
 					prefix: (line) =>
-						`${linePrefix(line)}${colorCharChange({ removed: true, value: '   ', added: false })}`,
+						`${linePrefix(line)}${colorCharChange({
+							removed: true,
+							value: '   ',
+							added: false,
+							count: 1,
+						})}`,
 				})}\n`;
 
 				if (!change.removed) {

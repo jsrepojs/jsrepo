@@ -31,7 +31,8 @@ export const gitlab: RegistryProvider = {
 	name: 'gitlab',
 
 	matches: (url) =>
-		startsWithOneOf(url.toLowerCase(), ['gitlab/', 'gitlab:', 'https://gitlab.com']),
+		startsWithOneOf(url.toLowerCase(), ['gitlab/', 'gitlab:', 'https://gitlab.com']) !==
+		undefined,
 
 	parse: (url, opts) => {
 		const parsed = parseUrl(url, opts);
