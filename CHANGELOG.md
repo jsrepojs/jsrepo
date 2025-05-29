@@ -1,5 +1,10 @@
 # jsrepo
 
+## 2.2.2
+### Patch Changes
+
+- cde57fc: feat(mcp): Include barebones CLI reference in response of tool calls
+
 ## 2.2.1
 ### Patch Changes
 
