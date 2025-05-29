@@ -68,6 +68,7 @@ export const manifestSchema = v.object({
 	version: v.optional(v.string()),
 	meta: v.optional(manifestMeta),
 	access: v.optional(accessLevel),
+	defaultPaths: v.optional(v.record(v.string(), v.string())),
 	peerDependencies: v.optional(peerDependencySchema),
 	configFiles: v.optional(v.array(manifestConfigFileSchema)),
 	categories: v.array(categorySchema),

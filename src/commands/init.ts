@@ -694,7 +694,13 @@ async function promptForRegistryConfig({
 	if (!options.yes) {
 		const configurePaths = await multiselect({
 			message: 'Which category paths would you like to configure?',
-			options: manifest.categories.map((cat) => ({ label: cat.name, value: cat.name })),
+			options: manifest.categories.map((cat) => ({
+				label: cat.name,
+				value: cat.name,
+				hint: manifest.defaultPaths?.[cat.name]
+					? `Default: ${manifest.defaultPaths?.[cat.name]}`
+					: undefined,
+			})),
 			required: false,
 		});
 
@@ -705,7 +711,7 @@ async function promptForRegistryConfig({
 
 		if (configurePaths.length > 0) {
 			for (const category of configurePaths) {
-				const configuredValue = paths[category];
+				const configuredValue = paths[category] ?? manifest.defaultPaths?.[category];
 
 				const categoryPath = await text({
 					message: `Where should ${category} be added in your project?`,
@@ -725,6 +731,17 @@ async function promptForRegistryConfig({
 				paths[category] = categoryPath;
 			}
 		}
+	}
+
+	// use the default path (if it exists) for any categories the user didn't configure
+	for (const category of manifest.categories) {
+		if (paths[category.name] !== undefined) continue;
+
+		const defaultPath = manifest.defaultPaths?.[category.name];
+
+		if (!defaultPath) continue;
+
+		paths[category.name] = defaultPath;
 	}
 
 	return { paths, configFiles, dependencies, devDependencies };

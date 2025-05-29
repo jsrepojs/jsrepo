@@ -51,6 +51,7 @@ export function createManifest(
 		version: config.version,
 		meta: config.meta,
 		access: config.access,
+		defaultPaths: config.defaultPaths,
 		peerDependencies: config.peerDependencies,
 		configFiles,
 		categories,

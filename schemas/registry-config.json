@@ -25,6 +25,14 @@
 			"default": "public",
 			"enum": ["public", "private", "marketplace"]
 		},
+		"defaultPaths": {
+			"type": "object",
+			"description": "A map of category names to default paths for the registry.",
+			"additionalProperties": {
+				"type": "string",
+				"description": "The default path for the given category."
+			}
+		},
 		"meta": {
 			"description": "Optional metadata to include in the manifest file.",
 			"type": "object",
