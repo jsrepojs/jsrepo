@@ -21,7 +21,8 @@ export interface GitHubProviderState extends RegistryProviderState {
 export const github: RegistryProvider = {
 	name: 'github',
 
-	matches: (url) => startsWithOneOf(url.toLowerCase(), ['github', 'https://github.com']),
+	matches: (url) =>
+		startsWithOneOf(url.toLowerCase(), ['github', 'https://github.com']) !== undefined,
 
 	parse: (url, opts) => {
 		const parsed = parseUrl(url, opts);

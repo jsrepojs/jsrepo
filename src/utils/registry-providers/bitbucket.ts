@@ -24,7 +24,8 @@ export interface BitBucketProviderState extends RegistryProviderState {
 export const bitbucket: RegistryProvider = {
 	name: 'bitbucket',
 
-	matches: (url) => startsWithOneOf(url.toLowerCase(), ['bitbucket', 'https://bitbucket.org']),
+	matches: (url) =>
+		startsWithOneOf(url.toLowerCase(), ['bitbucket', 'https://bitbucket.org']) !== undefined,
 
 	parse: (url, opts) => {
 		const parsed = parseUrl(url, opts);

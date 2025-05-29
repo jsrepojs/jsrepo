@@ -329,7 +329,7 @@ export async function connectServer() {
 						content: [
 							{
 								type: 'text',
-								text: JSON.stringify(response),
+								text: JSON.stringify({ ...response, cliReference: cliReference() }),
 							},
 						],
 					};
@@ -343,7 +343,7 @@ export async function connectServer() {
 						content: [
 							{
 								type: 'text',
-								text: JSON.stringify(response),
+								text: JSON.stringify({ ...response, cliReference: cliReference() }),
 							},
 						],
 					};
@@ -357,7 +357,7 @@ export async function connectServer() {
 						content: [
 							{
 								type: 'text',
-								text: JSON.stringify(response),
+								text: JSON.stringify({ ...response, cliReference: cliReference() }),
 							},
 						],
 					};
