@@ -239,29 +239,30 @@ async function getConfigFiles({ registry: repo, requiredOnly = false }: GetConfi
 	};
 }
 
-const discoverRegistriesTool: Tool = {
-	name: 'discover-registries',
+const searchRegistriesTool: Tool = {
+	name: 'search-registries',
 	description:
-		'Searches jsrepo.com for registries that could include components the user needs in their project.',
+		'Search jsrepo.com for registries that could include components the user needs in their project.',
 	inputSchema: {
 		type: 'object',
 		properties: {
-			primaryLanguage: {
+			query: {
+				description: 'A term to search for the registries by.',
 				type: 'string',
-				description:
-					'File extension of the primary language of the registry. i.e. TypeScript -> ts, React -> tsx/jsx',
 			},
 		},
-		required: ['primaryLanguage'],
+		required: ['query'],
 	},
 };
 
-interface DiscoverRegistriesArgs {
-	primaryLanguage: string;
+interface SearchRegistriesArgs {
+	query: string;
 }
 
-async function discoverRegistries({ primaryLanguage }: DiscoverRegistriesArgs) {
-	const response = await iFetch(`${jsrepo.BASE_URL}/api/registries?lang=${primaryLanguage}`);
+async function searchRegistries({ query }: SearchRegistriesArgs) {
+	const response = await iFetch(
+		`${jsrepo.BASE_URL}/api/registries?order_by=most_popular&q=${query}`
+	);
 
 	if (!response.ok) return [];
 
@@ -342,18 +343,16 @@ export async function connectServer() {
 						content: [
 							{
 								type: 'text',
-								text: `
-								Available components:
-								${response.components.map((c) => `- ${c}`).join('\n')}
-								Add a components to your project with:
-								- jsrepo add <component> -y -A
-								Add multiple components to your project in parallel with:
-								- jsrepo add <component> <component> ... -y -A
-								Update existing components with:
-								- jsrepo update <component> -y -A
-								Update multiple components with:
-								- jsrepo update <component> <component> ... -y -A
-								`,
+								text: `Available components:
+${JSON.stringify(response.components)}
+Add a component to your project with:
+jsrepo add ${response.components[0]} -y -A
+Add multiple components to your project in parallel with:
+jsrepo add ${response.components[0]} ${response.components[1] ?? response.components[0]} ... -y -A
+Update existing components with:
+jsrepo update ${response.components[0]} -y -A
+Update multiple components with:
+jsrepo update ${response.components[0]} ${response.components[1] ?? response.components[0]} ... -y -A`,
 							},
 						],
 					};
@@ -386,10 +385,10 @@ export async function connectServer() {
 						],
 					};
 				}
-				case 'discover-registries': {
-					const args = request.params.arguments as unknown as DiscoverRegistriesArgs;
+				case 'search-registries': {
+					const args = request.params.arguments as unknown as SearchRegistriesArgs;
 
-					const response = await discoverRegistries(args);
+					const response = await searchRegistries(args);
 
 					return {
 						content: [
@@ -439,7 +438,7 @@ export async function connectServer() {
 				listComponentsTool,
 				getComponentCodeTool,
 				getConfigFilesTool,
-				discoverRegistriesTool,
+				searchRegistriesTool,
 				cliReferenceTool,
 			],
 		};
