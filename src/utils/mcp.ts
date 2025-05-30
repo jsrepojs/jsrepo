@@ -11,6 +11,7 @@ import { cli } from '../cli';
 import { preloadBlocks } from './blocks';
 import * as array from './blocks/ts/array';
 import * as url from './blocks/ts/url';
+import { getProjectConfig } from './config';
 import { packageJson } from './context';
 import { iFetch } from './fetch';
 import * as registry from './registry-providers/internal';
@@ -18,28 +19,53 @@ import * as jsrepo from './registry-providers/jsrepo';
 
 const listComponentsTool: Tool = {
 	name: 'list-components',
-	description: 'Lists all available components/utilities for the provided registries.',
+	description:
+		'Lists all available components/utilities for the provided registries. If registries are not provided tries to use the registries in the users jsrepo.json file.',
 	inputSchema: {
 		type: 'object',
 		properties: {
 			registries: {
 				type: 'array',
 				description:
-					"Registries from the user's jsrepo.json `repos` key or any well-known jsrepo registry.",
+					'Registries to list components from. If not provided will use the registries in the users jsrepo.json file.',
 				items: {
 					type: 'string',
 				},
 			},
+			cwd: {
+				type: 'string',
+				description: 'The current working directory of the users project.',
+			},
 		},
-		required: ['registries'],
+		required: ['cwd'],
 	},
 };
 
 interface ListComponentsArgs {
-	registries: string[];
+	registries?: string[];
+	cwd: string;
 }
 
-async function listComponents(registries: string[]) {
+async function listComponents({ registries, cwd }: ListComponentsArgs) {
+	if (!registries) {
+		const config = getProjectConfig(cwd).match(
+			(v) => v,
+			() => {
+				throw new Error(
+					'Could not find your configuration file! Please provide `registries`.'
+				);
+			}
+		);
+
+		if (config.repos.length === 0) {
+			throw new Error(
+				'No registries (repos) in your configuration file! Please provide `registries`.'
+			);
+		}
+
+		registries = config.repos;
+	}
+
 	const states = (await registry.forEachPathGetProviderState(registries)).match(
 		(v) => v,
 		(err) => {
@@ -57,20 +83,7 @@ async function listComponents(registries: string[]) {
 	return {
 		components: array
 			.fromMap(components, (_, v) => v)
-			.map((c) => {
-				const name = `${c.category}/${c.name}`;
-				const fullName = url.join(c.sourceRepo.url, name);
-
-				return {
-					fullName: name,
-					...c,
-					sourceRepo: undefined,
-					commands: {
-						add: `jsrepo add ${fullName} -y -A`,
-						update: `jsrepo update ${fullName} -y -A`,
-					},
-				};
-			}),
+			.map((c) => url.join(c.sourceRepo.url, `${c.category}/${c.name}`)),
 	};
 }
 
@@ -151,6 +164,7 @@ async function getComponentCode({ component, includeTests = false }: GetComponen
 		files,
 		commands: {
 			add: `jsrepo add ${component} -y -A`,
+			addMultiple: `jsrepo add ${component} ... -y -A`,
 			update: `jsrepo update ${component} -y -A`,
 		},
 	};
@@ -165,8 +179,7 @@ const getConfigFilesTool: Tool = {
 		properties: {
 			registry: {
 				type: 'string',
-				description:
-					'Registry to list components from. (If not provided will return all for the current config file.)',
+				description: 'Registry to list config files from.',
 				examples: [
 					'@ieedan/std',
 					'github/ieedan/std',
@@ -323,13 +336,24 @@ export async function connectServer() {
 				case 'list-components': {
 					const args = request.params.arguments as unknown as ListComponentsArgs;
 
-					const response = await listComponents(args.registries);
+					const response = await listComponents(args);
 
 					return {
 						content: [
 							{
 								type: 'text',
-								text: JSON.stringify({ ...response, cliReference: cliReference() }),
+								text: `
+								Available components:
+								${response.components.map((c) => `- ${c}`).join('\n')}
+								Add a components to your project with:
+								- jsrepo add <component> -y -A
+								Add multiple components to your project in parallel with:
+								- jsrepo add <component> <component> ... -y -A
+								Update existing components with:
+								- jsrepo update <component> -y -A
+								Update multiple components with:
+								- jsrepo update <component> <component> ... -y -A
+								`,
 							},
 						],
 					};
@@ -343,7 +367,7 @@ export async function connectServer() {
 						content: [
 							{
 								type: 'text',
-								text: JSON.stringify({ ...response, cliReference: cliReference() }),
+								text: JSON.stringify(response),
 							},
 						],
 					};
@@ -357,7 +381,7 @@ export async function connectServer() {
 						content: [
 							{
 								type: 'text',
-								text: JSON.stringify({ ...response, cliReference: cliReference() }),
+								text: JSON.stringify(response),
 							},
 						],
 					};
