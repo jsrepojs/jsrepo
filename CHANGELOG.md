@@ -1,5 +1,10 @@
 # jsrepo
 
+## 2.3.1
+### Patch Changes
+
+- 0b297be: feat(mcp): Tool improvements and optimizations
+
 ## 2.3.0
 ### Minor Changes
 
