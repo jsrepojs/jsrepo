@@ -11,11 +11,11 @@ import { cli } from '../cli';
 import { preloadBlocks } from './blocks';
 import * as array from './blocks/ts/array';
 import * as url from './blocks/ts/url';
+import { getProjectConfig } from './config';
 import { packageJson } from './context';
 import { iFetch } from './fetch';
 import * as registry from './registry-providers/internal';
 import * as jsrepo from './registry-providers/jsrepo';
-import { getProjectConfig } from './config';
 
 const listComponentsTool: Tool = {
 	name: 'list-components',
@@ -27,7 +27,7 @@ const listComponentsTool: Tool = {
 			registries: {
 				type: 'array',
 				description:
-					"Registries from the user's jsrepo.json `repos` key or any well-known jsrepo registry.",
+					'Registries to list components from. If not provided will use the registries in the users jsrepo.json file.',
 				items: {
 					type: 'string',
 				},
@@ -83,21 +83,7 @@ async function listComponents({ registries, cwd }: ListComponentsArgs) {
 	return {
 		components: array
 			.fromMap(components, (_, v) => v)
-			.map((c) => {
-				const name = `${c.category}/${c.name}`;
-				const fullName = url.join(c.sourceRepo.url, name);
-
-				return {
-					fullName: name,
-					...c,
-					sourceRepo: undefined,
-					commands: {
-						add: `jsrepo add ${fullName} -y -A`,
-						addMultiple: `jsrepo add ${fullName} ... -y -A`,
-						update: `jsrepo update ${fullName} -y -A`,
-					},
-				};
-			}),
+			.map((c) => url.join(c.sourceRepo.url, `${c.category}/${c.name}`)),
 	};
 }
 
@@ -356,7 +342,18 @@ export async function connectServer() {
 						content: [
 							{
 								type: 'text',
-								text: JSON.stringify(response),
+								text: `
+								Available components:
+								${response.components.map((c) => `- ${c}`).join('\n')}
+								Add a components to your project with:
+								- jsrepo add <component> -y -A
+								Add multiple components to your project in parallel with:
+								- jsrepo add <component> <component> ... -y -A
+								Update existing components with:
+								- jsrepo update <component> -y -A
+								Update multiple components with:
+								- jsrepo update <component> <component> ... -y -A
+								`,
 							},
 						],
 					};
