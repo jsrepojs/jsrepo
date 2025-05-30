@@ -15,10 +15,12 @@ import { packageJson } from './context';
 import { iFetch } from './fetch';
 import * as registry from './registry-providers/internal';
 import * as jsrepo from './registry-providers/jsrepo';
+import { getProjectConfig } from './config';
 
 const listComponentsTool: Tool = {
 	name: 'list-components',
-	description: 'Lists all available components/utilities for the provided registries.',
+	description:
+		'Lists all available components/utilities for the provided registries. If registries are not provided tries to use the registries in the users jsrepo.json file.',
 	inputSchema: {
 		type: 'object',
 		properties: {
@@ -30,16 +32,40 @@ const listComponentsTool: Tool = {
 					type: 'string',
 				},
 			},
+			cwd: {
+				type: 'string',
+				description: 'The current working directory of the users project.',
+			},
 		},
-		required: ['registries'],
+		required: ['cwd'],
 	},
 };
 
 interface ListComponentsArgs {
-	registries: string[];
+	registries?: string[];
+	cwd: string;
 }
 
-async function listComponents(registries: string[]) {
+async function listComponents({ registries, cwd }: ListComponentsArgs) {
+	if (!registries) {
+		const config = getProjectConfig(cwd).match(
+			(v) => v,
+			() => {
+				throw new Error(
+					'Could not find your configuration file! Please provide `registries`.'
+				);
+			}
+		);
+
+		if (config.repos.length === 0) {
+			throw new Error(
+				'No registries (repos) in your configuration file! Please provide `registries`.'
+			);
+		}
+
+		registries = config.repos;
+	}
+
 	const states = (await registry.forEachPathGetProviderState(registries)).match(
 		(v) => v,
 		(err) => {
@@ -323,7 +349,7 @@ export async function connectServer() {
 				case 'list-components': {
 					const args = request.params.arguments as unknown as ListComponentsArgs;
 
-					const response = await listComponents(args.registries);
+					const response = await listComponents(args);
 
 					return {
 						content: [
