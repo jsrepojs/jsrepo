@@ -1,5 +1,10 @@
 # jsrepo
 
+## 2.3.2
+### Patch Changes
+
+- 6cb32f0: feat(mcp): Optimizations and improvements
+
 ## 2.3.1
 ### Patch Changes
 
