@@ -385,7 +385,7 @@ jsrepo update ${response.components[0]} ${response.components[1] ?? response.com
 						],
 					};
 				}
-				case 'discover-registries': {
+				case 'search-registries': {
 					const args = request.params.arguments as unknown as SearchRegistriesArgs;
 
 					const response = await searchRegistries(args);
