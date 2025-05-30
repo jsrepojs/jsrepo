@@ -239,10 +239,10 @@ async function getConfigFiles({ registry: repo, requiredOnly = false }: GetConfi
 	};
 }
 
-const discoverRegistriesTool: Tool = {
-	name: 'discover-registries',
+const searchRegistriesTool: Tool = {
+	name: 'search-registries',
 	description:
-		'Searches jsrepo.com for registries that could include components the user needs in their project.',
+		'Search jsrepo.com for registries that could include components the user needs in their project.',
 	inputSchema: {
 		type: 'object',
 		properties: {
@@ -255,11 +255,11 @@ const discoverRegistriesTool: Tool = {
 	},
 };
 
-interface DiscoverRegistriesArgs {
+interface SearchRegistriesArgs {
 	query: string;
 }
 
-async function discoverRegistries({ query }: DiscoverRegistriesArgs) {
+async function searchRegistries({ query }: SearchRegistriesArgs) {
 	const response = await iFetch(
 		`${jsrepo.BASE_URL}/api/registries?order_by=most_popular&q=${query}`
 	);
@@ -386,9 +386,9 @@ jsrepo update ${response.components[0]} ${response.components[1] ?? response.com
 					};
 				}
 				case 'discover-registries': {
-					const args = request.params.arguments as unknown as DiscoverRegistriesArgs;
+					const args = request.params.arguments as unknown as SearchRegistriesArgs;
 
-					const response = await discoverRegistries(args);
+					const response = await searchRegistries(args);
 
 					return {
 						content: [
@@ -438,7 +438,7 @@ jsrepo update ${response.components[0]} ${response.components[1] ?? response.com
 				listComponentsTool,
 				getComponentCodeTool,
 				getConfigFilesTool,
-				discoverRegistriesTool,
+				searchRegistriesTool,
 				cliReferenceTool,
 			],
 		};
