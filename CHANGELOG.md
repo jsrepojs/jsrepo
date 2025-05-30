@@ -1,5 +1,10 @@
 # jsrepo
 
+## 2.3.0
+### Minor Changes
+
+- de1aaca: feat: Allow registry owners to configure default paths for their users
+
 ## 2.2.2
 ### Patch Changes
 
