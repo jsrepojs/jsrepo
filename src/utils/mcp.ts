@@ -93,6 +93,7 @@ async function listComponents({ registries, cwd }: ListComponentsArgs) {
 					sourceRepo: undefined,
 					commands: {
 						add: `jsrepo add ${fullName} -y -A`,
+						addMultiple: `jsrepo add ${fullName} ... -y -A`,
 						update: `jsrepo update ${fullName} -y -A`,
 					},
 				};
@@ -177,6 +178,7 @@ async function getComponentCode({ component, includeTests = false }: GetComponen
 		files,
 		commands: {
 			add: `jsrepo add ${component} -y -A`,
+			addMultiple: `jsrepo add ${component} ... -y -A`,
 			update: `jsrepo update ${component} -y -A`,
 		},
 	};
@@ -191,8 +193,7 @@ const getConfigFilesTool: Tool = {
 		properties: {
 			registry: {
 				type: 'string',
-				description:
-					'Registry to list components from. (If not provided will return all for the current config file.)',
+				description: 'Registry to list config files from.',
 				examples: [
 					'@ieedan/std',
 					'github/ieedan/std',
@@ -355,7 +356,7 @@ export async function connectServer() {
 						content: [
 							{
 								type: 'text',
-								text: JSON.stringify({ ...response, cliReference: cliReference() }),
+								text: JSON.stringify(response),
 							},
 						],
 					};
@@ -369,7 +370,7 @@ export async function connectServer() {
 						content: [
 							{
 								type: 'text',
-								text: JSON.stringify({ ...response, cliReference: cliReference() }),
+								text: JSON.stringify(response),
 							},
 						],
 					};
@@ -383,7 +384,7 @@ export async function connectServer() {
 						content: [
 							{
 								type: 'text',
-								text: JSON.stringify({ ...response, cliReference: cliReference() }),
+								text: JSON.stringify(response),
 							},
 						],
 					};
