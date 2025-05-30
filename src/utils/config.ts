@@ -69,6 +69,7 @@ export const registryConfigSchema = v.object({
 	readme: v.optional(v.string(), 'README.md'),
 	access: v.optional(accessLevel),
 	meta: v.optional(manifestMeta),
+	defaultPaths: v.optional(v.record(v.string(), v.string())),
 	peerDependencies: v.optional(peerDependencySchema),
 	configFiles: v.optional(v.array(configFileSchema)),
 	dirs: v.array(v.string()),
