@@ -246,22 +246,23 @@ const discoverRegistriesTool: Tool = {
 	inputSchema: {
 		type: 'object',
 		properties: {
-			primaryLanguage: {
+			query: {
+				description: 'A term to search for the registries by.',
 				type: 'string',
-				description:
-					'File extension of the primary language of the registry. i.e. TypeScript -> ts, React -> tsx/jsx',
 			},
 		},
-		required: ['primaryLanguage'],
+		required: ['query'],
 	},
 };
 
 interface DiscoverRegistriesArgs {
-	primaryLanguage: string;
+	query: string;
 }
 
-async function discoverRegistries({ primaryLanguage }: DiscoverRegistriesArgs) {
-	const response = await iFetch(`${jsrepo.BASE_URL}/api/registries?lang=${primaryLanguage}&order_by=most_popular`);
+async function discoverRegistries({ query }: DiscoverRegistriesArgs) {
+	const response = await iFetch(
+		`${jsrepo.BASE_URL}/api/registries?order_by=most_popular&q=${query}`
+	);
 
 	if (!response.ok) return [];
 
