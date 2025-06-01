@@ -179,8 +179,7 @@ async function _build(options: Options) {
 		// just continue on
 	}
 
-	ig.add(IGNORED_DIRS);
-	ig.add(IGNORED_FILES);
+	ig.add([...IGNORED_DIRS, ...IGNORED_FILES]);
 
 	for (const dir of config.dirs) {
 		const dirPath = path.join(options.cwd, dir);
