@@ -17,6 +17,9 @@ import { tryGetTsconfig } from './files';
 /** sensible defaults for ignored directories */
 export const IGNORED_DIRS = ['.git', 'node_modules'] as const;
 
+/** system files that should be ignored by default */
+export const IGNORED_FILES = ['.DS_Store'] as const;
+
 export const PROJECT_CONFIG_NAME = 'jsrepo.json';
 export const REGISTRY_CONFIG_NAME = 'jsrepo-build-config.json';
 
