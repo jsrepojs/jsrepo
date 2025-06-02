@@ -1,5 +1,10 @@
 # jsrepo
 
+## 2.3.3
+### Patch Changes
+
+- b59bdc5: fix: Ignore `.DS_Store` files in build.
+
 ## 2.3.2
 ### Patch Changes
 
