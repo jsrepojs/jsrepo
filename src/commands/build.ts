@@ -10,7 +10,7 @@ import type { Category } from '../types';
 import * as ascii from '../utils/ascii';
 import { buildBlocksDirectory, buildConfigFiles, pruneUnused } from '../utils/build';
 import { DEFAULT_CONFIG, runRules } from '../utils/build/check';
-import { IGNORED_DIRS, IGNORED_FILES, type RegistryConfig, getRegistryConfig } from '../utils/config';
+import { IGNORES, type RegistryConfig, getRegistryConfig } from '../utils/config';
 import { createManifest, parseManifest } from '../utils/manifest';
 import { intro, spinner } from '../utils/prompts';
 
@@ -179,7 +179,7 @@ async function _build(options: Options) {
 		// just continue on
 	}
 
-	ig.add([...IGNORED_DIRS, ...IGNORED_FILES]);
+	ig.add(IGNORES);
 
 	for (const dir of config.dirs) {
 		const dirPath = path.join(options.cwd, dir);

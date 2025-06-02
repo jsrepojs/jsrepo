@@ -81,7 +81,7 @@ export function buildBlocksDirectory(
 		for (const file of files) {
 			const blockDir = path.join(categoryDir, file);
 			const relativePath = path.relative(cwd, blockDir);
-			
+
 			if (ignore.ignores(relativePath)) continue;
 
 			if (fs.statSync(blockDir).isFile()) {
