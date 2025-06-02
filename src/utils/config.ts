@@ -14,8 +14,8 @@ import { Err, Ok, type Result } from './blocks/ts/result';
 import { ruleConfigSchema } from './build/check';
 import { tryGetTsconfig } from './files';
 
-/** sensible defaults for ignored directories */
-export const IGNORED_DIRS = ['.git', 'node_modules'] as const;
+/** Files and directories ignore by default during build/publish */
+export const IGNORES = ['.git', 'node_modules', '.DS_Store'] as const;
 
 export const PROJECT_CONFIG_NAME = 'jsrepo.json';
 export const REGISTRY_CONFIG_NAME = 'jsrepo-build-config.json';
