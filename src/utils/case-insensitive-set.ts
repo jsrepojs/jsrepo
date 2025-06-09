@@ -54,6 +54,8 @@ export class CaseInsensitiveSet<T extends string> {
 
 	/**
 	 * Removes all values from the set.
+	 *
+	 * @returns void
 	 */
 	clear(): void {
 		this._items.clear();
@@ -76,7 +78,7 @@ export class CaseInsensitiveSet<T extends string> {
 	 * @param thisArg - Optional value to use as 'this' in the callback
 	 */
 	forEach(
-		callbackfn: (value: T, value2: T, set: CaseInsensitiveSet<T>) => void,
+		callbackfn: (value: T, _value2: T, set: CaseInsensitiveSet<T>) => void,
 		thisArg?: unknown
 	): void {
 		for (const value of this._items.values()) {
