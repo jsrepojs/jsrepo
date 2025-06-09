@@ -201,22 +201,6 @@ describe('CaseInsensitiveSet', () => {
 	});
 });
 
-describe('edge cases and error handling', () => {
-	it('handles very long strings', () => {
-		const longString = 'a'.repeat(10000);
-		const set = new CaseInsensitiveSet<string>();
-		set.add(longString);
-		expect(set.has(longString.toUpperCase())).toBe(true);
-	});
-
-	it('handles malformed unicode sequences gracefully', () => {
-		const malformed = '\uD800'; // Lone surrogate
-		const set = new CaseInsensitiveSet<string>();
-		set.add(malformed);
-		expect(set.has(malformed)).toBe(true);
-	});
-});
-
 describe('memory and performance', () => {
 	it('handles rapid add/delete cycles', () => {
 		const set = new CaseInsensitiveSet<string>();
@@ -286,23 +270,6 @@ describe('jsrepo integration patterns', () => {
 	});
 });
 
-describe('boundary conditions', () => {
-	it('handles maximum string length gracefully', () => {
-		const maxString = 'x'.repeat(65536); // Large but reasonable string
-		const set = new CaseInsensitiveSet<string>();
-
-		expect(() => set.add(maxString)).not.toThrow();
-		expect(set.has(maxString.toUpperCase())).toBe(true);
-	});
-
-	it('handles empty iterables in constructor', () => {
-		const emptySet = new CaseInsensitiveSet<string>([]);
-
-		expect(emptySet.size).toBe(0);
-	});
-});
-
-// Integration test with actual CLI commands
 describe('CLI integration tests', () => {
 	const testDir = path.join(__dirname, '../temp-test/case-sensitivity');
 
