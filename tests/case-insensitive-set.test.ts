@@ -272,6 +272,7 @@ describe('jsrepo integration patterns', () => {
 
 describe('CLI integration tests', () => {
 	const testDir = path.join(__dirname, '../temp-test/case-sensitivity');
+	const originalCWD = process.cwd();
 
 	beforeAll(() => {
 		if (fs.existsSync(testDir)) {
@@ -282,7 +283,7 @@ describe('CLI integration tests', () => {
 	});
 
 	afterAll(() => {
-		process.chdir(__dirname);
+		process.chdir(originalCWD);
 		if (fs.existsSync(testDir)) {
 			fs.rmSync(testDir, { recursive: true });
 		}
