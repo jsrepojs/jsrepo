@@ -163,7 +163,7 @@ describe('CaseInsensitiveSet', () => {
 			const set = new CaseInsensitiveSet<string>(['test']);
 			const context = { prefix: 'Hello: ' };
 
-			// biome-ignore lint/complexity/noForEach: <explanation>
+			// biome-ignore lint/complexity/noForEach: Testing the behavior of forEach with a custom thisArg
 			set.forEach(function (this: typeof context) {
 				expect(this.prefix).toBe('Hello: ');
 			}, context);
