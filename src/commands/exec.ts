@@ -82,6 +82,7 @@ export async function _exec(s: string | undefined, options: Options, command: an
 		config = {
 			$schema: '',
 			includeTests: false,
+			includeDocs: false,
 			watermark: true,
 			paths: {
 				'*': './',

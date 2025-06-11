@@ -35,6 +35,7 @@ const schema = v.object({
 	doNotListBlocks: v.optional(v.array(v.string())),
 	doNotListCategories: v.optional(v.array(v.string())),
 	allowSubdirectories: v.optional(v.boolean()),
+	includeDocs: v.optional(v.boolean()),
 	verbose: v.boolean(),
 	cwd: v.string(),
 });
@@ -71,6 +72,7 @@ export const publish = new Command('publish')
 	)
 	.option('--exclude-deps [deps...]', 'Dependencies that should not be added.')
 	.option('--allow-subdirectories', 'Allow subdirectories to be built.')
+	.option('--include-docs', 'Include documentation files (*.md, *.mdx) in the registry.')
 	.option('--verbose', 'Include debug logs.', false)
 	.option('--cwd <path>', 'The current working directory.', process.cwd())
 	.action(async (opts) => {
@@ -110,6 +112,7 @@ async function _publish(options: Options) {
 					excludeBlocks: options.excludeBlocks ?? [],
 					excludeCategories: options.excludeCategories ?? [],
 					allowSubdirectories: options.allowSubdirectories,
+					includeDocs: options.includeDocs ?? false,
 				} satisfies RegistryConfig;
 			}
 
@@ -133,6 +136,7 @@ async function _publish(options: Options) {
 			if (options.excludeDeps) mergedVal.excludeDeps = options.excludeDeps;
 			if (options.allowSubdirectories !== undefined)
 				mergedVal.allowSubdirectories = options.allowSubdirectories;
+			if (options.includeDocs !== undefined) mergedVal.includeDocs = options.includeDocs;
 
 			mergedVal.rules = { ...DEFAULT_CONFIG, ...mergedVal.rules };
 

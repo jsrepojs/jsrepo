@@ -6,6 +6,7 @@ import path from 'pathe';
 import * as v from 'valibot';
 import { type Block, type Category, type Manifest, categorySchema } from '../../types';
 import * as ascii from '../ascii';
+import * as strings from '../blocks/ts/strings';
 import type { RegistryConfig } from '../config';
 import { languages } from '../language-support';
 import { isDependedOn } from './check';
@@ -25,8 +26,14 @@ const TEST_SUFFIXES = [
 	'_stories.tsx',
 ] as const;
 
+const DOCS_SUFFIXES = ['.mdx', '.md'] as const;
+
 export function isTestFile(file: string): boolean {
-	return TEST_SUFFIXES.find((suffix) => file.endsWith(suffix)) !== undefined;
+	return strings.endsWithOneOf(file, TEST_SUFFIXES) !== undefined;
+}
+
+export function isDocsFile(file: string): boolean {
+	return strings.endsWithOneOf(file, DOCS_SUFFIXES) !== undefined;
 }
 
 type Options = {
@@ -87,6 +94,16 @@ export function buildBlocksDirectory(
 			if (fs.statSync(blockDir).isFile()) {
 				if (isTestFile(file)) continue;
 
+				if (isDocsFile(file)) {
+					if (!config.includeDocs) {
+						console.warn(
+							`${ascii.VERTICAL_LINE}  ${ascii.WARN} Documentation files (*.md, *.mdx) are not included by default include them with ${color.bold('--include-docs')}!`
+						);
+					}
+
+					continue;
+				}
+
 				const name = transformBlockName(file);
 
 				const listBlock = shouldListBlock(name, config);
@@ -111,6 +128,11 @@ export function buildBlocksDirectory(
 					TEST_SUFFIXES.find((suffix) => f === `${name}${suffix}`)
 				);
 
+				// tries to find a docs file with the same name as the file
+				const docsPath = files.find((f) =>
+					DOCS_SUFFIXES.find((suffix) => f === `${name}${suffix}`)
+				);
+
 				const { dependencies, devDependencies, local, imports } = lang
 					.resolveDependencies({
 						filePath: blockDir,
@@ -131,6 +153,7 @@ export function buildBlocksDirectory(
 					directory: path.relative(cwd, categoryDir),
 					category: categoryName,
 					tests: testsPath !== undefined,
+					docs: docsPath !== undefined,
 					subdirectory: false,
 					list: listCategory ? listBlock : false,
 					files: [file],
@@ -141,9 +164,10 @@ export function buildBlocksDirectory(
 				};
 
 				// if test file exists add the file
-				if (testsPath !== undefined) {
-					block.files.push(testsPath);
-				}
+				if (testsPath !== undefined) block.files.push(testsPath);
+
+				// if docs file exists add the file
+				if (docsPath !== undefined) block.files.push(docsPath);
 
 				category.blocks.push(block);
 			} else {
@@ -159,6 +183,7 @@ export function buildBlocksDirectory(
 				const imports: Record<string, string> = {};
 
 				let hasTests = false;
+				let hasDocs = false;
 
 				const blockFiles: string[] = [];
 
@@ -172,6 +197,18 @@ export function buildBlocksDirectory(
 						if (isTestFile(f)) {
 							hasTests = true;
 
+							blockFiles.push(relativeFilePath);
+							continue;
+						}
+
+						if (isDocsFile(f)) {
+							if (!config.includeDocs) {
+								console.warn(
+									`${ascii.VERTICAL_LINE}  ${ascii.WARN} Documentation files (*.md, *.mdx) are not included by default include them with ${color.bold('--include-docs')}!`
+								);
+							}
+
+							hasDocs = true;
 							blockFiles.push(relativeFilePath);
 							continue;
 						}
@@ -253,6 +290,7 @@ export function buildBlocksDirectory(
 					directory: path.relative(cwd, blockDir),
 					category: categoryName,
 					tests: hasTests,
+					docs: hasDocs,
 					subdirectory: true,
 					list: listCategory ? listBlock : false,
 					files: blockFiles,

@@ -36,6 +36,7 @@ import * as registry from '../utils/registry-providers/internal';
 const schema = v.object({
 	watermark: v.optional(v.boolean()),
 	tests: v.optional(v.boolean()),
+	docs: v.optional(v.boolean()),
 	formatter: v.optional(v.union([v.literal('prettier'), v.literal('biome'), v.literal('none')])),
 	paths: v.optional(v.record(v.string(), v.string())),
 	expand: v.boolean(),
@@ -70,6 +71,11 @@ export const add = new Command('add')
 	)
 	.addOption(
 		new Option('--tests <choice>', 'Include tests when adding blocks.')
+			.choices(['true', 'false'])
+			.argParser((val) => val === 'true')
+	)
+	.addOption(
+		new Option('--docs <choice>', 'Include docs when adding blocks.')
 			.choices(['true', 'false'])
 			.argParser((val) => val === 'true')
 	)
@@ -146,6 +152,7 @@ async function _add(blockNames: string[], options: Options) {
 		config = {
 			$schema: '',
 			includeTests: false,
+			includeDocs: false,
 			watermark: true,
 			paths: {
 				'*': './src/blocks',
@@ -162,6 +169,7 @@ async function _add(blockNames: string[], options: Options) {
 			: config.formatter;
 	config.watermark = options.watermark !== undefined ? options.watermark : config.watermark;
 	config.includeTests = options.tests !== undefined ? options.tests : config.includeTests;
+	config.includeDocs = options.docs !== undefined ? options.docs : config.includeDocs;
 	config.paths =
 		options.paths !== undefined ? { ...config.paths, ...options.paths } : config.paths;
 

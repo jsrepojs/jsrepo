@@ -103,6 +103,11 @@ const getComponentCodeTool: Tool = {
 				description: 'Should tests be included with the component code.',
 				default: false,
 			},
+			includeDocs: {
+				type: 'boolean',
+				description: 'Should docs be included with the component code.',
+				default: false,
+			},
 		},
 		required: ['component'],
 	},
@@ -111,9 +116,14 @@ const getComponentCodeTool: Tool = {
 interface GetComponentCodeArgs {
 	component: string;
 	includeTests?: boolean;
+	includeDocs?: boolean;
 }
 
-async function getComponentCode({ component, includeTests = false }: GetComponentCodeArgs) {
+async function getComponentCode({
+	component,
+	includeTests = false,
+	includeDocs = false,
+}: GetComponentCodeArgs) {
 	const provider = registry.selectProvider(component);
 
 	if (!provider) {
@@ -152,7 +162,7 @@ async function getComponentCode({ component, includeTests = false }: GetComponen
 		throw new Error(`${specifier} does not exist in ${repo}`);
 	}
 
-	const preloaded = preloadBlocks([block], { includeTests });
+	const preloaded = preloadBlocks([block], { includeTests, includeDocs });
 
 	const files = (await Promise.all(preloaded.map((p) => p.files))).flatMap((p) => [
 		...p.map((f) => ({ name: f.name, content: f.content.unwrapOr('<FETCH ERROR>') })),

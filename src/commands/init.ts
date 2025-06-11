@@ -51,6 +51,7 @@ const schema = v.object({
 	repos: v.optional(v.array(v.string())),
 	watermark: v.boolean(),
 	tests: v.optional(v.boolean()),
+	docs: v.optional(v.boolean()),
 	formatter: v.optional(formatterSchema),
 	paths: v.optional(v.record(v.string(), v.string())),
 	configFiles: v.optional(v.record(v.string(), v.string())),
@@ -76,6 +77,7 @@ const init = new Command('init')
 		'Will not add a watermark to each file upon adding it to your project.'
 	)
 	.option('--tests', 'Will include tests with the blocks.')
+	.option('--docs', 'Will include docs with the blocks.')
 	.addOption(
 		new Option(
 			'--formatter <formatter>',
@@ -369,6 +371,10 @@ const _initProject = async (registries: string[], options: Options) => {
 			initialConfig.isOk() && options.tests === undefined
 				? initialConfig.unwrap().includeTests
 				: (options.tests ?? false),
+		includeDocs:
+			initialConfig.isOk() && options.docs === undefined
+				? initialConfig.unwrap().includeDocs
+				: (options.docs ?? false),
 		watermark: options.watermark,
 		formatter: options.formatter,
 		configFiles,
@@ -778,6 +784,7 @@ const _initRegistry = async (options: Options) => {
 			excludeBlocks: [],
 			excludeCategories: [],
 			preview: false,
+			includeDocs: false,
 		};
 	}
 

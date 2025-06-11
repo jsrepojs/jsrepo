@@ -209,6 +209,11 @@
 			"type": "boolean",
 			"default": false
 		},
+		"includeDocs": {
+			"description": "Include documentation files (*.md, *.mdx) in the registry.",
+			"type": "boolean",
+			"default": false
+		},
 		"rules": {
 			"description": "Configure rules when checking manifest after build.",
 			"type": "object",

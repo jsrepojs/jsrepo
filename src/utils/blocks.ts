@@ -6,7 +6,7 @@ import type { Block } from '../types';
 import * as array from './blocks/ts/array';
 import { Err, Ok, type Result } from './blocks/ts/result';
 import * as url from './blocks/ts/url';
-import { isTestFile } from './build';
+import { isDocsFile, isTestFile } from './build';
 import { type Paths, type ProjectConfig, getPathForBlock, resolvePaths } from './config';
 import * as registry from './registry-providers/internal';
 
@@ -148,15 +148,19 @@ type PreloadedBlock = {
  */
 export function preloadBlocks(
 	blocks: registry.RemoteBlock[],
-	config: Pick<ProjectConfig, 'includeTests'>
+	config: Pick<ProjectConfig, 'includeTests' | 'includeDocs'>
 ): PreloadedBlock[] {
 	const preloaded: PreloadedBlock[] = [];
 
 	for (const block of blocks) {
-		// filters out test files if they are not supposed to be included
-		const includedFiles = block.files.filter((file) =>
-			isTestFile(file) ? config.includeTests : true
-		);
+		// filters out test/docs files if they are not supposed to be included
+		const includedFiles = block.files.filter((file) => {
+			if (isTestFile(file) && !config.includeTests) return false;
+
+			if (isDocsFile(file) && !config.includeDocs) return false;
+
+			return true;
+		});
 
 		const files = Promise.all(
 			includedFiles.map(async (file) => {

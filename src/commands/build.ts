@@ -28,6 +28,7 @@ const schema = v.object({
 	doNotListCategories: v.optional(v.array(v.string())),
 	allowSubdirectories: v.optional(v.boolean()),
 	preview: v.optional(v.boolean()),
+	includeDocs: v.optional(v.boolean()),
 	output: v.boolean(),
 	verbose: v.boolean(),
 	cwd: v.string(),
@@ -62,6 +63,7 @@ const build = new Command('build')
 	.option('--exclude-deps [deps...]', 'Dependencies that should not be added.')
 	.option('--allow-subdirectories', 'Allow subdirectories to be built.')
 	.option('--preview', 'Display a preview of the blocks list.')
+	.option('--include-docs', 'Include docs files (*.mdx, *.md) in the registry.')
 	.option('--no-output', `Do not output a \`${MANIFEST_FILE}\` file.`)
 	.option('--verbose', 'Include debug logs.', false)
 	.option('--cwd <path>', 'The current working directory.', process.cwd())
@@ -105,6 +107,7 @@ async function _build(options: Options) {
 					excludeCategories: options.excludeCategories ?? [],
 					allowSubdirectories: options.allowSubdirectories,
 					preview: options.preview,
+					includeDocs: options.includeDocs ?? false,
 				} satisfies RegistryConfig;
 			}
 
@@ -127,6 +130,7 @@ async function _build(options: Options) {
 			if (options.allowSubdirectories !== undefined)
 				mergedVal.allowSubdirectories = options.allowSubdirectories;
 			if (options.preview !== undefined) mergedVal.preview = options.preview;
+			if (options.includeDocs !== undefined) mergedVal.includeDocs = options.includeDocs;
 
 			mergedVal.rules = { ...DEFAULT_CONFIG, ...mergedVal.rules };
 

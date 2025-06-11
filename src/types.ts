@@ -7,6 +7,7 @@ export const blockSchema = v.object({
 	dependencies: v.array(v.string()),
 	devDependencies: v.array(v.string()),
 	tests: v.boolean(),
+	docs: v.optional(v.boolean(), false),
 	list: v.optional(v.boolean(), true),
 	/** Where to find the block relative to root */
 	directory: v.string(),
