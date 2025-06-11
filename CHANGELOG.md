@@ -1,5 +1,10 @@
 # jsrepo
 
+## 2.4.0
+### Minor Changes
+
+- d13b121: feat: Optionally include documentation files (*.md, *.mdx) in registry
+
 ## 2.3.3
 ### Patch Changes
 
