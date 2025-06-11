@@ -2,7 +2,7 @@
 
 > A CLI to add shared code from remote repositories.
  
-Latest Version: 2.3.3
+Latest Version: 2.4.0
 
 ## Commands
 
@@ -19,6 +19,7 @@ jsrepo add [options] [blocks...]
 - --formatter <choice>: The formatter to use when adding blocks. 
 - --watermark <choice>: Include a watermark at the top of added files. 
 - --tests <choice>: Include tests when adding blocks. 
+- --docs <choice>: Include docs when adding blocks. 
 - --paths <category=path,category=path>: The paths where categories should be added to your project. 
 - -E, --expand: Expands the diff so you see the entire file. 
 - --max-unchanged <number>: Maximum unchanged lines that will show without being collapsed. (default: 3)
@@ -66,6 +67,7 @@ jsrepo build [options]
 - --exclude-deps [deps...]: Dependencies that should not be added. 
 - --allow-subdirectories: Allow subdirectories to be built. 
 - --preview: Display a preview of the blocks list. 
+- --include-docs: Include docs files (*.mdx, *.md) in the registry. 
 - --no-output: Do not output a `jsrepo-manifest.json` file. 
 - --verbose: Include debug logs. 
 - --cwd <path>: The current working directory. (default: ./)
@@ -111,6 +113,7 @@ jsrepo init [options] [registries...]
 - --repos [repos...]: Repository to install the blocks from. (DEPRECATED) 
 - --no-watermark: Will not add a watermark to each file upon adding it to your project. 
 - --tests: Will include tests with the blocks. 
+- --docs: Will include docs with the blocks. 
 - --formatter <formatter>: What formatter to use when adding or updating blocks. 
 - --paths <category=path>,<category=path>: The paths to install the blocks to. (default: [object Object])
 - --config-files <configFile=path>,<configFile=path>: The paths to install the config files to. (default: [object Object])
@@ -161,6 +164,7 @@ jsrepo publish [options]
 - --do-not-list-categories [categoryNames...]: Do not list the categories with these names. 
 - --exclude-deps [deps...]: Dependencies that should not be added. 
 - --allow-subdirectories: Allow subdirectories to be built. 
+- --include-docs: Include documentation files (*.md, *.mdx) in the registry. 
 - --verbose: Include debug logs. 
 - --cwd <path>: The current working directory. (default: ./)
 
