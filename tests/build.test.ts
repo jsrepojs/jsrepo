@@ -73,6 +73,7 @@ describe('build', () => {
 			listCategories: [],
 			excludeDeps: [],
 			allowSubdirectories: true,
+			includeDocs: true,
 		};
 
 		fs.writeFileSync('jsrepo-build-config.json', JSON.stringify(buildConfig));
@@ -142,6 +143,13 @@ export const schema = v.object({});`
 export const add = (a: number, b: number) => a b;
 
 export const logAnswer = (a: number, b: number) => log(\`Answer is: \${add(a, b)}\`);`
+		);
+
+		fs.writeFileSync(
+			'./src/utils/add.md',
+			`# Add
+
+This is a test`
 		);
 
 		fs.writeFileSync(
@@ -247,6 +255,7 @@ export const highlighter = createHighlighterCore({
 							dependencies: ['shiki', '@shikijs/themes', '@shikijs/langs'],
 							devDependencies: [],
 							tests: false,
+							docs: false,
 							list: true,
 							directory: 'src/svelte',
 							subdirectory: false,
@@ -265,6 +274,7 @@ export const highlighter = createHighlighterCore({
 							dependencies: ['shiki', '@shikijs/themes', '@shikijs/langs'],
 							devDependencies: [],
 							tests: false,
+							docs: false,
 							list: true,
 							directory: 'src/ts',
 							subdirectory: false,
@@ -283,6 +293,7 @@ export const highlighter = createHighlighterCore({
 							dependencies: [],
 							devDependencies: [],
 							tests: false,
+							docs: false,
 							list: true,
 							directory: 'src/types',
 							subdirectory: false,
@@ -301,10 +312,11 @@ export const highlighter = createHighlighterCore({
 							dependencies: [],
 							devDependencies: [],
 							tests: false,
+							docs: true,
 							list: true,
 							directory: 'src/utils',
 							subdirectory: false,
-							files: ['add.ts'],
+							files: ['add.ts', 'add.md'],
 							_imports_: {
 								'./log': '{{utils/log}}',
 							},
@@ -316,6 +328,7 @@ export const highlighter = createHighlighterCore({
 							dependencies: ['valibot@1.0.0-beta.14'],
 							devDependencies: [],
 							tests: false,
+							docs: false,
 							list: true,
 							directory: 'src/utils/form1',
 							subdirectory: true,
@@ -329,6 +342,7 @@ export const highlighter = createHighlighterCore({
 							dependencies: ['chalk@^5.3.0'],
 							devDependencies: [],
 							tests: false,
+							docs: false,
 							list: true,
 							directory: 'src/utils',
 							subdirectory: false,
@@ -342,6 +356,7 @@ export const highlighter = createHighlighterCore({
 							dependencies: [],
 							devDependencies: [],
 							tests: false,
+							docs: false,
 							list: true,
 							directory: 'src/utils',
 							subdirectory: false,
@@ -386,76 +401,120 @@ const defaultConfig = {
 
 describe('shouldListBlock', () => {
 	it('lists if unspecified', () => {
-		expect(shouldListBlock('a', { ...defaultConfig })).toBe(true);
+		expect(shouldListBlock('a', { ...defaultConfig, includeDocs: false })).toBe(true);
 	});
 
 	it('lists when should list', () => {
-		expect(shouldListBlock('a', { ...defaultConfig, listBlocks: ['a'] })).toBe(true);
-		expect(shouldListBlock('a', { ...defaultConfig, doNotListBlocks: ['b'] })).toBe(true);
+		expect(
+			shouldListBlock('a', { ...defaultConfig, listBlocks: ['a'], includeDocs: false })
+		).toBe(true);
+		expect(
+			shouldListBlock('a', { ...defaultConfig, doNotListBlocks: ['b'], includeDocs: false })
+		).toBe(true);
 	});
 
 	it('does not list when should not list', () => {
-		expect(shouldListBlock('a', { ...defaultConfig, listBlocks: ['b'] })).toBe(false);
-		expect(shouldListBlock('a', { ...defaultConfig, doNotListBlocks: ['a'] })).toBe(false);
+		expect(
+			shouldListBlock('a', { ...defaultConfig, listBlocks: ['b'], includeDocs: false })
+		).toBe(false);
+		expect(
+			shouldListBlock('a', { ...defaultConfig, doNotListBlocks: ['a'], includeDocs: false })
+		).toBe(false);
 	});
 });
 
 describe('shouldListCategory', () => {
 	it('lists if unspecified', () => {
-		expect(shouldListCategory('a', { ...defaultConfig })).toBe(true);
+		expect(shouldListCategory('a', { ...defaultConfig, includeDocs: false })).toBe(true);
 	});
 
 	it('lists when should list', () => {
-		expect(shouldListCategory('a', { ...defaultConfig, listCategories: ['a'] })).toBe(true);
-		expect(shouldListCategory('a', { ...defaultConfig, doNotListCategories: ['b'] })).toBe(
-			true
-		);
+		expect(
+			shouldListCategory('a', { ...defaultConfig, listCategories: ['a'], includeDocs: false })
+		).toBe(true);
+		expect(
+			shouldListCategory('a', {
+				...defaultConfig,
+				doNotListCategories: ['b'],
+				includeDocs: false,
+			})
+		).toBe(true);
 	});
 
 	it('does not list when should not list', () => {
-		expect(shouldListCategory('a', { ...defaultConfig, listCategories: ['b'] })).toBe(false);
-		expect(shouldListCategory('a', { ...defaultConfig, doNotListCategories: ['a'] })).toBe(
-			false
-		);
+		expect(
+			shouldListCategory('a', { ...defaultConfig, listCategories: ['b'], includeDocs: false })
+		).toBe(false);
+		expect(
+			shouldListCategory('a', {
+				...defaultConfig,
+				doNotListCategories: ['a'],
+				includeDocs: false,
+			})
+		).toBe(false);
 	});
 });
 
 describe('shouldIncludeBlock', () => {
 	it('lists if unspecified', () => {
-		expect(shouldIncludeBlock('a', { ...defaultConfig })).toBe(true);
+		expect(shouldIncludeBlock('a', { ...defaultConfig, includeDocs: false })).toBe(true);
 	});
 
 	it('lists when should list', () => {
-		expect(shouldIncludeBlock('a', { ...defaultConfig, includeBlocks: ['a'] })).toBe(true);
-		expect(shouldIncludeBlock('a', { ...defaultConfig, excludeBlocks: ['b'] })).toBe(true);
+		expect(
+			shouldIncludeBlock('a', { ...defaultConfig, includeBlocks: ['a'], includeDocs: false })
+		).toBe(true);
+		expect(
+			shouldIncludeBlock('a', { ...defaultConfig, excludeBlocks: ['b'], includeDocs: false })
+		).toBe(true);
 	});
 
 	it('does not list when should not list', () => {
-		expect(shouldIncludeBlock('a', { ...defaultConfig, includeBlocks: ['b'] })).toBe(false);
-		expect(shouldIncludeBlock('a', { ...defaultConfig, excludeBlocks: ['a'] })).toBe(false);
+		expect(
+			shouldIncludeBlock('a', { ...defaultConfig, includeBlocks: ['b'], includeDocs: false })
+		).toBe(false);
+		expect(
+			shouldIncludeBlock('a', { ...defaultConfig, excludeBlocks: ['a'], includeDocs: false })
+		).toBe(false);
 	});
 });
 
 describe('shouldIncludeCategory', () => {
 	it('lists if unspecified', () => {
-		expect(shouldIncludeCategory('a', { ...defaultConfig })).toBe(true);
+		expect(shouldIncludeCategory('a', { ...defaultConfig, includeDocs: false })).toBe(true);
 	});
 
 	it('lists when should list', () => {
-		expect(shouldIncludeCategory('a', { ...defaultConfig, includeCategories: ['a'] })).toBe(
-			true
-		);
-		expect(shouldIncludeCategory('a', { ...defaultConfig, excludeCategories: ['b'] })).toBe(
-			true
-		);
+		expect(
+			shouldIncludeCategory('a', {
+				...defaultConfig,
+				includeCategories: ['a'],
+				includeDocs: false,
+			})
+		).toBe(true);
+		expect(
+			shouldIncludeCategory('a', {
+				...defaultConfig,
+				excludeCategories: ['b'],
+				includeDocs: false,
+			})
+		).toBe(true);
 	});
 
 	it('does not list when should not list', () => {
-		expect(shouldIncludeCategory('a', { ...defaultConfig, includeCategories: ['b'] })).toBe(
-			false
-		);
-		expect(shouldIncludeCategory('a', { ...defaultConfig, excludeCategories: ['a'] })).toBe(
-			false
-		);
+		expect(
+			shouldIncludeCategory('a', {
+				...defaultConfig,
+				includeCategories: ['b'],
+				includeDocs: false,
+			})
+		).toBe(false);
+		expect(
+			shouldIncludeCategory('a', {
+				...defaultConfig,
+				excludeCategories: ['a'],
+				includeDocs: false,
+			})
+		).toBe(false);
 	});
 });

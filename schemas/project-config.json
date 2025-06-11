@@ -12,7 +12,12 @@
 		"includeTests": {
 			"description": "When true includes the test files for each block in the same directory.",
 			"type": "boolean",
-			"default": "true"
+			"default": "false"
+		},
+		"includeDocs": {
+			"description": "When true includes the documentation files for each block in the same directory.",
+			"type": "boolean",
+			"default": "false"
 		},
 		"watermark": {
 			"description": "When true will add a watermark with the version and repository at the top of the installed files.",

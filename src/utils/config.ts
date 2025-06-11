@@ -35,6 +35,7 @@ export const projectConfigSchema = v.object({
 	$schema: v.string(),
 	repos: v.optional(v.array(v.string()), []),
 	includeTests: v.boolean(),
+	includeDocs: v.optional(v.boolean(), false),
 	paths: pathsSchema,
 	configFiles: v.optional(v.record(v.string(), v.string())),
 	watermark: v.optional(v.boolean(), true),
@@ -85,6 +86,7 @@ export const registryConfigSchema = v.object({
 	excludeDeps: v.optional(v.array(v.string()), []),
 	allowSubdirectories: v.optional(v.boolean()),
 	preview: v.optional(v.boolean()),
+	includeDocs: v.optional(v.boolean(), false),
 	rules: v.optional(ruleConfigSchema),
 });
 
