@@ -1,5 +1,10 @@
 # jsrepo
 
+## 2.4.1
+### Patch Changes
+
+- f1cce8b: fix: If a publish results in a `500` error guide user on where to get support.
+
 ## 2.4.0
 ### Minor Changes
 
