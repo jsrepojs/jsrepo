@@ -433,6 +433,12 @@ async function _publish(options: Options) {
 	if (!response.ok) {
 		const res = (await response.json()) as { message: string };
 
+		if (response.status === 500) {
+			program.error(
+				`${color.red(`${color.bold('[jsrepo.com]')} ${color.bold(response.status)} ${res.message}`)}\nPlease try again. If this persists please contact support at ${color.cyan('https://www.jsrepo.com/help')}`
+			);
+		}
+
 		program.error(
 			color.red(`${color.bold('[jsrepo.com]')} ${color.bold(response.status)} ${res.message}`)
 		);
