@@ -131,17 +131,14 @@ export function resolveImports({
 			cwd,
 		});
 
-		if (localDep.isErr()) {
-			errors.push(localDep.unwrapErr());
-			continue;
-		}
+		if (!localDep.isErr()) {
+			const dep = localDep.unwrap();
 
-		const dep = localDep.unwrap();
-
-		if (dep) {
-			localDeps.add(dep.dependency);
-			imports[specifier] = dep.template;
-			continue;
+			if (dep) {
+				localDeps.add(dep.dependency);
+				imports[specifier] = dep.template;
+				continue;
+			}
 		}
 
 		// check if the specifier is a package
