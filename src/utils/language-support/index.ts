@@ -123,18 +123,6 @@ export function resolveImports({
 			continue;
 		}
 
-		// check if the specifier is a package
-		const parsed = parsePackageName(specifier);
-
-		if (!parsed.isErr()) {
-			const depInfo = parsed.unwrap();
-
-			if (validatePackageName(depInfo.name).validForNewPackages) {
-				deps.add(specifier);
-				continue;
-			}
-		}
-
 		// if specifier wasn't a local dependency or package then it might be a path alias
 		const localDep = tryResolveLocalAlias(specifier, isSubDir, {
 			filePath,
@@ -153,11 +141,24 @@ export function resolveImports({
 		if (dep) {
 			localDeps.add(dep.dependency);
 			imports[specifier] = dep.template;
-		} else {
-			console.warn(
-				`${ascii.VERTICAL_LINE}  ${ascii.WARN} Skipped adding import \`${color.cyan(specifier)}\` from ${filePath}. Reason: Not a valid package name or path alias.`
-			);
+			continue;
 		}
+
+		// check if the specifier is a package
+		const parsed = parsePackageName(specifier);
+
+		if (!parsed.isErr()) {
+			const depInfo = parsed.unwrap();
+
+			if (validatePackageName(depInfo.name).validForNewPackages) {
+				deps.add(specifier);
+				continue;
+			}
+		}
+
+		console.warn(
+			`${ascii.VERTICAL_LINE}  ${ascii.WARN} Skipped adding import \`${color.cyan(specifier)}\` from ${filePath}. Reason: Not a valid package name or path alias.`
+		);
 	}
 
 	if (errors.length > 0) {
