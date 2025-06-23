@@ -123,7 +123,7 @@ export function resolveImports({
 			continue;
 		}
 
-		// if specifier wasn't a local dependency or package then it might be a path alias
+		// if specifier wasn't a local dependency then it might be a path alias
 		const localDep = tryResolveLocalAlias(specifier, isSubDir, {
 			filePath,
 			containingDir,
