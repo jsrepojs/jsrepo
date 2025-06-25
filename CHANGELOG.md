@@ -1,5 +1,10 @@
 # jsrepo
 
+## 2.4.2
+### Patch Changes
+
+- 42c7972: fix: Check if an import is a path alias before checking if it's a dependency
+
 ## 2.4.1
 ### Patch Changes
 
