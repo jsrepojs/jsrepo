@@ -1,5 +1,10 @@
 # jsrepo
 
+## 2.4.3
+### Patch Changes
+
+- 8b6eaae: fix: Ensure blocks can resolve blocks built out of a different `dir`
+
 ## 2.4.2
 ### Patch Changes
 
