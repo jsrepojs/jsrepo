@@ -203,22 +203,11 @@ function resolveLocalImport(
 ): Result<ResolveLocalImportResult | undefined, string> {
 	if (isSubDir && (mod.startsWith('./') || mod === '.')) return Ok(undefined);
 
-	// get the path to the current category
-	// if the block is a subdirectory block then containing dir must exist
-	const categoryDir = isSubDir ? path.join(containingDir!, '../') : path.join(filePath, '../');
-
 	// get the actual path to the module
 	const modPath = path.join(path.join(filePath, '../'), mod);
 
-	// get the full path to the current category containing folder
-	const fullDir = path.join(categoryDir, '../');
-
 	// prevent self reference in subdirectories
 	if (containingDir && modPath.startsWith(containingDir)) return Ok(undefined);
-
-	if (modPath.startsWith(fullDir)) {
-		return Ok(parsePath(modPath.slice(fullDir.length), dropExtension));
-	}
 
 	const absPath = path.resolve(modPath);
 
