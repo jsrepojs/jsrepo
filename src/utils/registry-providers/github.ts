@@ -81,10 +81,13 @@ export const github: RegistryProvider = {
 
 		const { owner, repoName, ref } = state as GitHubProviderState;
 
-		return new URL(resourcePath, `https://ungh.cc/repos/${owner}/${repoName}/files/${ref}/`);
+		return new URL(
+			`${resourcePath}?ref=${ref}`,
+			`https://api.github.com/repos/${owner}/${repoName}/contents/`
+		);
 	},
 
-	authHeader: (token) => ['Authorization', `token ${token}`],
+	authHeader: (token) => ['Authorization', `Bearer ${token}`],
 
 	formatFetchError: (state, filePath) => {
 		return `There was an error fetching \`${color.bold(filePath)}\` from ${color.bold(state.url)}.

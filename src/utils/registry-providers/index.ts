@@ -44,6 +44,10 @@ export async function fetchRaw(
 			headers[key] = value;
 		}
 
+		if (state.provider.name === github.name) {
+			headers.Accept = 'application/vnd.github.raw+json';
+		}
+
 		const response = await f(url.toString(), { headers });
 
 		verbose?.(`Got a response from ${url} ${response.status} ${response.statusText}`);
