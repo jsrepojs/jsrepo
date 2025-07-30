@@ -1,5 +1,10 @@
 # jsrepo
 
+## 2.4.4
+### Patch Changes
+
+- f8b4a55: fix: Fix a regression where users couldn't access private github repos
+
 ## 2.4.3
 ### Patch Changes
 
