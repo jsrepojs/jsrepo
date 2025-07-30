@@ -81,7 +81,10 @@ export const github: RegistryProvider = {
 
 		const { owner, repoName, ref } = state as GitHubProviderState;
 
-		return new URL(`${resourcePath}?ref=${ref}`, `https://api.github.com/repos/${owner}/${repoName}/contents/`);
+		return new URL(
+			`${resourcePath}?ref=${ref}`,
+			`https://api.github.com/repos/${owner}/${repoName}/contents/`
+		);
 	},
 
 	authHeader: (token) => ['Authorization', `Bearer ${token}`],
