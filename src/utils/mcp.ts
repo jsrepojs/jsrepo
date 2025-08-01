@@ -1,12 +1,7 @@
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import {
-	type CallToolRequest,
-	CallToolRequestSchema,
-	ListToolsRequestSchema,
-	type Tool,
-} from '@modelcontextprotocol/sdk/types.js';
-import color from 'chalk';
+import { ValibotJsonSchemaAdapter } from '@tmcp/adapter-valibot';
+import { StdioTransport } from '@tmcp/transport-stdio';
+import { McpServer } from 'tmcp';
+import * as v from 'valibot';
 import { cli } from '../cli';
 import { preloadBlocks } from './blocks';
 import * as array from './blocks/ts/array';
@@ -17,34 +12,80 @@ import { iFetch } from './fetch';
 import * as registry from './registry-providers/internal';
 import * as jsrepo from './registry-providers/jsrepo';
 
-const listComponentsTool: Tool = {
-	name: 'list-components',
-	description:
-		'Lists all available components/utilities for the provided registries. If registries are not provided tries to use the registries in the users jsrepo.json file.',
-	inputSchema: {
-		type: 'object',
-		properties: {
-			registries: {
-				type: 'array',
-				description:
-					'Registries to list components from. If not provided will use the registries in the users jsrepo.json file.',
-				items: {
-					type: 'string',
-				},
-			},
-			cwd: {
-				type: 'string',
-				description: 'The current working directory of the users project.',
-			},
-		},
-		required: ['cwd'],
-	},
-};
+const adapter = new ValibotJsonSchemaAdapter();
 
-interface ListComponentsArgs {
-	registries?: string[];
-	cwd: string;
-}
+const ListComponentsArgsSchema = v.object({
+	registries: v.pipe(
+		v.optional(v.array(v.string())),
+		v.metadata({
+			description:
+				'Registries to list components from. If not provided will use the registries in the users jsrepo.json file.',
+		})
+	),
+	cwd: v.pipe(
+		v.string(),
+		v.metadata({
+			description: 'The current working directory of the users project.',
+		})
+	),
+});
+
+const GetComponentCodeArgsSchema = v.object({
+	registry: v.pipe(
+		v.string(),
+		v.metadata({
+			description: 'Registry for the component.',
+		})
+	),
+	component: v.pipe(
+		v.string(),
+		v.metadata({
+			description: 'The component to get the code for. Format: <category>/<block>',
+		})
+	),
+	includeTests: v.pipe(
+		v.optional(v.boolean()),
+		v.metadata({
+			description: 'Should tests be included with the component code.',
+		})
+	),
+	includeDocs: v.pipe(
+		v.optional(v.boolean()),
+		v.metadata({
+			description: 'Should docs be included with the component code.',
+		})
+	),
+});
+
+const GetConfigFilesArgsSchema = v.object({
+	registry: v.pipe(
+		v.string(),
+		v.metadata({
+			description: 'Registry to list config files from.',
+		})
+	),
+	requiredOnly: v.pipe(
+		v.optional(v.boolean()),
+		v.metadata({
+			description:
+				'When true only returns the config files required for the registry to work properly.',
+		})
+	),
+});
+
+const SearchRegistriesArgsSchema = v.object({
+	query: v.pipe(
+		v.string(),
+		v.metadata({
+			description: 'A term to search for the registries by.',
+		})
+	),
+});
+
+type ListComponentsArgs = v.InferOutput<typeof ListComponentsArgsSchema>;
+type GetComponentCodeArgs = v.InferOutput<typeof GetComponentCodeArgsSchema>;
+type GetConfigFilesArgs = v.InferOutput<typeof GetConfigFilesArgsSchema>;
+type SearchRegistriesArgs = v.InferOutput<typeof SearchRegistriesArgsSchema>;
 
 async function listComponents({ registries, cwd }: ListComponentsArgs) {
 	if (!registries) {
@@ -85,38 +126,6 @@ async function listComponents({ registries, cwd }: ListComponentsArgs) {
 			.fromMap(components, (_, v) => v)
 			.map((c) => url.join(c.sourceRepo.url, `${c.category}/${c.name}`)),
 	};
-}
-
-const getComponentCodeTool: Tool = {
-	name: 'get-component-code',
-	description: 'Returns the associated code files for the provided component.',
-	inputSchema: {
-		type: 'object',
-		properties: {
-			component: {
-				type: 'string',
-				description:
-					'The component to get the code for. Format: <registry>/<category>/<block>',
-			},
-			includeTests: {
-				type: 'boolean',
-				description: 'Should tests be included with the component code.',
-				default: false,
-			},
-			includeDocs: {
-				type: 'boolean',
-				description: 'Should docs be included with the component code.',
-				default: false,
-			},
-		},
-		required: ['component'],
-	},
-};
-
-interface GetComponentCodeArgs {
-	component: string;
-	includeTests?: boolean;
-	includeDocs?: boolean;
 }
 
 async function getComponentCode({
@@ -180,40 +189,6 @@ async function getComponentCode({
 	};
 }
 
-const getConfigFilesTool: Tool = {
-	name: 'get-config-files',
-	description:
-		'Lists the config files for this registry. These are files that are either necessary for the registry to work or optional as marked by the `optional` boolean on each file.',
-	inputSchema: {
-		type: 'object',
-		properties: {
-			registry: {
-				type: 'string',
-				description: 'Registry to list config files from.',
-				examples: [
-					'@ieedan/std',
-					'github/ieedan/std',
-					'gitlab/ieedan/std',
-					'bitbucket/ieedan/std',
-					'azure/ieedan/std/std',
-					'https://example.com/r',
-				],
-			},
-			requiredOnly: {
-				type: 'boolean',
-				description:
-					'When true only returns the config files required for the registry to work properly.',
-			},
-		},
-		required: ['registry'],
-	},
-};
-
-interface GetConfigFilesArgs {
-	registry: string;
-	requiredOnly?: boolean;
-}
-
 async function getConfigFiles({ registry: repo, requiredOnly = false }: GetConfigFilesArgs) {
 	const state = (await registry.getProviderState(repo)).match(
 		(v) => v,
@@ -249,26 +224,6 @@ async function getConfigFiles({ registry: repo, requiredOnly = false }: GetConfi
 	};
 }
 
-const searchRegistriesTool: Tool = {
-	name: 'search-registries',
-	description:
-		'Search jsrepo.com for registries that could include components the user needs in their project.',
-	inputSchema: {
-		type: 'object',
-		properties: {
-			query: {
-				description: 'A term to search for the registries by.',
-				type: 'string',
-			},
-		},
-		required: ['query'],
-	},
-};
-
-interface SearchRegistriesArgs {
-	query: string;
-}
-
 async function searchRegistries({ query }: SearchRegistriesArgs) {
 	const response = await iFetch(
 		`${jsrepo.BASE_URL}/api/registries?order_by=most_popular&q=${query}`
@@ -301,14 +256,6 @@ async function searchRegistries({ query }: SearchRegistriesArgs) {
 	};
 }
 
-const cliReferenceTool: Tool = {
-	name: 'cli-reference',
-	description: 'A reference for the usage of the jsrepo CLI.',
-	inputSchema: {
-		type: 'object',
-	},
-};
-
 function cliReference() {
 	return {
 		name: cli.name(),
@@ -327,33 +274,38 @@ function cliReference() {
 	};
 }
 
-export async function connectServer() {
-	const server = new Server(
+export async function connectServer(registry?: string) {
+	const server = new McpServer(
 		{
 			name: 'jsrepo',
 			version: packageJson.version,
+			description: 'The jsrepo MCP server.',
 		},
 		{
+			adapter,
 			capabilities: {
-				tools: {},
+				tools: { listChanged: true },
 			},
 		}
 	);
 
-	server.setRequestHandler(CallToolRequestSchema, async (request: CallToolRequest) => {
-		console.error(`Received CallToolRequest calling: ${color.bold(request.params.name)}`);
-		try {
-			switch (request.params.name) {
-				case 'list-components': {
-					const args = request.params.arguments as unknown as ListComponentsArgs;
+	server.tool(
+		{
+			name: 'list-components',
+			description:
+				'Lists all available components/utilities for the provided registries. If registries are not provided tries to use the registries in the users jsrepo.json file.',
+			schema: ListComponentsArgsSchema,
+		},
+		async ({ registries, cwd }) => {
+			if (registry) registries = [registry];
 
-					const response = await listComponents(args);
+			const response = await listComponents({ registries, cwd });
 
-					return {
-						content: [
-							{
-								type: 'text',
-								text: `Available components:
+			return {
+				content: [
+					{
+						type: 'text',
+						text: `Available components:
 ${JSON.stringify(response.components)}
 Add a component to your project with:
 jsrepo add ${response.components[0]} -y -A
@@ -363,102 +315,104 @@ Update existing components with:
 jsrepo update ${response.components[0]} -y -A
 Update multiple components with:
 jsrepo update ${response.components[0]} ${response.components[1] ?? response.components[0]} ... -y -A`,
-							},
-						],
-					};
-				}
-				case 'get-component-code': {
-					const args = request.params.arguments as unknown as GetComponentCodeArgs;
-
-					const response = await getComponentCode(args);
-
-					return {
-						content: [
-							{
-								type: 'text',
-								text: JSON.stringify(response),
-							},
-						],
-					};
-				}
-				case 'get-config-files': {
-					const args = request.params.arguments as unknown as GetConfigFilesArgs;
-
-					const response = await getConfigFiles(args);
-
-					return {
-						content: [
-							{
-								type: 'text',
-								text: JSON.stringify(response),
-							},
-						],
-					};
-				}
-				case 'search-registries': {
-					const args = request.params.arguments as unknown as SearchRegistriesArgs;
-
-					const response = await searchRegistries(args);
-
-					return {
-						content: [
-							{
-								type: 'text',
-								text: JSON.stringify(response),
-							},
-						],
-					};
-				}
-				case 'cli-reference': {
-					const response = cliReference();
-
-					return {
-						content: [
-							{
-								type: 'text',
-								text: JSON.stringify(response),
-							},
-						],
-					};
-				}
-			}
-
-			throw new Error(`Invalid tool ${request.params.name}`);
-		} catch (err) {
-			console.error(
-				color.red(`Error executing tool ${color.bold(request.params.name)}: ${err}`)
-			);
-			return {
-				content: [
-					{
-						type: 'text',
-						text: JSON.stringify({
-							error: err instanceof Error ? err.message : String(err),
-						}),
 					},
 				],
 			};
 		}
-	});
+	);
 
-	server.setRequestHandler(ListToolsRequestSchema, async () => {
-		console.error('Received ListToolsRequest');
-		return {
-			tools: [
-				listComponentsTool,
-				getComponentCodeTool,
-				getConfigFilesTool,
-				searchRegistriesTool,
-				cliReferenceTool,
-			],
-		};
-	});
+	server.tool(
+		{
+			name: 'get-component-code',
+			description: 'Returns the associated code files for the provided component.',
+			schema: GetComponentCodeArgsSchema,
+		},
+		async ({ registry: reg, component, includeTests, includeDocs }) => {
+			if (registry) reg = registry;
 
-	const transport = new StdioServerTransport();
+			const response = await getComponentCode({
+				registry: reg,
+				component,
+				includeTests,
+				includeDocs,
+			});
 
-	console.error('Connecting server to transport...');
+			return {
+				content: [
+					{
+						type: 'text',
+						text: JSON.stringify(response),
+					},
+				],
+			};
+		}
+	);
 
-	await server.connect(transport);
+	server.tool(
+		{
+			name: 'get-config-files',
+			description:
+				'Lists the config files for this registry. These are files that are either necessary for the registry to work or optional as marked by the `optional` boolean on each file.',
+			schema: GetConfigFilesArgsSchema,
+		},
+		async ({ registry: reg, requiredOnly }) => {
+			if (registry) reg = registry;
+
+			const response = await getConfigFiles({ registry: reg, requiredOnly });
+
+			return {
+				content: [
+					{
+						type: 'text',
+						text: JSON.stringify(response),
+					},
+				],
+			};
+		}
+	);
+
+	server.tool(
+		{
+			name: 'search-registries',
+			description:
+				'Search jsrepo.com for registries that could include components the user needs in their project.',
+			schema: SearchRegistriesArgsSchema,
+		},
+		async ({ query }) => {
+			const response = await searchRegistries({ query });
+
+			return {
+				content: [
+					{
+						type: 'text',
+						text: JSON.stringify(response),
+					},
+				],
+			};
+		}
+	);
+
+	server.tool(
+		{
+			name: 'cli-reference',
+			description: 'A reference for the usage of the jsrepo CLI.',
+		},
+		async () => {
+			const response = cliReference();
+
+			return {
+				content: [
+					{
+						type: 'text',
+						text: JSON.stringify(response),
+					},
+				],
+			};
+		}
+	);
+
+	const transport = new StdioTransport(server);
+	transport.listen();
 
 	console.error('Server connected');
 }

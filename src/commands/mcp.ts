@@ -1,11 +1,11 @@
-import { Command } from 'commander';
+import { Argument, Command } from 'commander';
 import { connectServer } from '../utils/mcp';
 
 export const mcp = new Command('mcp')
 	.description('Interact with jsrepo through an MCP server.')
-	.option('--cwd <path>', 'The current working directory.', process.cwd())
-	.action(async () => {
-		await connectServer().catch((err) => {
+	.addArgument(new Argument('<registry>', 'The registry to use.').argOptional())
+	.action(async (registry?: string) => {
+		await connectServer(registry).catch((err) => {
 			console.error(err);
 			process.exit(1);
 		});
