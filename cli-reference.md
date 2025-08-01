@@ -2,7 +2,7 @@
 
 > A CLI to add shared code from remote repositories.
  
-Latest Version: 2.4.4
+Latest Version: 2.4.5
 
 ## Commands
 
@@ -133,11 +133,10 @@ Interact with jsrepo through an MCP server.
 
 #### Usage
 ```bash
-jsrepo mcp [options]
+jsrepo mcp [options] [registry]
 ```
 
 #### Options
-- --cwd <path>: The current working directory. (default: ./)
 
 ### publish
     

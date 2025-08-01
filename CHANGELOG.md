@@ -1,5 +1,11 @@
 # jsrepo
 
+## 2.4.5
+### Patch Changes
+
+- e010847: feat: Add optional argument to the `mcp` command to allow users to limit the mcp requests to one registry
+- e010847: chore: Move mcp server code from `@modelcontextprotocol/sdk` to `tmcp`
+
 ## 2.4.4
 ### Patch Changes
 
