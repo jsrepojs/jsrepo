@@ -13,7 +13,6 @@ import {
 } from '@clack/prompts';
 import color from 'chalk';
 import { Command, Option, program } from 'commander';
-import { createPathsMatcher } from 'get-tsconfig';
 import { detect, resolveCommand } from 'package-manager-detector';
 import path from 'pathe';
 import * as v from 'valibot';
@@ -31,7 +30,7 @@ import {
 	getRegistryConfig,
 } from '../utils/config';
 import { packageJson } from '../utils/context';
-import { formatFile, matchJSDescendant, tryGetTsconfig } from '../utils/files';
+import { formatFile, matchJSDescendant } from '../utils/files';
 import { loadFormatterConfig } from '../utils/format';
 import { json } from '../utils/language-support';
 import type { PackageJson } from '../utils/package';
@@ -46,6 +45,7 @@ import {
 } from '../utils/prompts';
 import * as registry from '../utils/registry-providers/internal';
 import { TokenManager } from '../utils/token-manager';
+import { createPathsMatcher, tryGetTsconfig } from '../utils/tsconfig';
 
 const schema = v.object({
 	repos: v.optional(v.array(v.string())),
@@ -203,7 +203,7 @@ const _initProject = async (registries: string[], options: Options) => {
 						return error;
 					}
 
-					const matcher = createPathsMatcher(tsconfigResult);
+					const matcher = createPathsMatcher(tsconfigResult, { cwd: options.cwd });
 
 					if (matcher) {
 						const found = matcher(value);

@@ -2,7 +2,6 @@ import fs from 'node:fs';
 import { builtinModules } from 'node:module';
 import type { PartialConfiguration } from '@biomejs/wasm-nodejs';
 import color from 'chalk';
-import { createPathsMatcher } from 'get-tsconfig';
 import path from 'pathe';
 import type * as prettier from 'prettier';
 import validatePackageName from 'validate-npm-package-name';
@@ -10,9 +9,9 @@ import * as ascii from '../ascii';
 import * as lines from '../blocks/ts/lines';
 import { Err, Ok, type Result } from '../blocks/ts/result';
 import type { Formatter } from '../config';
-import { tryGetTsconfig } from '../files';
 import { findNearestPackageJson } from '../package';
 import { parsePackageName } from '../parse-package-name';
+import { createPathsMatcher, tryGetTsconfig } from '../tsconfig';
 import { css } from './css';
 import { html } from './html';
 import { typescript } from './javascript';
@@ -287,7 +286,7 @@ function tryResolveLocalAlias(
 
 	if (config === null) return Ok(undefined);
 
-	const matcher = createPathsMatcher(config);
+	const matcher = createPathsMatcher(config, { cwd });
 
 	if (matcher) {
 		// if the mod is actually remote the returns paths will be empty
