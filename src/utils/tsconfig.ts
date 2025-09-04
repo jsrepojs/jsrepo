@@ -37,6 +37,11 @@ export function _createPathsMatcher(
 	configResult: TsConfigResult,
 	{ cwd }: { cwd: string }
 ): ((specifier: string) => string[]) | null {
+	const matchers: ((specifier: string) => string[])[] = [];
+
+	const matcher = createPathsMatcher(configResult);
+	if (matcher) matchers.push(matcher);
+
 	// resolve tsconfig references
 	if (configResult.config.references) {
 		for (const configPath of configResult.config.references) {
@@ -61,24 +66,15 @@ export function _createPathsMatcher(
 
 			if (config === null) continue;
 
-			const paths: Record<string, string[]> = {};
+			const matcher = _createPathsMatcher(config, { cwd: directory });
 
-			for (const [key, value] of Object.entries(config.config.compilerOptions?.paths ?? {})) {
-				// this way if the referenced tsconfig is in a different directory it will be resolved as expected
-				paths[key] = value.map((v) => path.join(directory, v));
-			}
-
-			configResult.config.compilerOptions = {
-				...configResult.config.compilerOptions,
-				paths: {
-					...configResult.config.compilerOptions?.paths,
-					...paths,
-				},
-			};
+			if (matcher) matchers.push(matcher);
 		}
 	}
 
-	return createPathsMatcher(configResult);
+	if (matchers.length === 0) return null;
+
+	return (specifier: string) => matchers.flatMap((matcher) => matcher(specifier));
 }
 
 export { _createPathsMatcher as createPathsMatcher };
