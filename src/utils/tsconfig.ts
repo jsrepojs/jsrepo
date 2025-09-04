@@ -37,29 +37,25 @@ export function _createPathsMatcher(
 	configResult: TsConfigResult,
 	{ cwd }: { cwd: string }
 ): ((specifier: string) => string[]) | null {
-	const matchers: ((specifier: string) => string[])[] = [];
-
 	const matcher = createPathsMatcher(configResult);
-	if (matcher) matchers.push(matcher);
+	const matchers: ((specifier: string) => string[])[] = matcher ? [matcher] : [];
 
 	// resolve tsconfig references
 	if (configResult.config.references) {
 		for (const configPath of configResult.config.references) {
 			const configPathOrDir = path.join(cwd, configPath.path);
 
+			if (!fs.existsSync(configPathOrDir)) continue;
+
 			let directory: string;
 			let fileName = 'tsconfig.json';
 
 			// references can be a file or a directory https://www.typescriptlang.org/docs/handbook/project-references.html
-			if (fs.existsSync(configPathOrDir)) {
-				if (fs.statSync(configPathOrDir).isFile()) {
-					directory = path.dirname(configPathOrDir);
-					fileName = path.basename(configPathOrDir);
-				} else {
-					directory = configPathOrDir;
-				}
+			if (fs.statSync(configPathOrDir).isFile()) {
+				directory = path.dirname(configPathOrDir);
+				fileName = path.basename(configPathOrDir);
 			} else {
-				continue;
+				directory = configPathOrDir;
 			}
 
 			const config = tryGetTsconfig(directory, fileName).unwrapOr(null);
@@ -74,6 +70,7 @@ export function _createPathsMatcher(
 
 	if (matchers.length === 0) return null;
 
+	// get all possible paths from all matchers
 	return (specifier: string) => matchers.flatMap((matcher) => matcher(specifier));
 }
 
