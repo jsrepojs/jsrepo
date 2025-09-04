@@ -38,34 +38,35 @@ export function _createPathsMatcher(
 	{ cwd }: { cwd: string }
 ): ((specifier: string) => string[]) | null {
 	const matcher = createPathsMatcher(configResult);
+
+	if (!configResult.config.references) return matcher;
+
 	const matchers: ((specifier: string) => string[])[] = matcher ? [matcher] : [];
 
 	// resolve tsconfig references
-	if (configResult.config.references) {
-		for (const configPath of configResult.config.references) {
-			const configPathOrDir = path.join(cwd, configPath.path);
+	for (const configPath of configResult.config.references) {
+		const configPathOrDir = path.join(cwd, configPath.path);
 
-			if (!fs.existsSync(configPathOrDir)) continue;
+		if (!fs.existsSync(configPathOrDir)) continue;
 
-			let directory: string;
-			let fileName = 'tsconfig.json';
+		let directory: string;
+		let fileName = 'tsconfig.json';
 
-			// references can be a file or a directory https://www.typescriptlang.org/docs/handbook/project-references.html
-			if (fs.statSync(configPathOrDir).isFile()) {
-				directory = path.dirname(configPathOrDir);
-				fileName = path.basename(configPathOrDir);
-			} else {
-				directory = configPathOrDir;
-			}
-
-			const config = tryGetTsconfig(directory, fileName).unwrapOr(null);
-
-			if (config === null) continue;
-
-			const matcher = _createPathsMatcher(config, { cwd: directory });
-
-			if (matcher) matchers.push(matcher);
+		// references can be a file or a directory https://www.typescriptlang.org/docs/handbook/project-references.html
+		if (fs.statSync(configPathOrDir).isFile()) {
+			directory = path.dirname(configPathOrDir);
+			fileName = path.basename(configPathOrDir);
+		} else {
+			directory = configPathOrDir;
 		}
+
+		const config = tryGetTsconfig(directory, fileName).unwrapOr(null);
+
+		if (config === null) continue;
+
+		const matcher = _createPathsMatcher(config, { cwd: directory });
+
+		if (matcher) matchers.push(matcher);
 	}
 
 	if (matchers.length === 0) return null;
