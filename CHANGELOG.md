@@ -1,5 +1,10 @@
 # jsrepo
 
+## 2.4.6
+### Patch Changes
+
+- 75ec915: fix: Resolve tsconfig references
+
 ## 2.4.5
 ### Patch Changes
 
