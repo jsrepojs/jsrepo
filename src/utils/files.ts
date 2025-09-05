@@ -147,29 +147,3 @@ export function matchJSDescendant(searchFilePath: string): string | undefined {
 
 	return undefined;
 }
-
-/** Attempts to get the js/tsconfig file for the searched path
- *
- * @param searchPath
- * @returns
- */
-export function tryGetTsconfig(searchPath?: string): Result<TsConfigResult | null, string> {
-	let config: TsConfigResult | null;
-
-	try {
-		config = getTsconfig(searchPath, 'tsconfig.json');
-
-		if (!config) {
-			// if we don't find the config at first check for a jsconfig
-			config = getTsconfig(searchPath, 'jsconfig.json');
-
-			if (!config) {
-				return Ok(null);
-			}
-		}
-	} catch (err) {
-		return Err(`Error while trying to get ${color.bold('tsconfig.json')}: ${err}`);
-	}
-
-	return Ok(config);
-}

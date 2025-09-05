@@ -1,6 +1,5 @@
 import fs from 'node:fs';
 import color from 'chalk';
-import { createPathsMatcher } from 'get-tsconfig';
 import path from 'pathe';
 import * as v from 'valibot';
 import {
@@ -12,7 +11,7 @@ import {
 } from '../types';
 import { Err, Ok, type Result } from './blocks/ts/result';
 import { ruleConfigSchema } from './build/check';
-import { tryGetTsconfig } from './files';
+import { createPathsMatcher, tryGetTsconfig } from './tsconfig';
 
 /** Files and directories ignore by default during build/publish */
 export const IGNORES = ['.git', 'node_modules', '.DS_Store'] as const;
@@ -113,7 +112,7 @@ export type RegistryConfig = v.InferOutput<typeof registryConfigSchema>;
 export function resolvePaths(paths: Paths, cwd: string): Result<Paths, string> {
 	const config = tryGetTsconfig(cwd).unwrapOr(null);
 
-	const matcher = config ? createPathsMatcher(config) : null;
+	const matcher = config ? createPathsMatcher(config, { cwd }) : null;
 
 	const newPaths: Paths = { '*': '' };
 
