@@ -1,5 +1,11 @@
 # jsrepo
 
+## 2.4.7
+### Patch Changes
+
+- 30aa663: fix: prevent out-of-memory when resolving cyclic dependency graphs
+- 47f3b08: fix: Ensure watermarks are not added to plain json files
+
 ## 2.4.6
 ### Patch Changes
 
