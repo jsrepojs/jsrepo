@@ -34,7 +34,7 @@ export const json: Lang = {
 	resolveDependencies: () =>
 		Ok({ dependencies: [], local: [], devDependencies: [], imports: {} }),
 	// json doesn't support comments
-	comment: (content: string) => content,
+	comment: (_content: string) => '',
 	format,
 };
 
