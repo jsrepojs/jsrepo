@@ -14,7 +14,9 @@ export async function resolveTree(
 	blockSpecifiers: string[],
 	blocksMap: Map<string, registry.RemoteBlock>,
 	repoPaths: registry.RegistryProviderState[],
-	installed: Map<string, registry.RemoteBlock> = new Map()
+	installed: Map<string, registry.RemoteBlock> = new Map(),
+	/** Tracks visited specifiers to prevent infinite recursion on cycles */
+	seen: Set<string> = new Set()
 ): Promise<Result<registry.RemoteBlock[], string>> {
 	const blocks = new Map<string, registry.RemoteBlock>();
 
@@ -66,20 +68,38 @@ export async function resolveTree(
 
 		const specifier = `${block.category}/${block.name}`;
 
+		// skip blocks we've already seen or that are marked as installed
+		if (seen.has(specifier) || installed.has(specifier)) {
+			continue;
+		}
+
+		seen.add(specifier);
 		blocks.set(specifier, block);
 
 		if (block.localDependencies && block.localDependencies.length > 0) {
-			const subDeps = await resolveTree(
-				block.localDependencies.filter((dep) => !blocks.has(dep) && !installed.has(dep)),
-				blocksMap,
-				repoPaths,
-				blocks
+			// filter dependencies that have not been seen/installed yet
+			const depsToResolve = block.localDependencies.filter(
+				(dep) => !seen.has(dep) && !installed.has(dep)
 			);
 
-			if (subDeps.isErr()) return Err(subDeps.unwrapErr());
+			if (depsToResolve.length > 0) {
+				const subDeps = await resolveTree(
+					depsToResolve,
+					blocksMap,
+					repoPaths,
+					installed,
+					seen
+				);
 
-			for (const dep of subDeps.unwrap()) {
-				blocks.set(`${dep.category}/${dep.name}`, dep);
+				if (subDeps.isErr()) return Err(subDeps.unwrapErr());
+
+				for (const dep of subDeps.unwrap()) {
+					const depSpecifier = `${dep.category}/${dep.name}`;
+					if (!seen.has(depSpecifier)) {
+						seen.add(depSpecifier);
+					}
+					blocks.set(depSpecifier, dep);
+				}
 			}
 		}
 	}
