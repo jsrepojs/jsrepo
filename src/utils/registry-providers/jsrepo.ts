@@ -106,7 +106,7 @@ export function parseUrl(
 
 	const [registryName, version] = name.split('@');
 
-	let specifier: string | undefined = undefined;
+	let specifier: string | undefined;
 
 	if (fullyQualified) {
 		specifier = rest.slice(rest.length - 2).join('/');

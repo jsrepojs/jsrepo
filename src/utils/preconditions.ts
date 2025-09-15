@@ -45,7 +45,7 @@ export function checkPreconditions(
 
 	for (const [name, options] of Object.entries(manifest.peerDependencies)) {
 		let expected: string;
-		let message: string | undefined = undefined;
+		let message: string | undefined;
 
 		if (typeof options === 'string') {
 			expected = options;

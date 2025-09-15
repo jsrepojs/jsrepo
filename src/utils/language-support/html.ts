@@ -1,9 +1,9 @@
 import fs from 'node:fs';
 import * as parse5 from 'parse5';
 import * as prettier from 'prettier';
-import { type Lang, formatError, resolveImports } from '.';
 import * as lines from '../blocks/ts/lines';
 import { Err, Ok } from '../blocks/ts/result';
+import { formatError, type Lang, resolveImports } from '.';
 
 /** Language support for `*.html` files. */
 export const html: Lang = {
@@ -15,7 +15,7 @@ export const html: Lang = {
 
 		const imports: string[] = [];
 
-		// @ts-ignore yeah I know
+		// @ts-expect-error yeah I know
 		const walk = (node, enter: (node) => void) => {
 			if (!node) return;
 
@@ -40,7 +40,7 @@ export const html: Lang = {
 
 				if (
 					n.tagName === 'link' &&
-					// @ts-ignore yeah I know
+					// @ts-expect-error yeah I know
 					n.attrs.find((attr) => attr.name === 'rel' && attr.value === 'stylesheet')
 				) {
 					for (const attr of n.attrs) {

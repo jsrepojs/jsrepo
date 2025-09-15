@@ -10,7 +10,7 @@ import type { Category } from '../types';
 import * as ascii from '../utils/ascii';
 import { buildBlocksDirectory, buildConfigFiles, pruneUnused } from '../utils/build';
 import { DEFAULT_CONFIG, runRules } from '../utils/build/check';
-import { IGNORES, type RegistryConfig, getRegistryConfig } from '../utils/config';
+import { getRegistryConfig, IGNORES, type RegistryConfig } from '../utils/config';
 import { createManifest, parseManifest } from '../utils/manifest';
 import { intro, spinner } from '../utils/prompts';
 

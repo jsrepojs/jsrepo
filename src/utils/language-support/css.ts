@@ -2,9 +2,9 @@ import fs from 'node:fs';
 import { Biome, Distribution } from '@biomejs/js-api';
 import * as cssDependency from 'css-dependency';
 import * as prettier from 'prettier';
-import { type Lang, formatError, resolveImports } from '.';
 import * as lines from '../blocks/ts/lines';
 import { Err, Ok } from '../blocks/ts/result';
+import { formatError, type Lang, resolveImports } from '.';
 
 /** Language support for `*.css` files. */
 export const css: Lang = {
@@ -42,7 +42,7 @@ export const css: Lang = {
 		return Ok(resolveResult.unwrap());
 	},
 	comment: (content) => `/*\n${lines.join(lines.get(content), { prefix: () => '\t' })}\n*/`,
-	format: async (code, { formatter, prettierOptions, biomeOptions, filePath }) => {
+	format: async (code, { formatter, prettierOptions, biomeOptions, filePath, cwd }) => {
 		if (!formatter) return code;
 
 		if (formatter === 'prettier') {
@@ -53,10 +53,12 @@ export const css: Lang = {
 			distribution: Distribution.NODE,
 		});
 
+		const { projectKey } = biome.openProject(cwd);
+
 		if (biomeOptions) {
-			biome.applyConfiguration(biomeOptions);
+			biome.applyConfiguration(projectKey, biomeOptions);
 		}
 
-		return biome.formatContent(code, { filePath }).content;
+		return biome.formatContent(projectKey, code, { filePath }).content;
 	},
 };

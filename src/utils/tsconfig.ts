@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import color from 'chalk';
-import { type TsConfigResult, createPathsMatcher, getTsconfig } from 'get-tsconfig';
+import { createPathsMatcher, getTsconfig, type TsConfigResult } from 'get-tsconfig';
 import path from 'pathe';
 import { Err, Ok, type Result } from './blocks/ts/result';
 

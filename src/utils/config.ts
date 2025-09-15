@@ -3,8 +3,8 @@ import color from 'chalk';
 import path from 'pathe';
 import * as v from 'valibot';
 import {
-	type Block,
 	accessLevel,
+	type Block,
 	configFileSchema,
 	manifestMeta,
 	peerDependencySchema,

@@ -1,22 +1,22 @@
 import color from 'chalk';
-import {
-	http,
-	azure,
-	bitbucket,
-	fetchManifest,
-	fetchRaw,
-	github,
-	gitlab,
-	jsrepo,
-	providers,
-	selectProvider,
-} from '.';
 import type { Block, Manifest } from '../../types';
 import { Err, Ok, type Result } from '../blocks/ts/result';
 import * as u from '../blocks/ts/url';
 import { iFetch } from '../fetch';
 import * as persisted from '../persisted';
 import { TokenManager } from '../token-manager';
+import {
+	azure,
+	bitbucket,
+	fetchManifest,
+	fetchRaw,
+	github,
+	gitlab,
+	http,
+	jsrepo,
+	providers,
+	selectProvider,
+} from '.';
 import type { RegistryProvider, RegistryProviderState } from './types';
 
 export type RemoteBlock = Block & { sourceRepo: RegistryProviderState };

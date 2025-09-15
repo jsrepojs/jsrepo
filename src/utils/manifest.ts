@@ -1,5 +1,5 @@
 import * as v from 'valibot';
-import { type Category, type Manifest, categorySchema, manifestSchema } from '../types';
+import { type Category, categorySchema, type Manifest, manifestSchema } from '../types';
 import { Err, Ok, type Result } from './blocks/ts/result';
 import type { RegistryConfig } from './config';
 

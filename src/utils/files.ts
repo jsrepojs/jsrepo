@@ -1,8 +1,7 @@
 import fs from 'node:fs';
-import type { PartialConfiguration } from '@biomejs/wasm-nodejs';
+import type { Configuration } from '@biomejs/wasm-nodejs';
 import color from 'chalk';
 import escapeStringRegexp from 'escape-string-regexp';
-import { type TsConfigResult, getTsconfig } from 'get-tsconfig';
 import path from 'pathe';
 import type * as prettier from 'prettier';
 import { Err, Ok, type Result } from './blocks/ts/result';
@@ -22,7 +21,7 @@ type TransformRemoteContentOptions = {
 	watermark: string;
 	imports: Record<string, string>;
 	prettierOptions: prettier.Options | null;
-	biomeOptions: PartialConfiguration | null;
+	biomeOptions: Configuration | null;
 	cwd: string;
 	verbose?: (msg: string) => void;
 };
@@ -61,6 +60,7 @@ export async function transformRemoteContent({
 				formatter: config.formatter,
 				prettierOptions,
 				biomeOptions,
+				cwd,
 			});
 		} catch (err) {
 			return Err(`Error formatting ${color.bold(file.destPath)} ${err}`);
@@ -94,7 +94,8 @@ type FormatOptions = {
 	};
 	formatter: ProjectConfig['formatter'];
 	prettierOptions: prettier.Options | null;
-	biomeOptions: PartialConfiguration | null;
+	biomeOptions: Configuration | null;
+	cwd: string;
 };
 
 /** Auto detects the language and formats the file content.
@@ -107,6 +108,7 @@ export async function formatFile({
 	formatter,
 	prettierOptions,
 	biomeOptions,
+	cwd,
 }: FormatOptions): Promise<string> {
 	const lang = languages.find((lang) => lang.matches(file.destPath));
 
@@ -119,6 +121,7 @@ export async function formatFile({
 				formatter,
 				prettierOptions,
 				biomeOptions,
+				cwd,
 			});
 		} catch {
 			return newContent;

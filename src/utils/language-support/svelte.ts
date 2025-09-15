@@ -2,9 +2,9 @@ import fs from 'node:fs';
 import { type Node, walk } from 'estree-walker';
 import * as prettier from 'prettier';
 import * as sv from 'svelte/compiler';
-import { type Lang, formatError, resolveImports } from '.';
 import * as lines from '../blocks/ts/lines';
 import { Err, Ok } from '../blocks/ts/result';
+import { formatError, type Lang, resolveImports } from '.';
 
 /** Language support for `*.svelte` files. */
 export const svelte: Lang = {

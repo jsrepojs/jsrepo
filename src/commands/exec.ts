@@ -11,7 +11,7 @@ import * as ascii from '../utils/ascii';
 import { resolveTree } from '../utils/blocks';
 import * as url from '../utils/blocks/ts/url';
 import { isTestFile } from '../utils/build';
-import { type ProjectConfig, getProjectConfig, resolvePaths } from '../utils/config';
+import { getProjectConfig, type ProjectConfig, resolvePaths } from '../utils/config';
 import {
 	type ConcurrentTask,
 	intro,
@@ -353,7 +353,7 @@ export async function _exec(s: string | undefined, options: Options, command: an
 		ignoreWorkspace: true,
 	});
 
-	const startIndex = (command.parent.rawArgs as string[]).findIndex((arg) => arg === '--');
+	const startIndex = (command.parent.rawArgs as string[]).indexOf('--');
 
 	let passthroughArgs: string[] = [];
 

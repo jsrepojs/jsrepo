@@ -13,8 +13,8 @@ import * as promises from '../utils/blocks/ts/promises';
 import * as url from '../utils/blocks/ts/url';
 import {
 	type Formatter,
-	type ProjectConfig,
 	getProjectConfig,
+	type ProjectConfig,
 	projectConfigSchema,
 	resolvePaths,
 } from '../utils/config';
@@ -89,7 +89,7 @@ export const add = new Command('add')
 	.option(
 		'--max-unchanged <number>',
 		'Maximum unchanged lines that will show without being collapsed.',
-		(val) => Number.parseInt(val), // this is such a dumb api thing
+		(val) => Number.parseInt(val, 10), // this is such a dumb api thing
 		3
 	)
 	.option('--repo <repo>', 'Repository to download the blocks from.')
@@ -309,7 +309,7 @@ async function _add(blockNames: string[], options: Options) {
 					const shortName = `${value.category}/${value.name}`;
 
 					const blockExists =
-						installedBlocks.findIndex((block) => block === shortName) !== -1;
+						installedBlocks.indexOf(shortName as `${string}/${string}`) !== -1;
 
 					let label: string;
 

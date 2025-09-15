@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'pathe';
-import { assert, afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, assert, beforeAll, describe, expect, it } from 'vitest';
 import { cli } from '../src/cli';
 import type { Manifest } from '../src/types';
 import {

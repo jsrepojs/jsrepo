@@ -21,13 +21,13 @@ import { parseRecord } from '../utils/blocks/commander/parsers';
 import * as u from '../utils/blocks/ts/url';
 import {
 	type Formatter,
-	PROJECT_CONFIG_NAME,
-	type Paths,
-	type ProjectConfig,
-	REGISTRY_CONFIG_NAME,
 	formatterSchema,
 	getProjectConfig,
 	getRegistryConfig,
+	type Paths,
+	PROJECT_CONFIG_NAME,
+	type ProjectConfig,
+	REGISTRY_CONFIG_NAME,
 } from '../utils/config';
 import { packageJson } from '../utils/context';
 import { formatFile, matchJSDescendant } from '../utils/files';
@@ -36,12 +36,12 @@ import { json } from '../utils/language-support';
 import type { PackageJson } from '../utils/package';
 import { checkPreconditions } from '../utils/preconditions';
 import {
-	type Task,
 	intro,
 	nextSteps,
 	promptInstallDependencies,
 	promptUpdateFile,
 	runTasks,
+	type Task,
 } from '../utils/prompts';
 import * as registry from '../utils/registry-providers/internal';
 import { TokenManager } from '../utils/token-manager';
@@ -113,7 +113,7 @@ const init = new Command('init')
 	.option(
 		'--max-unchanged <number>',
 		'Maximum unchanged lines that will show without being collapsed.',
-		(val) => Number.parseInt(val), // this is such a dumb api thing
+		(val) => Number.parseInt(val, 10), // this is such a dumb api thing
 		3
 	)
 	.option('-y, --yes', 'Skip confirmation prompt.', false)
@@ -395,6 +395,7 @@ const _initProject = async (registries: string[], options: Options) => {
 		prettierOptions,
 		filePath: configPath,
 		formatter: config.formatter,
+		cwd: options.cwd,
 	});
 
 	if (!fs.existsSync(options.cwd)) {
@@ -644,6 +645,7 @@ async function promptForRegistryConfig({
 				biomeOptions,
 				prettierOptions,
 				formatter,
+				cwd: options.cwd,
 			});
 
 			loading.stop(`Fetched the ${color.cyan(file.name)} from ${color.cyan(url)}`);

@@ -2,9 +2,9 @@ import fs from 'node:fs';
 import { Biome, Distribution } from '@biomejs/js-api';
 import oxc from 'oxc-parser';
 import * as prettier from 'prettier';
-import { type Lang, formatError, resolveImports } from '.';
 import * as lines from '../blocks/ts/lines';
 import { Err, Ok } from '../blocks/ts/result';
+import { formatError, type Lang, resolveImports } from '.';
 
 /** Parses the provided code and returns the names of any other modules required by the module.
  *
@@ -13,6 +13,7 @@ import { Err, Ok } from '../blocks/ts/result';
  * @returns
  */
 export function getJavascriptImports(fileName: string, code: string): string[] {
+	console.log('oxc', oxc);
 	const result = oxc.parseSync(fileName, code);
 
 	const modules: string[] = [];
@@ -76,7 +77,7 @@ export const typescript: Lang = {
 		return Ok(resolveResult.unwrap());
 	},
 	comment: (content) => `/*\n${lines.join(lines.get(content), { prefix: () => '\t' })}\n*/`,
-	format: async (code, { formatter, filePath, prettierOptions, biomeOptions }) => {
+	format: async (code, { formatter, filePath, prettierOptions, biomeOptions, cwd }) => {
 		if (!formatter) return code;
 
 		if (formatter === 'prettier') {
@@ -87,10 +88,12 @@ export const typescript: Lang = {
 			distribution: Distribution.NODE,
 		});
 
+		const { projectKey } = biome.openProject(cwd);
+
 		if (biomeOptions) {
-			biome.applyConfiguration(biomeOptions);
+			biome.applyConfiguration(projectKey, biomeOptions);
 		}
 
-		return biome.formatContent(code, { filePath }).content;
+		return biome.formatContent(projectKey, code, { filePath }).content;
 	},
 };

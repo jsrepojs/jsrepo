@@ -1,9 +1,9 @@
 import fs from 'node:fs';
 import * as cssDependency from 'css-dependency';
 import * as prettier from 'prettier';
-import { type Lang, formatError, resolveImports } from '.';
 import * as lines from '../blocks/ts/lines';
 import { Err, Ok } from '../blocks/ts/result';
+import { formatError, type Lang, resolveImports } from '.';
 
 /** Language support for `*.(sass|scss)` files. */
 export const sass: Lang = {
