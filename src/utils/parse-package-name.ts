@@ -6,9 +6,9 @@
 import { Err, Ok } from './blocks/ts/result';
 
 // Parsed a scoped package name into name, version, and path.
-const RE_SCOPED = /^(@[^\/]+\/[^@\/]+)(?:@([^\/]+))?(\/.*)?$/;
+const RE_SCOPED = /^(@[^/]+\/[^@/]+)(?:@([^/]+))?(\/.*)?$/;
 // Parsed a non-scoped package name into name, version, path
-const RE_NON_SCOPED = /^([^@\/]+)(?:@([^\/]+))?(\/.*)?$/;
+const RE_NON_SCOPED = /^([^@/]+)(?:@([^/]+))?(\/.*)?$/;
 
 export type Package = {
 	/** Name of the package as it would be installed from npm */

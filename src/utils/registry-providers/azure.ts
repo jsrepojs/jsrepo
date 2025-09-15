@@ -103,7 +103,7 @@ function parseUrl(
 
 	let [owner, project, repoName, ...rest] = repo.split('/');
 
-	let specifier: string | undefined = undefined;
+	let specifier: string | undefined;
 
 	if (fullyQualified) {
 		specifier = rest.slice(rest.length - 2).join('/');

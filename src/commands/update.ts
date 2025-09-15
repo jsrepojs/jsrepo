@@ -45,7 +45,7 @@ const update = new Command('update')
 	.option(
 		'--max-unchanged <number>',
 		'Maximum unchanged lines that will show without being collapsed.',
-		(val) => Number.parseInt(val), // this is such a dumb api thing
+		(val) => Number.parseInt(val, 10), // this is such a dumb api thing
 		3
 	)
 	.option('-n, --no', 'Do update any blocks.', false)

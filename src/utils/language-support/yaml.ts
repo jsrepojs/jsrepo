@@ -1,7 +1,7 @@
 import * as prettier from 'prettier';
-import type { Lang } from '.';
 import * as lines from '../blocks/ts/lines';
 import { Ok } from '../blocks/ts/result';
+import type { Lang } from '.';
 
 /** Language support for `*.(yaml|yml)` files. */
 export const yaml: Lang = {

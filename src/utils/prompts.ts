@@ -1,9 +1,8 @@
 import { stripVTControlCharacters as stripAsni } from 'node:util';
-import type { PartialConfiguration } from '@biomejs/wasm-nodejs';
+import type { Configuration } from '@biomejs/wasm-nodejs';
 import { cancel, confirm, intro, isCancel, log, select, spinner, text } from '@clack/prompts';
 import boxen from 'boxen';
 import color from 'chalk';
-import { program } from 'commander';
 import { diffLines } from 'diff';
 import { type Agent, detect, resolveCommand } from 'package-manager-detector';
 import type * as prettier from 'prettier';
@@ -76,7 +75,9 @@ export async function runTasksConcurrently({
  */
 function _spinner({
 	verbose,
-}: { verbose?: (msg: string) => void } = {}): ReturnType<typeof spinner> {
+}: {
+	verbose?: (msg: string) => void;
+} = {}): ReturnType<typeof spinner> {
 	const loading = spinner();
 
 	return {
@@ -190,7 +191,7 @@ type UpdateBlockOptions = {
 	config: {
 		formatter: ProjectConfig['formatter'];
 		prettierOptions: prettier.Options | null;
-		biomeOptions: PartialConfiguration | null;
+		biomeOptions: Configuration | null;
 	};
 	options: {
 		yes: boolean;
@@ -199,6 +200,7 @@ type UpdateBlockOptions = {
 		maxUnchanged: number;
 		verbose?: (msg: string) => void;
 		loading: ReturnType<typeof spinner>;
+		cwd: string;
 	};
 };
 
@@ -382,6 +384,7 @@ export async function promptUpdateFile({
 						biomeOptions: config.biomeOptions,
 						prettierOptions: config.prettierOptions,
 						formatter: config.formatter,
+						cwd: options.cwd,
 					});
 
 					process.stdout.write(`${ascii.VERTICAL_LINE}\n`);

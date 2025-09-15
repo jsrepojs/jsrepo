@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import { builtinModules } from 'node:module';
-import type { PartialConfiguration } from '@biomejs/wasm-nodejs';
+import type { Configuration } from '@biomejs/wasm-nodejs';
 import color from 'chalk';
 import path from 'pathe';
 import type * as prettier from 'prettier';
@@ -45,7 +45,8 @@ export type FormatOptions = {
 	/** Can be used to infer the prettier parser */
 	filePath: string;
 	prettierOptions: prettier.Options | null;
-	biomeOptions: PartialConfiguration | null;
+	biomeOptions: Configuration | null;
+	cwd: string;
 };
 
 export type Lang = {
@@ -450,7 +451,7 @@ function resolveRemoteDeps(
 
 			if (exemptDeps.has(depInfo.name)) continue;
 
-			let version: string | undefined = undefined;
+			let version: string | undefined;
 			if (packageDependencies !== undefined) {
 				version = packageDependencies[depInfo.name];
 			}

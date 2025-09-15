@@ -66,7 +66,6 @@ export const bitbucket: RegistryProvider = {
 				if (response.ok) {
 					const data = await response.json();
 
-					// @ts-ignore yes but we know
 					ref = data.mainbranch.name as string;
 				} else {
 					ref = DEFAULT_BRANCH;

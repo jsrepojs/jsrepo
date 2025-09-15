@@ -4,7 +4,7 @@ import { program } from 'commander';
 import type { Ignore } from 'ignore';
 import path from 'pathe';
 import * as v from 'valibot';
-import { type Block, type Category, type Manifest, categorySchema } from '../../types';
+import { type Block, type Category, categorySchema, type Manifest } from '../../types';
 import * as ascii from '../ascii';
 import * as strings from '../blocks/ts/strings';
 import type { RegistryConfig } from '../config';

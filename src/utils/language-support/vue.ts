@@ -1,9 +1,9 @@
 import fs from 'node:fs';
 import * as prettier from 'prettier';
 import * as v from 'vue/compiler-sfc';
-import { type Lang, formatError, resolveImports } from '.';
 import * as lines from '../blocks/ts/lines';
 import { Err, Ok } from '../blocks/ts/result';
+import { formatError, type Lang, resolveImports } from '.';
 import { getJavascriptImports } from './javascript';
 
 /** Language support for `*.vue` files. */

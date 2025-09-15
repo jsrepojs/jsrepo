@@ -11,7 +11,7 @@ function findNearestPackageJson(startDir: string, until: string): string | undef
 
 	if (startDir === until) return undefined;
 
-	const segments = startDir.split(/[\/\\]/);
+	const segments = startDir.split(/[/\\]/);
 
 	return findNearestPackageJson(segments.slice(0, segments.length - 1).join('/'), until);
 }

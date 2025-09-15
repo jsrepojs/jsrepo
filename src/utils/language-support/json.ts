@@ -1,12 +1,12 @@
 import { Biome, Distribution } from '@biomejs/js-api';
 import * as prettier from 'prettier';
-import type { Lang } from '.';
 import * as lines from '../blocks/ts/lines';
 import { Ok } from '../blocks/ts/result';
+import type { Lang } from '.';
 
 const format: Lang['format'] = async (
 	code,
-	{ formatter, prettierOptions, biomeOptions, filePath }
+	{ formatter, prettierOptions, biomeOptions, filePath, cwd }
 ) => {
 	if (!formatter) return code;
 
@@ -18,14 +18,16 @@ const format: Lang['format'] = async (
 		distribution: Distribution.NODE,
 	});
 
+	const { projectKey } = biome.openProject(cwd);
+
 	if (biomeOptions) {
-		biome.applyConfiguration({
+		biome.applyConfiguration(projectKey, {
 			...biomeOptions,
 			json: { parser: { allowComments: true } },
 		});
 	}
 
-	return biome.formatContent(code, { filePath }).content;
+	return biome.formatContent(projectKey, code, { filePath }).content;
 };
 
 /** Language support for `*.(json)` files. */

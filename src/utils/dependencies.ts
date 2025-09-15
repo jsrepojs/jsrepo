@@ -62,7 +62,7 @@ export async function installDependencies({
 	}
 }
 
-const templatePattern = /\{\{([^\/]+)\/([^\}]+)\}\}/g;
+const templatePattern = /\{\{([^/]+)\/([^}]+)\}\}/g;
 
 export type ResolveOptions = {
 	template: string;

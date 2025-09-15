@@ -1,5 +1,5 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.2.4/schema.json",
 	"formatter": {
 		"enabled": true,
 		"formatWithErrors": false,
@@ -10,19 +10,18 @@
 		"attributePosition": "auto"
 	},
 	"files": {
-		"ignore": ["dist", "node_modules", "docs", "temp-test"]
+		"includes": ["**", "!**/dist", "!**/node_modules", "!**/docs", "!**/temp-test"]
 	},
-	"organizeImports": { "enabled": true },
+	"assist": { "actions": { "source": { "organizeImports": "on" } } },
 	"linter": {
 		"enabled": true,
 		"rules": {
 			"recommended": true,
 			"complexity": {
 				"noExtraBooleanCast": "error",
-				"noMultipleSpacesInRegularExpressionLiterals": "error",
 				"noUselessCatch": "error",
 				"noUselessTypeConstraint": "error",
-				"noWith": "error"
+				"noAdjacentSpacesInRegex": "error"
 			},
 			"correctness": {
 				"noConstAssign": "error",
@@ -31,7 +30,6 @@
 				"noEmptyPattern": "error",
 				"noGlobalObjectCalls": "error",
 				"noInvalidConstructorSuper": "error",
-				"noInvalidNewBuiltin": "error",
 				"noNonoctalDecimalEscape": "error",
 				"noPrecisionLoss": "error",
 				"noSelfAssign": "error",
@@ -45,15 +43,17 @@
 				"noUnusedLabels": "error",
 				"noUnusedPrivateClassMembers": "error",
 				"noUnusedVariables": "error",
-				"useArrayLiterals": "off",
 				"useIsNan": "error",
 				"useValidForDirection": "error",
-				"useYield": "error"
+				"useYield": "error",
+				"noInvalidBuiltinInstantiation": "error",
+				"useValidTypeof": "error"
 			},
 			"style": {
 				"noNamespace": "error",
 				"useAsConstAssertion": "error",
-				"noNonNullAssertion": "off"
+				"noNonNullAssertion": "off",
+				"useArrayLiterals": "off"
 			},
 			"suspicious": {
 				"noAsyncPromiseExecutor": "error",
@@ -82,10 +82,10 @@
 				"noUnsafeNegation": "error",
 				"useGetterReturn": "error",
 				"useNamespaceKeyword": "error",
-				"useValidTypeof": "error"
+				"noWith": "error"
 			}
 		},
-		"ignore": ["**/dist/*", "**/node_modules/*"]
+		"includes": ["**", "!**/dist/**/*", "!**/node_modules/**/*"]
 	},
 	"javascript": {
 		"formatter": {
@@ -103,7 +103,7 @@
 	},
 	"overrides": [
 		{
-			"include": ["*.md"],
+			"includes": ["**/*.md"],
 			"formatter": {
 				"indentStyle": "space",
 				"indentWidth": 2,

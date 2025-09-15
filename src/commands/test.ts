@@ -143,7 +143,7 @@ async function _test(blockNames: string[], options: Options) {
 	const testingBlocksMapped: { name: string; block: registry.RemoteBlock }[] = [];
 
 	for (const blockSpecifier of testingBlocks) {
-		let block: registry.RemoteBlock | undefined = undefined;
+		let block: registry.RemoteBlock | undefined;
 
 		const provider = registry.selectProvider(blockSpecifier);
 
@@ -258,7 +258,7 @@ async function _test(blockNames: string[], options: Options) {
 			for (const mod of result.module.staticImports) {
 				const moduleSpecifier = mod.moduleRequest.value;
 
-				let newModuleSpecifier: string | undefined = undefined;
+				let newModuleSpecifier: string | undefined;
 
 				if (moduleSpecifier.startsWith('.')) {
 					if (block.subdirectory) {

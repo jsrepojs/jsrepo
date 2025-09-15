@@ -7,7 +7,7 @@ import * as array from './blocks/ts/array';
 import { Err, Ok, type Result } from './blocks/ts/result';
 import * as url from './blocks/ts/url';
 import { isDocsFile, isTestFile } from './build';
-import { type Paths, type ProjectConfig, getPathForBlock, resolvePaths } from './config';
+import { getPathForBlock, type Paths, type ProjectConfig, resolvePaths } from './config';
 import * as registry from './registry-providers/internal';
 
 export async function resolveTree(
@@ -21,7 +21,7 @@ export async function resolveTree(
 	const blocks = new Map<string, registry.RemoteBlock>();
 
 	for (const blockSpecifier of blockSpecifiers) {
-		let block: registry.RemoteBlock | undefined = undefined;
+		let block: registry.RemoteBlock | undefined;
 
 		const provider = registry.selectProvider(blockSpecifier);
 
