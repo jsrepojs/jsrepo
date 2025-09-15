@@ -1,5 +1,10 @@
 # jsrepo
 
+## 2.4.8
+### Patch Changes
+
+- ff542fb: chore: bump deps
+
 ## 2.4.7
 ### Patch Changes
 
