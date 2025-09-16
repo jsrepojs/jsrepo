@@ -1,5 +1,11 @@
 # jsrepo
 
+## 2.4.9
+### Patch Changes
+
+- 4bc9736: fix: Ensure stale cache is cleared in `--no-cache` mode
+- 4bc9736: fix: Update bitbucket default branch
+
 ## 2.4.8
 ### Patch Changes
 
