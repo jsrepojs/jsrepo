@@ -20,6 +20,7 @@ describe('add', () => {
 			},
 			repos: [registry],
 			watermark: true,
+			includeDocs: false,
 		};
 
 		fs.writeFileSync('jsrepo.json', JSON.stringify(config));
@@ -115,6 +116,24 @@ describe('add', () => {
 
 	it('adds from azure', async () => {
 		await addBlock('azure/ieedan/std/std', 'utils/math');
+
+		const blockBaseDir = './src/utils/math';
+
+		const expectedFiles = [
+			'circle.ts',
+			'conversions.ts',
+			'fractions.ts',
+			'gcf.ts',
+			'index.ts',
+			'triangles.ts',
+			'types.ts',
+		];
+
+		assertFilesExist(blockBaseDir, ...expectedFiles);
+	});
+
+	it('adds from bitbucket', async () => {
+		await addBlock('bitbucket/ieedan/std', 'utils/math');
 
 		const blockBaseDir = './src/utils/math';
 
