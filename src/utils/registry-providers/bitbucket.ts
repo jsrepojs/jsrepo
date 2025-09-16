@@ -2,7 +2,7 @@ import color from 'chalk';
 import { startsWithOneOf } from '../blocks/ts/strings';
 import type { ParseOptions, RegistryProvider, RegistryProviderState } from './types';
 
-const DEFAULT_BRANCH = 'master';
+const DEFAULT_BRANCH = 'main';
 
 export interface BitBucketProviderState extends RegistryProviderState {
 	owner: string;

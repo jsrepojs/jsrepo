@@ -75,7 +75,7 @@ export async function getProviderState(
 		const storage = persisted.get();
 
 		// only git providers are cached
-		if (provider.name !== http.name && !noCache) {
+		if (provider.name !== http.name) {
 			if (noCache) {
 				// remove the outdated cache if it exists
 				storage.delete(`${repo}-state`);
