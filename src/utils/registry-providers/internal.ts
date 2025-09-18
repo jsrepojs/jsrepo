@@ -38,12 +38,12 @@ export async function internalFetchRaw(
 /** Wraps the basic implementation to inject internal fetch method and the correct token. */
 export async function internalFetchManifest(
 	state: RegistryProviderState,
-	{ verbose }: { verbose?: (msg: string) => void } = {}
+	{ verbose, noCache }: { verbose?: (msg: string) => void; noCache?: boolean } = {}
 ) {
 	return await fetchManifest(state, {
 		verbose,
 		// @ts-expect-error it's fine
-		fetch: iFetch,
+		fetch: (input, init) => iFetch(input, { ...init, cache: noCache ? 'reload' : undefined }),
 		token: getProviderToken(state.provider, state.url),
 	});
 }
@@ -213,13 +213,13 @@ export type FetchManifestResult = {
  */
 export async function fetchManifests(
 	repos: RegistryProviderState[],
-	{ verbose }: { verbose?: (msg: string) => void } = {}
+	{ verbose, noCache }: { verbose?: (msg: string) => void; noCache?: boolean } = {}
 ): Promise<Result<FetchManifestResult[], { message: string; repo: string }>> {
 	const manifests: FetchManifestResult[] = [];
 
 	const errors = await Promise.all(
 		repos.map(async (state) => {
-			const getManifestResult = await internalFetchManifest(state, { verbose });
+			const getManifestResult = await internalFetchManifest(state, { verbose, noCache });
 
 			if (getManifestResult.isErr()) {
 				return Err({ message: getManifestResult.unwrapErr(), repo: state.url });
