@@ -276,6 +276,7 @@ async function _add(blockNames: string[], options: Options) {
 	const manifests = (
 		await registry.fetchManifests(resolvedRepos, {
 			verbose: options.verbose ? verbose : undefined,
+			noCache: !options.cache,
 		})
 	).match(
 		(v) => v,
