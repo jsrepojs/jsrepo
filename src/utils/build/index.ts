@@ -215,11 +215,7 @@ export function buildBlocksDirectory(
 							continue;
 						}
 
-						if (
-							config.includeFiles.some((pattern) =>
-								minimatch(relativeToRootDirectory, pattern)
-							)
-						) {
+						if (shouldIncludeFile(relativeToRootDirectory, config)) {
 							blockFiles.push(relativeFilePath);
 							continue;
 						}
@@ -423,9 +419,7 @@ export function shouldIncludeCategory(name: string, config: RegistryConfig) {
 }
 
 export function shouldIncludeFile(filePathRelativeToRoot: string, config: RegistryConfig) {
-	if (config.includeFiles.length === 0) {
-		return false;
-	}
+	if (config.includeFiles.length === 0) return false;
 
 	return config.includeFiles.some((pattern) =>
 		minimatch(filePathRelativeToRoot, pattern.replace(/^(\.\/|\/)/, ''))
