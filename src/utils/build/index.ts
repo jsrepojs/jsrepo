@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import color from 'chalk';
 import { program } from 'commander';
 import type { Ignore } from 'ignore';
+import { minimatch } from 'minimatch';
 import path from 'pathe';
 import * as v from 'valibot';
 import { type Block, type Category, categorySchema, type Manifest } from '../../types';
@@ -193,6 +194,7 @@ export function buildBlocksDirectory(
 						const filePath = path.join(base, f);
 						// relative to the block root
 						const relativeFilePath = filePath.slice(blockDir.length + 1);
+						const relativeToRootDirectory = filePath.replace(cwd, '').replace('/', '');
 
 						if (isTestFile(f)) {
 							hasTests = true;
@@ -211,6 +213,14 @@ export function buildBlocksDirectory(
 							hasDocs = true;
 							blockFiles.push(relativeFilePath);
 							continue;
+						}
+
+						if (
+							config.includeFiles.some((pattern) =>
+								minimatch(relativeToRootDirectory, pattern)
+							)
+						) {
+							blockFiles.push(relativeFilePath);
 						}
 
 						if (fs.statSync(filePath).isDirectory()) {
@@ -409,6 +419,16 @@ export function shouldIncludeCategory(name: string, config: RegistryConfig) {
 	}
 
 	return true;
+}
+
+export function shouldIncludeFile(filePathRelativeToRoot: string, config: RegistryConfig) {
+	if (config.includeFiles.length === 0) {
+		return false;
+	}
+
+	return config.includeFiles.some((pattern) =>
+		minimatch(filePathRelativeToRoot, pattern.replace(/^(\.\/|\/)/, ''))
+	);
 }
 
 /** Takes the given file and returns the block name */

@@ -783,6 +783,7 @@ const _initRegistry = async (options: Options) => {
 			excludeDeps: [],
 			includeBlocks: [],
 			includeCategories: [],
+			includeFiles: [],
 			excludeBlocks: [],
 			excludeCategories: [],
 			preview: false,

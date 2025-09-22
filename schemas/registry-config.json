@@ -150,6 +150,13 @@
 				"type": "string"
 			}
 		},
+		"includeFiles": {
+			"description": "Additional files to include in the manifest. (Supports glob patterns)",
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
 		"excludeBlocks": {
 			"description": "The names of the blocks that should not be included in the manifest.",
 			"type": "array",

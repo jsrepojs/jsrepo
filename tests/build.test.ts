@@ -6,6 +6,7 @@ import type { Manifest } from '../src/types';
 import {
 	shouldIncludeBlock,
 	shouldIncludeCategory,
+	shouldIncludeFile,
 	shouldListBlock,
 	shouldListCategory,
 } from '../src/utils/build';
@@ -65,6 +66,7 @@ describe('build', () => {
 			dirs: ['./src', './'],
 			includeBlocks: [],
 			includeCategories: [],
+			includeFiles: ['src/utils/block-with-asset/asset.txt'],
 			excludeBlocks: [],
 			excludeCategories: ['src'],
 			doNotListBlocks: ['noop'],
@@ -206,6 +208,19 @@ export const highlighter = createHighlighterCore({
 </script>`
 		);
 
+		fs.mkdirSync('./src/utils/block-with-asset', { recursive: true });
+
+		fs.writeFileSync(
+			'./src/utils/block-with-asset/index.ts',
+			`import { fs } from 'node:fs';
+
+const result = fs.readFileSync(new URL('./asset.txt', import.meta.url), 'utf-8');
+console.log(result);
+`
+		);
+
+		fs.writeFileSync('./src/utils/block-with-asset/asset.txt', 'This is an asset file.');
+
 		// build
 
 		await cli.parseAsync([
@@ -322,6 +337,20 @@ export const highlighter = createHighlighterCore({
 							},
 						},
 						{
+							_imports_: {},
+							category: 'utils',
+							dependencies: [],
+							devDependencies: [],
+							directory: 'src/utils/block-with-asset',
+							docs: false,
+							files: ['asset.txt', 'index.ts'],
+							list: true,
+							localDependencies: [],
+							name: 'block-with-asset',
+							subdirectory: true,
+							tests: false,
+						},
+						{
 							name: 'form1',
 							category: 'utils',
 							localDependencies: [],
@@ -395,6 +424,7 @@ const defaultConfig = {
 	excludeDeps: [],
 	includeBlocks: [],
 	includeCategories: [],
+	includeFiles: [],
 	excludeBlocks: [],
 	excludeCategories: [],
 };
@@ -516,5 +546,74 @@ describe('shouldIncludeCategory', () => {
 				includeDocs: false,
 			})
 		).toBe(false);
+	});
+});
+
+describe('shouldIncludeFile', () => {
+	it('does not list if unspecified', () => {
+		expect(
+			shouldIncludeFile('utils/math/asset.txt', { ...defaultConfig, includeDocs: false })
+		).toBe(false);
+	});
+
+	it('can include a file when referenced directly', () => {
+		expect(
+			shouldIncludeFile('utils/math/asset.txt', {
+				...defaultConfig,
+				includeFiles: ['/utils/math/asset.txt'],
+				includeDocs: false,
+			})
+		).toBe(true);
+	});
+
+	it('is lenient to leading slashes', () => {
+		expect(
+			shouldIncludeFile('utils/math/asset.txt', {
+				...defaultConfig,
+				includeFiles: ['/utils/math/asset.txt'],
+				includeDocs: false,
+			})
+		).toBe(true);
+		expect(
+			shouldIncludeFile('utils/math/asset.txt', {
+				...defaultConfig,
+				includeFiles: ['./utils/math/asset.txt'],
+				includeDocs: false,
+			})
+		).toBe(true);
+	});
+
+	it('it can include all files of a certain extension', () => {
+		expect(
+			shouldIncludeFile('utils/math/asset.txt', {
+				...defaultConfig,
+				includeFiles: ['**/*.txt'],
+				includeDocs: false,
+			})
+		).toBe(true);
+		expect(
+			shouldIncludeFile('utils/math/asset.png', {
+				...defaultConfig,
+				includeFiles: ['**/*.txt'],
+				includeDocs: false,
+			})
+		).toBe(false);
+	});
+
+	it('it can include all files in a certain directory', () => {
+		expect(
+			shouldIncludeFile('utils/math/files-to-include/asset.txt', {
+				...defaultConfig,
+				includeFiles: ['utils/math/files-to-include/**'],
+				includeDocs: false,
+			})
+		).toBe(true);
+		expect(
+			shouldIncludeFile('utils/math/files-to-include/image.png', {
+				...defaultConfig,
+				includeFiles: ['utils/math/files-to-include/**'],
+				includeDocs: false,
+			})
+		).toBe(true);
 	});
 });

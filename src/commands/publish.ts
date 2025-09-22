@@ -27,6 +27,7 @@ const schema = v.object({
 	dirs: v.optional(v.array(v.string())),
 	includeBlocks: v.optional(v.array(v.string())),
 	includeCategories: v.optional(v.array(v.string())),
+	includeFiles: v.optional(v.array(v.string())),
 	excludeBlocks: v.optional(v.array(v.string())),
 	excludeCategories: v.optional(v.array(v.string())),
 	excludeDeps: v.optional(v.array(v.string())),
@@ -109,6 +110,7 @@ async function _publish(options: Options) {
 					excludeDeps: options.excludeDeps ?? [],
 					includeBlocks: options.includeBlocks ?? [],
 					includeCategories: options.includeCategories ?? [],
+					includeFiles: options.includeFiles ?? [],
 					excludeBlocks: options.excludeBlocks ?? [],
 					excludeCategories: options.excludeCategories ?? [],
 					allowSubdirectories: options.allowSubdirectories,
@@ -131,6 +133,7 @@ async function _publish(options: Options) {
 			if (options.listCategories) mergedVal.listCategories = options.listCategories;
 			if (options.includeBlocks) mergedVal.includeBlocks = options.includeBlocks;
 			if (options.includeCategories) mergedVal.includeCategories = options.includeCategories;
+			if (options.includeFiles) mergedVal.includeFiles = options.includeFiles;
 			if (options.excludeBlocks) mergedVal.excludeBlocks = options.excludeBlocks;
 			if (options.excludeCategories) mergedVal.excludeCategories = options.excludeCategories;
 			if (options.excludeDeps) mergedVal.excludeDeps = options.excludeDeps;
