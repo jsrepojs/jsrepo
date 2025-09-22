@@ -221,6 +221,7 @@ export function buildBlocksDirectory(
 							)
 						) {
 							blockFiles.push(relativeFilePath);
+							continue;
 						}
 
 						if (fs.statSync(filePath).isDirectory()) {

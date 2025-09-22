@@ -13,7 +13,6 @@ import { formatError, type Lang, resolveImports } from '.';
  * @returns
  */
 export function getJavascriptImports(fileName: string, code: string): string[] {
-	console.log('oxc', oxc);
 	const result = oxc.parseSync(fileName, code);
 
 	const modules: string[] = [];
