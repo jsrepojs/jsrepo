@@ -1,5 +1,14 @@
 # jsrepo
 
+## 2.5.0
+### Minor Changes
+
+- 5985e18: feat: Add `includeFiles` to config to allow for serving any file type from a registry
+
+### Patch Changes
+
+- 5985e18: fix: Remove console.log in `build` command
+
 ## 2.4.9
 ### Patch Changes
 
