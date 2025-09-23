@@ -76,6 +76,7 @@ export const registryConfigSchema = v.object({
 	outputDir: v.optional(v.string()),
 	includeBlocks: v.optional(v.array(v.string()), []),
 	includeCategories: v.optional(v.array(v.string()), []),
+	includeFiles: v.optional(v.array(v.string()), []),
 	excludeBlocks: v.optional(v.array(v.string()), []),
 	excludeCategories: v.optional(v.array(v.string()), []),
 	doNotListBlocks: v.optional(v.array(v.string()), []),

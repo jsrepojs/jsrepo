@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import color from 'chalk';
 import { program } from 'commander';
 import type { Ignore } from 'ignore';
+import baseIgnore from 'ignore';
 import path from 'pathe';
 import * as v from 'valibot';
 import { type Block, type Category, categorySchema, type Manifest } from '../../types';
@@ -187,12 +188,15 @@ export function buildBlocksDirectory(
 
 				const blockFiles: string[] = [];
 
+				const shouldIncludeFile = createShouldIncludeFile(config);
+
 				// if the user has enabled allow subdirectories we recursively check each directory and resolve any dependencies
 				const walkFiles = (base: string, files: string[]) => {
 					for (const f of files) {
 						const filePath = path.join(base, f);
 						// relative to the block root
 						const relativeFilePath = filePath.slice(blockDir.length + 1);
+						const relativeToRootDirectory = filePath.replace(cwd, '').replace('/', '');
 
 						if (isTestFile(f)) {
 							hasTests = true;
@@ -209,6 +213,11 @@ export function buildBlocksDirectory(
 							}
 
 							hasDocs = true;
+							blockFiles.push(relativeFilePath);
+							continue;
+						}
+
+						if (shouldIncludeFile(relativeToRootDirectory)) {
 							blockFiles.push(relativeFilePath);
 							continue;
 						}
@@ -409,6 +418,16 @@ export function shouldIncludeCategory(name: string, config: RegistryConfig) {
 	}
 
 	return true;
+}
+
+export function createShouldIncludeFile(config: RegistryConfig) {
+	if (config.includeFiles.length === 0) return () => false;
+
+	// Dispite it's name, the ignore package can also be used to include files.
+	// It's just a pattern matching library based on the .gitignore syntax.
+	const ignore = baseIgnore().add(config.includeFiles.map((p) => p.replace(/^(\.\/|\/)/, '')));
+
+	return (filePathRelativeToRoot: string) => ignore.ignores(filePathRelativeToRoot);
 }
 
 /** Takes the given file and returns the block name */
