@@ -148,13 +148,13 @@ export async function forEachPathGetProviderState(
  */
 export async function fetchBlocks(
 	repos: RegistryProviderState[],
-	{ verbose }: { verbose?: (msg: string) => void } = {}
+	{ verbose, noCache }: { verbose?: (msg: string) => void; noCache?: boolean } = {}
 ): Promise<Result<Map<string, RemoteBlock>, { message: string; repo: string }>> {
 	const blocksMap = new Map<string, RemoteBlock>();
 
 	const errors = await Promise.all(
 		repos.map(async (state) => {
-			const getManifestResult = await internalFetchManifest(state, { verbose });
+			const getManifestResult = await internalFetchManifest(state, { verbose, noCache });
 
 			if (getManifestResult.isErr()) {
 				return Err({ message: getManifestResult.unwrapErr(), repo: state.url });
