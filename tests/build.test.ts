@@ -4,9 +4,9 @@ import { afterAll, assert, beforeAll, describe, expect, it } from 'vitest';
 import { cli } from '../src/cli';
 import type { Manifest } from '../src/types';
 import {
+	createShouldIncludeFile,
 	shouldIncludeBlock,
 	shouldIncludeCategory,
-	shouldIncludeFile,
 	shouldListBlock,
 	shouldListCategory,
 } from '../src/utils/build';
@@ -552,68 +552,77 @@ describe('shouldIncludeCategory', () => {
 describe('shouldIncludeFile', () => {
 	it('does not list if unspecified', () => {
 		expect(
-			shouldIncludeFile('utils/math/asset.txt', { ...defaultConfig, includeDocs: false })
+			createShouldIncludeFile({ ...defaultConfig, includeDocs: false })(
+				'utils/math/asset.txt'
+			)
 		).toBe(false);
 	});
 
 	it('can include a file when referenced directly', () => {
 		expect(
-			shouldIncludeFile('utils/math/asset.txt', {
+			createShouldIncludeFile({
 				...defaultConfig,
 				includeFiles: ['/utils/math/asset.txt'],
 				includeDocs: false,
-			})
+			})('utils/math/asset.txt')
 		).toBe(true);
 	});
 
 	it('is lenient to leading slashes', () => {
 		expect(
-			shouldIncludeFile('utils/math/asset.txt', {
+			createShouldIncludeFile({
 				...defaultConfig,
 				includeFiles: ['/utils/math/asset.txt'],
 				includeDocs: false,
-			})
+			})('utils/math/asset.txt')
 		).toBe(true);
 		expect(
-			shouldIncludeFile('utils/math/asset.txt', {
+			createShouldIncludeFile({
 				...defaultConfig,
 				includeFiles: ['./utils/math/asset.txt'],
 				includeDocs: false,
-			})
+			})('utils/math/asset.txt')
 		).toBe(true);
 	});
 
 	it('it can include all files of a certain extension', () => {
 		expect(
-			shouldIncludeFile('utils/math/asset.txt', {
+			createShouldIncludeFile({
 				...defaultConfig,
 				includeFiles: ['**/*.txt'],
 				includeDocs: false,
-			})
+			})('utils/math/asset.txt')
 		).toBe(true);
 		expect(
-			shouldIncludeFile('utils/math/asset.png', {
+			createShouldIncludeFile({
 				...defaultConfig,
-				includeFiles: ['**/*.txt'],
+				includeFiles: ['**/*.png'],
 				includeDocs: false,
-			})
+			})('utils/math/asset.png')
+		).toBe(true);
+		expect(
+			createShouldIncludeFile({
+				...defaultConfig,
+				includeFiles: ['**/*.png'],
+				includeDocs: false,
+			})('utils/math/asset.jpg')
 		).toBe(false);
 	});
 
 	it('it can include all files in a certain directory', () => {
 		expect(
-			shouldIncludeFile('utils/math/files-to-include/asset.txt', {
+			createShouldIncludeFile({
 				...defaultConfig,
 				includeFiles: ['utils/math/files-to-include/**'],
 				includeDocs: false,
-			})
+			})('utils/math/files-to-include/asset.txt')
 		).toBe(true);
 		expect(
-			shouldIncludeFile('utils/math/files-to-include/image.png', {
+			createShouldIncludeFile({
 				...defaultConfig,
 				includeFiles: ['utils/math/files-to-include/**'],
 				includeDocs: false,
-			})
+			})('utils/math/files-to-include/image.png')
 		).toBe(true);
 	});
 });

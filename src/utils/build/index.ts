@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import color from 'chalk';
 import { program } from 'commander';
 import type { Ignore } from 'ignore';
-import { minimatch } from 'minimatch';
+import baseIgnore from 'ignore';
 import path from 'pathe';
 import * as v from 'valibot';
 import { type Block, type Category, categorySchema, type Manifest } from '../../types';
@@ -188,6 +188,8 @@ export function buildBlocksDirectory(
 
 				const blockFiles: string[] = [];
 
+				const shouldIncludeFile = createShouldIncludeFile(config);
+
 				// if the user has enabled allow subdirectories we recursively check each directory and resolve any dependencies
 				const walkFiles = (base: string, files: string[]) => {
 					for (const f of files) {
@@ -215,7 +217,7 @@ export function buildBlocksDirectory(
 							continue;
 						}
 
-						if (shouldIncludeFile(relativeToRootDirectory, config)) {
+						if (shouldIncludeFile(relativeToRootDirectory)) {
 							blockFiles.push(relativeFilePath);
 							continue;
 						}
@@ -418,12 +420,12 @@ export function shouldIncludeCategory(name: string, config: RegistryConfig) {
 	return true;
 }
 
-export function shouldIncludeFile(filePathRelativeToRoot: string, config: RegistryConfig) {
-	if (config.includeFiles.length === 0) return false;
+export function createShouldIncludeFile(config: RegistryConfig) {
+	if (config.includeFiles.length === 0) return () => false;
 
-	return config.includeFiles.some((pattern) =>
-		minimatch(filePathRelativeToRoot, pattern.replace(/^(\.\/|\/)/, ''))
-	);
+	const ignore = baseIgnore().add(config.includeFiles.map((p) => p.replace(/^(\.\/|\/)/, '')));
+
+	return (filePathRelativeToRoot: string) => ignore.ignores(filePathRelativeToRoot);
 }
 
 /** Takes the given file and returns the block name */
