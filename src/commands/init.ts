@@ -532,7 +532,9 @@ async function promptForRegistryConfig({
 		(err) => program.error(color.red(err))
 	);
 
-	const manifest = (await registry.fetchManifest(providerState)).match(
+	const manifest = (
+		await registry.fetchManifest(providerState, { noCache: !options.cache })
+	).match(
 		(v) => v,
 		(err) => program.error(color.red(err))
 	);
