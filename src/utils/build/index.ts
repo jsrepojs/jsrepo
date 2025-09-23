@@ -422,7 +422,7 @@ export function shouldIncludeCategory(name: string, config: RegistryConfig) {
 
 export function createShouldIncludeFile(config: RegistryConfig) {
 	if (config.includeFiles.length === 0) return () => false;
-	
+
 	// Dispite it's name, the ignore package can also be used to include files.
 	// It's just a pattern matching library based on the .gitignore syntax.
 	const ignore = baseIgnore().add(config.includeFiles.map((p) => p.replace(/^(\.\/|\/)/, '')));
