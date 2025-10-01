@@ -160,10 +160,14 @@ const init = new Command('init')
 			options.project = response === 'project';
 		}
 
-		if (options.project || registries.length > 0) {
-			await _initProject(registries, options);
-		} else {
-			await _initRegistry(options);
+		try {
+			if (options.project || registries.length > 0) {
+				await _initProject(registries, options);
+			} else {
+				await _initRegistry(options);
+			}
+		} catch (err) {
+			program.error(color.red(`An unexpected error occurred: ${err}`));
 		}
 
 		outro(color.green('All done!'));
