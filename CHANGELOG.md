@@ -1,5 +1,10 @@
 # jsrepo
 
+## 2.5.1
+### Patch Changes
+
+- 0b202f0: chore: bump `tmcp`
+
 ## 2.5.0
 ### Minor Changes
 

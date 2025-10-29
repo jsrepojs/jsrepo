@@ -2,7 +2,7 @@
 
 > A CLI to add shared code from remote repositories.
  
-Latest Version: 2.5.0
+Latest Version: 2.5.1
 
 ## Commands
 
