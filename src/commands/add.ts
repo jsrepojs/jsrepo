@@ -462,7 +462,7 @@ async function _add(blockNames: string[], options: Options) {
 		(err) => program.error(color.red(err))
 	);
 
-	const updatedBlocks = new Set<string>();
+	const updatedBlocks = new Set<string | Buffer>();
 
 	let overwriteAll: boolean | undefined;
 
@@ -473,6 +473,12 @@ async function _add(blockNames: string[], options: Options) {
 		content: string;
 		block: registry.RemoteBlock;
 	}>[] = [];
+
+	const assetFiles: {
+		destination: string;
+		content: Buffer;
+		block: registry.RemoteBlock;
+	}[] = [];
 
 	for (const preloadedBlock of preloadedBlocks) {
 		const fullSpecifier = url.join(
@@ -647,6 +653,28 @@ async function _add(blockNames: string[], options: Options) {
 			});
 		});
 
+		preloadedBlock.assets?.then((files) => {
+			files.map(async (file) => {
+				const content = file.content.match(
+					(v) => v,
+					(err) => program.error(color.red(err))
+				);
+
+				const destPath = getBlockFilePath(
+					file.name,
+					preloadedBlock.block,
+					resolvedPaths,
+					options.cwd
+				);
+
+				assetFiles.push({
+					block: preloadedBlock.block,
+					content,
+					destination: destPath,
+				});
+			});
+		});
+
 		updatedBlocks.add(shortSpecifier);
 	}
 
@@ -657,9 +685,10 @@ async function _add(blockNames: string[], options: Options) {
 
 		// wait for any remaining files to finish loading
 		await Promise.all(preloadedBlocks.map((p) => p.files));
+		await Promise.all(preloadedBlocks.map((p) => p.assets));
 
 		await Promise.all(
-			updatedFiles.map(async (updatedFile) => {
+			[...updatedFiles, ...assetFiles].map(async (updatedFile) => {
 				const file = await updatedFile;
 
 				const folder = path.dirname(file.destination);
