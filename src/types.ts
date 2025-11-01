@@ -13,6 +13,7 @@ export const blockSchema = v.object({
 	directory: v.string(),
 	subdirectory: v.boolean(),
 	files: v.array(v.string()),
+	assets: v.optional(v.array(v.string())),
 	_imports_: v.record(v.string(), v.string()),
 });
 

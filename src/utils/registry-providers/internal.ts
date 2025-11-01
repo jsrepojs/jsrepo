@@ -8,6 +8,7 @@ import { TokenManager } from '../token-manager';
 import {
 	azure,
 	bitbucket,
+	fetchBuffer,
 	fetchManifest,
 	fetchRaw,
 	github,
@@ -28,6 +29,19 @@ export async function internalFetchRaw(
 	{ verbose }: { verbose?: (msg: string) => void } = {}
 ) {
 	return await fetchRaw(state, resourcePath, {
+		verbose,
+		// @ts-expect-error it's fine
+		fetch: iFetch,
+		token: getProviderToken(state.provider, state.url),
+	});
+}
+
+export async function internalFetchBuffer(
+	state: RegistryProviderState,
+	resourcePath: string,
+	{ verbose }: { verbose?: (msg: string) => void } = {}
+) {
+	return await fetchBuffer(state, resourcePath, {
 		verbose,
 		// @ts-expect-error it's fine
 		fetch: iFetch,
@@ -250,5 +264,6 @@ export {
 	providers,
 	internalFetchManifest as fetchManifest,
 	internalFetchRaw as fetchRaw,
+	internalFetchBuffer as fetchRawBuffer,
 	selectProvider,
 };

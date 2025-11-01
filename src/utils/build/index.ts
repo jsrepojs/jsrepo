@@ -187,6 +187,7 @@ export function buildBlocksDirectory(
 				let hasDocs = false;
 
 				const blockFiles: string[] = [];
+				const blockAssets: string[] = [];
 
 				const shouldIncludeFile = createShouldIncludeFile(config);
 
@@ -218,7 +219,7 @@ export function buildBlocksDirectory(
 						}
 
 						if (shouldIncludeFile(relativeToRootDirectory)) {
-							blockFiles.push(relativeFilePath);
+							blockAssets.push(relativeFilePath);
 							continue;
 						}
 
@@ -303,6 +304,7 @@ export function buildBlocksDirectory(
 					subdirectory: true,
 					list: listCategory ? listBlock : false,
 					files: blockFiles,
+					assets: blockAssets,
 					localDependencies: Array.from(localDepsSet.keys()),
 					dependencies: Array.from(depsSet.keys()),
 					devDependencies: Array.from(devDepsSet.keys()),

@@ -155,9 +155,15 @@ export type RegistryFile = {
 	content: Result<string, string>;
 };
 
+export type RegistryAsset = {
+	name: string;
+	content: Result<Buffer, string>;
+};
+
 type PreloadedBlock = {
 	block: registry.RemoteBlock;
 	files: Promise<RegistryFile[]>;
+	assets?: Promise<RegistryAsset[]>;
 };
 
 /** Starts loading the content of the files for each block and
@@ -193,9 +199,21 @@ export function preloadBlocks(
 			})
 		);
 
+		const assets = Promise.all(
+			(block.assets || []).map(async (file) => {
+				const content = await registry.fetchRawBuffer(
+					block.sourceRepo,
+					path.join(block.directory, file)
+				);
+
+				return { name: file, content };
+			})
+		);
+
 		preloaded.push({
 			block,
 			files,
+			assets,
 		});
 	}
 

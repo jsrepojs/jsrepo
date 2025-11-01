@@ -25,11 +25,11 @@ export type FetchOptions = {
 	verbose: (str: string) => void;
 };
 
-export async function fetchRaw(
+export async function fetchFile(
 	state: RegistryProviderState,
 	resourcePath: string,
 	{ verbose, fetch: f = fetch, token }: Partial<FetchOptions> = {}
-): Promise<Result<string, string>> {
+): Promise<Result<Response, string>> {
 	const url = await state.provider.resolveRaw(state, resourcePath);
 
 	verbose?.(`Trying to fetch from ${url}`);
@@ -62,10 +62,36 @@ export async function fetchRaw(
 			);
 		}
 
-		return Ok(await response.text());
+		return Ok(response);
 	} catch (err) {
 		return Err(state.provider.formatFetchError(state, resourcePath, err));
 	}
+}
+
+export async function fetchRaw(
+	state: RegistryProviderState,
+	resourcePath: string,
+	{ verbose, fetch: f = fetch, token }: Partial<FetchOptions> = {}
+): Promise<Result<string, string>> {
+	const result = await fetchFile(state, resourcePath, { verbose, fetch: f, token });
+
+	if (result.isErr()) return Err(result.unwrapErr());
+
+	const response = result.unwrap();
+	return Ok(await response.text());
+}
+
+export async function fetchBuffer(
+	state: RegistryProviderState,
+	resourcePath: string,
+	{ verbose, fetch: f = fetch, token }: Partial<FetchOptions> = {}
+): Promise<Result<Buffer, string>> {
+	const result = await fetchFile(state, resourcePath, { verbose, fetch: f, token });
+
+	if (result.isErr()) return Err(result.unwrapErr());
+
+	const response = result.unwrap();
+	return Ok(Buffer.from(await response.arrayBuffer()));
 }
 
 export async function fetchManifest(
