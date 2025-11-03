@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import path from 'node:path';
 import { cancel, confirm, isCancel, multiselect, outro } from '@clack/prompts';
 import color from 'chalk';
 import { Command, program } from 'commander';
@@ -294,6 +295,7 @@ async function _update(blockNames: string[], options: Options) {
 			if (updateResult.applyChanges) {
 				loading.start(`Writing changes to ${color.cyan(destPath)}`);
 
+				fs.mkdirSync(path.dirname(destPath), { recursive: true });
 				fs.writeFileSync(destPath, updateResult.updatedContent);
 
 				loading.stop(`Wrote changes to ${color.cyan(destPath)}.`);
