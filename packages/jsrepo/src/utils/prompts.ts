@@ -175,7 +175,9 @@ export async function promptAddEnvVars(
 	const envFilePath = envFile?.path ?? path.join(options.cwd, '.env.local');
 	fs.writeFileSync(envFilePath, newContents);
 
-	log.success(`Added environment variables to ${pc.cyan(path.relative(options.cwd, envFilePath))}`);
+	log.success(
+		`Added environment variables to ${pc.cyan(path.relative(options.cwd, envFilePath))}`
+	);
 
 	return updatedEnvVars;
 }

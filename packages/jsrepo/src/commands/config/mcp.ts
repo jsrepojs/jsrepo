@@ -111,7 +111,11 @@ export async function runMcp(
 	return ok({ duration, results });
 }
 
-export function formatResult({ duration, results, cwd }: ConfigMcpCommandResult & { cwd: string }): string {
+export function formatResult({
+	duration,
+	results,
+	cwd,
+}: ConfigMcpCommandResult & { cwd: string }): string {
 	return `Configured ${results.length} ${results.length > 1 ? 'clients' : 'client'} in ${pc.green(
 		`${duration.toFixed(2)}ms`
 	)}:\n${results.map((result) => formatClientResult(result, cwd)).join('\n')}`;
