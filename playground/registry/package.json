@@ -1,6 +1,7 @@
 {
 	"name": "@playground/registry",
 	"version": "0.0.0",
+	"private": true,
 	"description": "A playground registry for jsrepo",
 	"type": "module",
 	"scripts": {
