@@ -1,0 +1,34 @@
+---
+title: Introduction
+description: Why we built jsrepo.
+---
+
+> shadcn, but for everyone 😄
+
+**jsrepo** is a language agnostic CLI for distributing code. [shadcn/ui](https://ui.shadcn.com) proved that distributing code in a way that allows consumers to own the source is an extremely powerful pattern, **jsrepo** helps more people adopt this pattern by making it incredibly easy to distribute code from any language and source.
+
+<Accordion type="single" collapsible>
+	<AccordionItem value="q-1">
+		<AccordionTrigger>Is this trying to replace npm?</AccordionTrigger>
+		<AccordionContent className="flex flex-col gap-4 text-balance">
+			No, **jsrepo** won't replace npm but is perfect for distributing code like leftPad that probably shouldn't
+			be a package but you also shouldn't have to rewrite every time.
+		</AccordionContent>
+	</AccordionItem>
+	<AccordionItem value="q-2">
+		<AccordionTrigger>Why would I use this over the shadcn CLI?</AccordionTrigger>
+		<AccordionContent className="flex flex-col gap-4 text-balance">
+			**jsrepo** is language agnostic and is built to handle multiple registries in the same project. You also
+			aren't limited to just distributing your code from your own website you can also distribute it from most major git
+			providers (GitHub, GitLab, Bitbucket, etc).
+		</AccordionContent>
+	</AccordionItem>
+</Accordion>
+
+## Where to Start?
+
+<Cards>
+	<Card href="/docs/create-a-registry" icon={<PlusIcon />} title="Create your first registry">
+		Create a jsrepo registry in &lt;5 minutes
+	</Card>
+</Cards>

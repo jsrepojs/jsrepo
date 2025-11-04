@@ -1,0 +1,118 @@
+---
+title: gitlab
+description: Download and add registry items from a GitLab repository.
+---
+
+<BadgeGroup>
+	<SourceBadge path="packages/jsrepo/src/providers/gitlab.ts" />
+	<OfficialBadge />
+	<DefaultBadge />
+</BadgeGroup>
+
+
+## Usage
+
+To start adding registry items from a GitLab repository you can run the following command:
+
+```sh
+jsrepo add https://gitlab.com/<group>/<project>/<item-name>
+```
+
+The GitLab provider can parse GitLab URLs so that you can just copy and paste a link to a GitLab repository and it will just work:
+
+```sh
+jsrepo add https://gitlab.com/<group>/<project>/<item-name>
+jsrepo add https://gitlab.com/<group>/<project>/-/tree/<ref>
+```
+
+### The `gitlab/` shorthand
+
+You can also just use the `gitlab/` shorthand in place of `https://gitlab.com/`.
+
+```sh
+jsrepo add gitlab/<group>/<project>/<item-name>
+jsrepo add gitlab/<group>/<subgroup>/<project>/-/tree/<ref>
+```
+
+<Callout type="info">
+	If you configured a custom `baseUrl` in your `jsrepo.config` file then using the `gitlab/` shorthand will use your
+	custom base url instead of `https://gitlab.com/`.
+</Callout>
+
+### Custom base urls
+
+By default the GitLab provider will use `https://gitlab.com` as the base url for the `gitlab/` shorthand. You can configure this behavior by configuring `gitlab` in your `jsrepo.config` file:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { gitlab } from "jsrepo/providers";
+
+export default defineConfig({
+	providers: [gitlab({ baseUrl: "https://my-gitlab-instance.com" })], // [!code highlight]
+});
+```
+
+Alternatively you can use the `gitlab:https://<url>` shorthand to use a custom base url without having to touch your config file:
+
+```sh
+jsrepo add gitlab:https://my-gitlab-instance.com/<group>/<project>/<item-name>
+```
+
+This syntax tells the GitLab provider that it can resolve this URL as a GitLab repository.
+
+## Deploying your registry to GitLab
+
+When deploying your registry to GitLab you will want to use the `repository` output type:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { repository } from "jsrepo/outputs"; // [!code ++]
+
+export default defineConfig({
+	registry: {
+		// ...
+		outputs: [repository()], // [!code ++]
+	},
+});
+```
+
+This will create a `jsrepo.json` file that will contain everything users need to use your registry.
+
+<Callout type="warning">
+	The `jsrepo.json` file must be at the **root** of your repository otherwise users won't be able to use your registry.
+</Callout>
+
+## Authentication
+
+To authenticate with GitLab you can run the following command:
+
+```sh
+jsrepo auth gitlab
+```
+
+You can logout of your account by running:
+
+```sh
+jsrepo auth gitlab --logout
+```
+
+### Environment Variable
+
+If you prefer to use an environment variable or are in an environment where you can't use the `jsrepo auth` command you can provide the token via the `GITLAB_TOKEN` environment variable.
+
+```sh
+GITLAB_TOKEN=... jsrepo add 
+```
+
+## Options
+
+<TypeTable
+	type={{
+		baseUrl: {
+			description: "The base url to use when using the gitlab/ shorthand.",
+			type: "string",
+			default: "https://gitlab.com",
+		},
+	}}
+/>
+

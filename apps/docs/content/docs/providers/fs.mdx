@@ -1,0 +1,58 @@
+---
+title: fs
+description: Download and add registry items from your local filesystem.
+---
+
+<BadgeGroup>
+	<SourceBadge path="packages/jsrepo/src/providers/fs.ts" />
+	<OfficialBadge />
+</BadgeGroup>
+
+The `fs` provider allows you to distribute code from your local filesystem. This is useful when you want to test out how your registries behave without having to deploy them somewhere first.
+
+## Usage
+
+To start adding registry items from your local filesystem you first need to configure the provider in your `jsrepo.config` file:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { fs } from "jsrepo/providers"; // [!code ++]
+
+export default defineConfig({
+	providers: [fs()], // [!code ++]
+});
+```
+
+Now you can start adding registry items from your local filesystem:
+
+```sh
+jsrepo add fs://../registries/my-registry
+```
+
+You may also want to supply a base directory to the provider:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { fs } from "jsrepo/providers";
+
+export default defineConfig({
+	providers: [fs({ baseDir: "../registries" })], // [!code highlight]
+});
+```
+
+Now your commands will be relative to the base directory you defined:
+
+```sh
+jsrepo add fs://./my-registry
+```
+
+## Options
+
+<TypeTable
+	type={{
+		baseDir: {
+			description: "All paths will be relative to this directory.",
+			type: "string",
+		},
+	}}
+/>

@@ -1,0 +1,124 @@
+---
+title: Languages
+description: Language support for jsrepo.
+---
+
+**jsrepo** uses languages to determine the dependencies of registry items when you run the `build` command and also how to add and install dependencies.
+
+<Callout type="info">
+	**jsrepo** can distribute code of any language or file type but these are the languages that support [dependency
+	resolution](#what-is-dependency-resolution).
+</Callout>
+
+## Available Languages
+
+By default **jsrepo** supports the following languages:
+
+<Cards>
+	<Card href="/docs/languages/js" icon={<JavaScriptLogo />} title="JavaScript">
+		Support for `*.js`, `*.ts`, `*.jsx`, `*.tsx`, `*.mjs`, `*.mts` files.
+	</Card>
+	<Card href="/docs/languages/svelte" icon={<SvelteLogo />} title="Svelte">
+		Support for `*.svelte` files.
+	</Card>
+	<Card href="/docs/languages/vue" icon={<VueLogo />} title="Vue">
+		Support for `*.vue` files.
+	</Card>
+	<Card href="/docs/languages/css" icon={<CSSLogo />} title="CSS">
+		Support for `*.css`, `*.scss`, `*.sass` files.
+	</Card>
+	<Card href="/docs/languages/html" icon={<HTML5Logo />} title="HTML">
+		Support for `*.html` files.
+	</Card>
+</Cards>
+
+## What is dependency resolution?
+
+Dependency resolution is the process of determining the dependencies of a registry item. This process ensures that when you add a registry item that all of it's dependencies are also added.
+
+Without dependency resolution you need to manually specify dependencies of a registry item which is cumbersome and error prone.
+
+### How to manually specify dependencies
+
+If your language of choice doesn't support dependency resolution or your registry items have dependencies that cannot be automatically detected you can manually specify them like so:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { js } from "jsrepo/langs";
+
+export default defineConfig({
+	registry: {
+		items: [
+			{
+				name: "button",
+				type: "component",
+				files: [
+					{
+						path: "src/components/button.tsx",
+					},
+				],
+				registryDependencies: ["utils"], // [!code ++]
+				remoteDependencies: [
+					// [!code ++]
+					{
+						// [!code ++]
+						ecosystem: "js", // [!code ++]
+						name: "radix-ui", // [!code ++]
+						version: "1.4.3", // [!code ++]
+					}, // [!code ++]
+				], // [!code ++]
+			},
+		],
+	},
+});
+```
+
+### How to prevent automatic dependency resolution
+
+If you want to opt out of automatic dependency resolution you can do so by setting the `dependencyResolution` option to `manual` on the registry item or on the file itself.
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { js } from "jsrepo/langs";
+
+export default defineConfig({
+	registry: {
+		items: [
+			{
+				name: "button",
+				type: "component",
+				// for the entire item
+				dependencyResolution: "manual", // [!code ++]
+				files: [
+					{
+						path: "src/components/button.tsx",
+						// for individual files
+						dependencyResolution: "manual", // [!code ++]
+					},
+				],
+			},
+		],
+	},
+});
+```
+
+### Strict mode
+
+By default **jsrepo** will error if it cannot resolve all dependencies of a registry item. You can opt out of this behavior by setting the `strict` option to `false`.
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { js } from "jsrepo/langs";
+
+export default defineConfig({
+	registry: {
+		items: [
+			{
+				name: "button",
+				type: "component",
+				strict: false, // [!code ++]
+			},
+		],
+	},
+});
+```

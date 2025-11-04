@@ -1,0 +1,148 @@
+---
+title: Create a registry
+description: A complete guide to creating your own registry with jsrepo.
+---
+
+In this guide we will show you how to setup a registry with **jsrepo**.
+
+## Creating a registry
+
+To create a registry start by running:
+
+```npm
+npx jsrepo init
+```
+
+This will initialize a blank config in your project and install **jsrepo** as a dev dependency.
+
+Before we continue let's create some items for our registry.
+
+```ts tab="src/stdout.ts"
+export function print(msg: string) {
+    console.log(msg);
+}
+```
+
+```ts tab="src/logger.ts"
+import { print } from './stdout';
+export function createLogger() {
+    return {
+        log: print,
+    }
+}
+```
+
+Next we can configure the registry with the `registry` key.
+
+Let's start by giving the registry a name:
+
+```ts title="jsrepo.config.mts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+		name: 'my-first-registry', // [!code ++]
+	},
+});
+```
+
+Next let's add the items we just created to the registry:
+
+```ts title="jsrepo.config.mts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+        // ...
+        items: [ // [!code ++]
+            { // [!code ++]
+                name: 'logger', // [!code ++]
+                type: 'utils', // [!code ++]
+                files: [ // [!code ++]
+                    { // [!code ++]
+                        path: 'src/logger.ts', // [!code ++]
+                    }, // [!code ++]
+                ] // [!code ++]
+            }, // [!code ++]
+            { // [!code ++]
+                name: 'stdout', // [!code ++]
+                type: 'utils', // [!code ++]
+                add: 'when-needed', // [!code ++] this will prevent the item from being listed by the `add` command
+                files: [ // [!code ++]
+                    { // [!code ++]
+                        path: 'src/stdout.ts', // [!code ++]
+                    }, // [!code ++]
+                ] // [!code ++]
+            } // [!code ++]
+        ], // [!code ++]
+    }
+});
+```
+
+For now we will use the `repository` output for our registry so let's add it to our config:
+
+```ts title="jsrepo.config.mts"
+import { defineConfig } from "jsrepo";
+import { repository } from "jsrepo/outputs"; // [!code ++]
+
+export default defineConfig({
+	registry: {
+        // ...
+		outputs: [repository()], // [!code ++]
+	},
+});
+```
+
+Now we can build our registry with the `jsrepo build` command:
+
+```sh
+jsrepo build
+```
+
+This will create a `jsrepo.json` file at the root of our project that contains everything we need to start adding items from our registry to other projects.
+
+### Testing the registry
+
+To test our registry locally we can use the `fs` provider. Let's add it to our config:
+
+```ts title="jsrepo.config.mts"
+import { defineConfig } from "jsrepo";
+import { repository } from "jsrepo/outputs";
+import { fs } from "jsrepo/providers"; // [!code ++]
+
+export default defineConfig({
+    // ...
+	providers: [fs()], // [!code ++]
+});
+```
+
+Now let's initialize our registry with the `jsrepo init` command:   
+
+```sh
+jsrepo init fs://./
+```
+
+This will add the registry to the `registries` key in our config file:
+
+```ts title="jsrepo.config.mts"
+import { defineConfig } from "jsrepo";
+import { repository } from "jsrepo/outputs";
+import { fs } from "jsrepo/providers";
+
+export default defineConfig({
+	// ...
+	registries: ["fs://./"], // [!code ++]
+});
+```
+
+Now we can run `jsrepo add` to add an item to our project:
+
+```sh
+jsrepo add logger
+```
+
+## Deploying your registry
+
+Now that we have a working registry we can deploy it to wherever we want. Take a look at the [providers](/docs/providers) docs for the full list of hosting options. 
+
+Each provider has a guide on how to deploy your registry to that particular platform.

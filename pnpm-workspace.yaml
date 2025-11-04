@@ -1,3 +1,14 @@
-onlyBuiltDependencies:
-  - '@biomejs/biome'
-  - esbuild
+packages:
+  - "packages/*"
+  - "playground/*"
+  - "apps/*"
+
+catalog:
+  vitest: ^4.0.2
+  "@types/node": ^24.9.1
+  zod: ^4.1.12
+  tsdown: ^0.15.9
+  picocolors: ^1.1.1
+
+patchedDependencies:
+  commander: patches/commander.patch

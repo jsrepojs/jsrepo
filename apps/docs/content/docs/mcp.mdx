@@ -1,0 +1,122 @@
+---
+title: MCP Server
+description: The jsrepo MCP server.
+---
+
+<BadgeGroup>
+	<SourceBadge path="packages/mcp" />
+	<OfficialBadge />
+</BadgeGroup>
+
+The **jsrepo** MCP server has been built alongside the **jsrepo** CLI to ensure agents have first class support for interacting with jsrepo registries.
+
+<Callout type="info">
+    The **jsrepo** MCP ships separate to the **jsrepo** CLI to reduce the overall size of the CLI and can be found on npm as `@jsrepo/mcp`.
+</Callout>
+
+All **jsrepo** registries are supported out of the box by the MCP server, including registries hosted on custom providers (provided the custom provider is present in your `jsrepo.config`).
+
+## Configuration
+
+<UnderlineTabs defaultValue="cursor">
+	<UnderlineTabsList>
+		<UnderlineTabsTrigger value="cursor"><CursorLogo /> Cursor</UnderlineTabsTrigger>
+		<UnderlineTabsTrigger value="claude"><ClaudeLogo /> Claude Code </UnderlineTabsTrigger>
+		<UnderlineTabsTrigger value="vs-code"><VSCodeLogo /> VS Code</UnderlineTabsTrigger>
+		<UnderlineTabsTrigger value="codex"><OpenAILogo /> Codex</UnderlineTabsTrigger>
+	</UnderlineTabsList>
+	<UnderlineTabsContent value="cursor">
+        You can quickly configure the MCP server for Cursor by running the following command:
+
+		```sh
+        jsrepo config mcp --client cursor
+        ```
+
+        This will automatically configure the MCP server for Cursor in the correct file:
+
+        ```json title=".cursor/mcp.json"
+        {
+            "mcpServers": {
+                "jsrepo": {
+                    "command": "npx",
+                    "args": ["@jsrepo/mcp"]
+                }
+            }
+        }
+        ```
+	</UnderlineTabsContent>
+	<UnderlineTabsContent value="claude">
+        You can quickly configure the MCP server for Claude Code by running the following command:
+
+		```sh
+        jsrepo config mcp --client claude
+        ```
+
+        This will automatically configure the MCP server for Claude Code in the correct file:
+
+        ```json title=".mcp.json"
+        {
+            "mcpServers": {
+                "jsrepo": {
+                    "command": "npx",
+                    "args": ["@jsrepo/mcp"]
+                }
+            }
+        }
+        ```
+    </UnderlineTabsContent>
+	<UnderlineTabsContent value="vs-code">
+        You can quickly configure the MCP server for Claude Code by running the following command:
+
+		```sh
+        jsrepo config mcp --client vscode
+        ```
+
+        This will automatically configure the MCP server for Claude Code in the correct file:
+
+        ```json title=".vscode/mcp.json"
+        {
+            "mcpServers": {
+                "jsrepo": {
+                    "command": "npx",
+                    "args": ["@jsrepo/mcp"]
+                }
+            }
+        }
+        ```
+    </UnderlineTabsContent>
+	<UnderlineTabsContent value="codex">
+        You can quickly configure the MCP server for Codex by running the following command:
+
+		```sh
+        jsrepo config mcp --client codex
+        ```
+
+        This will automatically configure the MCP server for Codex in the correct file:
+
+        ```toml title="~/.codex/config.toml"
+        [mcp_servers.jsrepo]
+        command = "npx"
+        args = ["@jsrepo/mcp"]
+        ```
+    </UnderlineTabsContent>
+</UnderlineTabs>
+
+## Tools
+
+The jsrepo MCP server provides the following tools:
+
+| Tool | Description |
+|------|-------------|
+| `add_item_to_project` | Add a registry item or items directly to the users project |
+| `view_registry_item` | View the code and information about a registry item |
+| `search_items_in_registry` | Search for registry items in one or more registries |
+
+## Registry Authors
+
+Your registry will automatically be compatible with the **jsrepo** MCP server, but here are a few tips to improve the agents usage of your registry:
+
+- include all the registry metadata in your `jsrepo.config` to allow agents to find your registry more easily when searching
+- include a `description` with each item in your registry
+- include files with the type `registry:example` with an example of how to use each item
+

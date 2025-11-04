@@ -1,0 +1,55 @@
+import type { Dependency, Ecosystem, RemoteDependency, UnresolvedImport } from '@/utils/build';
+
+export type ResolveDependenciesOptions = {
+	fileName: string;
+	cwd: string;
+	excludeDeps: string[];
+	warn: (log: string) => void;
+};
+
+export type InstallDependenciesOptions = {
+	cwd: string;
+};
+
+export type TransformImportsOptions = {
+	cwd: string;
+	/** The path of the file that the imports will be transformed for. */
+	targetPath: string;
+	getItemPath(item: string): {
+		/** The resolved path of the dependency. */
+		path: string;
+		/** The alias of the dependency. */
+		alias?: string;
+	};
+};
+
+export type ImportTransform = {
+	/** The pattern to match the import. */
+	pattern: string | RegExp;
+	/** The replacement for the import. */
+	replacement: string;
+};
+
+export interface Language {
+	/** The name of the language. */
+	name: string;
+	/** Determines whether or not the language can resolve dependencies for the given file. */
+	canResolveDependencies(fileName: string): boolean;
+	resolveDependencies(
+		code: string,
+		opts: ResolveDependenciesOptions
+	): Promise<Dependency[]> | Dependency[];
+	/** Returns an object where the key is the import to be transformed and the value is the transformed import. */
+	transformImports(
+		_imports_: UnresolvedImport[],
+		opts: TransformImportsOptions
+	): Promise<ImportTransform[]> | ImportTransform[];
+
+	/** Determines whether or not the language can install dependencies for the given ecosystem. */
+	canInstallDependencies(ecosystem: Ecosystem): boolean;
+	/** Gets the install command to add the given dependencies to the project. */
+	installDependencies(
+		dependencies: RemoteDependency[],
+		opts: InstallDependenciesOptions
+	): Promise<void> | void;
+}

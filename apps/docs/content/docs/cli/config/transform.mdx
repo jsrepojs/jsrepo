@@ -1,0 +1,41 @@
+---
+title: transform
+description: Add a transform to your config.
+---
+
+```sh
+jsrepo config transform
+```
+
+## Usage
+
+Add a transform to your config. You will be prompted to install dependencies after adding:
+
+```sh
+jsrepo config transform @jsrepo/transform-prettier
+```
+
+Add multiple transforms at once:
+
+```sh
+jsrepo config transform @jsrepo/transform-prettier @jsrepo/transform-biome
+```
+
+## Options
+
+### `--cwd`
+
+The current working directory:
+
+```sh
+jsrepo config transform @jsrepo/transform-prettier --cwd ./my-project
+```
+
+### `--yes`
+
+Skip the confirmation prompt:
+
+```sh
+jsrepo config transform @jsrepo/transform-prettier --yes
+```
+

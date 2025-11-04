@@ -1,0 +1,52 @@
+{
+	"name": "@jsrepo/transform-biome",
+	"description": "A transform plugin for jsrepo to format code with biome.",
+	"version": "0.0.0",
+	"license": "MIT",
+	"homepage": "https://jsrepo.dev",
+	"author": {
+		"name": "Aidan Bleser",
+		"url": "https://github.com/ieedan"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/jsrepojs/jsrepo"
+	},
+	"bugs": {
+		"url": "https://github.com/jsrepojs/jsrepo/issues"
+	},
+	"keywords": [
+		"jsrepo",
+		"transform",
+		"biome",
+		"plugin"
+	],
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		}
+	},
+	"main": "./dist/index.js",
+	"files": [
+		"dist/**/*"
+	],
+	"scripts": {
+		"build": "tsdown",
+		"dev": "tsdown --watch",
+		"check": "tsc --noEmit"
+	},
+	"packageManager": "pnpm@10.17.1",
+	"peerDependencies": {
+		"jsrepo": "workspace:*"
+	},
+	"dependencies": {
+		"@biomejs/wasm-nodejs": "^2.2.4",
+		"@biomejs/js-api": "^3.0.0"
+	},
+	"devDependencies": {
+		"tsdown": "catalog:",
+		"@types/node": "catalog:"
+	}
+}

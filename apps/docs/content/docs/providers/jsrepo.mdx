@@ -1,0 +1,95 @@
+---
+title: jsrepo
+description: Download and add registry items from jsrepo.com
+---
+
+import { BadgesTable } from "@/components/badges-table";
+
+<BadgeGroup>
+	<SourceBadge path="packages/jsrepo/src/providers/jsrepo.ts" />
+	<OfficialBadge />
+	<DefaultBadge />
+</BadgeGroup>
+
+**jsrepo.com** is a centralized source registry for registries. Much like npm is for packages, **jsrepo.com** is for registries.
+
+**jsrepo.com** comes with a few added benefits over other registry providers:
+
+-   Semver support
+-   First class support for private registries with the `jsrepo auth` command
+-   Discoverability of your registry through the **jsrepo.com** website (also by the jsrepo mcp agent)
+-   Easier installation for your users with simple `@<scope>/<registry>` syntax
+
+## Usage
+
+To start adding registry items from **jsrepo.com** you can run the following command:
+
+```sh
+jsrepo add @<scope>/<registry>
+```
+
+You can also add registries at a specific version:
+
+```sh
+jsrepo add @<scope>/<registry>@1.0.0
+```
+
+## Authentication
+
+To authenticate with jsrepo.com you can run the following command:
+
+```sh
+jsrepo auth jsrepo
+```
+
+Once authenticated you will have access to all registries associated with your account public and private as well as the ability to publish registries.
+
+You can logout of your account by running:
+
+```sh
+jsrepo auth jsrepo --logout
+```
+
+### Environment Variable
+
+If you prefer to use an environment variable or are in an environment where you can't use the `jsrepo auth` command you can provide the token via the `JSREPO_TOKEN` environment variable.
+
+```sh
+JSREPO_TOKEN=... jsrepo publish 
+```
+
+## Publishing your registry to jsrepo.com
+
+Once you have authenticated you can publish your registry with the `publish` command:
+
+```sh
+jsrepo publish
+```
+
+## Badges
+
+<BadgesTable
+	badges={[
+		{
+			alt: 'jsrepo latest version',
+			hrefTemplate: 'https://jsrepo.com/badges/{{registry}}'
+		},
+		{
+			alt: 'jsrepo downloads weekly',
+			hrefTemplate: 'https://jsrepo.com/badges/{{registry}}/dm'
+		},
+		{
+			alt: 'jsrepo downloads monthly',
+			hrefTemplate: 'https://jsrepo.com/badges/{{registry}}/dw'
+		},
+		{
+			alt: 'jsrepo downloads yearly',
+			hrefTemplate: 'https://jsrepo.com/badges/{{registry}}/dy'
+		},
+		{
+			alt: 'jsrepo registry rating',
+			hrefTemplate: 'https://jsrepo.com/badges/{{registry}}/rating'
+		}
+	]}
+	defaultRegistry="@ieedan/std"
+/>

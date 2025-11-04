@@ -1,0 +1,102 @@
+---
+title: azure
+description: Download and add registry items from an Azure DevOps repository.
+---
+
+<BadgeGroup>
+	<SourceBadge path="packages/jsrepo/src/providers/azure.ts" />
+	<OfficialBadge />
+	<DefaultBadge />
+</BadgeGroup>
+
+## Usage
+
+To start adding registry items from an Azure DevOps repository you can run the following command:
+
+```sh
+jsrepo add azure/<org>/<project>/<repo>
+```
+
+The Azure provider understands refs as either branches or tags:
+
+```sh
+jsrepo add azure/<org>/<project>/<repo>/heads/<ref>
+jsrepo add azure/<org>/<project>/<repo>/tags/<ref>
+```
+
+### Custom base urls
+
+By default the Azure provider will use `https://dev.azure.com` as the base url. You can configure this behavior by configuring `azure` in your `jsrepo.config` file:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { azure } from "jsrepo/providers";
+
+export default defineConfig({
+	providers: [azure({ baseUrl: "https://dev.azure.com" })], // [!code highlight]
+});
+```
+
+Alternatively you can use the `azure:https://<url>` shorthand to use a custom base url without having to touch your config file:
+
+```sh
+jsrepo add azure:https://dev.azure.com/<org>/<project>/<repo>/heads/<ref>
+```
+
+This syntax tells the Azure provider that it can resolve this URL as an Azure DevOps repository.
+
+## Deploying your registry to Azure DevOps
+
+When deploying your registry to Azure DevOps you will want to use the `repository` output type:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { repository } from "jsrepo/outputs"; // [!code ++]
+
+export default defineConfig({
+	registry: {
+		// ...
+		outputs: [repository()], // [!code ++]
+	},
+});
+```
+
+This will create a `jsrepo.json` file that will contain everything users need to use your registry.
+
+<Callout type="warning">
+	The `jsrepo.json` file must be at the **root** of your repository otherwise users won't be able to use your registry.
+</Callout>
+
+## Authentication
+
+To authenticate with Azure DevOps you can run the following command:
+
+```sh
+jsrepo auth azure
+```
+
+You can logout of your account by running:
+
+```sh
+jsrepo auth azure --logout
+```
+
+### Environment Variable
+
+If you prefer to use an environment variable or are in an environment where you can't use the `jsrepo auth` command you can provide the token via the `AZURE_TOKEN` environment variable.
+
+```sh
+AZURE_TOKEN=... jsrepo add 
+```
+
+## Options
+
+<TypeTable
+	type={{
+		baseUrl: {
+			description: "The base url to use.",
+			type: "string",
+			default: "https://dev.azure.com",
+		},
+	}}
+/>

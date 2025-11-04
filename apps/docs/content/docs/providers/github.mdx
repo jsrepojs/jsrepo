@@ -1,0 +1,159 @@
+---
+title: github
+description: Download and add registry items from a GitHub repository.
+---
+
+<BadgeGroup>
+	<SourceBadge path="packages/jsrepo/src/providers/github.ts" />
+	<OfficialBadge />
+    <DefaultBadge />
+</BadgeGroup>
+
+## Usage
+
+To start adding registry items from a GitHub repository you can run the following command:
+
+```sh
+jsrepo add https://github.com/<owner>/<repo>/<item-name>
+```
+
+The GitHub provider can parse GitHub URLs so that you can just copy and paste a link to a GitHub repository and it will just work:
+
+```sh
+jsrepo add https://github.com/<owner>/<repo>/<item-name>
+jsrepo add https://github.com/<owner>/<repo>/tree/<ref>
+```
+
+### The `github/` shorthand
+
+You can also just use the `github/` shorthand in place of `https://github.com/`.
+
+```sh
+jsrepo add github/<owner>/<repo>/<item-name>
+jsrepo add github/<owner>/<repo>/tree/<ref>
+```
+
+<Callout type="info">
+	If you configured a custom `baseUrl` in your `jsrepo.config` file then using the `github/` shorthand will use your
+	custom base url instead of `https://github.com/`.
+</Callout>
+
+### Custom base urls
+
+By default the GitHub provider will use `https://github.com` as the base url for the `github/` shorthand. You can configure this behavior by configuring `github` in your `jsrepo.config` file:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { github } from "jsrepo/providers";
+
+export default defineConfig({
+	providers: [github({ baseUrl: "https://my-github-instance.com" })], // [!code highlight]
+});
+```
+
+Alternatively you can use the `github:https://<url>` shorthand to use a custom base url without having to touch your config file:
+
+```sh
+jsrepo add github:https://my-github-instance.com/<owner>/<repo>/<item-name>
+```
+
+This syntax tells the GitHub provider that it can resolve this URL as a GitHub repository.
+
+## Authentication
+
+To authenticate with GitHub you can run the following command:
+
+```sh
+jsrepo auth github
+```
+
+You can logout of your account by running:
+
+```sh
+jsrepo auth github --logout
+```
+
+### Environment Variable
+
+If you prefer to use an environment variable or are in an environment where you can't use the `jsrepo auth` command you can provide the token via the `GITHUB_TOKEN` environment variable.
+
+```sh
+GITHUB_TOKEN=... jsrepo add 
+```
+
+## Deploying your registry to GitHub
+
+When deploying your registry to GitHub you will want to use the `repository` output type:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { repository } from "jsrepo/outputs"; // [!code ++]
+
+export default defineConfig({
+	registry: {
+        // ...
+		outputs: [repository()], // [!code ++]
+	},
+});
+```
+
+This will create a `jsrepo.json` file that will contain everything users need to use your registry.
+
+<Callout type="warning">
+	The `jsrepo.json` file must be at the **root** of your repository otherwise users won't be able to use your registry.
+</Callout>
+
+### Workflow
+
+If you want to use GitHub Actions to automatically build your registry when you push changes you can use this workflow:
+
+```yml title=".github/workflows/build-registry.yml"
+name: build-registry
+on:
+  push:
+    branches:
+      - main
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm install
+      - name: Build jsrepo.json
+        run: jsrepo build
+      - name: Create pull request with changes
+        uses: peter-evans/create-pull-request@v7
+        with:
+          title: 'chore: update `jsrepo.json`'
+          body: |
+            - Update `jsrepo.json`
+            ---
+            This PR was auto generated
+          branch: build-registry
+          commit-message: build `jsrepo.json`
+```
+
+## Options
+
+<TypeTable
+	type={{
+		baseUrl: {
+			description: "The base url to use when using the github/ shorthand.",
+			type: "string",
+			default: "https://github.com",
+		},
+	}}
+/>

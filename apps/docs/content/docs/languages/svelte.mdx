@@ -1,0 +1,24 @@
+---
+title: svelte
+description: Svelte language support for jsrepo.
+---
+
+<BadgeGroup>
+	<SourceBadge path="packages/jsrepo/src/langs/svelte.ts" />
+	<OfficialBadge />
+	<DefaultBadge />
+</BadgeGroup>
+
+The `svelte` language plugin supports dependency resolution for Svelte files as well as installing remote dependencies with `ecosystem: "js"`.
+
+## Supported syntax
+
+The Svelte plugin parses all script tags and passes the code to the [JavaScript plugin](/docs/languages/js) to resolve dependencies so all the same syntax is supported.
+
+## Supported File Extensions
+
+The JavaScript language plugin supports the following file extensions:
+
+| Extension |
+| --------- |
+| `.svelte` |

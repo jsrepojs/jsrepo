@@ -1,0 +1,85 @@
+---
+title: Providers
+description: Host your code anywhere with jsrepo.
+---
+
+Providers are how **jsrepo** knows where to find registry items. When you provide a registry identifier to a **jsrepo** command the provider is responsible for resolving that to a usable URL.
+
+For example you might run the following command:
+
+```sh
+jsrepo init github/ieedan/std
+```
+
+In this case the `github` provider will be used to resolve the path to the `jsrepo.json` file which might look something like this:
+
+```plaintext
+https://api.github.com/repos/ieedan/std/contents/jsrepo.json?ref=main
+```
+
+This makes **jsrepo** far more flexibly than any other registry because you can host your registry anywhere.
+
+## Available providers
+
+<Cards>
+	<Card href="/docs/providers/jsrepo" icon={<JsrepoLogo />} title="jsrepo">
+		Download and add registry items from jsrepo.com
+	</Card>
+	<Card href="/docs/providers/github" icon={<GitHubLogo />} title="GitHub">
+		Download and add registry items from a GitHub repository.
+	</Card>
+	<Card href="/docs/providers/gitlab" icon={<GitLabLogo />} title="GitLab">
+		Download and add registry items from a GitLab repository.
+	</Card>
+	<Card href="/docs/providers/bitbucket" icon={<BitbucketLogo />} title="Bitbucket">
+		Download and add registry items from a Bitbucket repository.
+	</Card>
+	<Card href="/docs/providers/azure" icon={<AzureDevopsLogo />} title="AzureDevops">
+		Download and add registry items from an Azure DevOps repository.
+	</Card>
+	<Card href="/docs/providers/http" icon={<GlobeIcon />} title="Your Website">
+		Download and add registry items from your own website.
+	</Card>
+	<Card href="/docs/providers/fs" icon={<FolderIcon />} title="Local Filesystem">
+		Download and add registry items from your local filesystem.
+	</Card>
+</Cards>
+
+You can customize the providers that **jsrepo** uses by adding them to your `jsrepo.config` file.
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { github } from "jsrepo/providers"; // [!code ++]
+
+export default defineConfig({
+	providers: [github()], // [!code ++]
+});
+```
+
+## Provider plugins
+
+Provider plugins are a way to add support for additional providers to **jsrepo**.
+
+### Adding provider plugins
+
+You can add provider plugins by running the following command:
+
+```sh
+jsrepo config provider <plugin>
+```
+
+This will automatically install the plugin and add it to your config file:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig, DEFAULT_PROVIDERS } from "jsrepo"; // [!code ++]
+import myProvider from "jsrepo-provider-myprovider"; // [!code ++]
+
+export default defineConfig({
+	providers: [...DEFAULT_PROVIDERS, myProvider()], // [!code ++]
+});
+```
+
+<Callout type="info">
+	You will notice the addition of the `DEFAULT_PROVIDERS` object in the example above. This way you can continue to
+	use all other providers alongside your provider plugin.
+</Callout>

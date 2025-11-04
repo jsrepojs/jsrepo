@@ -1,0 +1,49 @@
+{
+	"name": "@jsrepo/transform-prettier",
+	"description": "A transform plugin for jsrepo to format code with prettier.",
+	"version": "0.0.0",
+	"license": "MIT",
+	"homepage": "https://jsrepo.dev",
+	"author": {
+		"name": "Aidan Bleser",
+		"url": "https://github.com/ieedan"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/jsrepojs/jsrepo"
+	},
+	"bugs": {
+		"url": "https://github.com/jsrepojs/jsrepo/issues"
+	},
+	"keywords": [
+		"jsrepo",
+		"transform",
+		"prettier",
+		"plugin"
+	],
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		}
+	},
+	"main": "./dist/index.js",
+	"files": [
+		"dist/**/*"
+	],
+	"scripts": {
+		"build": "tsdown",
+		"dev": "tsdown --watch",
+		"check": "tsc --noEmit"
+	},
+	"packageManager": "pnpm@10.17.1",
+	"peerDependencies": {
+		"jsrepo": "workspace:*",
+		"prettier": "3.x"
+	},
+	"devDependencies": {
+		"tsdown": "catalog:",
+		"@types/node": "catalog:"
+	}
+}
