@@ -16,10 +16,7 @@ async function loadVueCompiler() {
 		vueCompiler = await import('vue/compiler-sfc');
 		return vueCompiler;
 	} catch {
-		throw new MissingPeerDependencyError(
-			'vue',
-			'Vue language support'
-		);
+		throw new MissingPeerDependencyError('vue', 'Vue language support');
 	}
 }
 

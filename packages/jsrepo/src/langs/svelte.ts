@@ -16,10 +16,7 @@ async function loadSvelteCompiler() {
 		svelteCompiler = await import('svelte/compiler');
 		return svelteCompiler;
 	} catch {
-		throw new MissingPeerDependencyError(
-			'svelte',
-			'Svelte language support'
-		);
+		throw new MissingPeerDependencyError('svelte', 'Svelte language support');
 	}
 }
 

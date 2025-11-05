@@ -435,11 +435,8 @@ export class NoItemsToUpdateError extends JsrepoError {
 
 export class MissingPeerDependencyError extends JsrepoError {
 	constructor(packageName: string, feature: string) {
-		super(
-			`"${packageName}" is required for ${feature} to work.`,
-			{
-				suggestion: `Please install it.`
-			}
-		);
+		super(`"${packageName}" is required for ${feature} to work.`, {
+			suggestion: `Please install it.`,
+		});
 	}
 }
