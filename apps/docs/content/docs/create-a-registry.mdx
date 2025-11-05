@@ -147,6 +147,8 @@ Now that we have a working registry we can deploy it to wherever we want. Take a
 
 Each provider has a guide on how to deploy your registry to that particular platform.
 
+This is the end of the basic guide. You can now start adding items to your registry and deploying it to your favorite hosting platform.
+
 ## Advanced Usage
 
 Now that we have covered the basics of creating a registry we can start to explore some of the features that make **jsrepo** so powerful.
@@ -272,3 +274,106 @@ Environment variables will be added to the users `.env.local` or `.env` file.
 If you leave an environment variable blank the user will be prompted to add a value for it.
 
 Values you configure here will ***never*** overwrite existing values in the user's env file.
+
+### Distributing multiple registries
+
+It's become common to distribute multiple registries to allow users to optionally use different variants of your registry for example JavaScript or TypeScript.
+
+However until now there wasn't an easy way to do this.
+
+**jsrepo** solves this by allowing you to define multiple registries in the same config:
+
+```ts title="jsrepo.config.mts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: [
+        {
+            name: '@my-registry/typescript',
+            // ...
+        },
+        {
+            name: '@my-registry/javascript',
+            // ...
+        }
+    ]
+});
+```
+
+You can then use the `outputs` api to define where each registry should be output to:
+
+```ts title="jsrepo.config.mts"
+import { defineConfig } from "jsrepo";
+import { distributed } from "jsrepo/outputs";
+
+export default defineConfig({
+	registry: [
+        {
+            name: '@my-registry/typescript',
+            outputs: [distributed({ dir: "./public/r/ts" })], // [!code ++]
+            // ...
+        },
+        {
+            name: '@my-registry/javascript',
+            outputs: [distributed({ dir: "./public/r/js" })], // [!code ++]
+            // ...
+        }
+    ]
+});
+```
+
+### Dynamically generating registries
+
+You don't always want to have to manually define your entire registry in your config file.
+
+AI has made this less cumbersome but it's still annoying to have a 1k LOC file just to define your registry.
+
+In **jsrepo v2** we automatically generated your registry based on a bunch of complicated options and this wasn't the best experience.
+
+In **jsrepo v3** we are giving the control back to you allowing you to write your own code to generate your registry.
+
+To do this simply pass a function to the `registry` key that returns a registry config:
+
+```ts title="jsrepo.config.mts"
+import { defineConfig } from "jsrepo";
+// define your own custom function
+import { getItems } from "./getItems";
+
+export default defineConfig({
+	registry: ({ cwd }) => {
+        return {
+            name: 'my-registry',
+            items: getItems(cwd)
+        }
+    }
+});
+```
+
+Oh and of course you can also pass an array of functions:
+
+```ts title="jsrepo.config.mts"
+import { defineConfig } from "jsrepo";
+// define your own custom function
+import { getItems } from "./getItems";
+
+export default defineConfig({
+	registry: [
+		({ cwd }) => {
+			return {
+				name: '@my-registry/typescript',
+				items: getItems(path.join(cwd, 'src/registry/ts'))
+			}
+		},
+        ({ cwd }) => {
+			return {
+				name: '@my-registry/javascript',
+				items: getItems(path.join(cwd, 'src/registry/js'))
+			}
+		}
+	]
+});
+```
+
+<Callout type="info">
+    Dynamically generated registries will still work with the `--watch` flag.
+</Callout>
