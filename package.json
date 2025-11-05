@@ -13,7 +13,7 @@
 		"check": "biome check --fix && pnpm type:check",
 		"type:check": "pnpm -r check",
 		"test": "pnpm -r test",
-		"changeset-version": "changeset version && pnpm format",
+		"changeset:version": "changeset version && pnpm format",
 		"ci:release": "pnpm build:packages && changeset publish",
 		"postinstall": "pnpm build:packages",
 		"build:packages": "pnpm -parallel --filter './packages/*' build"
