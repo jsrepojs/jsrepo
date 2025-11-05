@@ -151,3 +151,124 @@ Each provider has a guide on how to deploy your registry to that particular plat
 
 Now that we have covered the basics of creating a registry we can start to explore some of the features that make **jsrepo** so powerful.
 
+### Exclude deps
+
+Many times you may not want certain dependencies to be installed with your registry items. For instance if you import `useState` from `react` you probably don't want to force users to install `react` with your registry.
+
+For this you can use the `excludeDeps` key of your registry config.
+
+```ts title="jsrepo.config.mts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+        // ...
+		excludeDeps: ["react"], // [!code ++]
+	},
+});
+```
+
+### Configure when an item is added
+
+We mentioned this briefly above but you can configure when an item is added in the user's project by setting the `add` key an item.
+
+- `"on-init"` - Added on registry init or when it's needed by another item
+- `"when-needed"` - Not listed and only added when another item is added that depends on it
+- `"when-added"` - Added when the user selects it to be added
+
+```ts title="jsrepo.config.mts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+		items: [
+			{
+				// ...
+				add: "when-added", // [!code ++]
+			}
+		]
+	},
+});
+```
+
+<Callout type="info">
+    It's good practice to put your framework in the `excludeDeps` list whether that be `react`, `vue`, `svelte`, or `next` etc.
+</Callout>
+
+### Configuring the user's project
+
+There are a few common things you may want to automatically configure in the user's project when they first initialize your registry.
+
+#### Default Paths
+
+You can configure the `defaultPaths` key of your registry config to configure the default paths for items or item types to be added to in the user's project.
+
+```ts title="jsrepo.config.mts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+        // ...
+		defaultPaths: {
+			component: "src/components/ui",
+		},
+	},
+});
+```
+
+#### Plugins
+
+You can also configure the `plugins` key to automatically install plugins to the user's project when they initialize your registry.
+
+```ts title="jsrepo.config.mts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+		plugins: {
+            languages: [{ package: "jsrepo-language-go" }], // [!code ++]
+            // by setting the optional key to true the user will be prompted to install the plugin if it is not already installed.
+			transforms: [{ package: "@jsrepo/transform-prettier", optional: true }], // [!code ++]
+		},
+	},
+});
+```
+
+### Environment Variables
+
+Sometimes your registry items may require environment variables to work.
+
+For this you can define the `envVars` key of that particular item:
+
+```ts title="jsrepo.config.mts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+        // ...
+        items: [
+            // ...
+            {
+                // ...
+                name: 'db',
+                type: 'lib',
+                files: [
+                    {
+                        path: 'src/db.ts',
+                    }
+                ],
+                envVars: {
+                    DATABASE_URL: "https://example.com/database",
+                    DATABASE_SECRET_TOKEN: "",
+                },
+            }
+        ]
+	},
+});
+```
+
+Environment variables will be added to the users `.env.local` or `.env` file.
+
+If you leave an environment variable blank the user will be prompted to add a value for it.
+
+Values you configure here will ***never*** overwrite existing values in the user's env file.
