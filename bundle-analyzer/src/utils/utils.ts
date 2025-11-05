@@ -1,8 +1,8 @@
 import pc from 'picocolors';
 
 export function displaySize(bytes: number): string {
-	const showYellow = bytes > KILOBYTE * 500;
-	const showRed = bytes > MEGABYTE;
+	const showYellow = bytes >= KILOBYTE * 500;
+	const showRed = bytes >= MEGABYTE;
 
 	function getSizeString(bytes: number) {
 		if (bytes < KILOBYTE) return `${displayDividedSize(bytes)} B`;

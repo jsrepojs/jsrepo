@@ -24,5 +24,8 @@ jobs:
             - name: Check Types
               run: pnpm check
 
+            - name: Bundle Analyze
+              run: pnpm bundle:analyze
+
             - name: Test
               run: pnpm test
