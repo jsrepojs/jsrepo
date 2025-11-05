@@ -12,7 +12,7 @@ import {
 	type DistributedOutputManifestFile,
 } from '@/outputs/distributed';
 import type { RepositoryOutputFile } from '@/outputs/repository';
-import { type FetchOptions, fetchManifest, type Provider, type ProviderFactory } from '@/providers';
+import { fetchManifest, type Provider, type ProviderFactory } from '@/providers';
 import type { RemoteDependency } from '@/utils/build';
 import type { Config, RegistryItemType } from '@/utils/config';
 import { arePathsEqual, getPathsMatcher, resolvePath, resolvePaths } from '@/utils/config/utils';
@@ -33,11 +33,13 @@ import {
 	type ZodError,
 } from './errors';
 import { VERTICAL_LINE } from './prompts';
+import { TokenManager } from './token-manager';
 
 export type ResolvedRegistry = {
 	url: string;
 	provider: Provider;
 	manifest: Manifest;
+	token?: string;
 };
 
 /**
@@ -57,6 +59,7 @@ export async function resolveRegistries(
 	>
 > {
 	if (registries.length === 0) return ok(new Map());
+	const tokenManager = new TokenManager();
 	const resolvedRegistries: Result<
 		ResolvedRegistry,
 		InvalidRegistryError | ManifestFetchError | InvalidJSONError | ZodError
@@ -64,10 +67,11 @@ export async function resolveRegistries(
 		registries.map(async (registry) => {
 			const pf = providers.find((p) => p?.matches(registry));
 			if (!pf) return err(new InvalidRegistryError(registry));
-			const provider = await pf?.create(registry, { cwd });
-			const manifestResult = await fetchManifest(provider, {});
+			const token = tokenManager.get(pf, registry);
+			const provider = await pf?.create(registry, { cwd, token });
+			const manifestResult = await fetchManifest(provider, { token });
 			if (manifestResult.isErr()) return err(manifestResult.error);
-			return ok({ url: registry, provider, manifest: manifestResult.value });
+			return ok({ url: registry, provider, manifest: manifestResult.value, token });
 		})
 	);
 	const resultMap = new Map<string, ResolvedRegistry>();
@@ -160,9 +164,15 @@ export async function resolveWantedItems(
 		if (wantedItem.registryUrl) {
 			resolvedRegistry = resolvedRegistries.get(wantedItem.registryUrl)!;
 
-			resolvedItem = resolvedRegistry.manifest.items.find(
+			const item = resolvedRegistry.manifest.items.find(
 				(i) => i.name === wantedItem.itemName
-			)!;
+			);
+			if (!item) {
+				return err(
+					new RegistryItemNotFoundError(wantedItem.itemName, resolvedRegistry.url)
+				);
+			}
+			resolvedItem = item;
 		} else {
 			const blockMatches = new Map<
 				string,
@@ -285,9 +295,11 @@ export function resolveTree(
 	return ok(Array.from(resolvedItems.values()));
 }
 
-export async function fetchItem(block: ResolvedItem, options: FetchOptions) {
+export async function fetchItem(block: ResolvedItem) {
 	try {
-		const contents = await block.registry.provider.fetch(`${block.name}.json`, options);
+		const contents = await block.registry.provider.fetch(`${block.name}.json`, {
+			token: block.registry.token,
+		});
 
 		return safeParseFromJSON(DistributedOutputItemSchema, contents);
 	} catch (e) {
@@ -300,9 +312,9 @@ export async function fetchItem(block: ResolvedItem, options: FetchOptions) {
 	}
 }
 
-export async function fetchFile(fileName: string, block: ResolvedItem, options: FetchOptions) {
+export async function fetchFile(fileName: string, block: ResolvedItem) {
 	try {
-		return ok(await block.registry.provider.fetch(fileName, options));
+		return ok(await block.registry.provider.fetch(fileName, { token: block.registry.token }));
 	} catch (error) {
 		if (error instanceof ProviderFetchError)
 			return err(
@@ -330,12 +342,11 @@ export async function fetchFile(fileName: string, block: ResolvedItem, options: 
  * @returns
  */
 async function fetchItemRepositoryMode(
-	item: ResolvedItem,
-	options: FetchOptions
+	item: ResolvedItem
 ): Promise<Result<ItemRepository, RegistryFileFetchError>> {
 	const files = await Promise.all(
 		(item.files as RepositoryOutputFile[]).map(async (file) => {
-			const result = await fetchFile(file.path, item, options);
+			const result = await fetchFile(file.path, item);
 			if (result.isErr()) return err(result.error);
 			return ok({
 				...file,
@@ -369,10 +380,9 @@ async function fetchItemRepositoryMode(
  * @returns
  */
 async function fetchItemDistributedMode(
-	item: ResolvedItem,
-	options: FetchOptions
+	item: ResolvedItem
 ): Promise<Result<ItemDistributed, RegistryItemFetchError | InvalidJSONError>> {
-	const result = await fetchItem(item, options);
+	const result = await fetchItem(item);
 	if (result.isErr()) return err(result.error);
 	return ok({
 		...result.value,
@@ -383,8 +393,7 @@ async function fetchItemDistributedMode(
 type ExtractResultValue<T> = T extends Result<infer V, unknown> ? V : never;
 
 export async function fetchAllResolvedItems(
-	items: ResolvedItem[],
-	options: FetchOptions
+	items: ResolvedItem[]
 ): Promise<
 	Result<
 		Array<ItemRepository | ItemDistributed>,
@@ -394,10 +403,10 @@ export async function fetchAllResolvedItems(
 	const itemsResult = await Promise.all(
 		items.map(async (item) => {
 			if (item.registry.manifest.type === 'repository') {
-				return await fetchItemRepositoryMode(item, options);
+				return await fetchItemRepositoryMode(item);
 			}
 
-			return await fetchItemDistributedMode(item, options);
+			return await fetchItemDistributedMode(item);
 		})
 	);
 
@@ -556,7 +565,7 @@ export async function resolveAndFetchAllItems(
 	if (resolvedResult.isErr()) return err(resolvedResult.error);
 	const resolvedItems = resolvedResult.value;
 
-	const itemsResult = await fetchAllResolvedItems(resolvedItems, {});
+	const itemsResult = await fetchAllResolvedItems(resolvedItems);
 	if (itemsResult.isErr()) return err(itemsResult.error);
 	const items = itemsResult.value;
 
