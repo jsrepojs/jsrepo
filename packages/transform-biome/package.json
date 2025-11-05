@@ -1,7 +1,7 @@
 {
 	"name": "@jsrepo/transform-biome",
 	"description": "A transform plugin for jsrepo to format code with biome.",
-	"version": "0.0.1-beta.0",
+	"version": "0.0.1-beta.3",
 	"license": "MIT",
 	"homepage": "https://v3.jsrepo.dev",
 	"author": {
@@ -30,7 +30,8 @@
 	},
 	"main": "./dist/index.js",
 	"files": [
-		"dist/**/*"
+		"dist/**/*",
+		"!dist/**/*.map"
 	],
 	"scripts": {
 		"build": "tsdown",
@@ -43,11 +44,12 @@
 		"jsrepo": "workspace:*"
 	},
 	"dependencies": {
-		"@biomejs/wasm-nodejs": "^2.2.4",
-		"@biomejs/js-api": "^3.0.0"
+		"@biomejs/js-api": "^4.0.0",
+		"@biomejs/wasm-nodejs": "^2.3.4"
 	},
 	"devDependencies": {
+		"@types/node": "catalog:",
 		"tsdown": "catalog:",
-		"@types/node": "catalog:"
+		"typescript": "catalog:"
 	}
 }

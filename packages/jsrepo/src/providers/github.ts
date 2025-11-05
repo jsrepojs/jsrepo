@@ -69,10 +69,7 @@ class GitHub implements Provider {
 		return new GitHub(state, opts);
 	}
 
-	async fetch(
-		resourcePath: string,
-		{ token, fetch: f = fetch }: FetchOptions = {}
-	): Promise<string> {
+	async fetch(resourcePath: string, { token, fetch: f = fetch }: FetchOptions): Promise<string> {
 		const url = this.resolveRaw(resourcePath);
 		try {
 			const headers: Record<string, string> = {

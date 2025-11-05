@@ -22,11 +22,13 @@ export default function Layout({ children }: LayoutProps<"/">) {
 			suppressHydrationWarning
 		>
 			<body className="flex flex-col min-h-screen">
-				<Script
-					defer
-					src="https://cloud.umami.is/script.js"
-					data-website-id="c8df5723-7064-489a-ae4b-723c8534340c"
-				/>
+				{process.env.NODE_ENV === "production" && (
+					<Script
+						defer
+						src="https://cloud.umami.is/script.js"
+						data-website-id="c8df5723-7064-489a-ae4b-723c8534340c"
+					/>
+				)}
 				<RootProvider>{children}</RootProvider>
 			</body>
 		</html>

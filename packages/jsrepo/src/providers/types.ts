@@ -13,12 +13,12 @@ import type {
 import type pc from 'picocolors';
 
 export type FetchOptions = {
-	token?: string;
+	token: string | undefined;
 	fetch?: typeof fetch;
 };
 
 export type CreateOptions = {
-	token?: string;
+	token: string | undefined;
 	fetch?: typeof fetch;
 	cwd: string;
 };
@@ -110,5 +110,5 @@ export interface ProviderFactory {
 }
 
 export interface Provider {
-	fetch(resourcePath: string, fetchOpts?: FetchOptions): Promise<string>;
+	fetch(resourcePath: string, fetchOpts: FetchOptions): Promise<string>;
 }
