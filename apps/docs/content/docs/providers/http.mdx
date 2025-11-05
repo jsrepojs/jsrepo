@@ -11,13 +11,13 @@ import { Files, Folder, File } from "@/components/files";
 	<DefaultBadge />
 </BadgeGroup>
 
-The http provider is the simplest provider by far. To add registry items simply provide the base url of the `jsrepo.json` file:
+The http provider is the simplest provider by far. To add registry items simply provide the base url of the `registry.json` file:
 
 ```sh
 jsrepo add https://example.com/registry
 ```
 
-**jsrepo** will then find the `jsrepo.json` file from `https://example.com/registry/jsrepo.json`.
+**jsrepo** will then find the `registry.json` file from `https://example.com/registry/registry.json`.
 
 ## Deploying a registry to your own website
 
@@ -38,7 +38,7 @@ This will output your registry to the `public/r` directory which might look some
 <Files>
 	<Folder name="public" defaultOpen>
 		<Folder name="r" defaultOpen>
-			<File name="jsrepo.json" />
+			<File name="registry.json" />
 			<File name="button.json" />
 			<File name="utils.json" />
 		</Folder>

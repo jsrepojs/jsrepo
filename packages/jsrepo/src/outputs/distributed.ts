@@ -29,7 +29,7 @@ export type DistributedOutputOptions = {
  * This will create a file structure like:
  * ```plaintext
  * 📁 public/r
- * ├── jsrepo.json
+ * ├── registry.json
  * ├── button.json
  * └── math.json
  * ```

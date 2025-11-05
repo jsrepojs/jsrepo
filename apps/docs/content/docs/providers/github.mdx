@@ -97,10 +97,10 @@ export default defineConfig({
 });
 ```
 
-This will create a `jsrepo.json` file that will contain everything users need to use your registry.
+This will create a `registry.json` file that will contain everything users need to use your registry.
 
 <Callout type="warning">
-	The `jsrepo.json` file must be at the **root** of your repository otherwise users won't be able to use your registry.
+	The `registry.json` file must be at the **root** of your repository otherwise users won't be able to use your registry.
 </Callout>
 
 ### Workflow
@@ -132,18 +132,18 @@ jobs:
           node-version: '20'
       - name: Install dependencies
         run: npm install
-      - name: Build jsrepo.json
+      - name: Build registry.json
         run: jsrepo build
       - name: Create pull request with changes
         uses: peter-evans/create-pull-request@v7
         with:
-          title: 'chore: update `jsrepo.json`'
+          title: 'chore: update `registry.json`'
           body: |
-            - Update `jsrepo.json`
+            - Update `registry.json`
             ---
             This PR was auto generated
           branch: build-registry
-          commit-message: build `jsrepo.json`
+          commit-message: build `registry.json`
 ```
 
 ## Options
