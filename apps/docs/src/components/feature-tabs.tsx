@@ -120,7 +120,7 @@ function FeatureTabsTrigger({
 			<div
 				data-state={activeTab === value ? "active" : "inactive"}
 				className={cn(
-					"hidden md:block border-border group bg-card px-6 [--radix-accordion-content-height:137px] duration-300",
+					"hidden md:block border-border group bg-fd-card px-6 [--radix-accordion-content-height:137px] duration-300",
 					"h-0 data-[state=inactive]:py-0 data-[state=active]:py-4 data-[state=inactive]:h-0 data-[state=active]:h-[137px] data-[state=inactive]:animate-accordion-up data-[state=active]:animate-accordion-down"
 				)}
 			>
@@ -140,7 +140,7 @@ function FeatureTabsContent({
 	return activeTab !== value ? (
 		<></>
 	) : (
-		<div className={cn("border border-t-0 md:border-l-0 md:border-y-0 w-full bg-card", className)} {...props}>
+		<div className={cn("border border-t-0 md:border-l-0 md:border-y-0 w-full bg-fd-card", className)} {...props}>
 			{children}
 		</div>
 	);
