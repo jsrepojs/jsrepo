@@ -16,4 +16,5 @@ export default defineConfig({
 	alias: {
 		'@/': './src/',
 	},
+	minify: true
 });
