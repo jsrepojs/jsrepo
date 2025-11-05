@@ -28,11 +28,17 @@ jobs:
             - name: Build packages
               run: pnpm build:packages
 
+            - name: Bundle Analyze
+              id: analyze
+              continue-on-error: true
+              run: |
+                  pnpm bundle:analyze > bundle-output.txt 2>&1 || true
+
             - name: Generate PR comment
               id: comment
               continue-on-error: true
               run: |
-                  node scripts/generate-bundle-comment.js > comment-body.txt || echo "## 📦 Bundle Size Analysis
+                  node scripts/generate-bundle-comment.js bundle-output.txt > comment-body.txt || echo "## 📦 Bundle Size Analysis
 
                   ⚠️ Failed to generate bundle analysis comment." > comment-body.txt
 
