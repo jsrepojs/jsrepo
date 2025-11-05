@@ -1,3 +1,4 @@
+import pc from 'picocolors';
 import type { z } from 'zod';
 import type { RegistryItemType } from './config';
 
@@ -71,20 +72,26 @@ export class NoPackageJsonFoundError extends JsrepoError {
 
 export class InvalidRegistryError extends JsrepoError {
 	constructor(registry: string) {
-		super(`Invalid registry: ${registry} A provider for this registry was not found.`, {
-			suggestion: 'Maybe you need to add a provider for this registry?',
-			docsLink: 'See: https://v3.jsrepo.dev/docs/providers',
-		});
+		super(
+			`Invalid registry: ${pc.bold(registry)} A provider for this registry was not found.`,
+			{
+				suggestion: 'Maybe you need to add a provider for this registry?',
+				docsLink: 'See: https://v3.jsrepo.dev/docs/providers',
+			}
+		);
 	}
 }
 
 export class RegistryItemNotFoundError extends JsrepoError {
 	constructor(itemName: string, registry?: string) {
-		super(`${itemName} not found in ${registry ? `${registry}` : 'any registry'}`, {
-			suggestion: registry
-				? `Run \`jsrepo add --registry ${registry}\` to list all items in this registry`
-				: 'Run `jsrepo add` to list all available registry items.',
-		});
+		super(
+			`${pc.bold(itemName)} not found in ${pc.bold(registry ? `${registry}` : 'any registry')}.`,
+			{
+				suggestion: registry
+					? `Run ${pc.bold(`\`jsrepo add --registry ${registry}\``)} to list all items in this registry`
+					: `Run ${pc.bold(`jsrepo add`)} to list all available registry items.`,
+			}
+		);
 	}
 }
 
@@ -102,7 +109,7 @@ export class ManifestFetchError extends JsrepoError {
 	constructor(error: unknown) {
 		super(
 			error instanceof ProviderFetchError
-				? `Error fetching manifest file from ${error.resourcePath}: ${error.message}`
+				? `Error fetching manifest file from ${pc.bold(error.resourcePath)}: ${error.message}`
 				: `Error fetching manifest file: ${error instanceof Error ? error.message : String(error)}`,
 			{
 				suggestion: 'Please try again.',
@@ -115,7 +122,7 @@ export class RegistryItemFetchError extends JsrepoError {
 	constructor(error: unknown, options: { registry: string; item: string }) {
 		super(
 			error instanceof ProviderFetchError
-				? `Error fetching ${options.registry}/${options.item} from ${error.resourcePath}: ${error.message}`
+				? `Error fetching ${pc.bold(`${options.registry}/${options.item}`)} from ${pc.bold(error.resourcePath)}: ${error.message}`
 				: `Error fetching ${options.registry}/${options.item}: ${error instanceof Error ? error.message : String(error)}`,
 			{
 				suggestion: 'Please try again.',
@@ -130,8 +137,8 @@ export class RegistryFileFetchError extends JsrepoError {
 		options: { registry: string; item: string; resourcePath: string | undefined }
 	) {
 		super(
-			`Error fetching ${options.registry}/${options.item}${
-				options.resourcePath ? ` from ${options.resourcePath}` : ''
+			`Error fetching ${pc.bold(`${options.registry}/${options.item}`)}${
+				options.resourcePath ? ` from ${pc.bold(options.resourcePath)}` : ''
 			}: ${message}`,
 			{
 				suggestion: 'Please try again.',
@@ -154,9 +161,9 @@ export class MultipleRegistriesError extends JsrepoError {
 		super(
 			`${registries
 				.map((r, i) => `${i === registries.length - 1 ? 'and ' : ''}${r}`)
-				.join(', ')} contain ${itemName}.`,
+				.join(', ')} contain ${pc.bold(itemName)}.`,
 			{
-				suggestion: `You will have to be more specific by providing the registry url like: \`${registries[0]}/${itemName}\`.`,
+				suggestion: `You will have to be more specific by providing the registry url like: ${pc.bold(`\`${registries[0]}/${itemName}\``)}.`,
 			}
 		);
 	}
@@ -165,7 +172,7 @@ export class MultipleRegistriesError extends JsrepoError {
 export class AlreadyInitializedError extends JsrepoError {
 	constructor() {
 		super('Config already initialized.', {
-			suggestion: 'To configure a new registry run `jsrepo init <registry>`',
+			suggestion: `To configure a new registry run ${pc.bold(`\`jsrepo init <registry>\``)}.`,
 		});
 	}
 }
@@ -180,7 +187,7 @@ export class FailedToLoadConfigError extends JsrepoError {
 
 export class ConfigNotFoundError extends JsrepoError {
 	constructor(path: string) {
-		super(`Config not found at ${path}`, {
+		super(`Config not found at ${pc.bold(path)}.`, {
 			suggestion: 'Please run `jsrepo init` to create a config file.',
 			docsLink: 'https://v3.jsrepo.dev/docs/jsrepo-config',
 		});
@@ -208,7 +215,7 @@ export class NoRegistriesError extends JsrepoError {
 
 export class NoPathProvidedError extends JsrepoError {
 	constructor({ item, type }: { item: string; type: string }) {
-		super(`No path was provided for ${item} of type ${type}`, {
+		super(`No path was provided for ${pc.bold(item)} of type ${pc.bold(type)}.`, {
 			suggestion: 'Please configure a path with the `paths` key.',
 			docsLink: 'https://v3.jsrepo.dev/docs/jsrepo-config#paths',
 		});
@@ -227,7 +234,7 @@ export class BuildError extends JsrepoError {
 
 export class NoOutputsError extends BuildError {
 	constructor({ registryName }: { registryName: string }) {
-		super(`No outputs were defined in the registry ${registryName}.`, {
+		super(`No outputs were defined in the registry ${pc.bold(registryName)}.`, {
 			registryName,
 			suggestion: 'Please define at least one output using the `registry.outputs` key.',
 		});
@@ -236,7 +243,7 @@ export class NoOutputsError extends BuildError {
 
 export class NoListedItemsError extends BuildError {
 	constructor({ registryName }: { registryName: string }) {
-		super(`No items were listed in the registry ${registryName}.`, {
+		super(`No items were listed in the registry ${pc.bold(registryName)}.`, {
 			registryName,
 			suggestion: 'Please list at least one item using the `items` key.',
 		});
@@ -245,7 +252,7 @@ export class NoListedItemsError extends BuildError {
 
 export class DuplicateItemNameError extends BuildError {
 	constructor({ name, registryName }: { name: string; registryName: string }) {
-		super(`Duplicate item name: ${name}.`, {
+		super(`Duplicate item name: ${pc.bold(name)}.`, {
 			registryName,
 			suggestion: 'Please ensure each item has a unique name.',
 		});
@@ -254,7 +261,7 @@ export class DuplicateItemNameError extends BuildError {
 
 export class SelfReferenceError extends BuildError {
 	constructor({ name, registryName }: { name: string; registryName: string }) {
-		super(`Self reference: ${name}.`, {
+		super(`Self reference: ${pc.bold(name)}.`, {
 			registryName,
 			suggestion: 'Please ensure each item does not reference itself.',
 		});
@@ -263,7 +270,7 @@ export class SelfReferenceError extends BuildError {
 
 export class NoFilesError extends BuildError {
 	constructor({ name, registryName }: { name: string; registryName: string }) {
-		super(`No files were listed in the item ${name}.`, {
+		super(`No files were listed in the item ${pc.bold(name)}.`, {
 			registryName,
 			suggestion: 'Please list at least one file using the `files` key.',
 		});
@@ -272,7 +279,7 @@ export class NoFilesError extends BuildError {
 
 export class IllegalBlockNameError extends BuildError {
 	constructor({ name, registryName }: { name: string; registryName: string }) {
-		super(`Illegal block name: ${name}.`, {
+		super(`Illegal block name: ${pc.bold(name)}.`, {
 			registryName,
 			suggestion: 'Please ensure the block name is not the same as the manifest file name.',
 		});
@@ -285,7 +292,7 @@ export class InvalidRegistryDependencyError extends BuildError {
 		item,
 		registryName,
 	}: { dependency: string; item: string; registryName: string }) {
-		super(`Invalid registry dependency: ${dependency} for item ${item}.`, {
+		super(`Invalid registry dependency: ${pc.bold(dependency)} for item ${pc.bold(item)}.`, {
 			registryName,
 			suggestion: 'Please ensure the dependency is a valid item in the registry.',
 		});
@@ -305,7 +312,7 @@ export class DuplicateFileReferenceError extends BuildError {
 		registryName: string;
 	}) {
 		super(
-			`Duplicate file reference: ${path} is in both ${parent.type}/${parent.name} and ${duplicateParent.type}/${duplicateParent.name}.`,
+			`Duplicate file reference: ${pc.bold(path)} is in both ${pc.bold(`${parent.type}/${parent.name}`)} and ${pc.bold(`${duplicateParent.type}/${duplicateParent.name}`)}.`,
 			{
 				registryName,
 				suggestion: 'Please ensure the file is not referenced multiple times.',
@@ -324,10 +331,13 @@ export class FileNotFoundError extends BuildError {
 		parent: { name: string; type: RegistryItemType };
 		registryName: string;
 	}) {
-		super(`File not found: ${path} in ${parent.name} of type ${parent.type}.`, {
-			registryName,
-			suggestion: 'Please ensure the file exists.',
-		});
+		super(
+			`File not found: ${pc.bold(path)} in ${pc.bold(parent.name)} of type ${pc.bold(parent.type)}.`,
+			{
+				registryName,
+				suggestion: 'Please ensure the file exists.',
+			}
+		);
 	}
 }
 
@@ -337,7 +347,7 @@ export class FileNotResolvedError extends BuildError {
 		item,
 		registryName,
 	}: { file: string; item: string; registryName: string }) {
-		super(`File not resolved: ${file} in item ${item}.`, {
+		super(`File not resolved: ${pc.bold(file)} in item ${pc.bold(item)}.`, {
 			registryName,
 			suggestion: 'Please ensure the file is resolved.',
 		});
@@ -356,16 +366,19 @@ export class ImportedFileNotResolvedError extends BuildError {
 		item: string;
 		registryName: string;
 	}) {
-		super(`Imported file not resolved: ${referencedFile} in ${fileName} of item ${item}.`, {
-			registryName,
-			suggestion: 'Make sure the file exists and is part of the registry.',
-		});
+		super(
+			`Imported file not resolved: ${pc.bold(referencedFile)} in ${pc.bold(fileName)} of item ${pc.bold(item)}.`,
+			{
+				registryName,
+				suggestion: 'Make sure the file exists and is part of the registry.',
+			}
+		);
 	}
 }
 
 export class InvalidPluginError extends JsrepoError {
 	constructor(plugin: string) {
-		super(`Invalid plugin name: ${plugin} is not a valid npm package name.`, {
+		super(`Invalid plugin name: ${pc.bold(plugin)} is not a valid npm package name.`, {
 			suggestion: 'Double check the plugin name and try again.',
 		});
 	}
@@ -373,7 +386,7 @@ export class InvalidPluginError extends JsrepoError {
 
 export class InvalidKeyTypeError extends JsrepoError {
 	constructor({ key, type }: { key: string; type: 'object' | 'array' }) {
-		super(`The ${key} key in your config must be an ${type}.`, {
+		super(`The ${pc.bold(key)} key in your config must be an ${pc.bold(type)}.`, {
 			suggestion: 'Please check your config and try again.',
 		});
 	}
@@ -418,9 +431,12 @@ export class InvalidJSONError extends JsrepoError {
 
 export class NoProviderFoundError extends JsrepoError {
 	constructor(provider: string) {
-		super(`No provider found for ${provider}. Maybe you need to add it to your config?`, {
-			suggestion: 'Please check the provider name and try again.',
-		});
+		super(
+			`No provider found for ${pc.bold(provider)}. Maybe you need to add it to your config?`,
+			{
+				suggestion: 'Please check the provider name and try again.',
+			}
+		);
 	}
 }
 
@@ -435,7 +451,7 @@ export class NoItemsToUpdateError extends JsrepoError {
 
 export class MissingPeerDependencyError extends JsrepoError {
 	constructor(packageName: string, feature: string) {
-		super(`"${packageName}" is required for ${feature} to work.`, {
+		super(`${pc.bold(packageName)} is required for ${feature} to work.`, {
 			suggestion: `Please install it.`,
 		});
 	}

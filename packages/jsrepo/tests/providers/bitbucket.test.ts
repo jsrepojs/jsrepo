@@ -4,7 +4,10 @@ import { describe, it } from 'vitest';
 describe('bitbucket', () => {
 	it('correctly resolves repository url', async () => {
 		const bb = bitbucket();
-		const bitbucketState = await bb.create('bitbucket/ieedan/std', { cwd: process.cwd() });
+		const bitbucketState = await bb.create('bitbucket/ieedan/std', {
+			cwd: process.cwd(),
+			token: undefined,
+		});
 		await bitbucketState.fetch('README.md');
 	});
 
@@ -12,6 +15,7 @@ describe('bitbucket', () => {
 		const bb = bitbucket();
 		const bitbucketState = await bb.create('bitbucket:https://bitbucket.org/ieedan/std', {
 			cwd: process.cwd(),
+			token: undefined,
 		});
 		await bitbucketState.fetch('README.md');
 	});
