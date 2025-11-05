@@ -36,9 +36,19 @@ jobs:
 
                   ⚠️ Failed to generate bundle analysis comment." > comment-body.txt
 
+            - name: Find existing comment
+              id: fc
+              continue-on-error: true
+              uses: peter-evans/find-comment@v4
+              with:
+                  issue-number: ${{ github.event.pull_request.number }}
+                  comment-author: github-actions[bot]
+                  body-includes: Bundle Size Analysis
+
             - name: Create or update PR comment
               continue-on-error: true
-              uses: mshick/add-pr-comment@v2
+              uses: peter-evans/create-or-update-comment@v4
               with:
-                  message-path: comment-body.txt
-                  message-id: bundle-analyze
+                  body-path: comment-body.txt
+                  comment-id: ${{ steps.fc.outputs.comment-id }}
+                  edit-mode: replace
