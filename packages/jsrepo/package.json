@@ -63,7 +63,8 @@
 	"bin": "./dist/bin.js",
 	"main": "./dist/index.js",
 	"files": [
-		"dist/**/*"
+		"dist/**/*",
+		"!dist/**/*.map"
 	],
 	"scripts": {
 		"start": "node ./dist/bin.js",
@@ -72,10 +73,10 @@
 		"check": "tsc --noEmit",
 		"test": "vitest"
 	},
-	"packageManager": "pnpm@10.17.1",
+	"packageManager": "pnpm@10.20.0",
 	"dependencies": {
-		"commander": "^14.0.1",
-		"oxc-parser": "^0.94.0",
+		"commander": "^14.0.2",
+		"oxc-parser": "^0.96.0",
 		"unconfig": "^7.3.3"
 	},
 	"peerDependencies": {
@@ -99,19 +100,20 @@
 		"dedent": "^1.7.0",
 		"diff": "^8.0.2",
 		"escape-string-regexp": "^5.0.0",
-		"get-tsconfig": "^4.10.1",
+		"get-tsconfig": "^4.13.0",
 		"is-unicode-supported": "^2.1.0",
-		"magic-string": "^0.30.19",
-		"nevereverthrow": "^0.2.1",
+		"magic-string": "^0.30.21",
+		"nevereverthrow": "^0.3.0",
 		"node-machine-id": "^1.1.12",
-		"package-manager-detector": "^1.4.0",
+		"package-manager-detector": "^1.5.0",
 		"parse5": "^8.0.0",
 		"pathe": "^2.0.3",
 		"picocolors": "catalog:",
 		"semver": "^7.7.3",
-		"tinyexec": "^1.0.1",
+		"tinyexec": "^1.0.2",
 		"tsdown": "catalog:",
-		"vite": "^7.1.12",
+		"typescript": "catalog:",
+		"vite": "^7.2.0",
 		"vitest": "catalog:",
 		"zod": "catalog:"
 	}

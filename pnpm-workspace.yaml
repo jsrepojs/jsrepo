@@ -4,8 +4,9 @@ packages:
   - "apps/*"
 
 catalog:
-  vitest: ^4.0.2
-  "@types/node": ^24.9.1
+  vitest: ^4.0.7
+  "@types/node": ^24.10.0
   zod: ^4.1.12
-  tsdown: ^0.15.9
+  tsdown: ^0.15.12
   picocolors: ^1.1.1
+  typescript: ^5.9.3

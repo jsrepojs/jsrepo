@@ -25,7 +25,8 @@
 	"bin": "./dist/index.js",
 	"main": "./dist/index.js",
 	"files": [
-		"dist/**/*"
+		"dist/**/*",
+		"!dist/**/*.map"
 	],
 	"scripts": {
 		"build": "tsdown",
@@ -40,7 +41,7 @@
 		"jsrepo": "workspace:*"
 	},
 	"devDependencies": {
-		"@tmcp/adapter-zod": "^0.1.6",
+		"@tmcp/adapter-zod": "^0.1.7",
 		"@tmcp/transport-in-memory": "^0.0.2",
 		"@tmcp/transport-stdio": "^0.4.0",
 		"@types/node": "catalog:",
@@ -49,6 +50,7 @@
 		"picocolors": "catalog:",
 		"tmcp": "^1.16.2",
 		"tsdown": "catalog:",
+		"typescript": "catalog:",
 		"vitest": "catalog:",
 		"zod": "catalog:"
 	}
