@@ -28,48 +28,17 @@ jobs:
             - name: Build packages
               run: pnpm build:packages
 
-            - name: Bundle Analyze
-              id: analyze
-              continue-on-error: true
-              run: |
-                  results="[]"
-                  for package in packages/*/; do
-                      if [ -f "$package/package.json" ]; then
-                          package_name=$(jq -r '.name' "$package/package.json" 2>/dev/null || basename "$package")
-                          size_json=$(node bundle-analyzer/dist/index.js analyze "$package" --json 2>/dev/null | tr -d '\n' || echo '{"size":0}')
-                          if echo "$size_json" | jq -e '.size' > /dev/null 2>&1; then
-                              results=$(echo "$results" | jq --arg name "$package_name" --argjson size_json "$size_json" '. += [{"name": $name, "size": ($size_json | .size)}]')
-                          fi
-                      fi
-                  done
-                  echo "$results" > bundle-results.json
-
             - name: Generate PR comment
               id: comment
               continue-on-error: true
               run: |
-                  if [ -f bundle-results.json ]; then
-                      cat > comment-body.txt << 'EOF'
-                  ## 📦 Bundle Size Analysis
+                  node scripts/generate-bundle-comment.js > comment-body.txt || echo "## 📦 Bundle Size Analysis
 
-                  | Package | Unpacked Size |
-                  |---------|---------------|
-                  EOF
-                      jq -r 'sort_by(-.size) | .[] | (.size / 1024 / 1024) as $mb | (.size / 1024) as $kb | if $mb >= 1 then "\(.name)|\($mb)|MB" elif $kb >= 1 then "\(.name)|\($kb)|KB" else "\(.name)|\(.size)|B" end' bundle-results.json | while IFS='|' read -r name size unit; do
-                          formatted_size=$(printf "%.2f" "$size" 2>/dev/null || echo "$size")
-                          echo "| \`$name\` | $formatted_size $unit |" >> comment-body.txt
-                      done || echo "| *Failed to parse results* | - |" >> comment-body.txt
-                  else
-                      echo "## 📦 Bundle Size Analysis
-
-                  ⚠️ Bundle analysis did not produce output." > comment-body.txt
-                  fi
+                  ⚠️ Failed to generate bundle analysis comment." > comment-body.txt
 
             - name: Create or update PR comment
               continue-on-error: true
-              uses: peter-evans/create-or-update-comment@v4
+              uses: mshick/add-pr-comment@v2
               with:
-                  issue-number: ${{ github.event.pull_request.number }}
-                  comment-id: bundle-analyze
-                  body-path: comment-body.txt
-                  edit-mode: replace
+                  message-path: comment-body.txt
+                  message-id: bundle-analyze
