@@ -1,4 +1,4 @@
-name: CI
+name: Bundle Analyze
 
 on:
     pull_request:
@@ -6,7 +6,7 @@ on:
             - next
 
 jobs:
-    CI:
+    bundle-analyze:
         runs-on: ubuntu-latest
 
         steps:
@@ -20,8 +20,12 @@ jobs:
             - name: Install dependencies
               run: pnpm install
 
-            - name: Check Types
-              run: pnpm check
+            - name: Build bundle analyzer
+              run: pnpm --filter bundle-analyzer build
 
-            - name: Test
-              run: pnpm test
+            - name: Build packages
+              run: pnpm build:packages
+
+            - name: Bundle Analyze
+              run: pnpm bundle:analyze
+
