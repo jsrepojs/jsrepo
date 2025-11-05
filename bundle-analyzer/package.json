@@ -17,6 +17,7 @@
 	"packageManager": "pnpm@10.17.1",
 	"dependencies": {
 		"@npmcli/arborist": "^9.1.6",
+		"commander": "^14.0.1",
 		"npm-packlist": "^10.0.3",
 		"picocolors": "catalog:"
 	},
@@ -24,6 +25,7 @@
 		"@types/node": "catalog:",
 		"@types/npm-packlist": "^7.0.3",
 		"@types/npmcli__arborist": "^6.3.1",
-		"tsdown": "catalog:"
+		"tsdown": "catalog:",
+		"zod": "catalog:"
 	}
 }
