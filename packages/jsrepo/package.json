@@ -77,8 +77,12 @@
 		"commander": "^14.0.1",
 		"oxc-parser": "^0.94.0",
 		"unconfig": "^7.3.3",
-		"vue": "^3.5.22",
+		"vue": "^3.5.22"
+	},
+	"devDependencies": {
 		"@clack/prompts": "1.0.0-alpha.6",
+		"@types/node": "catalog:",
+		"@types/semver": "^7.7.1",
 		"conf": "^15.0.2",
 		"css-dependency": "^0.0.3",
 		"dedent": "^1.7.0",
@@ -100,9 +104,5 @@
 		"vite": "^7.1.12",
 		"vitest": "catalog:",
 		"zod": "catalog:"
-	},
-	"devDependencies": {
-		"@types/node": "catalog:",
-		"@types/semver": "^7.7.1"
 	}
 }
