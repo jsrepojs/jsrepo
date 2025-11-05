@@ -60,7 +60,7 @@
 			"default": "./dist/api/utils.js"
 		}
 	},
-	"bin": "./dist/bin.js",
+	"bin": "./dist/bin.js",	
 	"main": "./dist/bin.js",
 	"files": [
 		"dist/**/*"
@@ -74,7 +74,6 @@
 	},
 	"packageManager": "pnpm@10.17.1",
 	"dependencies": {
-		"@oxc-parser/binding-wasm32-wasi": "^0.94.0",
 		"commander": "^14.0.1",
 		"oxc-parser": "^0.94.0",
 		"unconfig": "^7.3.3",

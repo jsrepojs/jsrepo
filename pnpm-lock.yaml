@@ -155,9 +155,6 @@ importers:
       '@clack/prompts':
         specifier: 1.0.0-alpha.6
         version: 1.0.0-alpha.6
-      '@oxc-parser/binding-wasm32-wasi':
-        specifier: ^0.94.0
-        version: 0.94.0
       commander:
         specifier: ^14.0.1
         version: 14.0.1(patch_hash=c5b8f01cdaed96b5c5ce4dbe450d95b4283df9865de8ad26ac29894f624b2ee0)
@@ -1581,6 +1578,7 @@ packages:
   '@oxc-parser/binding-wasm32-wasi@0.94.0':
     resolution: {integrity: sha512-VoCtQZIsRZN8mszbdizh+5MwzbgbMxsPgT2hOzzILQLNY2o2OXG3xSiFNFakVhbWc9qSTaZ/MRDsqR+IM3fLFw==}
     engines: {node: '>=14.0.0'}
+    cpu: [wasm32]
 
   '@oxc-parser/binding-win32-arm64-msvc@0.94.0':
     resolution: {integrity: sha512-3wsbMqV8V7WaLdiQ2oawdgKkCgMHXJ7VDuo6uIcXauU3wK6CG0QyDXRV9bPWzorGLRBUHndu/2VB1+9dgT9fvg==}
@@ -5522,6 +5520,7 @@ snapshots:
     dependencies:
       '@emnapi/wasi-threads': 1.1.0
       tslib: 2.8.1
+    optional: true
 
   '@emnapi/core@1.6.0':
     dependencies:
@@ -5532,6 +5531,7 @@ snapshots:
   '@emnapi/runtime@1.5.0':
     dependencies:
       tslib: 2.8.1
+    optional: true
 
   '@emnapi/runtime@1.6.0':
     dependencies:
@@ -5541,6 +5541,7 @@ snapshots:
   '@emnapi/wasi-threads@1.1.0':
     dependencies:
       tslib: 2.8.1
+    optional: true
 
   '@esbuild/aix-ppc64@0.25.10':
     optional: true
@@ -5971,6 +5972,7 @@ snapshots:
       '@emnapi/core': 1.5.0
       '@emnapi/runtime': 1.5.0
       '@tybys/wasm-util': 0.10.1
+    optional: true
 
   '@napi-rs/wasm-runtime@1.0.7':
     dependencies:
@@ -6173,6 +6175,7 @@ snapshots:
   '@oxc-parser/binding-wasm32-wasi@0.94.0':
     dependencies:
       '@napi-rs/wasm-runtime': 1.0.6
+    optional: true
 
   '@oxc-parser/binding-win32-arm64-msvc@0.94.0':
     optional: true
@@ -6865,6 +6868,7 @@ snapshots:
   '@tybys/wasm-util@0.10.1':
     dependencies:
       tslib: 2.8.1
+    optional: true
 
   '@types/chai@5.2.2':
     dependencies:
