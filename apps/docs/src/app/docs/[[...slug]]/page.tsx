@@ -16,9 +16,9 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 	return (
 		<div className="contents group/page">
 			<DocsPage toc={page.data.toc} full={page.data.full}>
-				<div className="flex place-items-center justify-between">
-					<DocsTitle>{page.data.title}</DocsTitle>
-					<div className="flex place-items-center gap-2">
+				<div className="flex gap-4 lg:flex-row flex-col lg:place-items-center lg:justify-between">
+					<DocsTitle className="lg:order-1 order-2">{page.data.title}</DocsTitle>
+					<div className="flex place-items-center gap-2 lg:order-2 order-1">
 						<LLMCopyButton markdownUrl={`${page.url}.mdx`} />
 						<ViewOptions
 							markdownUrl={`${page.url}.mdx`}
@@ -26,7 +26,9 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 						/>
 					</div>
 				</div>
-				<DocsDescription className="group-has-data-[slot='badge-group']/page:mb-0">{page.data.description}</DocsDescription>
+				<DocsDescription className="group-has-data-[slot='badge-group']/page:mb-0">
+					{page.data.description}
+				</DocsDescription>
 				<DocsBody>
 					<MDX
 						components={getMDXComponents({
