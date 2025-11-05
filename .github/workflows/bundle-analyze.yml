@@ -29,32 +29,5 @@ jobs:
               run: pnpm build:packages
 
             - name: Bundle Analyze
-              id: analyze
-              continue-on-error: true
               run: |
-                  pnpm bundle:analyze 2>&1 | tee bundle-output.txt
-
-            - name: Generate PR comment
-              id: comment
-              continue-on-error: true
-              run: |
-                  node scripts/generate-bundle-comment.js bundle-output.txt > comment-body.txt || echo "## 📦 Bundle Size Analysis
-
-                  ⚠️ Failed to generate bundle analysis comment." > comment-body.txt
-
-            - name: Find existing comment
-              id: fc
-              continue-on-error: true
-              uses: peter-evans/find-comment@v4
-              with:
-                  issue-number: ${{ github.event.pull_request.number }}
-                  comment-author: github-actions[bot]
-                  body-includes: Bundle Size Analysis
-
-            - name: Create or update PR comment
-              continue-on-error: true
-              uses: peter-evans/create-or-update-comment@v4
-              with:
-                  body-path: comment-body.txt
-                  comment-id: ${{ steps.fc.outputs.comment-id }}
-                  edit-mode: replace
+                  pnpm bundle:analyze
