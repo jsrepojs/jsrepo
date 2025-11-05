@@ -26,7 +26,6 @@ export function displayDividedSize(size: number): string {
 	return sizeStr.endsWith('.00') ? sizeStr.slice(0, -3) : sizeStr;
 }
 
-// Utilities for working with file sizes
 export const BYTE = 1;
 export const KILOBYTE = 1024;
 export const MEGABYTE = 1024 * KILOBYTE;
