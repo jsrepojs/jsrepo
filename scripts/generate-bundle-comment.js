@@ -118,20 +118,28 @@ try {
 	try {
 		readFileSync(outputPath, 'utf-8');
 	} catch {
-		console.error('## 📦 Bundle Size Analysis\n\n⚠️ Bundle output file not found.');
-		process.exit(1);
+		console.log('## 📦 Bundle Size Analysis\n\n⚠️ Bundle output file not found.');
+		process.exit(0); // Exit successfully so comment is still posted
 	}
 	
 	const results = parseBundleOutput(outputPath);
 
 	if (results.length === 0) {
-		// Try to read the file and show first few lines for debugging
+		// Check if file contains error indicators
 		const output = readFileSync(outputPath, 'utf-8');
-		const preview = output.split('\n').slice(0, 10).join('\n');
-		console.error('## 📦 Bundle Size Analysis\n\n⚠️ No bundle analysis results found.');
-		console.error('\nFirst 10 lines of output:');
-		console.error(preview);
-		process.exit(1);
+		const hasErrors = output.includes('Error') || output.includes('error') || output.includes('Failed');
+		
+		if (hasErrors) {
+			console.log('## 📦 Bundle Size Analysis\n\n❌ Bundle analysis failed. Please check the workflow logs for details.');
+		} else {
+			// Try to read the file and show first few lines for debugging
+			const preview = output.split('\n').slice(0, 10).join('\n');
+			console.log('## 📦 Bundle Size Analysis\n\n⚠️ No bundle analysis results found.');
+			console.log('\n<details><summary>First 10 lines of output</summary>\n\n```');
+			console.log(preview);
+			console.log('```\n\n</details>');
+		}
+		process.exit(0); // Exit successfully so comment is still posted
 	}
 
 	// Sort by size descending
@@ -148,7 +156,7 @@ try {
 
 	console.log(markdown);
 } catch (error) {
-	console.error('## 📦 Bundle Size Analysis\n\n⚠️ Failed to generate bundle analysis comment.');
-	console.error(error.message);
-	process.exit(1);
+	console.log('## 📦 Bundle Size Analysis\n\n⚠️ Failed to generate bundle analysis comment.');
+	console.log(`\nError: ${error.message}`);
+	process.exit(0); // Exit successfully so comment is still posted
 }
