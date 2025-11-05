@@ -6,7 +6,6 @@ import pc from 'picocolors';
 import { z } from 'zod';
 import {
 	commonOptions,
-	defaultCommandOptions,
 	defaultCommandOptionsSchema,
 	error,
 	parseOptions,
@@ -30,7 +29,8 @@ export const language = new Command('language')
 		'[languages...]',
 		'Names of the languages you want to add to your config. ex: (jsrepo-language-go, jsrepo-language-rust)'
 	)
-	.addOptions(...defaultCommandOptions, commonOptions.yes)
+	.addOption(commonOptions.cwd)
+	.addOption(commonOptions.yes)
 	.action(async (languages, rawOptions) => {
 		const options = parseOptions(schema, rawOptions);
 

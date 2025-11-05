@@ -7,7 +7,7 @@ import path from 'pathe';
 import pc from 'picocolors';
 import { z } from 'zod';
 import {
-	defaultCommandOptions,
+	commonOptions,
 	defaultCommandOptionsSchema,
 	parseOptions,
 	tryCommand,
@@ -35,7 +35,7 @@ export const mcp = new Command('mcp')
 		)
 	)
 	.option('--all', `Configure all supported MCP clients`, false)
-	.addOptions(...defaultCommandOptions)
+	.addOption(commonOptions.cwd)
 	.action(async (rawOptions) => {
 		const options = parseOptions(schema, rawOptions);
 

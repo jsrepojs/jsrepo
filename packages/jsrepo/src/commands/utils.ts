@@ -28,11 +28,8 @@ export const commonOptions = {
 	)
 		.argParser((value) => Number.parseInt(value, 10))
 		.default(5),
+	cwd: new Option('--cwd <path>', 'The current working directory.').default(process.cwd()),
 };
-
-export const defaultCommandOptions = [
-	new Option('--cwd <path>', 'The current working directory.').default(process.cwd()),
-];
 
 export function parseOptions<T>(
 	schema: z.ZodSchema<T>,

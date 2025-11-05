@@ -6,7 +6,6 @@ import pc from 'picocolors';
 import { z } from 'zod';
 import {
 	commonOptions,
-	defaultCommandOptions,
 	defaultCommandOptionsSchema,
 	error,
 	parseOptions,
@@ -30,7 +29,8 @@ export const provider = new Command('provider')
 		'[providers...]',
 		'Names of the providers you want to add to your config. ex: (jsrepo-provider-jsr, jsrepo-provider-npm)'
 	)
-	.addOptions(...defaultCommandOptions, commonOptions.yes)
+	.addOption(commonOptions.cwd)
+	.addOption(commonOptions.yes)
 	.action(async (providers, rawOptions) => {
 		const options = parseOptions(schema, rawOptions);
 

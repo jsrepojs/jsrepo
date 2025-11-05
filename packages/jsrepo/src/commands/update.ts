@@ -7,7 +7,6 @@ import pc from 'picocolors';
 import { z } from 'zod';
 import {
 	commonOptions,
-	defaultCommandOptions,
 	defaultCommandOptionsSchema,
 	error,
 	parseOptions,
@@ -68,14 +67,12 @@ export const update = new Command('update')
 	.option('--with-examples', 'Include examples in the update.', false)
 	.option('--with-docs', 'Include docs in the update.', false)
 	.option('--with-tests', 'Include tests in the update.', false)
-	.addOptions(
-		...defaultCommandOptions,
-		commonOptions.yes,
-		commonOptions.verbose,
-		commonOptions.overwrite,
-		commonOptions.expand,
-		commonOptions.maxUnchanged
-	)
+	.addOption(commonOptions.cwd)
+	.addOption(commonOptions.yes)
+	.addOption(commonOptions.verbose)
+	.addOption(commonOptions.overwrite)
+	.addOption(commonOptions.expand)
+	.addOption(commonOptions.maxUnchanged)
 	.action(async (blockNames, rawOptions) => {
 		const options = parseOptions(schema, rawOptions);
 

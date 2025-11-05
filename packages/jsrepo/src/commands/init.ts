@@ -8,7 +8,6 @@ import { z } from 'zod';
 import pkg from '@/../package.json';
 import {
 	commonOptions,
-	defaultCommandOptions,
 	defaultCommandOptionsSchema,
 	parseOptions,
 	tryCommand,
@@ -66,14 +65,12 @@ export type InitOptions = z.infer<typeof schema>;
 export const init = new Command('init')
 	.description('Initialize a new jsrepo project.')
 	.argument('[registries...]', 'The registries to initialize.')
-	.addOptions(
-		...defaultCommandOptions,
-		commonOptions.yes,
-		commonOptions.verbose,
-		commonOptions.overwrite,
-		commonOptions.expand,
-		commonOptions.maxUnchanged
-	)
+	.addOption(commonOptions.cwd)
+	.addOption(commonOptions.yes)
+	.addOption(commonOptions.verbose)
+	.addOption(commonOptions.overwrite)
+	.addOption(commonOptions.expand)
+	.addOption(commonOptions.maxUnchanged)
 	.action(async (registries, rawOptions) => {
 		const options = parseOptions(schema, rawOptions);
 

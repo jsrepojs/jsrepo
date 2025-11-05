@@ -60,7 +60,7 @@
 			"default": "./dist/api/utils.js"
 		}
 	},
-	"bin": "./dist/bin.js",	
+	"bin": "./dist/bin.js",
 	"main": "./dist/bin.js",
 	"files": [
 		"dist/**/*"

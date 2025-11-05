@@ -16,7 +16,6 @@ import pc from 'picocolors';
 import { z } from 'zod';
 import {
 	commonOptions,
-	defaultCommandOptions,
 	defaultCommandOptionsSchema,
 	parseOptions,
 	tryCommand,
@@ -41,7 +40,8 @@ export const auth = new Command('auth')
 	.argument('[provider]', 'The provider to authenticate to.')
 	.option('--logout', 'Execute the logout flow.', false)
 	.option('--token <token>', 'The token to use for authenticating to this provider.')
-	.addOptions(...defaultCommandOptions, commonOptions.verbose)
+	.addOption(commonOptions.cwd)
+	.addOption(commonOptions.verbose)
 	.action(async (provider, rawOptions) => {
 		const options = parseOptions(schema, rawOptions);
 

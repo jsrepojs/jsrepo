@@ -28,9 +28,6 @@
 		"wait-on": "^9.0.1"
 	},
 	"pnpm": {
-		"patchedDependencies": {
-			"commander@14.0.1": "patches/commander@14.0.1.patch"
-		},
 		"onlyBuiltDependencies": [
 			"esbuild",
 			"msw",
