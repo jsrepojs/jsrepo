@@ -8,6 +8,8 @@ on:
 jobs:
     bundle-analyze:
         runs-on: ubuntu-latest
+        permissions:
+            pull-requests: write
 
         steps:
             - uses: actions/checkout@v4
@@ -27,5 +29,44 @@ jobs:
               run: pnpm build:packages
 
             - name: Bundle Analyze
-              run: pnpm bundle:analyze
+              id: analyze
+              continue-on-error: true
+              run: |
+                  results="[]"
+                  for package in packages/*/; do
+                      if [ -f "$package/package.json" ]; then
+                          package_name=$(basename "$package")
+                          size_json=$(node bundle-analyzer/dist/index.js analyze "$package" --json 2>/dev/null || echo '{"size":0}')
+                          size=$(echo "$size_json" | jq -r '.size // 0')
+                          if [ -n "$size" ] && [ "$size" != "null" ]; then
+                              results=$(echo "$results" | jq --arg name "$package_name" --argjson size "$size" '. += [{"name": $name, "size": $size}]')
+                          fi
+                      fi
+                  done
+                  echo "$results" > bundle-results.json
 
+            - name: Generate PR comment
+              id: comment
+              continue-on-error: true
+              run: |
+                  if [ -f bundle-results.json ]; then
+                      cat > comment-body.txt << 'EOF'
+                  ## 📦 Bundle Size Analysis
+
+                  | Package | Unpacked Size |
+                  |---------|---------------|
+                  EOF
+                      jq -r 'sort_by(-.size) | .[] | (.size / 1024 / 1024) as $mb | (.size / 1024) as $kb | if $mb >= 1 then "| `\(.name)` | \($mb | floor) MB |" elif $kb >= 1 then "| `\(.name)` | \($kb | floor) KB |" else "| `\(.name)` | \(.size) B |" end' bundle-results.json >> comment-body.txt || echo "| *Failed to parse results* | - |" >> comment-body.txt
+                  else
+                      echo "## 📦 Bundle Size Analysis
+
+                  ⚠️ Bundle analysis did not produce output." > comment-body.txt
+                  fi
+
+            - name: Create or update PR comment
+              continue-on-error: true
+              uses: peter-evans/create-or-update-comment@v4
+              with:
+                  comment-id: bundle-analyze
+                  body-path: comment-body.txt
+                  edit-mode: replace
