@@ -14,8 +14,10 @@
 	},
 	"changesets": [
 		"all-files-film",
+		"clear-states-pull",
 		"early-carrots-punch",
 		"early-loops-cheat",
+		"frank-tips-tease",
 		"silent-rivers-knock",
 		"wacky-suns-go",
 		"wise-lions-hide"
