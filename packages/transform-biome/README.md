@@ -1,6 +1,6 @@
 # @jsrepo/transform-biome
 
-[![npm version](https://flat.badgen.net/npm/v/@svecosystem/strip-types?color=pink)](https://npmjs.com/package/@jsrepo/transform-biome)
+[![npm version](https://flat.badgen.net/npm/v/@jsrepo/transform-biome?color=pink)](https://npmjs.com/package/@jsrepo/transform-biome)
 [![npm downloads](https://flat.badgen.net/npm/dm/@jsrepo/transform-biome?color=pink)](https://npmjs.com/package/@jsrepo/transform-biome)
 
 A transform plugin for formatting registry items with Biome using your local biome configuration before they are added to your project.

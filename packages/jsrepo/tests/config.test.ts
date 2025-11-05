@@ -1,5 +1,5 @@
-import { defineConfig } from 'jsrepo';
 import { describe, expect, it } from 'vitest';
+import { defineConfig } from '@/utils/config';
 
 describe('config', () => {
 	it('should add default providers', () => {

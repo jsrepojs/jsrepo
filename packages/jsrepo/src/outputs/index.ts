@@ -1,4 +1,4 @@
-import z from 'zod';
+import { z } from 'zod';
 import { DistributedOutputManifestSchema } from '@/outputs/distributed';
 import { RepositoryOutputManifestSchema } from '@/outputs/repository';
 

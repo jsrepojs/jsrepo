@@ -1,0 +1,55 @@
+{
+	"name": "@jsrepo/shadcn",
+	"description": "A package to help you distribute your jsrepo registry as a shadcn registry.",
+	"version": "0.0.0",
+	"license": "MIT",
+	"homepage": "https://jsrepo.dev",
+	"author": {
+		"name": "Aidan Bleser",
+		"url": "https://github.com/ieedan"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/jsrepojs/jsrepo"
+	},
+	"bugs": {
+		"url": "https://github.com/jsrepojs/jsrepo/issues"
+	},
+	"keywords": [
+		"jsrepo",
+		"shadcn",
+		"registry",
+		"output",
+		"adapter"
+	],
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./output": {
+			"types": "./dist/output.d.ts",
+			"default": "./dist/output.js"
+		}
+	},
+	"main": "./dist/index.js",
+	"files": [
+		"dist/**/*"
+	],
+	"scripts": {
+		"build": "tsdown",
+		"dev": "tsdown --watch",
+		"check": "tsc --noEmit"
+	},
+	"packageManager": "pnpm@10.17.1",
+	"peerDependencies": {
+		"jsrepo": "workspace:*"
+	},
+	"devDependencies": {
+		"@types/node": "catalog:",
+		"shadcn": "^3.5.0",
+		"tsdown": "catalog:",
+		"zod": "catalog:"
+	}
+}

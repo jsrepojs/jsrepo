@@ -28,8 +28,7 @@ import { type CLIError, NoProviderFoundError } from '@/utils/errors';
 import { initLogging, intro, outro } from '@/utils/prompts';
 import { TokenManager } from '@/utils/token-manager';
 
-export const schema = z.object({
-	...defaultCommandOptionsSchema.shape,
+export const schema = defaultCommandOptionsSchema.extend({
 	token: z.string().optional(),
 	logout: z.boolean(),
 	verbose: z.boolean(),

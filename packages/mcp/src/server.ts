@@ -3,6 +3,7 @@ import dedent from 'dedent';
 import fuzzysort from 'fuzzysort';
 import {
 	getPathsForItems,
+	OptionallyInstalledRegistryTypes,
 	prepareUpdates,
 	promptAddEnvVars,
 	RegistryItemNotFoundError,
@@ -260,7 +261,13 @@ server.tool(
 
 					## Files
 					${itemResult.files
-						?.filter((file) => 'registry:file' === (file.type ?? 'registry:file'))
+						?.filter(
+							(file) =>
+								file.type === undefined ||
+								!(OptionallyInstalledRegistryTypes as unknown as string[]).includes(
+									file.type
+								)
+						)
 						.map((file) => `\`\`\`${file.path}\n${file.contents}\n\`\`\``)
 						.join('\n')}
 

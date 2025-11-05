@@ -1,4 +1,4 @@
-import z from 'zod';
+import { z } from 'zod';
 import { DEFAULT_LANGS, type Language } from '@/langs';
 import type { Output } from '@/outputs/types';
 import { DEFAULT_PROVIDERS, type ProviderFactory } from '@/providers';
@@ -109,12 +109,12 @@ export type RegistryItem = {
 	/** Whether the dependency resolution should be automatic or manual. @default "auto" */
 	dependencyResolution?: 'auto' | 'manual';
 	/**
-	 * Dependencies to other items in the registry. For many languages these can be automatically detected but can also be nice if there is another item you need that cannot be detected. They should be in the format of `<category>/<name>`.
+	 * Dependencies to other items in the registry. For many languages these can be automatically detected but can also be nice if there is another item you need that cannot be detected. They should be in the format of `<name>`.
 	 * @example
 	 * ```ts
 	 * {
 	 *  // ...
-	 *  registryDependencies: ["<category>/<name>"]
+	 *  registryDependencies: ["<name>"]
 	 * }
 	 * ```
 	 */
@@ -136,16 +136,13 @@ export type RegistryItem = {
 	envVars?: Record<string, string>;
 };
 
-export const RegistryFileTypeSchema = z.enum([
-	'registry:file',
-
-	// optionally installed
+export const OptionallyInstalledRegistryTypes = [
 	'registry:example',
 	'registry:doc',
 	'registry:test',
-]);
+] as const;
 
-export type RegistryFileType = z.infer<typeof RegistryFileTypeSchema>;
+export type RegistryFileType = LooseAutocomplete<(typeof OptionallyInstalledRegistryTypes)[number]>;
 
 export type RegistryItemFile = {
 	/** Relative path to the file from the registry config. */
@@ -156,9 +153,6 @@ export type RegistryItemFile = {
 	 * - "registry:example" - An example file (optionally installed, great for LLMs)
 	 * - "registry:test" - A test file (optionally installed)
 	 * - "registry:doc" - A documentation file (optionally installed, great for LLMs)
-	 * - "registry:file" - A regular file (always installed)
-	 *
-	 * @default "registry:file"
 	 */
 	type?: RegistryFileType;
 	/**

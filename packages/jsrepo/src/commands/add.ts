@@ -39,8 +39,7 @@ import {
 	promptInstallDependenciesByEcosystem,
 } from '@/utils/prompts';
 
-export const schema = z.object({
-	...defaultCommandOptionsSchema.shape,
+export const schema = defaultCommandOptionsSchema.extend({
 	yes: z.boolean(),
 	all: z.boolean(),
 	overwrite: z.boolean(),

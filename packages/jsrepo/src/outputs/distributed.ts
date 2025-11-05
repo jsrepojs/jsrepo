@@ -3,7 +3,7 @@ import path from 'pathe';
 import { z } from 'zod';
 import { type Output, RegistryPluginsSchema } from '@/outputs/types';
 import { MANIFEST_FILE } from '@/utils/build';
-import { RegistryFileTypeSchema, RegistryMetaSchema } from '@/utils/config';
+import { RegistryMetaSchema } from '@/utils/config';
 import { stringify } from '@/utils/json';
 import { safeParseFromJSON } from '@/utils/zod';
 
@@ -129,7 +129,7 @@ export function distributed({ dir, format }: DistributedOutputOptions): Output {
 
 export const DistributedOutputManifestFileSchema = z.object({
 	path: z.string(),
-	type: RegistryFileTypeSchema.optional(),
+	type: z.string().optional(),
 	target: z.string().optional(),
 });
 
@@ -155,9 +155,8 @@ export const DistributedOutputManifestItemSchema = z.object({
 	files: z.array(DistributedOutputManifestFileSchema),
 });
 
-export const DistributedOutputManifestSchema = z.object({
+export const DistributedOutputManifestSchema = RegistryMetaSchema.extend({
 	type: z.literal('distributed'),
-	...RegistryMetaSchema.shape,
 	plugins: RegistryPluginsSchema.optional(),
 	items: z.array(DistributedOutputManifestItemSchema),
 	defaultPaths: z.record(z.string(), z.string()).optional(),
@@ -168,7 +167,7 @@ export type DistributedOutputManifest = z.infer<typeof DistributedOutputManifest
 export const DistributedOutputFileSchema = z.object({
 	path: z.string(),
 	contents: z.string(),
-	type: RegistryFileTypeSchema.optional(),
+	type: z.string().optional(),
 	_imports_: z.array(
 		z.object({
 			import: z.string(),

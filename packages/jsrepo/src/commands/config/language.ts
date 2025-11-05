@@ -18,8 +18,7 @@ import { loadConfigSearch } from '@/utils/config/utils';
 import { type CLIError, ConfigNotFoundError } from '@/utils/errors';
 import { intro, outro, promptInstallDependencies } from '@/utils/prompts';
 
-export const schema = z.object({
-	...defaultCommandOptionsSchema.shape,
+export const schema = defaultCommandOptionsSchema.extend({
 	yes: z.boolean(),
 });
 

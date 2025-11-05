@@ -33,8 +33,7 @@ import {
 import { intro, isTTY, outro } from '@/utils/prompts';
 import { debounced } from '@/utils/utils';
 
-export const schema = z.object({
-	...defaultCommandOptionsSchema.shape,
+export const schema = defaultCommandOptionsSchema.extend({
 	watch: z.boolean(),
 	debounce: z.number(),
 });

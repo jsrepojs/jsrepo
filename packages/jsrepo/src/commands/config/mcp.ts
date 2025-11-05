@@ -18,8 +18,7 @@ import { intro, outro } from '@/utils/prompts';
 
 const supportedClients = ['cursor', 'claude', 'vscode', 'codex'] as const;
 
-export const schema = z.object({
-	...defaultCommandOptionsSchema.shape,
+export const schema = defaultCommandOptionsSchema.extend({
 	client: z.array(z.enum(supportedClients)).optional(),
 	all: z.boolean().optional(),
 });

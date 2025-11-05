@@ -3,7 +3,7 @@ import path from 'pathe';
 import { z } from 'zod';
 import { type Output, RegistryPluginsSchema } from '@/outputs/types';
 import { MANIFEST_FILE } from '@/utils/build';
-import { RegistryFileTypeSchema, RegistryMetaSchema } from '@/utils/config';
+import { RegistryMetaSchema } from '@/utils/config';
 import { stringify } from '@/utils/json';
 
 export type RepositoryOutputOptions = {
@@ -80,7 +80,7 @@ export function repository({ format }: RepositoryOutputOptions = {}): Output {
 
 export const RepositoryOutputFileSchema = z.object({
 	path: z.string(),
-	type: RegistryFileTypeSchema.optional(),
+	type: z.string().optional(),
 	relativePath: z.string(),
 	_imports_: z.array(
 		z.object({
@@ -116,9 +116,8 @@ export const RepositoryOutputManifestItemSchema = z.object({
 
 export type RepositoryOutputManifestItem = z.infer<typeof RepositoryOutputManifestItemSchema>;
 
-export const RepositoryOutputManifestSchema = z.object({
+export const RepositoryOutputManifestSchema = RegistryMetaSchema.extend({
 	type: z.literal('repository'),
-	...RegistryMetaSchema.shape,
 	plugins: RegistryPluginsSchema.optional(),
 	items: z.array(RepositoryOutputManifestItemSchema),
 	defaultPaths: z.record(z.string(), z.string()).optional(),
