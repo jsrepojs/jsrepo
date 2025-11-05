@@ -30,8 +30,9 @@ jobs:
 
             - name: Bundle Analyze
               id: analyze
+              continue-on-error: true
               run: |
-                  pnpm bundle:analyze > bundle-output.txt 2>&1
+                  pnpm bundle:analyze 2>&1 | tee bundle-output.txt
 
             - name: Generate PR comment
               id: comment
