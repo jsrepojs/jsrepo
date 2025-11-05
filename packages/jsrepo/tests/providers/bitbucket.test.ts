@@ -8,7 +8,7 @@ describe('bitbucket', () => {
 			cwd: process.cwd(),
 			token: undefined,
 		});
-		await bitbucketState.fetch('README.md');
+		await bitbucketState.fetch('README.md', { token: undefined });
 	});
 
 	it('correctly resolves repository url with custom baseUrl', async () => {
@@ -17,6 +17,6 @@ describe('bitbucket', () => {
 			cwd: process.cwd(),
 			token: undefined,
 		});
-		await bitbucketState.fetch('README.md');
+		await bitbucketState.fetch('README.md', { token: undefined });
 	});
 });

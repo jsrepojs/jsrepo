@@ -8,6 +8,6 @@ describe('github', () => {
 			cwd: process.cwd(),
 			token: undefined,
 		});
-		await githubState.fetch('README.md');
+		await githubState.fetch('README.md', { token: undefined });
 	});
 });

@@ -110,5 +110,5 @@ export interface ProviderFactory {
 }
 
 export interface Provider {
-	fetch(resourcePath: string, fetchOpts?: FetchOptions): Promise<string>;
+	fetch(resourcePath: string, fetchOpts: FetchOptions): Promise<string>;
 }

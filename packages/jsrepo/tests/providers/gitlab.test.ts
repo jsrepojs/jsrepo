@@ -8,7 +8,7 @@ describe('gitlab', () => {
 			cwd: process.cwd(),
 			token: undefined,
 		});
-		await gitlabState.fetch('README.md');
+		await gitlabState.fetch('README.md', { token: undefined });
 	});
 
 	it('correctly resolves repository url with custom baseUrl', async () => {
@@ -17,7 +17,7 @@ describe('gitlab', () => {
 			cwd: process.cwd(),
 			token: undefined,
 		});
-		await gitlabState.fetch('README.md');
+		await gitlabState.fetch('README.md', { token: undefined });
 	});
 
 	it('correctly resolves nested group urls', async () => {
@@ -26,7 +26,7 @@ describe('gitlab', () => {
 			cwd: process.cwd(),
 			token: undefined,
 		});
-		await gitlabState.fetch('README.md');
+		await gitlabState.fetch('README.md', { token: undefined });
 	});
 
 	it('correctly resolves nested group urls with ref', async () => {
@@ -35,6 +35,6 @@ describe('gitlab', () => {
 			cwd: process.cwd(),
 			token: undefined,
 		});
-		await gitlabState.fetch('README.md');
+		await gitlabState.fetch('README.md', { token: undefined });
 	});
 });

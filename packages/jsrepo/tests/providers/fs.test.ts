@@ -8,12 +8,12 @@ describe('fs', () => {
 			cwd: process.cwd(),
 			token: undefined,
 		});
-		await fState.fetch('fs.test.ts');
+		await fState.fetch('fs.test.ts', { token: undefined });
 	});
 
 	it('correctly resolves path with baseDir', async () => {
 		const f = fs({ baseDir: './tests/providers' });
 		const fState = await f.create('fs://.', { cwd: process.cwd(), token: undefined });
-		await fState.fetch('fs.test.ts');
+		await fState.fetch('fs.test.ts', { token: undefined });
 	});
 });

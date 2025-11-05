@@ -8,6 +8,6 @@ describe('azure', () => {
 			cwd: process.cwd(),
 			token: undefined,
 		});
-		await azureState.fetch('README.md');
+		await azureState.fetch('README.md', { token: undefined });
 	});
 });
