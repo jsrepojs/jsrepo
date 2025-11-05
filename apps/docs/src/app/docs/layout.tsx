@@ -3,8 +3,9 @@ import { baseOptions } from '@/lib/layout.shared';
 import { source } from '@/lib/source';
 
 export default function Layout({ children }: LayoutProps<'/docs'>) {
+  const base = baseOptions();
   return (
-    <DocsLayout tree={source.pageTree} {...baseOptions()}>
+    <DocsLayout {...base} tree={source.pageTree}>
       {children}
     </DocsLayout>
   );
