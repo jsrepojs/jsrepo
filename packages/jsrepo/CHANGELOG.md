@@ -1,5 +1,14 @@
 # jsrepo
 
+## 3.0.0-beta.3
+### Patch Changes
+
+
+- fix: ensure token is provided to fetch methods ([#643](https://github.com/jsrepojs/jsrepo/pull/643))
+
+
+- fix: Improve error message when registry item cannot be found ([#643](https://github.com/jsrepojs/jsrepo/pull/643))
+
 ## 3.0.0-beta.2
 ### Patch Changes
 
