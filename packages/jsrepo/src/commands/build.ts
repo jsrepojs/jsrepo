@@ -5,7 +5,7 @@ import path from 'pathe';
 import pc from 'picocolors';
 import { z } from 'zod';
 import {
-	defaultCommandOptions,
+	commonOptions,
 	defaultCommandOptionsSchema,
 	error,
 	forEachRegistry,
@@ -42,7 +42,7 @@ export type BuildOptions = z.infer<typeof schema>;
 
 export const build = new Command('build')
 	.description('Build your registry.')
-	.addOptions(...defaultCommandOptions)
+	.addOption(commonOptions.cwd)
 	.option('-w, --watch', 'Watch for changes and rebuild automatically', false)
 	.option(
 		'-d, --debounce <ms>',

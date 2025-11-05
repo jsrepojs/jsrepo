@@ -35,7 +35,8 @@ export type CLIError =
 	| CouldNotFindJsrepoImportError
 	| ZodError
 	| InvalidJSONError
-	| NoProviderFoundError;
+	| NoProviderFoundError
+	| MissingPeerDependencyError;
 
 export class JsrepoError extends Error {
 	private readonly suggestion: string;
@@ -428,6 +429,14 @@ export class NoItemsToUpdateError extends JsrepoError {
 		super("We couldn't find any items to update.", {
 			suggestion:
 				'Add items to your project using `jsrepo add` and then run `jsrepo update` to update them.',
+		});
+	}
+}
+
+export class MissingPeerDependencyError extends JsrepoError {
+	constructor(packageName: string, feature: string) {
+		super(`"${packageName}" is required for ${feature} to work.`, {
+			suggestion: `Please install it.`,
 		});
 	}
 }

@@ -22,11 +22,6 @@ catalogs:
       specifier: ^4.1.12
       version: 4.1.12
 
-patchedDependencies:
-  commander@14.0.1:
-    hash: c5b8f01cdaed96b5c5ce4dbe450d95b4283df9865de8ad26ac29894f624b2ee0
-    path: patches/commander@14.0.1.patch
-
 importers:
 
   .:
@@ -152,15 +147,15 @@ importers:
 
   packages/jsrepo:
     dependencies:
-      '@oxc-parser/binding-wasm32-wasi':
-        specifier: ^0.94.0
-        version: 0.94.0
       commander:
         specifier: ^14.0.1
-        version: 14.0.1(patch_hash=c5b8f01cdaed96b5c5ce4dbe450d95b4283df9865de8ad26ac29894f624b2ee0)
+        version: 14.0.1
       oxc-parser:
         specifier: ^0.94.0
         version: 0.94.0
+      svelte:
+        specifier: ^5.41.4
+        version: 5.41.4
       unconfig:
         specifier: ^7.3.3
         version: 7.3.3
@@ -222,9 +217,6 @@ importers:
       semver:
         specifier: ^7.7.3
         version: 7.7.3
-      svelte:
-        specifier: ^5.41.4
-        version: 5.41.4
       tinyexec:
         specifier: ^1.0.1
         version: 1.0.1
@@ -5523,6 +5515,7 @@ snapshots:
     dependencies:
       '@emnapi/wasi-threads': 1.1.0
       tslib: 2.8.1
+    optional: true
 
   '@emnapi/core@1.6.0':
     dependencies:
@@ -5533,6 +5526,7 @@ snapshots:
   '@emnapi/runtime@1.5.0':
     dependencies:
       tslib: 2.8.1
+    optional: true
 
   '@emnapi/runtime@1.6.0':
     dependencies:
@@ -5542,6 +5536,7 @@ snapshots:
   '@emnapi/wasi-threads@1.1.0':
     dependencies:
       tslib: 2.8.1
+    optional: true
 
   '@esbuild/aix-ppc64@0.25.10':
     optional: true
@@ -5972,6 +5967,7 @@ snapshots:
       '@emnapi/core': 1.5.0
       '@emnapi/runtime': 1.5.0
       '@tybys/wasm-util': 0.10.1
+    optional: true
 
   '@napi-rs/wasm-runtime@1.0.7':
     dependencies:
@@ -6174,6 +6170,7 @@ snapshots:
   '@oxc-parser/binding-wasm32-wasi@0.94.0':
     dependencies:
       '@napi-rs/wasm-runtime': 1.0.6
+    optional: true
 
   '@oxc-parser/binding-win32-arm64-msvc@0.94.0':
     optional: true
@@ -6866,6 +6863,7 @@ snapshots:
   '@tybys/wasm-util@0.10.1':
     dependencies:
       tslib: 2.8.1
+    optional: true
 
   '@types/chai@5.2.2':
     dependencies:
@@ -7226,7 +7224,7 @@ snapshots:
 
   commander@11.1.0: {}
 
-  commander@14.0.1(patch_hash=c5b8f01cdaed96b5c5ce4dbe450d95b4283df9865de8ad26ac29894f624b2ee0): {}
+  commander@14.0.1: {}
 
   compute-scroll-into-view@3.1.1: {}
 
@@ -9344,7 +9342,7 @@ snapshots:
       '@dotenvx/dotenvx': 1.51.1
       '@modelcontextprotocol/sdk': 1.21.0
       browserslist: 4.27.0
-      commander: 14.0.1(patch_hash=c5b8f01cdaed96b5c5ce4dbe450d95b4283df9865de8ad26ac29894f624b2ee0)
+      commander: 14.0.1
       cosmiconfig: 9.0.0(typescript@5.9.3)
       dedent: 1.7.0
       deepmerge: 4.3.1

@@ -6,7 +6,6 @@ import pc from 'picocolors';
 import { z } from 'zod';
 import {
 	commonOptions,
-	defaultCommandOptions,
 	defaultCommandOptionsSchema,
 	error,
 	parseOptions,
@@ -30,7 +29,8 @@ export const transform = new Command('transform')
 		'[transforms...]',
 		'Names of the transforms you want to add to your config. ex: (@jsrepo/transform-prettier, @jsrepo/transform-biome)'
 	)
-	.addOptions(...defaultCommandOptions, commonOptions.yes)
+	.addOption(commonOptions.cwd)
+	.addOption(commonOptions.yes)
 	.action(async (transforms, rawOptions) => {
 		const options = parseOptions(schema, rawOptions);
 
