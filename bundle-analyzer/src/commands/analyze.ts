@@ -38,7 +38,9 @@ export const analyze = new Command('analyze')
 
 		if (options.failIfExceedsBytes !== undefined && totalSize > options.failIfExceedsBytes) {
 			if (options.json) {
-				console.error(JSON.stringify({ error: 'Bundle size exceeds limit', size: totalSize }));
+				console.error(
+					JSON.stringify({ error: 'Bundle size exceeds limit', size: totalSize })
+				);
 			} else {
 				console.error(
 					pc.red(`❌ Bundle size exceeds ${displaySize(options.failIfExceedsBytes)}`)
@@ -127,7 +129,11 @@ function displayTree(node: TreeNode, totalSize: number, prefix = '', isLast = tr
 	}
 }
 
-async function runAnalyze(options: { cwd: string; failIfExceedsBytes?: number; json?: boolean }): Promise<number> {
+async function runAnalyze(options: {
+	cwd: string;
+	failIfExceedsBytes?: number;
+	json?: boolean;
+}): Promise<number> {
 	const arborist = new Arborist({ path: options.cwd });
 	const tree = await arborist.loadActual();
 	const list = await packlist(tree);
