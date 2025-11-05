@@ -1,18 +1,40 @@
-import * as v from 'vue/compiler-sfc';
 import { getImports, installDependencies, resolveImports, transformImports } from '@/langs/js';
 import type { Language } from '@/langs/types';
+import { MissingPeerDependencyError } from '@/utils/errors';
 
 // biome-ignore lint/complexity/noBannedTypes: leave me alone for a minute
 export type VueOptions = {};
 
+let vueCompiler: typeof import('vue/compiler-sfc') | null = null;
+
+async function loadVueCompiler() {
+	if (vueCompiler) {
+		return vueCompiler;
+	}
+
+	try {
+		vueCompiler = await import('vue/compiler-sfc');
+		return vueCompiler;
+	} catch {
+		throw new MissingPeerDependencyError(
+			'vue',
+			'Vue language support'
+		);
+	}
+}
+
 /**
  * Vue language support.
+ *
+ * @remarks
+ * Requires `vue` to be installed in your project.
  */
 export function vue(_options: VueOptions = {}): Language {
 	return {
 		name: 'vue',
 		canResolveDependencies: (fileName) => fileName.endsWith('.vue'),
 		resolveDependencies: async (code, opts) => {
+			const v = await loadVueCompiler();
 			const neededScripts: string[] = [];
 			const parsed = v.parse(code, {
 				filename: opts.fileName,

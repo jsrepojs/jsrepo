@@ -153,6 +153,9 @@ importers:
       oxc-parser:
         specifier: ^0.94.0
         version: 0.94.0
+      svelte:
+        specifier: ^5.41.4
+        version: 5.41.4
       unconfig:
         specifier: ^7.3.3
         version: 7.3.3
@@ -214,9 +217,6 @@ importers:
       semver:
         specifier: ^7.7.3
         version: 7.7.3
-      svelte:
-        specifier: ^5.41.4
-        version: 5.41.4
       tinyexec:
         specifier: ^1.0.1
         version: 1.0.1

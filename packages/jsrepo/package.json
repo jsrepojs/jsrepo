@@ -76,8 +76,19 @@
 	"dependencies": {
 		"commander": "^14.0.1",
 		"oxc-parser": "^0.94.0",
-		"unconfig": "^7.3.3",
-		"vue": "^3.5.22"
+		"unconfig": "^7.3.3"
+	},
+	"peerDependencies": {
+		"vue": "^3.5.22",
+		"svelte": "^5.41.4"
+	},
+	"peerDependenciesMeta": {
+		"vue": {
+			"optional": true
+		},
+		"svelte": {
+			"optional": true
+		}
 	},
 	"devDependencies": {
 		"@clack/prompts": "1.0.0-alpha.6",
@@ -98,7 +109,6 @@
 		"pathe": "^2.0.3",
 		"picocolors": "catalog:",
 		"semver": "^7.7.3",
-		"svelte": "^5.41.4",
 		"tinyexec": "^1.0.1",
 		"tsdown": "catalog:",
 		"vite": "^7.1.12",
