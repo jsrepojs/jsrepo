@@ -70,7 +70,8 @@
 		"build": "tsdown",
 		"dev": "tsdown --watch",
 		"check": "tsc --noEmit",
-		"test": "vitest"
+		"test": "vitest",
+		"bundle:analyze": "node ../../bundle-analyzer/dist/index.js ."
 	},
 	"packageManager": "pnpm@10.17.1",
 	"dependencies": {

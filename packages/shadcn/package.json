@@ -40,7 +40,8 @@
 	"scripts": {
 		"build": "tsdown",
 		"dev": "tsdown --watch",
-		"check": "tsc --noEmit"
+		"check": "tsc --noEmit",
+		"bundle:analyze": "node ../../bundle-analyzer/dist/index.js ."
 	},
 	"packageManager": "pnpm@10.17.1",
 	"peerDependencies": {
