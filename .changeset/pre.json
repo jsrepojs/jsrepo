@@ -6,7 +6,11 @@
 		"@jsrepo/mcp": "0.0.0",
 		"@jsrepo/transform-biome": "0.0.0",
 		"@jsrepo/transform-prettier": "0.0.0",
-		"@jsrepo/shadcn": "0.0.0"
+		"@jsrepo/shadcn": "0.0.0",
+		"@jsrepo/docs": "0.0.0",
+		"@playground/project": "0.0.0",
+		"@playground/react-project": "0.1.0",
+		"@playground/registry": "0.0.0"
 	},
-	"changesets": []
+	"changesets": ["all-files-film", "wacky-suns-go"]
 }
