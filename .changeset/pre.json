@@ -12,5 +12,12 @@
 		"@playground/react-project": "0.1.0",
 		"@playground/registry": "0.0.0"
 	},
-	"changesets": ["all-files-film", "wacky-suns-go"]
+	"changesets": [
+		"all-files-film",
+		"early-carrots-punch",
+		"early-loops-cheat",
+		"silent-rivers-knock",
+		"wacky-suns-go",
+		"wise-lions-hide"
+	]
 }
