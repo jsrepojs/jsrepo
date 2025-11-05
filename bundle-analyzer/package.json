@@ -1,0 +1,29 @@
+{
+	"name": "@jsrepo/bundle-analyzer",
+	"description": "A package to help you distribute your jsrepo registry as a shadcn registry.",
+	"private": true,
+	"type": "module",
+	"main": "./dist/index.js",
+	"bin": "./dist/index.js",
+	"files": [
+		"dist/**/*"
+	],
+	"scripts": {
+		"build": "tsdown",
+		"dev": "tsdown --watch",
+		"check": "tsc --noEmit",
+		"start": "node ./dist/index.js"
+	},
+	"packageManager": "pnpm@10.17.1",
+	"dependencies": {
+		"@npmcli/arborist": "^9.1.6",
+		"npm-packlist": "^10.0.3",
+		"picocolors": "catalog:"
+	},
+	"devDependencies": {
+		"@types/node": "catalog:",
+		"@types/npm-packlist": "^7.0.3",
+		"@types/npmcli__arborist": "^6.3.1",
+		"tsdown": "catalog:"
+	}
+}
