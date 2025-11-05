@@ -1,5 +1,14 @@
 # @jsrepo/mcp
 
+## 0.0.1-beta.2
+### Patch Changes
+
+
+- chore: bump deps ([#641](https://github.com/jsrepojs/jsrepo/pull/641))
+
+- Updated dependencies [[`ab13bc5`](https://github.com/jsrepojs/jsrepo/commit/ab13bc5e460964f377b7914e7e8bf815b323ccd4), [`ab13bc5`](https://github.com/jsrepojs/jsrepo/commit/ab13bc5e460964f377b7914e7e8bf815b323ccd4)]:
+  - jsrepo@3.0.0-beta.2
+
 ## 0.0.1-beta.1
 ### Patch Changes
 

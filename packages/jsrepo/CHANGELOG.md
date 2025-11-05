@@ -1,5 +1,14 @@
 # jsrepo
 
+## 3.0.0-beta.2
+### Patch Changes
+
+
+- fix: Remove zod reliance for exported types ([#641](https://github.com/jsrepojs/jsrepo/pull/641))
+
+
+- chore: bump deps ([#641](https://github.com/jsrepojs/jsrepo/pull/641))
+
 ## 3.0.0-beta.1
 ### Patch Changes
 
