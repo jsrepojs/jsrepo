@@ -36,10 +36,9 @@ jobs:
                   for package in packages/*/; do
                       if [ -f "$package/package.json" ]; then
                           package_name=$(basename "$package")
-                          size_json=$(node bundle-analyzer/dist/index.js analyze "$package" --json 2>/dev/null || echo '{"size":0}')
-                          size=$(echo "$size_json" | jq -r '.size // 0')
-                          if [ -n "$size" ] && [ "$size" != "null" ]; then
-                              results=$(echo "$results" | jq --arg name "$package_name" --argjson size "$size" '. += [{"name": $name, "size": $size}]')
+                          size_json=$(node bundle-analyzer/dist/index.js analyze "$package" --json 2>/dev/null | tr -d '\n' || echo '{"size":0}')
+                          if echo "$size_json" | jq -e '.size' > /dev/null 2>&1; then
+                              results=$(echo "$results" | jq --arg name "$package_name" --argjson size_json "$size_json" '. += [{"name": $name, "size": ($size_json | .size)}]')
                           fi
                       fi
                   done
@@ -67,6 +66,7 @@ jobs:
               continue-on-error: true
               uses: peter-evans/create-or-update-comment@v4
               with:
+                  issue-number: ${{ github.event.pull_request.number }}
                   comment-id: bundle-analyze
                   body-path: comment-body.txt
                   edit-mode: replace
