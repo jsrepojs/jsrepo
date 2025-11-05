@@ -8,7 +8,8 @@ import { z } from 'zod';
 import { displaySize, MEGABYTE } from '../utils/utils';
 
 const analyzeOptionsSchema = z.object({
-	failIfExceedsBytes: z.number(),
+	failIfExceedsBytes: z.number().optional(),
+	json: z.boolean().optional(),
 });
 
 export type AnalyzeOptions = z.infer<typeof analyzeOptionsSchema>;
@@ -22,20 +23,27 @@ export const analyze = new Command('analyze')
 		(val) => Number.parseInt(val, 10),
 		MEGABYTE
 	)
-	.action(async (cwd: string, options: { failIfExceedsBytes?: number }) => {
+	.option('--json', 'Output results as JSON')
+	.action(async (cwd: string, options: { failIfExceedsBytes?: number; json?: boolean }) => {
 		const analyzeOptions = analyzeOptionsSchema.parse({
 			failIfExceedsBytes: options.failIfExceedsBytes,
+			json: options.json,
 		});
 
 		const totalSize = await runAnalyze({
 			cwd,
 			failIfExceedsBytes: analyzeOptions.failIfExceedsBytes,
+			json: analyzeOptions.json,
 		});
 
 		if (options.failIfExceedsBytes !== undefined && totalSize > options.failIfExceedsBytes) {
-			console.error(
-				pc.red(`❌ Bundle size exceeds ${displaySize(options.failIfExceedsBytes)}`)
-			);
+			if (options.json) {
+				console.error(JSON.stringify({ error: 'Bundle size exceeds limit', size: totalSize }));
+			} else {
+				console.error(
+					pc.red(`❌ Bundle size exceeds ${displaySize(options.failIfExceedsBytes)}`)
+				);
+			}
 			process.exit(1);
 		}
 	});
@@ -119,7 +127,7 @@ function displayTree(node: TreeNode, totalSize: number, prefix = '', isLast = tr
 	}
 }
 
-async function runAnalyze(options: { cwd: string; failIfExceedsBytes?: number }): Promise<number> {
+async function runAnalyze(options: { cwd: string; failIfExceedsBytes?: number; json?: boolean }): Promise<number> {
 	const arborist = new Arborist({ path: options.cwd });
 	const tree = await arborist.loadActual();
 	const list = await packlist(tree);
@@ -134,22 +142,26 @@ async function runAnalyze(options: { cwd: string; failIfExceedsBytes?: number })
 
 	const totalSize = files.reduce((acc, file) => acc + file.stats.size, 0);
 
-	console.log(`Total unpacked size: ${displaySize(totalSize)}`);
+	if (options.json) {
+		console.log(JSON.stringify({ size: totalSize }));
+	} else {
+		console.log(`Total unpacked size: ${displaySize(totalSize)}`);
 
-	const root = buildTree(files);
-	const children = Array.from(root.children.values()).sort((a, b) => {
-		// Sort directories before files, then by size descending
-		if (a.isFile !== b.isFile) {
-			return a.isFile ? 1 : -1;
+		const root = buildTree(files);
+		const children = Array.from(root.children.values()).sort((a, b) => {
+			// Sort directories before files, then by size descending
+			if (a.isFile !== b.isFile) {
+				return a.isFile ? 1 : -1;
+			}
+			return b.size - a.size;
+		});
+
+		for (let i = 0; i < children.length; i++) {
+			const child = children[i];
+			if (!child) continue;
+			const isLast = i === children.length - 1;
+			displayTree(child, totalSize, '', isLast);
 		}
-		return b.size - a.size;
-	});
-
-	for (let i = 0; i < children.length; i++) {
-		const child = children[i];
-		if (!child) continue;
-		const isLast = i === children.length - 1;
-		displayTree(child, totalSize, '', isLast);
 	}
 
 	return totalSize;
