@@ -1,0 +1,87 @@
+---
+title: shadcn
+description: Output your registry as a shadcn registry.
+---
+
+<BadgeGroup>
+	<SourceBadge path="packages/shadcn/src/output.ts" />
+	<OfficialBadge />
+</BadgeGroup>
+
+The `@jsrepo/shadcn` is a package that helps you distribute your jsrepo registry as a shadcn registry.
+
+<Callout type="warning">
+    Users can only use the **shadcn** CLI to add items from a registry output by this plugin.
+</Callout>
+
+## Usage
+
+To get started install the package:
+
+```npm
+npm install @jsrepo/shadcn -D
+```
+
+Next let's add the output to our config file:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { output } from "@jsrepo/shadcn/output";
+
+export default defineConfig({
+	registry: {
+        // ...
+		outputs: [output({ dir: "./public/r/shadcn" })], // [!code ++]
+	},
+});
+```
+
+Now running `jsrepo build` will output a **shadcn** registry to the `./public/r/shadcn` directory.
+
+## defineShadcnRegistry
+
+**shadcn** registries are defined a bit differently than **jsrepo** registries, generally this plugin should correctly resolve those differences or warn you if it is unable to. 
+
+However if you are only distributing your registry as a **shadcn** registry and don't care about the other features of **jsrepo** you can use the `defineShadcnRegistry` function to define your registry the *"shadcn"* way.
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { defineShadcnRegistry, output } from "@jsrepo/shadcn";
+
+export default defineConfig({
+	registry: defineShadcnRegistry({
+		// make sure you still include the output
+		outputs: [output({ dir: "./public/r/shadcn" })],
+	}),
+});
+```
+
+<Callout type="info">
+    When using the `defineShadcnRegistry` function it's be possible to just paste the contents of the **shadcn** `registry.json` file into your config file and start building your registry with **jsrepo**.
+</Callout>
+
+## Outputting jsrepo registries alongside shadcn registries
+
+Currently the **jsrepo** and **shadcn** outputs are not compatible to be used in the same directory. Because of this you will need to serve each registry from a different URL.
+
+The preferred way to avoid this conflict would be to publish your registry to [jsrepo.com](https://jsrepo.com) (which also has it's own benefits).
+
+In absence of that, the easiest way to do this and our recommendation is to postfix the **shadcn** registry output `dir` option with `/shadcn`.
+
+For example:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { distributed } from "jsrepo/outputs";
+import { output } from "@jsrepo/shadcn/output";
+
+export default defineConfig({
+	registry: {
+		outputs: [
+            distributed({ dir: "./public/r" }), 
+            output({ dir: "./public/r" }) // [!code --]
+            output({ dir: "./public/r/shadcn" }) // [!code ++]
+        ],
+	},
+});
+```

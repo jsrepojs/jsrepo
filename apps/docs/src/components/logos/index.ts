@@ -12,6 +12,7 @@ import { Claude } from "./claude";
 import { OpenAI } from "./openai";
 import { VSCode } from "./vscode";
 import { Cursor } from "./cursor";
+import { Shadcn } from "./shadcn";
 
 export {
 	GitHub as GitHubLogo,
@@ -28,4 +29,5 @@ export {
 	OpenAI as OpenAILogo,
 	VSCode as VSCodeLogo,
 	Cursor as CursorLogo,
+	Shadcn as ShadcnLogo,
 };

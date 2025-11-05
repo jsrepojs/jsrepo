@@ -26,7 +26,7 @@ import {
 	SelfReferenceError,
 } from './errors';
 
-export const MANIFEST_FILE = 'jsrepo.json';
+export const MANIFEST_FILE = 'registry.json';
 
 export type BuildResult = RegistryMeta & {
 	plugins?: {

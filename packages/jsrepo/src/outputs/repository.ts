@@ -26,7 +26,7 @@ export type RepositoryOutputOptions = {
  * This will create a manifest file at the root of your repository like:
  * ```plaintext
  * 📁 .
- * └── jsrepo.json
+ * └── registry.json
  * ```
  * @param options
  * @returns

@@ -29,7 +29,7 @@ export type HttpOptions =
  *
  * @urlFormat
  * ```
- * 'https://<domain>/<path to jsrepo.json>'
+ * 'https://<domain>/<path to registry.json>'
  * ```
  *
  * @note
