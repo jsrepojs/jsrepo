@@ -8,7 +8,7 @@ export default defineConfig({
 		authors: ["Aidan Bleser"],
 		bugs: "https://github.com/jsrepojs/jsrepo/issues",
 		description: "Registry blocks for your registry",
-		homepage: "https://jsrepo.dev/registry-kit/react",
+		homepage: "https://v3.jsrepo.dev/registry-kit/react",
 		repository: "https://github.com/jsrepojs/jsrepo/",
 		tags: ["react", "components", "registry"],
 		version: "0.0.1",

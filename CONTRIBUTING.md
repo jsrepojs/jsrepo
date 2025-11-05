@@ -67,7 +67,7 @@ To test jsrepo manually you can use the playground projects in the [`playground/
 - `packages/jsrepo` - jsrepo CLI
 - `packages/mcp` - MCP server for jsrepo
 - `playground/` - Playground projects to manually test jsrepo
-- `apps/docs` - Contains the documentation hosted at [https://jsrepo.dev](https://jsrepo.dev).
+- `apps/docs` - Contains the documentation hosted at [https://v3.jsrepo.dev](https://v3.jsrepo.dev).
 
 ## Before opening a PR
 

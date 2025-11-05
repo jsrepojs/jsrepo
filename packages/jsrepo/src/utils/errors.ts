@@ -72,7 +72,7 @@ export class InvalidRegistryError extends JsrepoError {
 	constructor(registry: string) {
 		super(`Invalid registry: ${registry} A provider for this registry was not found.`, {
 			suggestion: 'Maybe you need to add a provider for this registry?',
-			docsLink: 'See: https://jsrepo.dev/docs/providers',
+			docsLink: 'See: https://v3.jsrepo.dev/docs/providers',
 		});
 	}
 }
@@ -181,7 +181,7 @@ export class ConfigNotFoundError extends JsrepoError {
 	constructor(path: string) {
 		super(`Config not found at ${path}`, {
 			suggestion: 'Please run `jsrepo init` to create a config file.',
-			docsLink: 'https://jsrepo.dev/docs/jsrepo-config',
+			docsLink: 'https://v3.jsrepo.dev/docs/jsrepo-config',
 		});
 	}
 }
@@ -209,7 +209,7 @@ export class NoPathProvidedError extends JsrepoError {
 	constructor({ item, type }: { item: string; type: string }) {
 		super(`No path was provided for ${item} of type ${type}`, {
 			suggestion: 'Please configure a path with the `paths` key.',
-			docsLink: 'https://jsrepo.dev/docs/jsrepo-config#paths',
+			docsLink: 'https://v3.jsrepo.dev/docs/jsrepo-config#paths',
 		});
 	}
 }

@@ -3,7 +3,7 @@
 	"description": "A transform plugin for jsrepo to format code with prettier.",
 	"version": "0.0.1-beta.0",
 	"license": "MIT",
-	"homepage": "https://jsrepo.dev",
+	"homepage": "https://v3.jsrepo.dev",
 	"author": {
 		"name": "Aidan Bleser",
 		"url": "https://github.com/ieedan"
