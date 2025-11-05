@@ -45,39 +45,64 @@ function parseBundleOutput(outputPath) {
 	const results = [];
 	let currentPackage = '';
 
-	for (const line of lines) {
+	for (let i = 0; i < lines.length; i++) {
+		const line = lines[i];
+		
 		// Check if this is a package name line (ends with :)
-		// pnpm outputs: "packages/jsrepo:" or "@jsrepo/jsrepo:" etc.
-		if (line.endsWith(':') && (line.includes('packages/') || line.includes('@'))) {
-			currentPackage = line.slice(0, -1).trim();
+		// pnpm outputs: "packages/jsrepo:" when running with -r
+		if (line.trim().endsWith(':') && (line.includes('packages/') || line.match(/^@[\w-]+\/[\w-]+:/))) {
+			currentPackage = line.trim().slice(0, -1);
 			continue;
 		}
 
 		// Check if this is the "Total unpacked size:" line
 		if (line.includes('Total unpacked size:')) {
 			const match = line.match(/Total unpacked size:\s*(.+)/);
-			if (match && currentPackage) {
+			if (match) {
 				const sizeStr = match[1].trim();
 				const sizeBytes = parseSizeString(sizeStr);
 				
 				// Extract package name from package.json if available
 				let packageName = currentPackage;
-				try {
-					const packageJsonPath = join(rootDir, currentPackage, 'package.json');
-					const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
-					packageName = packageJson.name || packageName.split('/').pop() || packageName;
-				} catch {
-					// Fallback to directory name
-					packageName = currentPackage.includes('/')
-						? currentPackage.split('/').pop() || currentPackage
-						: currentPackage;
+				if (currentPackage) {
+					try {
+						const packageJsonPath = join(rootDir, currentPackage, 'package.json');
+						const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
+						packageName = packageJson.name || packageName.split('/').pop() || packageName;
+					} catch {
+						// Fallback to directory name
+						packageName = currentPackage.includes('/')
+							? currentPackage.split('/').pop() || currentPackage
+							: currentPackage;
+					}
+				} else {
+					// If we don't have a package context, try to infer from previous lines
+					// Look backwards up to 5 lines for package context
+					for (let j = i - 1; j >= 0 && j >= i - 5; j--) {
+						const prevLine = lines[j];
+						if (prevLine?.trim().endsWith(':') && (prevLine.includes('packages/') || prevLine.match(/^@[\w-]+\/[\w-]+:/))) {
+							currentPackage = prevLine.trim().slice(0, -1);
+							try {
+								const packageJsonPath = join(rootDir, currentPackage, 'package.json');
+								const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
+								packageName = packageJson.name || currentPackage.split('/').pop() || currentPackage;
+							} catch {
+								packageName = currentPackage.includes('/')
+									? currentPackage.split('/').pop() || currentPackage
+									: currentPackage;
+							}
+							break;
+						}
+					}
 				}
 				
-				results.push({
-					name: packageName,
-					size: sizeBytes,
-					sizeStr: removeAnsiCodes(sizeStr),
-				});
+				if (packageName && sizeBytes > 0) {
+					results.push({
+						name: packageName,
+						size: sizeBytes,
+						sizeStr: removeAnsiCodes(sizeStr),
+					});
+				}
 				currentPackage = '';
 			}
 		}
@@ -88,11 +113,25 @@ function parseBundleOutput(outputPath) {
 
 try {
 	const outputPath = process.argv[2] || join(rootDir, 'bundle-output.txt');
+	
+	// Check if file exists
+	try {
+		readFileSync(outputPath, 'utf-8');
+	} catch {
+		console.error('## 📦 Bundle Size Analysis\n\n⚠️ Bundle output file not found.');
+		process.exit(1);
+	}
+	
 	const results = parseBundleOutput(outputPath);
 
 	if (results.length === 0) {
-		console.log('## 📦 Bundle Size Analysis\n\n⚠️ No bundle analysis results found.');
-		process.exit(0);
+		// Try to read the file and show first few lines for debugging
+		const output = readFileSync(outputPath, 'utf-8');
+		const preview = output.split('\n').slice(0, 10).join('\n');
+		console.error('## 📦 Bundle Size Analysis\n\n⚠️ No bundle analysis results found.');
+		console.error('\nFirst 10 lines of output:');
+		console.error(preview);
+		process.exit(1);
 	}
 
 	// Sort by size descending
