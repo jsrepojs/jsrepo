@@ -60,7 +60,17 @@ export const RegistryMetaSchema = z.object({
 	meta: z.record(z.string(), z.string()).optional(),
 });
 
-export type RegistryMeta = z.infer<typeof RegistryMetaSchema>;
+export type RegistryMeta = {
+	name: string;
+	description?: string;
+	version?: string;
+	homepage?: string;
+	tags?: string[];
+	repository?: string;
+	bugs?: string;
+	authors?: string[];
+	meta?: Record<string, string>;
+};
 
 export type RegistryConfig = RegistryMeta & {
 	/** These dependencies will not be installed with registry items even if detected. */

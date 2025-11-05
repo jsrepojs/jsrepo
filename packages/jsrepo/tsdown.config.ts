@@ -16,4 +16,7 @@ export default defineConfig({
 	alias: {
 		'@/': './src/',
 	},
+	dts: {
+		sourcemap: true,
+	},
 });

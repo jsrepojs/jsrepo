@@ -24,7 +24,6 @@
 		"@svitejs/changesets-changelog-github-compact": "^1.2.0",
 		"concurrently": "^9.2.1",
 		"pkg-pr-new": "^0.0.60",
-		"typescript": "^5.9.3",
 		"wait-on": "^9.0.1"
 	},
 	"pnpm": {

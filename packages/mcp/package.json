@@ -25,7 +25,8 @@
 	"bin": "./dist/index.js",
 	"main": "./dist/index.js",
 	"files": [
-		"dist/**/*"
+		"dist/**/*",
+		"!dist/**/*.map"
 	],
 	"scripts": {
 		"build": "tsdown",
@@ -49,6 +50,7 @@
 		"picocolors": "catalog:",
 		"tmcp": "^1.16.2",
 		"tsdown": "catalog:",
+		"typescript": "catalog:",
 		"vitest": "catalog:",
 		"zod": "catalog:"
 	}
