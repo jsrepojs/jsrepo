@@ -35,7 +35,7 @@ jobs:
                   results="[]"
                   for package in packages/*/; do
                       if [ -f "$package/package.json" ]; then
-                          package_name=$(basename "$package")
+                          package_name=$(jq -r '.name' "$package/package.json" 2>/dev/null || basename "$package")
                           size_json=$(node bundle-analyzer/dist/index.js analyze "$package" --json 2>/dev/null | tr -d '\n' || echo '{"size":0}')
                           if echo "$size_json" | jq -e '.size' > /dev/null 2>&1; then
                               results=$(echo "$results" | jq --arg name "$package_name" --argjson size_json "$size_json" '. += [{"name": $name, "size": ($size_json | .size)}]')
