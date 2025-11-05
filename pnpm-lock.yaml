@@ -152,38 +152,7 @@ importers:
         version: 9.1.6
       commander:
         specifier: ^14.0.1
-        version: 14.0.1(patch_hash=c5b8f01cdaed96b5c5ce4dbe450d95b4283df9865de8ad26ac29894f624b2ee0)
-      npm-packlist:
-        specifier: ^10.0.3
-        version: 10.0.3
-      picocolors:
-        specifier: 'catalog:'
-        version: 1.1.1
-    devDependencies:
-      '@types/node':
-        specifier: 'catalog:'
-        version: 24.9.1
-      '@types/npm-packlist':
-        specifier: ^7.0.3
-        version: 7.0.3
-      '@types/npmcli__arborist':
-        specifier: ^6.3.1
-        version: 6.3.1
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.15.9(typescript@5.9.3)
-      zod:
-        specifier: 'catalog:'
-        version: 4.1.12
-
-  packages/jsrepo:
-    dependencies:
-      '@npmcli/arborist':
-        specifier: ^9.1.6
-        version: 9.1.6
-      commander:
-        specifier: ^14.0.1
-        version: 14.0.1(patch_hash=c5b8f01cdaed96b5c5ce4dbe450d95b4283df9865de8ad26ac29894f624b2ee0)
+        version: 14.0.1
       npm-packlist:
         specifier: ^10.0.3
         version: 10.0.3
@@ -7643,10 +7612,6 @@ snapshots:
     dependencies:
       '@types/node': 20.19.23
 
-  '@types/cacache@19.0.0':
-    dependencies:
-      '@types/node': 20.19.23
-
   '@types/chai@5.2.2':
     dependencies:
       '@types/deep-eql': 4.0.2
@@ -8107,8 +8072,6 @@ snapshots:
   commander@11.1.0: {}
 
   commander@14.0.1: {}
-
-  common-ancestor-path@1.0.1: {}
 
   common-ancestor-path@1.0.1: {}
 
