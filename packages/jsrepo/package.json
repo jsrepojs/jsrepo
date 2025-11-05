@@ -61,7 +61,7 @@
 		}
 	},
 	"bin": "./dist/bin.js",
-	"main": "./dist/bin.js",
+	"main": "./dist/index.js",
 	"files": [
 		"dist/**/*"
 	],
