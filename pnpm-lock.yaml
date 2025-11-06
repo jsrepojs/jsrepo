@@ -152,7 +152,7 @@ importers:
         version: 9.1.6
       commander:
         specifier: ^14.0.1
-        version: 14.0.1
+        version: 14.0.2
       npm-packlist:
         specifier: ^10.0.3
         version: 10.0.3
@@ -162,7 +162,7 @@ importers:
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
-        version: 24.9.1
+        version: 24.10.0
       '@types/npm-packlist':
         specifier: ^7.0.3
         version: 7.0.3
@@ -171,7 +171,7 @@ importers:
         version: 6.3.1
       tsdown:
         specifier: 'catalog:'
-        version: 0.15.9(typescript@5.9.3)
+        version: 0.15.12(@arethetypeswrong/core@0.18.2)(typescript@5.9.3)
       zod:
         specifier: 'catalog:'
         version: 4.1.12
@@ -1575,6 +1575,10 @@ packages:
   '@oxc-project/types@0.96.0':
     resolution: {integrity: sha512-r/xkmoXA0xEpU6UGtn18CNVjXH6erU3KCpCDbpLmbVxBFor1U9MqN5Z2uMmCHJuXjJzlnDR+hWY+yPoLo8oHDw==}
 
+  '@pkgjs/parseargs@0.11.0':
+    resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
+    engines: {node: '>=14'}
+
   '@quansync/fs@0.1.5':
     resolution: {integrity: sha512-lNS9hL2aS2NZgNW7BBj+6EBl4rOf8l+tQ0eRY6JWCI8jI2kc53gSoqbjojU0OnAWhzoXiOjFyGsHcDGePB3lhA==}
 
@@ -2429,6 +2433,27 @@ packages:
 
   '@types/node@24.10.0':
     resolution: {integrity: sha512-qzQZRBqkFsYyaSWXuEHc2WR9c0a0CXwiE5FWUvn7ZM+vdy1uZLfCunD38UzhuB7YN/J11ndbDBcTmOdxJo9Q7A==}
+
+  '@types/npm-package-arg@6.1.4':
+    resolution: {integrity: sha512-vDgdbMy2QXHnAruzlv68pUtXCjmqUk3WrBAsRboRovsOmxbfn/WiYCjmecyKjGztnMps5dWp4Uq2prp+Ilo17Q==}
+
+  '@types/npm-packlist@7.0.3':
+    resolution: {integrity: sha512-NzSrjqJyBeEkvZSXaMtcWIre5jcKft70OrqrRZ2dhX7rt7lWWMGfmaCcHsp3OzhwIs15QbydxUZCP4k0JvATDQ==}
+
+  '@types/npm-registry-fetch@8.0.9':
+    resolution: {integrity: sha512-7NxvodR5Yrop3pb6+n8jhJNyzwOX0+6F+iagNEoi9u1CGxruYAwZD8pvGc9prIkL0+FdX5Xp0p80J9QPrGUp/g==}
+
+  '@types/npmcli__arborist@6.3.1':
+    resolution: {integrity: sha512-CUADRvIKRFwVuiroLQ0wWzOpeOcL8OacCbODtZZxMOA+PBg1au/D8ry/zBnQWdEH+i0IXKeNL2Nt0er30bYWng==}
+
+  '@types/npmcli__package-json@4.0.4':
+    resolution: {integrity: sha512-6QjlFUSHBmZJWuC08bz1ZCx6tm4t+7+OJXAdvM6tL2pI7n6Bh5SIp/YxQvnOLFf8MzCXs2ijyFgrzaiu1UFBGA==}
+
+  '@types/npmlog@7.0.0':
+    resolution: {integrity: sha512-hJWbrKFvxKyWwSUXjZMYTINsSOY6IclhvGOZ97M8ac2tmR9hMwmTnYaMdpGhvju9ctWLTPhCS+eLfQNluiEjQQ==}
+
+  '@types/pacote@11.1.8':
+    resolution: {integrity: sha512-/XLR0VoTh2JEO0jJg1q/e6Rh9bxjBq9vorJuQmtT7rRrXSiWz7e7NsvXVYJQ0i8JxMlBMPPYDTnrRe7MZRFA8Q==}
 
   '@types/react-dom@19.2.2':
     resolution: {integrity: sha512-9KQPoO6mZCi7jcIStSnlOWn2nEF3mNmyr3rIAsGnAbQKYbRLyqmeSc39EVgtxXVia+LMT8j3knZLAZAh+xLmrw==}
@@ -6655,6 +6680,9 @@ snapshots:
 
   '@oxc-project/types@0.96.0': {}
 
+  '@pkgjs/parseargs@0.11.0':
+    optional: true
+
   '@quansync/fs@0.1.5':
     dependencies:
       quansync: 0.2.11
@@ -7429,6 +7457,42 @@ snapshots:
   '@types/node@24.10.0':
     dependencies:
       undici-types: 7.16.0
+
+  '@types/npm-package-arg@6.1.4': {}
+
+  '@types/npm-packlist@7.0.3':
+    dependencies:
+      '@types/ignore-walk': 4.0.3
+      '@types/npmcli__arborist': 6.3.1
+
+  '@types/npm-registry-fetch@8.0.9':
+    dependencies:
+      '@types/node': 20.19.23
+      '@types/node-fetch': 2.6.13
+      '@types/npm-package-arg': 6.1.4
+      '@types/npmlog': 7.0.0
+      '@types/ssri': 7.1.5
+
+  '@types/npmcli__arborist@6.3.1':
+    dependencies:
+      '@npm/types': 1.0.2
+      '@types/cacache': 19.0.0
+      '@types/node': 20.19.23
+      '@types/npmcli__package-json': 4.0.4
+      '@types/pacote': 11.1.8
+
+  '@types/npmcli__package-json@4.0.4': {}
+
+  '@types/npmlog@7.0.0':
+    dependencies:
+      '@types/node': 20.19.23
+
+  '@types/pacote@11.1.8':
+    dependencies:
+      '@types/node': 20.19.23
+      '@types/npm-registry-fetch': 8.0.9
+      '@types/npmlog': 7.0.0
+      '@types/ssri': 7.1.5
 
   '@types/react-dom@19.2.2(@types/react@19.2.2)':
     dependencies:

@@ -17,7 +17,8 @@
 		"ci:release": "pnpm build:packages && changeset publish",
 		"postinstall": "pnpm build:packages",
 		"build:packages": "pnpm -parallel --filter './packages/*' build",
-		"bundle:analyze": "pnpm -r --filter './packages/*' --color=always bundle:analyze"
+		"bundle-analyze": "pnpm build:bundle-analyzer && pnpm -r --filter './packages/*' --color=always bundle-analyze",
+		"build:bundle-analyzer": "pnpm -F @jsrepo/bundle-analyzer build"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.3.0",

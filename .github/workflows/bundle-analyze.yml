@@ -23,11 +23,11 @@ jobs:
               run: pnpm install
 
             - name: Build bundle analyzer
-              run: pnpm --filter bundle-analyzer build
+              run: pnpm build:bundle-analyzer
 
             - name: Build packages
               run: pnpm build:packages
 
             - name: Bundle Analyze
               run: |
-                  pnpm bundle:analyze
+                  pnpm bundle-analyze
