@@ -71,7 +71,8 @@
 		"build": "tsdown",
 		"dev": "tsdown --watch",
 		"check": "tsc --noEmit",
-		"test": "vitest"
+		"test": "vitest",
+		"bundle-analyze": "FORCE_COLOR=1 node ../../bundle-analyzer/dist/index.js analyze ."
 	},
 	"packageManager": "pnpm@10.20.0",
 	"dependencies": {

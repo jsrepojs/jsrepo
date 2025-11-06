@@ -34,7 +34,8 @@
 		"start": "node ./dist/index.js mcp",
 		"check": "tsc --noEmit",
 		"mcp:inspector": "pnpm dlx @modelcontextprotocol/inspector node ./dist/index.js mcp",
-		"test": "vitest"
+		"test": "vitest",
+		"bundle-analyze": "FORCE_COLOR=1 node ../../bundle-analyzer/dist/index.js analyze ."
 	},
 	"packageManager": "pnpm@10.17.1",
 	"dependencies": {

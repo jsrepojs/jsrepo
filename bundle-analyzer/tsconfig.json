@@ -1,0 +1,16 @@
+{
+	"compilerOptions": {
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"isolatedModules": true,
+		"moduleResolution": "Bundler",
+		"module": "ES2022",
+		"target": "ES2022",
+		"skipLibCheck": true,
+		"strict": true,
+		"noEmit": true,
+		"noUncheckedIndexedAccess": true,
+		"resolveJsonModule": true
+	},
+	"include": ["src/**/*.ts"]
+}
