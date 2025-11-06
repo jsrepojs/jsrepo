@@ -175,6 +175,50 @@ export async function validateRegistryConfig(
 	return ok();
 }
 
+export async function buildRegistry(
+	registry: RegistryConfig,
+	{ options, config }: { options: { cwd: string }; config: Config }
+): Promise<Result<BuildResult, BuildError>> {
+	const result = await validateRegistryConfig(registry);
+	if (result.isErr()) return err(result.error);
+
+	// start by resolving all the files so we know where stuff is
+	const files = registry.items.flatMap((item) =>
+		item.files.map((file) => {
+			const basePath = getItemBasePath(item);
+			return {
+				...file,
+				parent: {
+					name: item.name,
+					type: item.type,
+					basePath: basePath ?? '',
+				},
+			} satisfies UnresolvedFile;
+		})
+	);
+	const resolvedFilesResult = await resolveFiles(files, {
+		cwd: options.cwd,
+		config,
+		registry,
+	});
+	if (resolvedFilesResult.isErr()) return err(resolvedFilesResult.error);
+	const resolvedFiles = resolvedFilesResult.value;
+
+	const resolvedItemsResult = await resolveRegistryItems(registry.items, {
+		cwd: options.cwd,
+		resolvedFiles,
+		registryName: registry.name,
+	});
+	if (resolvedItemsResult.isErr()) return err(resolvedItemsResult.error);
+	const resolvedItems = resolvedItemsResult.value;
+
+	return ok({
+		...registry,
+		items: Array.from(resolvedItems.values()),
+		defaultPaths: registry.defaultPaths as Record<string, string> | undefined,
+	});
+}
+
 export async function resolveFiles(
 	files: UnresolvedFile[],
 	{

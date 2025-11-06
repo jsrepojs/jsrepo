@@ -81,8 +81,8 @@
 		"unconfig": "^7.3.3"
 	},
 	"peerDependencies": {
-		"vue": "^3.5.22",
-		"svelte": "^5.41.4"
+		"svelte": "^5.41.4",
+		"vue": "^3.5.22"
 	},
 	"peerDependenciesMeta": {
 		"vue": {
@@ -96,6 +96,7 @@
 		"@clack/prompts": "1.0.0-alpha.6",
 		"@types/node": "catalog:",
 		"@types/semver": "^7.7.1",
+		"@types/tar-stream": "^3.1.4",
 		"conf": "^15.0.2",
 		"css-dependency": "^0.0.3",
 		"dedent": "^1.7.0",
@@ -111,6 +112,7 @@
 		"pathe": "^2.0.3",
 		"picocolors": "catalog:",
 		"semver": "^7.7.3",
+		"tar-stream": "^3.1.7",
 		"tinyexec": "^1.0.2",
 		"tsdown": "catalog:",
 		"typescript": "catalog:",

@@ -2,7 +2,7 @@ import nodeMachineId from 'node-machine-id';
 import type {
 	CreateOptions,
 	FetchOptions,
-	GetToken,
+	Prompts,
 	Provider,
 	ProviderFactory,
 } from '@/providers/types';
@@ -59,7 +59,8 @@ export type JsrepoOptions = {
  * });
  * ```
  */
-export function jsrepo(options: JsrepoOptions = {}): ProviderFactory {
+export function jsrepo(options: JsrepoOptions = {}): ProviderFactory & { baseUrl: string } {
+	const baseUrl = options.baseUrl ?? BASE_URL;
 	return {
 		name: 'jsrepo',
 		matches: (url: string) => url.startsWith('@'),
@@ -67,8 +68,9 @@ export function jsrepo(options: JsrepoOptions = {}): ProviderFactory {
 		auth: {
 			tokenStoredFor: 'provider',
 			envVar: 'JSREPO_TOKEN',
-			getToken,
+			getToken: (opts) => getToken(opts, baseUrl),
 		},
+		baseUrl,
 	};
 }
 
@@ -188,13 +190,13 @@ class Jsrepo implements Provider {
  * @param param0
  * @returns
  */
-const getToken: GetToken = async ({ p }) => {
+const getToken = async ({ p }: { p: Prompts }, baseUrl: string) => {
 	const hardwareId = nodeMachineId.machineIdSync(true);
 
 	let anonSessionId: string;
 
 	try {
-		const response = await fetch(`${BASE_URL}/api/login/device`, {
+		const response = await fetch(`${baseUrl}/api/login/device`, {
 			method: 'POST',
 			headers: { 'content-type': 'application/json' },
 			body: JSON.stringify({ hardwareId }),
@@ -213,7 +215,7 @@ const getToken: GetToken = async ({ p }) => {
 		});
 	}
 
-	p.log.step(`Sign in at ${p.color.cyan(`${BASE_URL}/login/device/${anonSessionId}`)}`);
+	p.log.step(`Sign in at ${p.color.cyan(`${baseUrl}/login/device/${anonSessionId}`)}`);
 
 	const timeout = 1000 * 60 * 60 * 15; // 15 minutes
 
@@ -233,7 +235,7 @@ const getToken: GetToken = async ({ p }) => {
 		// wait initially cause c'mon ain't no way
 		await sleep(5000); // wait 5 seconds
 
-		const endpoint = `${BASE_URL}/api/login/device/${anonSessionId}`;
+		const endpoint = `${baseUrl}/api/login/device/${anonSessionId}`;
 
 		try {
 			const response = await fetch(endpoint, {
