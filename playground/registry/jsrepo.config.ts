@@ -70,6 +70,18 @@ export default defineConfig({
 						},
 					],
 				},
+				{
+					name: 'test',
+					type: 'rule',
+					add: 'optionally-on-init',
+					dependencyResolution: 'manual',
+					files: [
+						{
+							path: 'rules/test.mdc',
+							target: '.cursor/rules/test.mdc',
+						},
+					],
+				},
 			],
 		},
 	],

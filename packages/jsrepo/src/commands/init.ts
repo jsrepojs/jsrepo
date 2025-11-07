@@ -229,6 +229,31 @@ export async function runInit(
 			.map((item) => ({ registry, item }))
 	);
 
+	const optionallyOnInitItems = Array.from(resolvedRegistries.values()).flatMap((registry) =>
+		registry.manifest.items
+			.filter((item) => item.add === 'optionally-on-init')
+			.map((item) => ({ registry, item }))
+	);
+
+	if (optionallyOnInitItems.length > 0) {
+		const response = await multiselect({
+			message: `Would you like to add any of the following items?`,
+			options: optionallyOnInitItems.map((item) => ({
+				label: item.item.name,
+				value: item.item.name,
+			})),
+		});
+
+		if (isCancel(response)) {
+			cancel('Canceled!');
+			process.exit(0);
+		}
+
+		itemsToAdd.push(
+			...optionallyOnInitItems.filter((item) => response.includes(item.item.name))
+		);
+	}
+
 	const neededDependencies: {
 		dependencies: RemoteDependency[];
 		devDependencies: RemoteDependency[];
@@ -400,12 +425,25 @@ async function initDefaultPaths(
 	}
 ) {
 	const types = Array.from(
-		new Set(registry.manifest.items.map((item) => normalizeItemTypeForPath(item.type)))
+		new Set(
+			registry.manifest.items
+				// filter out items where all files have a target since we don't need to prompt the user for a path
+				.filter((item) => {
+					const allFilesHaveTargets =
+						item.files.filter((file) => file.target !== undefined).length ===
+						item.files.length;
+
+					if (allFilesHaveTargets) return false;
+
+					return true;
+				})
+				.map((item) => normalizeItemTypeForPath(item.type))
+		)
 	);
 
 	let paths = config?.paths ?? {};
 
-	if (!options.yes) {
+	if (!options.yes && types.length > 0) {
 		const configurePaths = await multiselect({
 			message: 'Which paths would you like to configure?',
 			options: types.map((type) => ({

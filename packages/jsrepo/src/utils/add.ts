@@ -14,7 +14,7 @@ import {
 import type { RepositoryOutputFile } from '@/outputs/repository';
 import { fetchManifest, type Provider, type ProviderFactory } from '@/providers';
 import type { RemoteDependency } from '@/utils/build';
-import type { Config, RegistryItemType } from '@/utils/config';
+import type { Config, RegistryItemAdd, RegistryItemType } from '@/utils/config';
 import { arePathsEqual, getPathsMatcher, resolvePath, resolvePaths } from '@/utils/config/utils';
 import { formatDiff } from '@/utils/diff';
 import type { PathsMatcher } from '@/utils/tsconfig';
@@ -137,7 +137,7 @@ export type ResolvedWantedItem = {
 	item: {
 		name: string;
 		description?: string;
-		add?: 'on-init' | 'when-needed' | 'when-added';
+		add?: RegistryItemAdd;
 		type: RegistryItemType;
 		registryDependencies?: string[];
 		dependencies?: (RemoteDependency | string)[];
@@ -236,7 +236,7 @@ export async function resolveWantedItems(
 export type ResolvedItem = {
 	name: string;
 	description?: string;
-	add?: 'on-init' | 'when-needed' | 'when-added';
+	add?: RegistryItemAdd;
 	type: RegistryItemType;
 	dependencies?: (RemoteDependency | string)[];
 	registry: ResolvedRegistry;
@@ -246,7 +246,7 @@ export type ResolvedItem = {
 export type ItemRepository = {
 	name: string;
 	type: RegistryItemType;
-	add?: 'on-init' | 'when-needed' | 'when-added';
+	add?: RegistryItemAdd;
 	description?: string;
 	dependencies?: (RemoteDependency | string)[];
 	devDependencies?: (RemoteDependency | string)[];
@@ -430,8 +430,8 @@ export async function fetchAllResolvedItems(
 }
 
 /** Tries to get the path for an item. If the path is not set, it will prompt the user for a path. */
-export async function getBlockLocation(
-	block: { name: string; type: RegistryItemType },
+export async function getItemLocation(
+	item: { name: string; type: RegistryItemType; files: { path: string; target?: string }[] },
 	{
 		paths,
 		nonInteractive,
@@ -444,9 +444,16 @@ export async function getBlockLocation(
 		matcher: PathsMatcher;
 	}
 ): Promise<Result<{ resolvedPath: string; path: string }, NoPathProvidedError>> {
+	if (item.files.filter((file) => file.target !== undefined).length === item.files.length) {
+		// if all the files are just target files we don't need to prompt the user for a path
+		return ok({
+			path: '',
+			resolvedPath: '',
+		});
+	}
 	const defaultPath = paths['*'];
-	const type = normalizeItemTypeForPath(block.type);
-	const path = paths[block.name] ?? paths[type];
+	const type = normalizeItemTypeForPath(item.type);
+	const path = paths[item.name] ?? paths[type];
 	if (!path) {
 		if (defaultPath) {
 			return ok({
@@ -457,7 +464,7 @@ export async function getBlockLocation(
 		}
 
 		// we just error in non-interactive mode
-		if (nonInteractive) return err(new NoPathProvidedError({ item: block.name, type }));
+		if (nonInteractive) return err(new NoPathProvidedError({ item: item.name, type }));
 
 		const blocksPath = await text({
 			message: `Where would you like to add ${pc.cyan(type)}?`,
@@ -588,7 +595,7 @@ export async function getPathsForItems({
 	options,
 	continueOnNoPath = false,
 }: {
-	items: { name: string; type: RegistryItemType }[];
+	items: { name: string; type: RegistryItemType; files: { path: string; target?: string }[] }[];
 	config: Config | undefined;
 	options: { cwd: string; yes: boolean };
 	continueOnNoPath?: boolean;
@@ -613,7 +620,7 @@ export async function getPathsForItems({
 		// the item name can be used to override the target
 		const itemPath = resolvedPaths[`${type}/${item.name}`] ?? resolvedPaths[type];
 		if (itemPath !== undefined) continue;
-		const result = await getBlockLocation(item, {
+		const result = await getItemLocation(item, {
 			paths: resolvedPaths,
 			nonInteractive: options.yes,
 			options,

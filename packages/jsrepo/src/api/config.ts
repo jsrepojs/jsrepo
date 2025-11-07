@@ -5,6 +5,9 @@ export {
 	OptionallyInstalledRegistryTypes,
 	type RegistryConfig,
 	type RegistryItem,
+	type RegistryItemAdd,
+	type RegistryItemFile,
+	type RegistryItemType,
 	type Transform,
 	type TransformOptions,
 } from '@/utils/config';

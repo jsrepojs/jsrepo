@@ -7,6 +7,7 @@ import type {
 	RegistryConfig,
 	RegistryFileType,
 	RegistryItem,
+	RegistryItemAdd,
 	RegistryItemType,
 	RegistryMeta,
 	RegistryPlugin,
@@ -53,7 +54,7 @@ export type ResolvedItem = {
 	/** Dependencies to code located in a remote repository to be installed later with a package manager. */
 	dependencies?: RemoteDependency[];
 	devDependencies?: RemoteDependency[];
-	add: 'on-init' | 'when-needed' | 'when-added';
+	add: RegistryItemAdd;
 	envVars?: Record<string, string>;
 };
 
@@ -192,6 +193,7 @@ export async function buildRegistry(
 			const basePath = getItemBasePath(item);
 			return {
 				...file,
+				dependencyResolution: file.dependencyResolution ?? item.dependencyResolution,
 				parent: {
 					name: item.name,
 					type: item.type,
@@ -467,6 +469,7 @@ export async function resolveRegistryItem(
 			}
 
 			files.push({
+				target: resolvedFile.target,
 				path: resolvedFile.path,
 				content: resolvedFile.content,
 				type: resolvedFile.type,

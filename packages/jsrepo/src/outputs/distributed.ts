@@ -3,7 +3,7 @@ import path from 'pathe';
 import { z } from 'zod';
 import { type Output, RegistryPluginsSchema } from '@/outputs/types';
 import { MANIFEST_FILE } from '@/utils/build';
-import { RegistryMetaSchema } from '@/utils/config';
+import { RegistryItemAddSchema, RegistryMetaSchema } from '@/utils/config';
 import { stringify } from '@/utils/json';
 import { safeParseFromJSON } from '@/utils/zod';
 
@@ -140,7 +140,7 @@ export const DistributedOutputManifestItemSchema = z.object({
 	description: z.string().optional(),
 	type: z.string(),
 	registryDependencies: z.array(z.string()).optional(),
-	add: z.enum(['on-init', 'when-needed', 'when-added']).optional(),
+	add: RegistryItemAddSchema.optional(),
 	dependencies: z
 		.array(
 			z.union([
@@ -200,7 +200,7 @@ export const DistributedOutputItemSchema = z.object({
 	description: z.string().optional(),
 	type: z.string(),
 	registryDependencies: z.array(z.string()).optional(),
-	add: z.enum(['on-init', 'when-needed', 'when-added']).optional(),
+	add: RegistryItemAddSchema.optional(),
 	dependencies: z
 		.array(
 			z.union([

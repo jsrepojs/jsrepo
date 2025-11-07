@@ -3,7 +3,7 @@ import path from 'pathe';
 import { z } from 'zod';
 import { type Output, RegistryPluginsSchema } from '@/outputs/types';
 import { MANIFEST_FILE } from '@/utils/build';
-import { RegistryMetaSchema } from '@/utils/config';
+import { RegistryItemAddSchema, RegistryMetaSchema } from '@/utils/config';
 import { stringify } from '@/utils/json';
 
 export type RepositoryOutputOptions = {
@@ -103,7 +103,7 @@ export const RepositoryOutputManifestItemSchema = z.object({
 	description: z.string().optional(),
 	type: z.string(),
 	registryDependencies: z.array(z.string()).optional(),
-	add: z.enum(['on-init', 'when-needed', 'when-added']).optional(),
+	add: RegistryItemAddSchema.optional(),
 	files: z.array(RepositoryOutputFileSchema).optional().default([]),
 	dependencies: z
 		.array(

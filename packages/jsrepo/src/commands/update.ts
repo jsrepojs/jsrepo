@@ -174,7 +174,11 @@ export async function runUpdate(
 		);
 
 		const itemPathsResult = await getPathsForItems({
-			items: allItems.map((item) => ({ name: item.item.name, type: item.item.type })),
+			items: allItems.map((item) => ({
+				name: item.item.name,
+				type: item.item.type,
+				files: item.item.files,
+			})),
 			config,
 			options: {
 				cwd: options.cwd,

@@ -117,6 +117,15 @@ export type RegistryPlugin = {
 
 export type RegistryItemType = LooseAutocomplete<'block' | 'component' | 'lib' | 'hook' | 'ui'>;
 
+export const RegistryItemAddSchema = z.enum([
+	'optionally-on-init',
+	'on-init',
+	'when-needed',
+	'when-added',
+]);
+
+export type RegistryItemAdd = z.infer<typeof RegistryItemAddSchema>;
+
 export type RegistryItem = {
 	/** The name of the item. Spaces are NOT allowed. */
 	name: string;
@@ -159,7 +168,7 @@ export type RegistryItem = {
 	 *
 	 * @default "when-added"
 	 */
-	add?: 'on-init' | 'when-needed' | 'when-added';
+	add?: RegistryItemAdd;
 	/**
 	 * Environment variables that are required for the item to work. These will be added to the users `.env` or `.env.local` file. NEVER ADD SECRETS HERE.
 	 */
