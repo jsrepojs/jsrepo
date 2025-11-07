@@ -139,19 +139,26 @@ server.tool(
 			}
 		);
 
-		const { neededDependencies, neededEnvVars, neededFiles } = await prepareUpdates({
-			configResult,
-			options: {
-				cwd: options.cwd,
-				yes: true,
-				withExamples: options.withExamples ?? false,
-				withDocs: options.withDocs ?? false,
-				withTests: options.withTests ?? false,
-			},
-			itemPaths,
-			resolvedPaths,
-			items,
-		});
+		const { neededDependencies, neededEnvVars, neededFiles } = (
+			await prepareUpdates({
+				configResult,
+				options: {
+					cwd: options.cwd,
+					yes: true,
+					withExamples: options.withExamples ?? false,
+					withDocs: options.withDocs ?? false,
+					withTests: options.withTests ?? false,
+				},
+				itemPaths,
+				resolvedPaths,
+				items,
+			})
+		).match(
+			(value) => value,
+			(error) => {
+				throw error;
+			}
+		);
 
 		await updateFiles({
 			files: neededFiles,
@@ -173,7 +180,7 @@ server.tool(
 					description: item.description,
 					type: item.type,
 					files: item.files?.map((file) => ({
-						code: file.contents,
+						code: file.content,
 						path: file.path,
 					})),
 				})),
@@ -268,28 +275,28 @@ server.tool(
 									file.type
 								)
 						)
-						.map((file) => `\`\`\`${file.path}\n${file.contents}\n\`\`\``)
+						.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
 						.join('\n')}
 
 					## Dependencies
-					${itemResult.remoteDependencies?.map((dependency) => `- ${dependency.name}`).join('\n')}
+					${itemResult.dependencies?.map((dependency) => `- ${typeof dependency === 'string' ? dependency : dependency.name}`).join('\n')}
 
 					## Examples
 					${itemResult.files
 						?.filter((file) => file.type === 'registry:example')
-						.map((file) => `\`\`\`${file.path}\n${file.contents}\n\`\`\``)
+						.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
 						.join('\n')}
 
 					## Docs
 					${itemResult.files
 						?.filter((file) => file.type === 'registry:doc')
-						.map((file) => `\`\`\`${file.path}\n${file.contents}\n\`\`\``)
+						.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
 						.join('\n')}
 
 					## Tests
 					${itemResult.files
 						?.filter((file) => file.type === 'registry:test')
-						.map((file) => `\`\`\`${file.path}\n${file.contents}\n\`\`\``)
+						.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
 						.join('\n')}
 
 					## Environment Variables

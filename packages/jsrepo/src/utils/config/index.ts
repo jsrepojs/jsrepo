@@ -58,18 +58,34 @@ export const RegistryMetaSchema = z.object({
 	bugs: z.string().optional(),
 	authors: z.array(z.string()).optional(),
 	meta: z.record(z.string(), z.string()).optional(),
+	access: z.enum(['public', 'private', 'marketplace']).optional(),
 });
 
 export type RegistryMeta = {
+	/**
+	 * The name of the registry. When publishing to [jsrepo.com](https://jsrepo.com) the name must follow the format of `@<scope>/<name>`.
+	 */
 	name: string;
 	description?: string;
-	version?: string;
+	/**
+	 * The version of the registry. When publishing to [jsrepo.com](https://jsrepo.com) the version can be provided as `package` to use the version from the `package.json` file, otherwise it should be a valid semver version.
+	 */
+	version?: LooseAutocomplete<'package'>;
 	homepage?: string;
 	tags?: string[];
 	repository?: string;
 	bugs?: string;
 	authors?: string[];
 	meta?: Record<string, string>;
+	/** The access level of the registry when published to jsrepo.com with `jsrepo publish`.
+	 *
+	 *  - "public" - The registry will be visible to everyone
+	 *  - "private" - The registry will be visible to only you
+	 *  - "marketplace" - The registry will purchasable on the jsrepo.com marketplace
+	 *
+	 *  @default "public"
+	 */
+	access?: 'public' | 'private' | 'marketplace';
 };
 
 export type RegistryConfig = RegistryMeta & {
@@ -129,7 +145,11 @@ export type RegistryItem = {
 	 * ```
 	 */
 	registryDependencies?: string[];
-	remoteDependencies?: RemoteDependency[];
+	/**
+	 * Provide a list of dependencies to be installed with the item. If dependencies are provided as a string they will be assumed to be a js dependency.
+	 */
+	dependencies?: (RemoteDependency | string)[];
+	devDependencies?: (RemoteDependency | string)[];
 	/**
 	 * Controls when the item will be added to the project.
 	 *

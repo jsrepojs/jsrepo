@@ -53,22 +53,18 @@ export function cleanVersion(version: string) {
 
 /** Returns only the dependencies that should be installed based on what is already in the package.json */
 export function shouldInstall<T extends Omit<RemoteDependency, 'ecosystem'>>(
-	dependencies: T[],
+	dependencies: { dependencies: T[]; devDependencies: T[] },
 	{ pkg }: { pkg: Partial<PackageJson> }
-): T[] {
-	const deps = new Map<string, T>();
-	for (const dep of dependencies) {
-		let foundDep: string | undefined;
-
-		if (dep.dev) {
-			foundDep = pkg.devDependencies?.[dep.name];
-		} else {
-			foundDep = pkg.dependencies?.[dep.name];
-		}
+): { dependencies: T[]; devDependencies: T[] } {
+	function shouldShouldInstallDependency(
+		dep: T,
+		pkgDeps: Record<string, string> | undefined
+	): boolean {
+		const foundDep = pkgDeps?.[dep.name];
 
 		// if version isn't pinned and dep exists delete
 		if (dep.version === undefined && foundDep) {
-			continue;
+			return false;
 		}
 
 		// if the version installed satisfies the requested version remove the dep
@@ -76,10 +72,26 @@ export function shouldInstall<T extends Omit<RemoteDependency, 'ecosystem'>>(
 			foundDep &&
 			(dep.version === undefined || semver.satisfies(cleanVersion(foundDep), dep.version))
 		) {
-			continue;
+			return false;
 		}
+
+		return true;
+	}
+
+	const deps = new Map<string, T>();
+	for (const dep of dependencies.dependencies) {
+		if (!shouldShouldInstallDependency(dep, pkg.dependencies)) continue;
 
 		deps.set(dep.name, dep);
 	}
-	return Array.from(deps.values());
+	const devDeps = new Map<string, T>();
+	for (const dep of dependencies.devDependencies) {
+		if (!shouldShouldInstallDependency(dep, pkg.devDependencies)) continue;
+
+		devDeps.set(dep.name, dep);
+	}
+	return {
+		dependencies: Array.from(deps.values()),
+		devDependencies: Array.from(devDeps.values()),
+	};
 }

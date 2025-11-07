@@ -13,14 +13,7 @@ import {
 	parseOptions,
 	tryCommand,
 } from '@/commands/utils';
-import {
-	type BuildResult,
-	getItemBasePath,
-	resolveFiles,
-	resolveRegistryItems,
-	type UnresolvedFile,
-	validateRegistryConfig,
-} from '@/utils/build';
+import { buildRegistry, validateRegistryConfig } from '@/utils/build';
 import type { Config } from '@/utils/config';
 import { loadConfig, loadConfigSearch } from '@/utils/config/utils';
 import {
@@ -114,44 +107,9 @@ export async function runBuild(
 				);
 			}
 
-			// start by resolving all the files so we know where stuff is
-			const files = registry.items.flatMap((item) =>
-				item.files.map((file) => {
-					const basePath = getItemBasePath(item);
-					return {
-						...file,
-						parent: {
-							name: item.name,
-							type: item.type,
-							basePath: basePath ?? '',
-						},
-					} satisfies UnresolvedFile;
-				})
-			);
-			const resolvedFilesResult = await resolveFiles(files, {
-				cwd: options.cwd,
-				config,
-				registry,
-			});
-			if (resolvedFilesResult.isErr()) return err(resolvedFilesResult.error);
-			const resolvedFiles = resolvedFilesResult.value;
-
-			// now we resolve registry items
-
-			const resolvedItemsResult = await resolveRegistryItems(registry.items, {
-				cwd: options.cwd,
-				resolvedFiles,
-				registryName: registry.name,
-			});
-			if (resolvedItemsResult.isErr()) return err(resolvedItemsResult.error);
-			const resolvedItems = resolvedItemsResult.value;
-
-			const buildResult: BuildResult = {
-				// we spread here so that users are allowed to supply additional props and they can be passed through to a custom output
-				...registry,
-				items: Array.from(resolvedItems.values()),
-				defaultPaths: registry.defaultPaths as Record<string, string> | undefined,
-			};
+			const buildResultResult = await buildRegistry(registry, { options, config });
+			if (buildResultResult.isErr()) return err(buildResultResult.error);
+			const buildResult = buildResultResult.value;
 
 			if (registry.outputs.length === 0)
 				return err(new NoOutputsError({ registryName: registry.name }));
@@ -166,8 +124,8 @@ export async function runBuild(
 			return ok({
 				name: registry.name,
 				time: duration,
-				items: resolvedItems.size,
-				files: resolvedFiles.size,
+				items: buildResult.items.length,
+				files: buildResult.items.flatMap((item) => item.files.length).length,
 				outputs: registry.outputs.length,
 			});
 		},

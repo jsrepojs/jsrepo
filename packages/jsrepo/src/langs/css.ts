@@ -32,7 +32,8 @@ export function css({ allowTailwindDirectives = true }: Partial<CssOptions> = {}
 			fileName.endsWith('.css') || fileName.endsWith('.scss') || fileName.endsWith('.sass'),
 		resolveDependencies: async (code, opts) => {
 			const imports = c.parse(code, { allowTailwindDirectives });
-			if (imports.isErr()) return [];
+			if (imports.isErr())
+				return { localDependencies: [], dependencies: [], devDependencies: [] };
 
 			return resolveImports(
 				imports.unwrap().map((imp) => imp.module),

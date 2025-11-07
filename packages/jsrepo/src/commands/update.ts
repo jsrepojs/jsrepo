@@ -168,7 +168,7 @@ export async function runUpdate(
 		const allItems: ResolvedWantedItem[] = Array.from(resolvedRegistries.entries()).flatMap(
 			([_, registry]) => {
 				return registry.manifest.items
-					.filter((item) => item.add === 'when-added')
+					.filter((item) => (item.add ?? 'when-added') === 'when-added')
 					.map((item) => ({ item, registry }));
 			}
 		);
@@ -255,13 +255,16 @@ export async function runUpdate(
 	if (itemPathsResult.isErr()) return err(itemPathsResult.error);
 	const { itemPaths, resolvedPaths } = itemPathsResult.value;
 
-	const { neededDependencies, neededEnvVars, neededFiles, updatedPaths } = await prepareUpdates({
+	const prepareUpdatesResult = await prepareUpdates({
 		configResult,
 		options,
 		itemPaths,
 		resolvedPaths,
 		items,
 	});
+	if (prepareUpdatesResult.isErr()) return err(prepareUpdatesResult.error);
+	const { neededDependencies, neededEnvVars, neededFiles, updatedPaths } =
+		prepareUpdatesResult.value;
 
 	const updatedFiles = await updateFiles({ files: neededFiles, options });
 

@@ -20,11 +20,13 @@ import {
 	FileNotResolvedError,
 	IllegalBlockNameError,
 	ImportedFileNotResolvedError,
+	InvalidDependencyError,
 	InvalidRegistryDependencyError,
 	NoFilesError,
 	NoListedItemsError,
 	SelfReferenceError,
 } from './errors';
+import { parsePackageName } from './parse-package-name';
 
 export const MANIFEST_FILE = 'registry.json';
 
@@ -49,14 +51,15 @@ export type ResolvedItem = {
 	/** Dependencies to other items in the registry */
 	registryDependencies?: string[];
 	/** Dependencies to code located in a remote repository to be installed later with a package manager. */
-	remoteDependencies?: RemoteDependency[];
+	dependencies?: RemoteDependency[];
+	devDependencies?: RemoteDependency[];
 	add: 'on-init' | 'when-needed' | 'when-added';
 	envVars?: Record<string, string>;
 };
 
 export type RegistryFile = {
 	path: string;
-	contents: string;
+	content: string;
 	type?: RegistryFileType;
 	/** Templates for resolving imports when adding items to users projects. This way users can add their items anywhere and things will just work. */
 	_imports_: UnresolvedImport[];
@@ -77,7 +80,6 @@ export type RemoteDependency = {
 	ecosystem: Ecosystem;
 	name: string;
 	version?: string;
-	dev?: boolean;
 };
 
 export type LocalDependency = {
@@ -115,8 +117,10 @@ export type ResolvedFile = {
 	parent: ParentItem;
 	path: string;
 	type?: RegistryFileType;
-	dependencies: Dependency[];
-	contents: string;
+	localDependencies: LocalDependency[];
+	dependencies: RemoteDependency[];
+	devDependencies: RemoteDependency[];
+	content: string;
 	target?: string;
 };
 
@@ -175,6 +179,50 @@ export async function validateRegistryConfig(
 	return ok();
 }
 
+export async function buildRegistry(
+	registry: RegistryConfig,
+	{ options, config }: { options: { cwd: string }; config: Config }
+): Promise<Result<BuildResult, BuildError>> {
+	const result = await validateRegistryConfig(registry);
+	if (result.isErr()) return err(result.error);
+
+	// start by resolving all the files so we know where stuff is
+	const files = registry.items.flatMap((item) =>
+		item.files.map((file) => {
+			const basePath = getItemBasePath(item);
+			return {
+				...file,
+				parent: {
+					name: item.name,
+					type: item.type,
+					basePath: basePath ?? '',
+				},
+			} satisfies UnresolvedFile;
+		})
+	);
+	const resolvedFilesResult = await resolveFiles(files, {
+		cwd: options.cwd,
+		config,
+		registry,
+	});
+	if (resolvedFilesResult.isErr()) return err(resolvedFilesResult.error);
+	const resolvedFiles = resolvedFilesResult.value;
+
+	const resolvedItemsResult = await resolveRegistryItems(registry.items, {
+		cwd: options.cwd,
+		resolvedFiles,
+		registryName: registry.name,
+	});
+	if (resolvedItemsResult.isErr()) return err(resolvedItemsResult.error);
+	const resolvedItems = resolvedItemsResult.value;
+
+	return ok({
+		...registry,
+		items: Array.from(resolvedItems.values()),
+		defaultPaths: registry.defaultPaths as Record<string, string> | undefined,
+	});
+}
+
 export async function resolveFiles(
 	files: UnresolvedFile[],
 	{
@@ -216,18 +264,27 @@ export async function resolveFiles(
 
 		if (!fs.statSync(filePath).isDirectory()) {
 			const contents = fs.readFileSync(path.join(cwd, file.path), 'utf-8');
-			let dependencies: Dependency[] = [];
+			let dependencies: RemoteDependency[] = [];
+			let devDependencies: RemoteDependency[] = [];
+			let localDependencies: LocalDependency[] = [];
 			if (file.dependencyResolution !== 'manual') {
 				const language = config.languages.find((language) =>
 					language.canResolveDependencies(file.path)
 				);
 				if (language) {
-					dependencies = await language.resolveDependencies(contents, {
+					const {
+						localDependencies: localDeps,
+						dependencies: deps,
+						devDependencies: devDeps,
+					} = await language.resolveDependencies(contents, {
 						cwd,
 						fileName: file.path,
 						excludeDeps: registry.excludeDeps ?? [],
 						warn: log.warn,
 					});
+					localDependencies = localDeps;
+					dependencies = deps;
+					devDependencies = devDeps;
 				} else {
 					log.warn(`Couldn't find a language to resolve dependencies for ${file.path}.`);
 				}
@@ -236,7 +293,9 @@ export async function resolveFiles(
 			resolvedFiles.set(normalizedPath, {
 				...file,
 				dependencies,
-				contents,
+				devDependencies,
+				localDependencies,
+				content: contents,
 			});
 		} else {
 			const files = fs.readdirSync(filePath);
@@ -306,12 +365,35 @@ export async function resolveRegistryItem(
 
 	const files: RegistryFile[] = [];
 	const registryDependencies = new Set<string>(item.registryDependencies ?? []);
-	const remoteDependencies = new Map<`${Ecosystem}:${string}@${string}`, RemoteDependency>();
-	for (const remoteDependency of item.remoteDependencies ?? []) {
-		remoteDependencies.set(
-			`${remoteDependency.ecosystem}:${remoteDependency.name}@${remoteDependency.version}`,
-			remoteDependency
-		);
+	const dependencies = new Map<`${Ecosystem}:${string}@${string}`, RemoteDependency>();
+	for (const dependency of item.dependencies ?? []) {
+		if (typeof dependency === 'string') {
+			const parsed = parsePackageName(dependency);
+			if (parsed.isErr())
+				return err(
+					new InvalidDependencyError({ dependency, registryName, itemName: item.name })
+				);
+		} else {
+			dependencies.set(
+				`${dependency.ecosystem}:${dependency.name}@${dependency.version}`,
+				dependency
+			);
+		}
+	}
+	const devDependencies = new Map<`${Ecosystem}:${string}@${string}`, RemoteDependency>();
+	for (const dependency of item.devDependencies ?? []) {
+		if (typeof dependency === 'string') {
+			const parsed = parsePackageName(dependency);
+			if (parsed.isErr())
+				return err(
+					new InvalidDependencyError({ dependency, registryName, itemName: item.name })
+				);
+		} else {
+			devDependencies.set(
+				`${dependency.ecosystem}:${dependency.name}@${dependency.version}`,
+				dependency
+			);
+		}
 	}
 
 	for (const file of item.files) {
@@ -376,7 +458,7 @@ export async function resolveRegistryItem(
 							);
 						}
 					} else {
-						remoteDependencies.set(
+						dependencies.set(
 							`${dependency.ecosystem}:${dependency.name}@${dependency.version}`,
 							dependency
 						);
@@ -386,7 +468,7 @@ export async function resolveRegistryItem(
 
 			files.push({
 				path: resolvedFile.path,
-				contents: resolvedFile.contents,
+				content: resolvedFile.content,
 				type: resolvedFile.type,
 				_imports_,
 			});
@@ -400,7 +482,7 @@ export async function resolveRegistryItem(
 		basePath: getItemBasePath(item) ?? '',
 		files,
 		registryDependencies: Array.from(registryDependencies),
-		remoteDependencies: Array.from(remoteDependencies.values()),
+		dependencies: Array.from(dependencies.values()),
 		add: item.add ?? 'when-added',
 		envVars: item.envVars,
 	});

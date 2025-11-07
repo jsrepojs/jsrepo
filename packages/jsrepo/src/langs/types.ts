@@ -1,4 +1,4 @@
-import type { Dependency, Ecosystem, RemoteDependency, UnresolvedImport } from '@/utils/build';
+import type { Ecosystem, LocalDependency, RemoteDependency, UnresolvedImport } from '@/utils/build';
 
 export type ResolveDependenciesOptions = {
 	fileName: string;
@@ -30,6 +30,12 @@ export type ImportTransform = {
 	replacement: string;
 };
 
+export type ResolveDependenciesResult = {
+	localDependencies: LocalDependency[];
+	dependencies: RemoteDependency[];
+	devDependencies: RemoteDependency[];
+};
+
 export interface Language {
 	/** The name of the language. */
 	name: string;
@@ -38,7 +44,7 @@ export interface Language {
 	resolveDependencies(
 		code: string,
 		opts: ResolveDependenciesOptions
-	): Promise<Dependency[]> | Dependency[];
+	): Promise<ResolveDependenciesResult> | ResolveDependenciesResult;
 	/** Returns an object where the key is the import to be transformed and the value is the transformed import. */
 	transformImports(
 		_imports_: UnresolvedImport[],
@@ -49,7 +55,7 @@ export interface Language {
 	canInstallDependencies(ecosystem: Ecosystem): boolean;
 	/** Gets the install command to add the given dependencies to the project. */
 	installDependencies(
-		dependencies: RemoteDependency[],
+		dependencies: { dependencies: RemoteDependency[]; devDependencies: RemoteDependency[] },
 		opts: InstallDependenciesOptions
 	): Promise<void> | void;
 }

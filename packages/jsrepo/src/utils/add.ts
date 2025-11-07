@@ -20,6 +20,7 @@ import { formatDiff } from '@/utils/diff';
 import type { PathsMatcher } from '@/utils/tsconfig';
 import { safeParseFromJSON } from '@/utils/zod';
 import {
+	InvalidDependencyError,
 	type InvalidJSONError,
 	InvalidRegistryError,
 	type ManifestFetchError,
@@ -32,6 +33,7 @@ import {
 	RegistryNotProvidedError,
 	type ZodError,
 } from './errors';
+import { parsePackageName } from './parse-package-name';
 import { VERTICAL_LINE } from './prompts';
 import { TokenManager } from './token-manager';
 
@@ -135,10 +137,10 @@ export type ResolvedWantedItem = {
 	item: {
 		name: string;
 		description?: string;
-		add: 'on-init' | 'when-needed' | 'when-added';
+		add?: 'on-init' | 'when-needed' | 'when-added';
 		type: RegistryItemType;
 		registryDependencies?: string[];
-		remoteDependencies?: RemoteDependency[];
+		dependencies?: (RemoteDependency | string)[];
 		files: Array<RepositoryOutputFile | DistributedOutputManifestFile>;
 	};
 };
@@ -172,7 +174,7 @@ export async function resolveWantedItems(
 					new RegistryItemNotFoundError(wantedItem.itemName, resolvedRegistry.url)
 				);
 			}
-			resolvedItem = item;
+			resolvedItem = { ...item, add: item.add ?? 'when-added' };
 		} else {
 			const blockMatches = new Map<
 				string,
@@ -180,7 +182,11 @@ export async function resolveWantedItems(
 			>();
 			for (const [url, registry] of resolvedRegistries.entries()) {
 				const item = registry.manifest.items.find((i) => i.name === wantedItem.itemName);
-				if (item) blockMatches.set(url, { registry, item });
+				if (item)
+					blockMatches.set(url, {
+						registry,
+						item,
+					});
 			}
 
 			if (blockMatches.size === 0) {
@@ -230,9 +236,9 @@ export async function resolveWantedItems(
 export type ResolvedItem = {
 	name: string;
 	description?: string;
-	add: 'on-init' | 'when-needed' | 'when-added';
+	add?: 'on-init' | 'when-needed' | 'when-added';
 	type: RegistryItemType;
-	remoteDependencies?: RemoteDependency[];
+	dependencies?: (RemoteDependency | string)[];
 	registry: ResolvedRegistry;
 	files: Array<RepositoryOutputFile | DistributedOutputManifestFile>;
 };
@@ -240,11 +246,12 @@ export type ResolvedItem = {
 export type ItemRepository = {
 	name: string;
 	type: RegistryItemType;
-	add: 'on-init' | 'when-needed' | 'when-added';
+	add?: 'on-init' | 'when-needed' | 'when-added';
 	description?: string;
-	remoteDependencies?: RemoteDependency[];
+	dependencies?: (RemoteDependency | string)[];
+	devDependencies?: (RemoteDependency | string)[];
 	registry: ResolvedRegistry;
-	files: Array<RepositoryOutputFile & { contents: string }>;
+	files: Array<RepositoryOutputFile & { content: string }>;
 	envVars?: Record<string, string>;
 };
 
@@ -274,7 +281,10 @@ export function resolveTree(
 				return err(
 					new RegistryItemNotFoundError(registryDependency, wantedItem.registry.url)
 				);
-			needsResolving.push({ registry: wantedItem.registry, item });
+			needsResolving.push({
+				registry: wantedItem.registry,
+				item,
+			});
 		}
 
 		const resolvedRegistryDependencies = resolveTree(needsResolving, { resolvedItems });
@@ -287,7 +297,7 @@ export function resolveTree(
 			name: wantedItem.item.name,
 			type: wantedItem.item.type,
 			add: wantedItem.item.add,
-			remoteDependencies: wantedItem.item.remoteDependencies,
+			dependencies: wantedItem.item.dependencies,
 			registry: wantedItem.registry,
 			files: wantedItem.item.files,
 		});
@@ -350,7 +360,7 @@ async function fetchItemRepositoryMode(
 			if (result.isErr()) return err(result.error);
 			return ok({
 				...file,
-				contents: result.value,
+				content: result.value,
 			});
 		})
 	);
@@ -366,7 +376,7 @@ async function fetchItemRepositoryMode(
 		type: item.type,
 		add: item.add,
 		description: item.description,
-		remoteDependencies: item.remoteDependencies,
+		dependencies: item.dependencies,
 		registry: item.registry,
 		files: filesResult,
 	});
@@ -435,7 +445,8 @@ export async function getBlockLocation(
 	}
 ): Promise<Result<{ resolvedPath: string; path: string }, NoPathProvidedError>> {
 	const defaultPath = paths['*'];
-	const path = paths[block.name] ?? paths[block.type];
+	const type = normalizeItemTypeForPath(block.type);
+	const path = paths[block.name] ?? paths[type];
 	if (!path) {
 		if (defaultPath) {
 			return ok({
@@ -446,14 +457,13 @@ export async function getBlockLocation(
 		}
 
 		// we just error in non-interactive mode
-		if (nonInteractive)
-			return err(new NoPathProvidedError({ item: block.name, type: block.type }));
+		if (nonInteractive) return err(new NoPathProvidedError({ item: block.name, type }));
 
 		const blocksPath = await text({
-			message: `Where would you like to add ${pc.cyan(block.type)}?`,
-			placeholder: `./src/${block.type}`,
-			initialValue: `./src/${block.type}`,
-			defaultValue: `./src/${block.type}`,
+			message: `Where would you like to add ${pc.cyan(type)}?`,
+			placeholder: `./src/${type}`,
+			initialValue: `./src/${type}`,
+			defaultValue: `./src/${type}`,
 			validate(value) {
 				if (!value || value.trim() === '') return 'Please provide a value';
 			},
@@ -514,19 +524,19 @@ export async function transformRemoteContent(
 		},
 	});
 	for (const transformation of transformations ?? []) {
-		file.contents = file.contents.replace(transformation.pattern, transformation.replacement);
+		file.content = file.content.replace(transformation.pattern, transformation.replacement);
 	}
 	for (const transform of config?.transforms ?? []) {
-		const result = await transform.transform(file.contents, {
+		const result = await transform.transform(file.content, {
 			cwd: options.cwd,
 			fileName: filePath,
 			registryUrl: item.registry.url,
 			item: item,
 		});
-		file.contents = result.code ?? file.contents;
+		file.content = result.code ?? file.content;
 	}
 
-	return file.contents;
+	return file.content;
 }
 
 export function getTargetPath(
@@ -599,8 +609,9 @@ export async function getPathsForItems({
 	});
 	// get any paths that are not already set
 	for (const item of items) {
+		const type = normalizeItemTypeForPath(item.type);
 		// the item name can be used to override the target
-		const itemPath = resolvedPaths[`${item.type}/${item.name}`] ?? resolvedPaths[item.type];
+		const itemPath = resolvedPaths[`${type}/${item.name}`] ?? resolvedPaths[type];
 		if (itemPath !== undefined) continue;
 		const result = await getBlockLocation(item, {
 			paths: resolvedPaths,
@@ -615,9 +626,9 @@ export async function getPathsForItems({
 			return err(result.error);
 		}
 		const { path: originalPath, resolvedPath } = result.value;
-		resolvedPaths[item.type] = resolvedPath;
+		resolvedPaths[type] = resolvedPath;
 		if (config) {
-			config.paths[item.type] = originalPath;
+			config.paths[type] = originalPath;
 		}
 	}
 
@@ -630,11 +641,11 @@ export type UpdatedFile = {
 	itemName: string;
 	registryUrl: string;
 	filePath: string;
-	contents: string;
+	content: string;
 } & (
 	| {
 			type: 'update';
-			oldContents: string;
+			oldContent: string;
 	  }
 	| {
 			type: 'create';
@@ -665,25 +676,35 @@ export async function prepareUpdates({
 	itemPaths: Record<string, { path: string; alias?: string }>;
 	resolvedPaths: Config['paths'];
 	items: (ItemRepository | ItemDistributed)[];
-}): Promise<{
-	neededDependencies: RemoteDependency[];
-	neededEnvVars: Record<string, string> | undefined;
-	neededFiles: UpdatedFile[];
-	updatedPaths: Config['paths'] | undefined;
-}> {
+}): Promise<
+	Result<
+		{
+			neededDependencies: {
+				dependencies: RemoteDependency[];
+				devDependencies: RemoteDependency[];
+			};
+			neededEnvVars: Record<string, string> | undefined;
+			neededFiles: UpdatedFile[];
+			updatedPaths: Config['paths'] | undefined;
+		},
+		InvalidDependencyError
+	>
+> {
 	const neededFiles: UpdatedFile[] = [];
 	const neededDependencies = new Set<RemoteDependency>();
+	const neededDevDependencies = new Set<RemoteDependency>();
 	let neededEnvVars: Record<string, string> | undefined;
 
 	for (const item of items) {
-		const itemPath = itemPaths[`${item.type}/${item.name}`]!;
+		const type = normalizeItemTypeForPath(item.type);
+		const itemPath = itemPaths[`${type}/${item.name}`]!;
 		for (const file of item.files) {
 			if (file.type === 'registry:example' && !options.withExamples) continue;
 			if (file.type === 'registry:doc' && !options.withDocs) continue;
 			if (file.type === 'registry:test' && !options.withTests) continue;
 
 			const filePath = getTargetPath(file, { itemPath, options });
-			file.contents = await transformRemoteContent(file, {
+			file.content = await transformRemoteContent(file, {
 				item,
 				languages: configResult?.config.languages ?? DEFAULT_LANGS,
 				options,
@@ -696,15 +717,15 @@ export async function prepareUpdates({
 			if (fs.existsSync(filePath)) {
 				const originalContents = fs.readFileSync(filePath, 'utf-8');
 
-				if (originalContents === file.contents) {
+				if (originalContents === file.content) {
 					continue;
 				}
 
 				neededFiles.push({
 					type: 'update',
-					oldContents: originalContents,
+					oldContent: originalContents,
 					filePath,
-					contents: file.contents,
+					content: file.content,
 					itemName: item.name,
 					registryUrl: item.registry.url,
 				});
@@ -712,15 +733,56 @@ export async function prepareUpdates({
 				neededFiles.push({
 					type: 'create',
 					filePath,
-					contents: file.contents,
+					content: file.content,
 					itemName: item.name,
 					registryUrl: item.registry.url,
 				});
 			}
 		}
-		// add any remote dependencies
-		for (const remoteDependency of item.remoteDependencies ?? []) {
-			neededDependencies.add(remoteDependency);
+		// add any dependencies
+		for (const remoteDependency of item.dependencies ?? []) {
+			if (typeof remoteDependency === 'string') {
+				const parsedResult = parsePackageName(remoteDependency);
+				if (parsedResult.isErr())
+					return err(
+						new InvalidDependencyError({
+							dependency: remoteDependency,
+							registryName: item.registry.url,
+							itemName: item.name,
+						})
+					);
+				const parsed = parsedResult.value;
+				// assume js ecosystem for string deps
+				neededDependencies.add({
+					ecosystem: 'js',
+					name: parsed.name,
+					version: parsed.version,
+				});
+			} else {
+				neededDependencies.add(remoteDependency);
+			}
+		}
+		for (const remoteDevDependency of item.devDependencies ?? []) {
+			if (typeof remoteDevDependency === 'string') {
+				const parsedResult = parsePackageName(remoteDevDependency);
+				if (parsedResult.isErr())
+					return err(
+						new InvalidDependencyError({
+							dependency: remoteDevDependency,
+							registryName: item.registry.url,
+							itemName: item.name,
+						})
+					);
+				const parsed = parsedResult.value;
+				// assume js ecosystem for string deps
+				neededDevDependencies.add({
+					ecosystem: 'js',
+					name: parsed.name,
+					version: parsed.version,
+				});
+			} else {
+				neededDevDependencies.add(remoteDevDependency);
+			}
 		}
 		// add any env vars
 		for (const [name, value] of Object.entries(item.envVars ?? {})) {
@@ -741,12 +803,15 @@ export async function prepareUpdates({
 		updatedPaths = undefined;
 	}
 
-	return {
-		neededDependencies: Array.from(neededDependencies),
+	return ok({
+		neededDependencies: {
+			dependencies: Array.from(neededDependencies),
+			devDependencies: Array.from(neededDevDependencies),
+		},
 		neededEnvVars,
 		neededFiles,
 		updatedPaths,
-	};
+	});
 }
 
 export async function updateFiles({
@@ -765,10 +830,10 @@ export async function updateFiles({
 	for (const file of files) {
 		if (file.type === 'create' || options.overwrite) {
 			fs.mkdirSync(path.dirname(file.filePath), { recursive: true });
-			fs.writeFileSync(file.filePath, file.contents);
+			fs.writeFileSync(file.filePath, file.content);
 			updatedFiles.push(path.relative(options.cwd, file.filePath));
 		} else {
-			const changes = diffLines(file.oldContents, file.contents);
+			const changes = diffLines(file.oldContent, file.content);
 			const relativePath = path.relative(options.cwd, file.filePath);
 			const formattedDiff = formatDiff({
 				from: `${file.registryUrl}/${file.itemName}`,
@@ -808,7 +873,7 @@ export async function updateFiles({
 
 			if (confirmResult === 'no') continue;
 
-			fs.writeFileSync(file.filePath, file.contents);
+			fs.writeFileSync(file.filePath, file.content);
 			updatedFiles.push(path.relative(options.cwd, file.filePath));
 		}
 	}
@@ -832,18 +897,18 @@ export function getItemPaths(
 > {
 	return items.reduce(
 		(acc, item) => {
-			const path = resolvedPaths[`${item.type}/${item.name}`] ?? resolvedPaths[item.type]!;
+			const type = normalizeItemTypeForPath(item.type);
+			const path = resolvedPaths[`${type}/${item.name}`] ?? resolvedPaths[type]!;
 			// we know that if the resolved path is not the same that the user is using an alias
 			const alias =
-				(config?.paths[`${item.type}/${item.name}`] &&
-				config?.paths[`${item.type}/${item.name}`] !==
-					resolvedPaths[`${item.type}/${item.name}`]
-					? config.paths[`${item.type}/${item.name}`]
+				(config?.paths[`${type}/${item.name}`] &&
+				config?.paths[`${type}/${item.name}`] !== resolvedPaths[`${type}/${item.name}`]
+					? config.paths[`${type}/${item.name}`]
 					: undefined) ??
-				(config?.paths[item.type] && config?.paths[item.type] !== resolvedPaths[item.type]
-					? config.paths[item.type]
+				(config?.paths[type] && config?.paths[type] !== resolvedPaths[type]
+					? config.paths[type]
 					: undefined);
-			acc[`${item.type}/${item.name}`] = {
+			acc[`${type}/${item.name}`] = {
 				path,
 				alias,
 			};
@@ -857,4 +922,14 @@ export function getItemPaths(
 			}
 		>
 	);
+}
+
+/**
+ * Normalizes the item type for the path. We strip the `registry:` prefix if it exists.
+ * @param type
+ * @returns
+ */
+export function normalizeItemTypeForPath(type: RegistryItemType) {
+	if (type.startsWith('registry:')) return type.slice('registry:'.length);
+	return type;
 }

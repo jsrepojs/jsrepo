@@ -37,7 +37,9 @@ export type CLIError =
 	| ZodError
 	| InvalidJSONError
 	| NoProviderFoundError
-	| MissingPeerDependencyError;
+	| MissingPeerDependencyError
+	| InvalidRegistryNameError
+	| InvalidRegistryVersionError;
 
 export class JsrepoError extends Error {
 	private readonly suggestion: string;
@@ -299,6 +301,19 @@ export class InvalidRegistryDependencyError extends BuildError {
 	}
 }
 
+export class InvalidDependencyError extends BuildError {
+	constructor({
+		dependency,
+		registryName,
+		itemName,
+	}: { dependency: string; registryName: string; itemName: string }) {
+		super(`Invalid dependency: ${pc.bold(dependency)} for ${pc.bold(itemName)}.`, {
+			registryName,
+			suggestion: 'Please ensure the dependency is a valid npm package name.',
+		});
+	}
+}
+
 export class DuplicateFileReferenceError extends BuildError {
 	constructor({
 		path,
@@ -411,6 +426,7 @@ export class CouldNotFindJsrepoImportError extends JsrepoError {
 export class ZodError extends JsrepoError {
 	readonly zodError: z.ZodError;
 	constructor(error: z.ZodError) {
+		console.log(error.issues);
 		super(`Zod error: ${error.message}`, {
 			suggestion: 'Check the input schema and try again.',
 		});
@@ -454,5 +470,33 @@ export class MissingPeerDependencyError extends JsrepoError {
 		super(`${pc.bold(packageName)} is required for ${feature} to work.`, {
 			suggestion: `Please install it.`,
 		});
+	}
+}
+
+export class InvalidRegistryNameError extends JsrepoError {
+	constructor(registryName: string) {
+		super(
+			`Invalid registry name: ${pc.bold(registryName)} is not a valid name. The name should be provided as ${pc.bold(`\`@<scope>/<registry>\``)}.`,
+			{
+				suggestion: 'Please check the registry name and try again.',
+			}
+		);
+	}
+}
+
+export class InvalidRegistryVersionError extends JsrepoError {
+	constructor(registryVersion: string | undefined, registryName: string) {
+		if (registryVersion === undefined) {
+			super(`No version was provided for ${pc.bold(registryName)}.`, {
+				suggestion: `Please provide a version using the ${pc.bold(`\`version\``)} key.`,
+			});
+		} else {
+			super(
+				`Invalid version for ${pc.bold(registryName)}: ${pc.bold(registryVersion)} is not a valid version. The version should be provided as ${pc.bold(`\`<major>.<minor>.<patch>\``)}.`,
+				{
+					suggestion: 'Please check the registry version and try again.',
+				}
+			);
+		}
 	}
 }

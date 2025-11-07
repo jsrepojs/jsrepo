@@ -1,10 +1,18 @@
 import { CodeBlock, Pre } from "fumadocs-ui/components/codeblock";
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { TypeTable } from "fumadocs-ui/components/type-table";
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
 import * as UI from "@/components/ui";
 import * as Logos from "@/components/logos";
-import * as Icons from "lucide-react";
+import * as AllLucideIcons from "lucide-react";
+
+// Only import the <name>Icon icons to prevent conflicts
+const Icons = Object.fromEntries(
+  Object.entries(AllLucideIcons).filter(
+    ([key]) => key.endsWith("Icon")
+  )
+);
 
 // use this function to get MDX components, you will need it for rendering MDX
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
@@ -15,6 +23,8 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 				<Pre>{props.children}</Pre>
 			</CodeBlock>
 		),
+		Steps,
+		Step,
 		TypeTable,
 		...Logos,
 		...UI,

@@ -53,7 +53,8 @@ export function repository({ format }: RepositoryOutputOptions = {}): Output {
 					type: item.type,
 					add: item.add,
 					registryDependencies: item.registryDependencies,
-					remoteDependencies: item.remoteDependencies,
+					dependencies: item.dependencies,
+					devDependencies: item.devDependencies,
 					files: item.files.map((file) => ({
 						type: file.type,
 						path: file.path,
@@ -82,13 +83,16 @@ export const RepositoryOutputFileSchema = z.object({
 	path: z.string(),
 	type: z.string().optional(),
 	relativePath: z.string(),
-	_imports_: z.array(
-		z.object({
-			import: z.string(),
-			item: z.string(),
-			meta: z.record(z.string(), z.unknown()),
-		})
-	),
+	_imports_: z
+		.array(
+			z.object({
+				import: z.string(),
+				item: z.string(),
+				meta: z.record(z.string(), z.unknown()),
+			})
+		)
+		.optional()
+		.default([]),
 	target: z.string().optional(),
 });
 
@@ -99,16 +103,27 @@ export const RepositoryOutputManifestItemSchema = z.object({
 	description: z.string().optional(),
 	type: z.string(),
 	registryDependencies: z.array(z.string()).optional(),
-	add: z.enum(['on-init', 'when-needed', 'when-added']),
-	files: z.array(RepositoryOutputFileSchema),
-	remoteDependencies: z
+	add: z.enum(['on-init', 'when-needed', 'when-added']).optional(),
+	files: z.array(RepositoryOutputFileSchema).optional().default([]),
+	dependencies: z
 		.array(
 			z.object({
 				ecosystem: z.string(),
 				name: z.string(),
 				version: z.string().optional(),
-				dev: z.boolean().optional(),
 			})
+		)
+		.optional(),
+	devDependencies: z
+		.array(
+			z.union([
+				z.object({
+					ecosystem: z.string(),
+					name: z.string(),
+					version: z.string().optional(),
+				}),
+				z.string(),
+			])
 		)
 		.optional(),
 	envVars: z.record(z.string(), z.string()).optional(),

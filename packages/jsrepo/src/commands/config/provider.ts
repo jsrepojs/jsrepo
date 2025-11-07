@@ -83,7 +83,10 @@ export async function runProvider(
 
 	fs.writeFileSync(config.path, newCode);
 
-	await promptInstallDependencies(providers, { options, configPath: config.path });
+	await promptInstallDependencies(
+		{ devDependencies: providers, dependencies: [] },
+		{ options, configPath: config.path }
+	);
 
 	const end = performance.now();
 	const duration = end - start;

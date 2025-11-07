@@ -58,7 +58,7 @@ export function defineShadcnRegistry(registry: ShadcnRegistry): RegistryConfig {
 		items: registry.items.map((item) => {
 			return {
 				...item,
-				remoteDependencies: item.dependencies?.map((dependency) => {
+				dependencies: item.dependencies?.map((dependency) => {
 					const parsed = parsePackageName(dependency);
 					if (parsed === undefined) {
 						throw new JsrepoError(`Invalid package name: ${dependency}`, {

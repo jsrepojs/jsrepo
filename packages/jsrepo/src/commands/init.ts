@@ -15,6 +15,7 @@ import {
 import { DEFAULT_PROVIDERS } from '@/providers';
 import {
 	getPathsForItems,
+	normalizeItemTypeForPath,
 	prepareUpdates,
 	type ResolvedRegistry,
 	resolveAndFetchAllItems,
@@ -142,7 +143,10 @@ export async function runInit(
 		log.success(`Wrote config to ${pc.cyan(path.relative(options.cwd, configPath))}`);
 
 		if (!hasJsrepo) {
-			await promptInstallDependencies([], { configPath, options });
+			await promptInstallDependencies(
+				{ dependencies: [], devDependencies: [] },
+				{ configPath, options }
+			);
 		}
 		return ok();
 	}
@@ -196,7 +200,6 @@ export async function runInit(
 				? {
 						name: plugin.plugin.packageName,
 						version: plugin.plugin.version,
-						dev: true,
 						ecosystem: 'js',
 					}
 				: undefined
@@ -204,10 +207,13 @@ export async function runInit(
 	);
 
 	if (neededDeps.size > 0) {
-		await promptInstallDependencies(Array.from(neededDeps), {
-			options: { yes: true },
-			configPath,
-		});
+		await promptInstallDependencies(
+			{ dependencies: [], devDependencies: Array.from(neededDeps) },
+			{
+				options: { yes: true },
+				configPath,
+			}
+		);
 	}
 
 	neededDeps.clear();
@@ -223,6 +229,10 @@ export async function runInit(
 			.map((item) => ({ registry, item }))
 	);
 
+	const neededDependencies: {
+		dependencies: RemoteDependency[];
+		devDependencies: RemoteDependency[];
+	} = { dependencies: [], devDependencies: [] };
 	if (itemsToAdd.length > 0) {
 		spinner.start(
 			`Fetching ${pc.cyan(itemsToAdd.map((item) => item.item.name).join(', '))}...`
@@ -240,20 +250,26 @@ export async function runInit(
 		if (itemPathsResult.isErr()) return err(itemPathsResult.error);
 		const { itemPaths, resolvedPaths } = itemPathsResult.value;
 
-		const { neededDependencies, neededEnvVars, neededFiles, updatedPaths } =
-			await prepareUpdates({
-				configResult: { path: configPath, config },
-				options: {
-					cwd: options.cwd,
-					yes: options.yes,
-					withExamples: false,
-					withDocs: false,
-					withTests: false,
-				},
-				itemPaths,
-				resolvedPaths,
-				items,
-			});
+		const prepareUpdatesResult = await prepareUpdates({
+			configResult: { path: configPath, config },
+			options: {
+				cwd: options.cwd,
+				yes: options.yes,
+				withExamples: false,
+				withDocs: false,
+				withTests: false,
+			},
+			itemPaths,
+			resolvedPaths,
+			items,
+		});
+		if (prepareUpdatesResult.isErr()) return err(prepareUpdatesResult.error);
+		const {
+			neededDependencies: neededDeps,
+			neededEnvVars,
+			neededFiles,
+			updatedPaths,
+		} = prepareUpdatesResult.value;
 
 		const updatedFiles = await updateFiles({ files: neededFiles, options });
 
@@ -270,7 +286,8 @@ export async function runInit(
 		}
 
 		if (updatedPaths) config.paths = updatedPaths;
-		neededDependencies.map((dep) => neededDeps.add(dep));
+		neededDeps.dependencies.push(...neededDependencies.dependencies);
+		neededDeps.devDependencies.push(...neededDependencies.devDependencies);
 	}
 
 	if (config.paths !== undefined) {
@@ -285,7 +302,7 @@ export async function runInit(
 		log.success(`Updated paths`);
 	}
 
-	await promptInstallDependenciesByEcosystem(Array.from(neededDeps), { options, config });
+	await promptInstallDependenciesByEcosystem(neededDependencies, { options, config });
 
 	return ok();
 }
@@ -382,7 +399,9 @@ async function initDefaultPaths(
 		options: InitOptions;
 	}
 ) {
-	const types = Array.from(new Set(registry.manifest.items.map((item) => item.type)));
+	const types = Array.from(
+		new Set(registry.manifest.items.map((item) => normalizeItemTypeForPath(item.type)))
+	);
 
 	let paths = config?.paths ?? {};
 
@@ -405,16 +424,15 @@ async function initDefaultPaths(
 		}
 
 		if (configurePaths.length > 0) {
-			for (const category of configurePaths) {
-				const configuredValue =
-					paths[category] ?? registry.manifest.defaultPaths?.[category];
+			for (const type of configurePaths) {
+				const configuredValue = paths[type] ?? registry.manifest.defaultPaths?.[type];
 
 				const categoryPath = await text({
-					message: `Where should ${category} be added in your project?`,
+					message: `Where should ${type} be added in your project?`,
 					validate(value) {
 						if (!value || value.trim() === '') return 'Please provide a value';
 					},
-					placeholder: configuredValue ? configuredValue : `./src/${category}`,
+					placeholder: configuredValue ? configuredValue : `./src/${type}`,
 					defaultValue: configuredValue,
 					initialValue: configuredValue,
 				});
@@ -424,7 +442,7 @@ async function initDefaultPaths(
 					process.exit(0);
 				}
 
-				paths[category] = categoryPath;
+				paths[type] = categoryPath;
 			}
 		}
 	}
