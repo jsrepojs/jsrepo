@@ -48,7 +48,7 @@ export function output(options: OutputOptions): Output {
 						// validated above
 						type: getType(item.type) as Registry['items'][number]['type'],
 						envVars: item.envVars,
-						dependencies: item.remoteDependencies?.map(
+						dependencies: item.dependencies?.map(
 							(dependency) =>
 								`${dependency.name}${dependency.version ? `@${dependency.version}` : ''}`
 						),
@@ -93,7 +93,7 @@ export function output(options: OutputOptions): Output {
 					}),
 					envVars: item.envVars,
 					registryDependencies: item.registryDependencies,
-					dependencies: item.remoteDependencies?.map(
+					dependencies: item.dependencies?.map(
 						(dependency) =>
 							`${dependency.name}${dependency.version ? `@${dependency.version}` : ''}`
 					),

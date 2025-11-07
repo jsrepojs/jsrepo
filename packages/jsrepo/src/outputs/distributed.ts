@@ -59,7 +59,7 @@ export function distributed({ dir, format }: DistributedOutputOptions): Output {
 					type: item.type,
 					add: item.add,
 					registryDependencies: item.registryDependencies,
-					remoteDependencies: item.remoteDependencies,
+					dependencies: item.dependencies,
 					envVars: item.envVars,
 					files: item.files.map((file) => ({
 						type: file.type,
@@ -93,7 +93,7 @@ export function distributed({ dir, format }: DistributedOutputOptions): Output {
 						target: file.target,
 					})),
 					registryDependencies: item.registryDependencies,
-					remoteDependencies: item.remoteDependencies,
+					dependencies: item.dependencies,
 					envVars: item.envVars,
 				};
 				files.push({
@@ -140,23 +140,37 @@ export const DistributedOutputManifestItemSchema = z.object({
 	description: z.string().optional(),
 	type: z.string(),
 	registryDependencies: z.array(z.string()).optional(),
-	add: z.enum(['on-init', 'when-needed', 'when-added']),
-	remoteDependencies: z
+	add: z.enum(['on-init', 'when-needed', 'when-added']).optional(),
+	dependencies: z
 		.array(
-			z.object({
-				ecosystem: z.string(),
-				name: z.string(),
-				version: z.string().optional(),
-				dev: z.boolean().optional(),
-			})
+			z.union([
+				z.object({
+					ecosystem: z.string(),
+					name: z.string(),
+					version: z.string().optional(),
+				}),
+				z.string(),
+			])
+		)
+		.optional(),
+	devDependencies: z
+		.array(
+			z.union([
+				z.object({
+					ecosystem: z.string(),
+					name: z.string(),
+					version: z.string().optional(),
+				}),
+				z.string(),
+			])
 		)
 		.optional(),
 	envVars: z.record(z.string(), z.string()).optional(),
-	files: z.array(DistributedOutputManifestFileSchema),
+	files: z.array(DistributedOutputManifestFileSchema).optional().default([]),
 });
 
 export const DistributedOutputManifestSchema = RegistryMetaSchema.extend({
-	type: z.literal('distributed'),
+	type: z.literal('distributed').optional().default('distributed'),
 	plugins: RegistryPluginsSchema.optional(),
 	items: z.array(DistributedOutputManifestItemSchema),
 	defaultPaths: z.record(z.string(), z.string()).optional(),
@@ -183,19 +197,33 @@ export const DistributedOutputItemSchema = z.object({
 	description: z.string().optional(),
 	type: z.string(),
 	registryDependencies: z.array(z.string()).optional(),
-	add: z.enum(['on-init', 'when-needed', 'when-added']),
-	remoteDependencies: z
+	add: z.enum(['on-init', 'when-needed', 'when-added']).optional(),
+	dependencies: z
 		.array(
-			z.object({
-				ecosystem: z.string(),
-				name: z.string(),
-				version: z.string().optional(),
-				dev: z.boolean().optional(),
-			})
+			z.union([
+				z.object({
+					ecosystem: z.string(),
+					name: z.string(),
+					version: z.string().optional(),
+				}),
+				z.string(),
+			])
+		)
+		.optional(),
+	devDependencies: z
+		.array(
+			z.union([
+				z.object({
+					ecosystem: z.string(),
+					name: z.string(),
+					version: z.string().optional(),
+				}),
+				z.string(),
+			])
 		)
 		.optional(),
 	envVars: z.record(z.string(), z.string()).optional(),
-	files: z.array(DistributedOutputFileSchema),
+	files: z.array(DistributedOutputFileSchema).optional().default([]),
 });
 
 export type DistributedOutputItem = z.infer<typeof DistributedOutputItemSchema>;

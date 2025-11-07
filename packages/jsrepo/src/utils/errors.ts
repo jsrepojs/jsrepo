@@ -301,6 +301,19 @@ export class InvalidRegistryDependencyError extends BuildError {
 	}
 }
 
+export class InvalidDependencyError extends BuildError {
+	constructor({
+		dependency,
+		registryName,
+		itemName,
+	}: { dependency: string; registryName: string; itemName: string }) {
+		super(`Invalid dependency: ${pc.bold(dependency)} for ${pc.bold(itemName)}.`, {
+			registryName,
+			suggestion: 'Please ensure the dependency is a valid npm package name.',
+		});
+	}
+}
+
 export class DuplicateFileReferenceError extends BuildError {
 	constructor({
 		path,
@@ -413,6 +426,7 @@ export class CouldNotFindJsrepoImportError extends JsrepoError {
 export class ZodError extends JsrepoError {
 	readonly zodError: z.ZodError;
 	constructor(error: z.ZodError) {
+		console.log(error.issues);
 		super(`Zod error: ${error.message}`, {
 			suggestion: 'Check the input schema and try again.',
 		});

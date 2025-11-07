@@ -14,7 +14,6 @@ import type {
 	TransformImportsOptions,
 } from '@/langs/types';
 import type {
-	Dependency,
 	LocalDependency,
 	RemoteDependency,
 	ResolvedFile,
@@ -59,9 +58,13 @@ export type ImportTemplate = { filePathRelativeToItem: string };
 export async function resolveImports(
 	imports: string[],
 	opts: ResolveDependenciesOptions
-): Promise<Dependency[]> {
+): Promise<{
+	localDependencies: LocalDependency[];
+	dependencies: RemoteDependency[];
+	devDependencies: RemoteDependency[];
+}> {
 	const localDeps: LocalDependency[] = [];
-	const deps: RemoteDependency[] = [];
+	const remoteDeps: RemoteDependency[] = [];
 
 	for (const specifier of imports) {
 		// don't resolve node builtins or node: imports
@@ -106,7 +109,7 @@ export async function resolveImports(
 			if (validateNpmPackageName(depInfo.name).validForNewPackages) {
 				if (opts.excludeDeps.includes(depInfo.name)) continue;
 
-				deps.push({
+				remoteDeps.push({
 					ecosystem: 'js',
 					name: depInfo.name,
 					version: depInfo.version,
@@ -122,7 +125,13 @@ export async function resolveImports(
 		);
 	}
 
-	return [...localDeps, ...resolveRemoteDeps(deps, opts.fileName)];
+	const { dependencies, devDependencies } = resolveRemoteDeps(remoteDeps, opts.fileName);
+
+	return {
+		localDependencies: localDeps,
+		dependencies,
+		devDependencies,
+	};
 }
 
 function createImportTemplate(
@@ -274,10 +283,14 @@ function tryResolveLocalAlias(
  * @param filePath
  * @returns
  */
-function resolveRemoteDeps(deps: RemoteDependency[], filePath: string): Dependency[] {
-	if (deps.length === 0) return [];
+function resolveRemoteDeps(
+	deps: RemoteDependency[],
+	filePath: string
+): { dependencies: RemoteDependency[]; devDependencies: RemoteDependency[] } {
+	if (deps.length === 0) return { dependencies: [], devDependencies: [] };
 
-	const resolvedDeps: RemoteDependency[] = [];
+	const dependencies: RemoteDependency[] = [];
+	const devDependencies: RemoteDependency[] = [];
 
 	const packageResult = findNearestPackageJson(path.dirname(filePath));
 
@@ -286,7 +299,7 @@ function resolveRemoteDeps(deps: RemoteDependency[], filePath: string): Dependen
 			packageResult.package;
 
 		for (const dep of deps) {
-			const resolved = resolvedDeps.filter((d) => d.name === dep.name);
+			const resolved = dependencies.filter((d) => d.name === dep.name);
 			if (resolved.length > 0) {
 				if (dep.version === undefined) continue;
 
@@ -298,7 +311,7 @@ function resolveRemoteDeps(deps: RemoteDependency[], filePath: string): Dependen
 			if (packageDependencies !== undefined) {
 				version = packageDependencies[dep.name];
 				if (version !== undefined) {
-					resolvedDeps.push({ ...dep, version });
+					dependencies.push({ ...dep, version });
 					continue;
 				}
 			}
@@ -306,15 +319,16 @@ function resolveRemoteDeps(deps: RemoteDependency[], filePath: string): Dependen
 			if (packageDevDependencies !== undefined) {
 				version = packageDevDependencies[dep.name];
 				if (version !== undefined) {
-					resolvedDeps.push({ ...dep, version, dev: true });
+					devDependencies.push({ ...dep, version });
+					continue;
 				}
 			}
 
-			resolvedDeps.push({ ...dep });
+			dependencies.push({ ...dep });
 		}
 	}
 
-	return resolvedDeps;
+	return { dependencies, devDependencies };
 }
 
 export async function transformImports(
@@ -377,7 +391,7 @@ function createReplacement(replacement: string): string {
 }
 
 export async function installDependencies(
-	dependencies: RemoteDependency[],
+	dependencies: { dependencies: RemoteDependency[]; devDependencies: RemoteDependency[] },
 	{ cwd }: InstallDependenciesOptions
 ): Promise<void> {
 	const packageResult = findNearestPackageJson(cwd);
@@ -385,7 +399,7 @@ export async function installDependencies(
 	const pm = (await detect({ cwd }))?.agent ?? 'npm';
 
 	// this is only if no dependencies were provided
-	if (dependencies.length === 0) {
+	if (dependencies.dependencies.length === 0 && dependencies.devDependencies.length === 0) {
 		const installCmd = resolveCommand(pm, 'install', []);
 
 		if (installCmd === null) return;
@@ -403,23 +417,25 @@ export async function installDependencies(
 		return;
 	}
 
-	const deps = shouldInstall(dependencies, { pkg: packageResult.package });
+	const { dependencies: deps, devDependencies: devDeps } = shouldInstall(dependencies, {
+		pkg: packageResult.package,
+	});
 
-	if (deps.length === 0) return;
+	if (deps.length === 0 && devDeps.length === 0) return;
 
 	const add = resolveCommand(pm, 'add', [
-		...deps.filter((d) => !d.dev).map((d) => `${d.name}${d.version ? `@${d.version}` : ''}`),
+		...deps.map((d) => `${d.name}${d.version ? `@${d.version}` : ''}`),
 	]);
 	const addDev = resolveCommand(pm, 'add', [
 		'-D',
-		...deps.filter((d) => d.dev).map((d) => `${d.name}${d.version ? `@${d.version}` : ''}`),
+		...devDeps.map((d) => `${d.name}${d.version ? `@${d.version}` : ''}`),
 	]);
 
 	await runCommands({
 		title: `Installing dependencies with ${pm}...`,
 		commands: [
-			...(add && deps.some((d) => !d.dev) ? [add] : []),
-			...(addDev && deps.some((d) => d.dev) ? [addDev] : []),
+			...(add && deps.length > 0 ? [add] : []),
+			...(addDev && devDeps.length > 0 ? [addDev] : []),
 		],
 		cwd,
 		messages: {

@@ -50,7 +50,11 @@ export function vue(_options: VueOptions = {}): Language {
 					);
 				})
 			);
-			return imports.flat();
+			return {
+				localDependencies: imports.flatMap((imp) => imp.localDependencies),
+				dependencies: imports.flatMap((imp) => imp.dependencies),
+				devDependencies: imports.flatMap((imp) => imp.devDependencies),
+			};
 		},
 		transformImports: async (imports, opts) => transformImports(imports, opts),
 		canInstallDependencies: (ecosystem) => ecosystem === 'js',

@@ -20,6 +20,7 @@ import { formatDiff } from '@/utils/diff';
 import type { PathsMatcher } from '@/utils/tsconfig';
 import { safeParseFromJSON } from '@/utils/zod';
 import {
+	InvalidDependencyError,
 	type InvalidJSONError,
 	InvalidRegistryError,
 	type ManifestFetchError,
@@ -32,6 +33,7 @@ import {
 	RegistryNotProvidedError,
 	type ZodError,
 } from './errors';
+import { parsePackageName } from './parse-package-name';
 import { VERTICAL_LINE } from './prompts';
 import { TokenManager } from './token-manager';
 
@@ -135,10 +137,10 @@ export type ResolvedWantedItem = {
 	item: {
 		name: string;
 		description?: string;
-		add: 'on-init' | 'when-needed' | 'when-added';
+		add?: 'on-init' | 'when-needed' | 'when-added';
 		type: RegistryItemType;
 		registryDependencies?: string[];
-		remoteDependencies?: RemoteDependency[];
+		dependencies?: (RemoteDependency | string)[];
 		files: Array<RepositoryOutputFile | DistributedOutputManifestFile>;
 	};
 };
@@ -172,7 +174,7 @@ export async function resolveWantedItems(
 					new RegistryItemNotFoundError(wantedItem.itemName, resolvedRegistry.url)
 				);
 			}
-			resolvedItem = item;
+			resolvedItem = { ...item, add: item.add ?? 'when-added' };
 		} else {
 			const blockMatches = new Map<
 				string,
@@ -180,7 +182,11 @@ export async function resolveWantedItems(
 			>();
 			for (const [url, registry] of resolvedRegistries.entries()) {
 				const item = registry.manifest.items.find((i) => i.name === wantedItem.itemName);
-				if (item) blockMatches.set(url, { registry, item });
+				if (item)
+					blockMatches.set(url, {
+						registry,
+						item,
+					});
 			}
 
 			if (blockMatches.size === 0) {
@@ -230,9 +236,9 @@ export async function resolveWantedItems(
 export type ResolvedItem = {
 	name: string;
 	description?: string;
-	add: 'on-init' | 'when-needed' | 'when-added';
+	add?: 'on-init' | 'when-needed' | 'when-added';
 	type: RegistryItemType;
-	remoteDependencies?: RemoteDependency[];
+	dependencies?: (RemoteDependency | string)[];
 	registry: ResolvedRegistry;
 	files: Array<RepositoryOutputFile | DistributedOutputManifestFile>;
 };
@@ -240,9 +246,10 @@ export type ResolvedItem = {
 export type ItemRepository = {
 	name: string;
 	type: RegistryItemType;
-	add: 'on-init' | 'when-needed' | 'when-added';
+	add?: 'on-init' | 'when-needed' | 'when-added';
 	description?: string;
-	remoteDependencies?: RemoteDependency[];
+	dependencies?: (RemoteDependency | string)[];
+	devDependencies?: (RemoteDependency | string)[];
 	registry: ResolvedRegistry;
 	files: Array<RepositoryOutputFile & { contents: string }>;
 	envVars?: Record<string, string>;
@@ -274,7 +281,10 @@ export function resolveTree(
 				return err(
 					new RegistryItemNotFoundError(registryDependency, wantedItem.registry.url)
 				);
-			needsResolving.push({ registry: wantedItem.registry, item });
+			needsResolving.push({
+				registry: wantedItem.registry,
+				item,
+			});
 		}
 
 		const resolvedRegistryDependencies = resolveTree(needsResolving, { resolvedItems });
@@ -287,7 +297,7 @@ export function resolveTree(
 			name: wantedItem.item.name,
 			type: wantedItem.item.type,
 			add: wantedItem.item.add,
-			remoteDependencies: wantedItem.item.remoteDependencies,
+			dependencies: wantedItem.item.dependencies,
 			registry: wantedItem.registry,
 			files: wantedItem.item.files,
 		});
@@ -366,7 +376,7 @@ async function fetchItemRepositoryMode(
 		type: item.type,
 		add: item.add,
 		description: item.description,
-		remoteDependencies: item.remoteDependencies,
+		dependencies: item.dependencies,
 		registry: item.registry,
 		files: filesResult,
 	});
@@ -665,14 +675,23 @@ export async function prepareUpdates({
 	itemPaths: Record<string, { path: string; alias?: string }>;
 	resolvedPaths: Config['paths'];
 	items: (ItemRepository | ItemDistributed)[];
-}): Promise<{
-	neededDependencies: RemoteDependency[];
-	neededEnvVars: Record<string, string> | undefined;
-	neededFiles: UpdatedFile[];
-	updatedPaths: Config['paths'] | undefined;
-}> {
+}): Promise<
+	Result<
+		{
+			neededDependencies: {
+				dependencies: RemoteDependency[];
+				devDependencies: RemoteDependency[];
+			};
+			neededEnvVars: Record<string, string> | undefined;
+			neededFiles: UpdatedFile[];
+			updatedPaths: Config['paths'] | undefined;
+		},
+		InvalidDependencyError
+	>
+> {
 	const neededFiles: UpdatedFile[] = [];
 	const neededDependencies = new Set<RemoteDependency>();
+	const neededDevDependencies = new Set<RemoteDependency>();
 	let neededEnvVars: Record<string, string> | undefined;
 
 	for (const item of items) {
@@ -718,9 +737,50 @@ export async function prepareUpdates({
 				});
 			}
 		}
-		// add any remote dependencies
-		for (const remoteDependency of item.remoteDependencies ?? []) {
-			neededDependencies.add(remoteDependency);
+		// add any dependencies
+		for (const remoteDependency of item.dependencies ?? []) {
+			if (typeof remoteDependency === 'string') {
+				const parsedResult = parsePackageName(remoteDependency);
+				if (parsedResult.isErr())
+					return err(
+						new InvalidDependencyError({
+							dependency: remoteDependency,
+							registryName: item.registry.url,
+							itemName: item.name,
+						})
+					);
+				const parsed = parsedResult.value;
+				// assume js ecosystem for string deps
+				neededDependencies.add({
+					ecosystem: 'js',
+					name: parsed.name,
+					version: parsed.version,
+				});
+			} else {
+				neededDependencies.add(remoteDependency);
+			}
+		}
+		for (const remoteDevDependency of item.devDependencies ?? []) {
+			if (typeof remoteDevDependency === 'string') {
+				const parsedResult = parsePackageName(remoteDevDependency);
+				if (parsedResult.isErr())
+					return err(
+						new InvalidDependencyError({
+							dependency: remoteDevDependency,
+							registryName: item.registry.url,
+							itemName: item.name,
+						})
+					);
+				const parsed = parsedResult.value;
+				// assume js ecosystem for string deps
+				neededDevDependencies.add({
+					ecosystem: 'js',
+					name: parsed.name,
+					version: parsed.version,
+				});
+			} else {
+				neededDevDependencies.add(remoteDevDependency);
+			}
 		}
 		// add any env vars
 		for (const [name, value] of Object.entries(item.envVars ?? {})) {
@@ -741,12 +801,15 @@ export async function prepareUpdates({
 		updatedPaths = undefined;
 	}
 
-	return {
-		neededDependencies: Array.from(neededDependencies),
+	return ok({
+		neededDependencies: {
+			dependencies: Array.from(neededDependencies),
+			devDependencies: Array.from(neededDevDependencies),
+		},
 		neededEnvVars,
 		neededFiles,
 		updatedPaths,
-	};
+	});
 }
 
 export async function updateFiles({

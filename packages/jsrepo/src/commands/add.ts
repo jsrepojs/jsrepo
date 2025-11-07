@@ -163,7 +163,7 @@ export async function runAdd(
 				userSelections = await groupMultiselect({
 					message: 'Which items would you like to add?',
 					options: possibleItems
-						.filter((item) => item.item.add === 'when-added')
+						.filter((item) => (item.item.add ?? 'when-added') === 'when-added')
 						.reduce(
 							(acc, item) => {
 								if (!acc[item.registry.url]) {
@@ -191,7 +191,7 @@ export async function runAdd(
 				userSelections = await multiselect({
 					message: 'Which items would you like to add?',
 					options: possibleItems
-						.filter((item) => item.item.add === 'when-added')
+						.filter((item) => (item.item.add ?? 'when-added') === 'when-added')
 						.map((item) => ({
 							label:
 								resolvedRegistries.size > 1
@@ -270,13 +270,16 @@ export async function runAdd(
 	if (itemPathsResult.isErr()) return err(itemPathsResult.error);
 	const { itemPaths, resolvedPaths } = itemPathsResult.value;
 
-	const { neededDependencies, neededEnvVars, neededFiles, updatedPaths } = await prepareUpdates({
+	const prepareUpdatesResult = await prepareUpdates({
 		configResult,
 		options,
 		itemPaths,
 		resolvedPaths,
 		items,
 	});
+	if (prepareUpdatesResult.isErr()) return err(prepareUpdatesResult.error);
+	const { neededDependencies, neededEnvVars, neededFiles, updatedPaths } =
+		prepareUpdatesResult.value;
 
 	const updatedFiles = await updateFiles({ files: neededFiles, options });
 

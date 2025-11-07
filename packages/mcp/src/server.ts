@@ -139,19 +139,26 @@ server.tool(
 			}
 		);
 
-		const { neededDependencies, neededEnvVars, neededFiles } = await prepareUpdates({
-			configResult,
-			options: {
-				cwd: options.cwd,
-				yes: true,
-				withExamples: options.withExamples ?? false,
-				withDocs: options.withDocs ?? false,
-				withTests: options.withTests ?? false,
-			},
-			itemPaths,
-			resolvedPaths,
-			items,
-		});
+		const { neededDependencies, neededEnvVars, neededFiles } = (
+			await prepareUpdates({
+				configResult,
+				options: {
+					cwd: options.cwd,
+					yes: true,
+					withExamples: options.withExamples ?? false,
+					withDocs: options.withDocs ?? false,
+					withTests: options.withTests ?? false,
+				},
+				itemPaths,
+				resolvedPaths,
+				items,
+			})
+		).match(
+			(value) => value,
+			(error) => {
+				throw error;
+			}
+		);
 
 		await updateFiles({
 			files: neededFiles,
@@ -272,7 +279,7 @@ server.tool(
 						.join('\n')}
 
 					## Dependencies
-					${itemResult.remoteDependencies?.map((dependency) => `- ${dependency.name}`).join('\n')}
+					${itemResult.dependencies?.map((dependency) => `- ${typeof dependency === 'string' ? dependency : dependency.name}`).join('\n')}
 
 					## Examples
 					${itemResult.files

@@ -145,7 +145,11 @@ export type RegistryItem = {
 	 * ```
 	 */
 	registryDependencies?: string[];
-	remoteDependencies?: RemoteDependency[];
+	/**
+	 * Provide a list of dependencies to be installed with the item. If dependencies are provided as a string they will be assumed to be a js dependency.
+	 */
+	dependencies?: (RemoteDependency | string)[];
+	devDependencies?: (RemoteDependency | string)[];
 	/**
 	 * Controls when the item will be added to the project.
 	 *

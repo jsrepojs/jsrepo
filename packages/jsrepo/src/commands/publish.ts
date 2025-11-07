@@ -354,7 +354,8 @@ function collectRegistryFiles(buildResult: BuildResult, cwd: string) {
 			type: item.type,
 			add: item.add,
 			registryDependencies: item.registryDependencies,
-			remoteDependencies: item.remoteDependencies,
+			dependencies: item.dependencies,
+			devDependencies: item.devDependencies,
 			envVars: item.envVars,
 			files: item.files.map((file) => ({
 				type: file.type,
@@ -382,7 +383,8 @@ function collectRegistryFiles(buildResult: BuildResult, cwd: string) {
 				target: file.target,
 			})),
 			registryDependencies: item.registryDependencies,
-			remoteDependencies: item.remoteDependencies,
+			dependencies: item.dependencies,
+			devDependencies: item.devDependencies,
 			envVars: item.envVars,
 		};
 		files.push({

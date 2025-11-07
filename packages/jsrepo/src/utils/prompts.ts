@@ -99,7 +99,10 @@ function spinner({
 export { outro } from '@clack/prompts';
 
 export async function promptInstallDependencies(
-	dependencies: Omit<RemoteDependency, 'ecosystem'>[],
+	dependencies: {
+		dependencies: Omit<RemoteDependency, 'ecosystem'>[];
+		devDependencies: Omit<RemoteDependency, 'ecosystem'>[];
+	},
 	{ options, configPath }: { options: { yes: boolean }; configPath: string }
 ) {
 	let install = options.yes;
@@ -119,12 +122,16 @@ export async function promptInstallDependencies(
 
 	if (install) {
 		await installDependencies(
-			dependencies.map((dependency) => ({
-				name: dependency.name,
-				version: dependency.version,
-				dev: dependency.dev,
-				ecosystem: 'js',
-			})),
+			{
+				dependencies: dependencies.dependencies.map((dependency) => ({
+					...dependency,
+					ecosystem: 'js',
+				})),
+				devDependencies: dependencies.devDependencies.map((dependency) => ({
+					...dependency,
+					ecosystem: 'js',
+				})),
+			},
 			{
 				cwd: path.dirname(configPath),
 			}
@@ -183,25 +190,47 @@ export async function promptAddEnvVars(
 }
 
 export async function promptInstallDependenciesByEcosystem(
-	neededDependencies: RemoteDependency[],
+	neededDependencies: { dependencies: RemoteDependency[]; devDependencies: RemoteDependency[] },
 	{ options, config }: { options: { cwd: string; yes: boolean }; config: Config | undefined }
 ): Promise<RemoteDependency[]> {
 	// we can fast path the js dependencies since we support js out of the box
 	const deps = shouldInstall(
-		neededDependencies.filter((dep) => dep.ecosystem === 'js'),
+		{
+			dependencies: neededDependencies.dependencies.filter((dep) => dep.ecosystem === 'js'),
+			devDependencies: neededDependencies.devDependencies.filter(
+				(dep) => dep.ecosystem === 'js'
+			),
+		},
 		{ pkg: findNearestPackageJson(options.cwd)?.package ?? {} }
 	);
-	const dependenciesByEcosystem = deps.reduce(
-		(acc, dep) => {
-			if (!acc[dep.ecosystem]) {
-				acc[dep.ecosystem] = [dep];
-			} else {
-				acc[dep.ecosystem]?.push(dep);
-			}
-			return acc;
-		},
-		{} as Record<string, RemoteDependency[]>
-	);
+	const dependenciesByEcosystem = new Map<
+		string,
+		{ dependencies: RemoteDependency[]; devDependencies: RemoteDependency[] }
+	>();
+	for (const dep of deps.dependencies) {
+		const ecosystem = dependenciesByEcosystem.get(dep.ecosystem);
+		if (ecosystem) {
+			ecosystem.dependencies.push(dep);
+			dependenciesByEcosystem.set(dep.ecosystem, ecosystem);
+		} else {
+			dependenciesByEcosystem.set(dep.ecosystem, {
+				dependencies: [dep],
+				devDependencies: [],
+			});
+		}
+	}
+	for (const dep of deps.devDependencies) {
+		const ecosystem = dependenciesByEcosystem.get(dep.ecosystem);
+		if (ecosystem) {
+			ecosystem.devDependencies.push(dep);
+			dependenciesByEcosystem.set(dep.ecosystem, ecosystem);
+		} else {
+			dependenciesByEcosystem.set(dep.ecosystem, {
+				dependencies: [],
+				devDependencies: [dep],
+			});
+		}
+	}
 
 	const languages = config?.languages ?? DEFAULT_LANGS;
 
@@ -223,10 +252,10 @@ export async function promptInstallDependenciesByEcosystem(
 	}
 
 	if (install) {
-		for (const ecosystem in dependenciesByEcosystem) {
+		for (const [ecosystem, dependencies] of dependenciesByEcosystem) {
 			await languages
 				.find((lang) => lang.canInstallDependencies(ecosystem))
-				?.installDependencies(dependenciesByEcosystem[ecosystem]!, {
+				?.installDependencies(dependencies, {
 					cwd: options.cwd,
 				});
 		}
