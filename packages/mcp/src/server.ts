@@ -180,7 +180,7 @@ server.tool(
 					description: item.description,
 					type: item.type,
 					files: item.files?.map((file) => ({
-						code: file.contents,
+						code: file.content,
 						path: file.path,
 					})),
 				})),
@@ -275,7 +275,7 @@ server.tool(
 									file.type
 								)
 						)
-						.map((file) => `\`\`\`${file.path}\n${file.contents}\n\`\`\``)
+						.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
 						.join('\n')}
 
 					## Dependencies
@@ -284,19 +284,19 @@ server.tool(
 					## Examples
 					${itemResult.files
 						?.filter((file) => file.type === 'registry:example')
-						.map((file) => `\`\`\`${file.path}\n${file.contents}\n\`\`\``)
+						.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
 						.join('\n')}
 
 					## Docs
 					${itemResult.files
 						?.filter((file) => file.type === 'registry:doc')
-						.map((file) => `\`\`\`${file.path}\n${file.contents}\n\`\`\``)
+						.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
 						.join('\n')}
 
 					## Tests
 					${itemResult.files
 						?.filter((file) => file.type === 'registry:test')
-						.map((file) => `\`\`\`${file.path}\n${file.contents}\n\`\`\``)
+						.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
 						.join('\n')}
 
 					## Environment Variables
