@@ -39,7 +39,7 @@ export type DistributedOutputOptions = {
 export function distributed({ dir, format }: DistributedOutputOptions): Output {
 	return {
 		output: async (buildResult, { cwd }) => {
-			const files: { path: string; contents: string }[] = [];
+			const files: { path: string; content: string }[] = [];
 			const manifest: DistributedOutputManifest = {
 				name: buildResult.name,
 				authors: buildResult.authors,
@@ -73,7 +73,7 @@ export function distributed({ dir, format }: DistributedOutputOptions): Output {
 			};
 			files.push({
 				path: path.join(cwd, dir, MANIFEST_FILE),
-				contents: stringify(manifest, { format }),
+				content: stringify(manifest, { format }),
 			});
 
 			for (const item of buildResult.items) {
@@ -84,7 +84,7 @@ export function distributed({ dir, format }: DistributedOutputOptions): Output {
 					add: item.add,
 					files: item.files.map((file) => ({
 						type: file.type,
-						contents: file.contents,
+						content: file.content,
 						path: path.relative(
 							path.join(cwd, item.basePath),
 							path.join(cwd, file.path)
@@ -98,7 +98,7 @@ export function distributed({ dir, format }: DistributedOutputOptions): Output {
 				};
 				files.push({
 					path: path.join(cwd, dir, `${item.name}.json`),
-					contents: stringify(outputItem, { format }),
+					content: stringify(outputItem, { format }),
 				});
 			}
 
@@ -106,7 +106,7 @@ export function distributed({ dir, format }: DistributedOutputOptions): Output {
 				if (!fs.existsSync(path.dirname(file.path))) {
 					fs.mkdirSync(path.dirname(file.path), { recursive: true });
 				}
-				fs.writeFileSync(file.path, file.contents);
+				fs.writeFileSync(file.path, file.content);
 			}
 		},
 		clean: async ({ cwd }) => {
@@ -180,15 +180,18 @@ export type DistributedOutputManifest = z.infer<typeof DistributedOutputManifest
 
 export const DistributedOutputFileSchema = z.object({
 	path: z.string(),
-	contents: z.string(),
+	content: z.string(),
 	type: z.string().optional(),
-	_imports_: z.array(
-		z.object({
-			import: z.string(),
-			item: z.string(),
-			meta: z.record(z.string(), z.unknown()),
-		})
-	),
+	_imports_: z
+		.array(
+			z.object({
+				import: z.string(),
+				item: z.string(),
+				meta: z.record(z.string(), z.unknown()),
+			})
+		)
+		.optional()
+		.default([]),
 	target: z.string().optional(),
 });
 

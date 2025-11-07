@@ -251,7 +251,7 @@ export type ItemRepository = {
 	dependencies?: (RemoteDependency | string)[];
 	devDependencies?: (RemoteDependency | string)[];
 	registry: ResolvedRegistry;
-	files: Array<RepositoryOutputFile & { contents: string }>;
+	files: Array<RepositoryOutputFile & { content: string }>;
 	envVars?: Record<string, string>;
 };
 
@@ -360,7 +360,7 @@ async function fetchItemRepositoryMode(
 			if (result.isErr()) return err(result.error);
 			return ok({
 				...file,
-				contents: result.value,
+				content: result.value,
 			});
 		})
 	);
@@ -524,19 +524,19 @@ export async function transformRemoteContent(
 		},
 	});
 	for (const transformation of transformations ?? []) {
-		file.contents = file.contents.replace(transformation.pattern, transformation.replacement);
+		file.content = file.content.replace(transformation.pattern, transformation.replacement);
 	}
 	for (const transform of config?.transforms ?? []) {
-		const result = await transform.transform(file.contents, {
+		const result = await transform.transform(file.content, {
 			cwd: options.cwd,
 			fileName: filePath,
 			registryUrl: item.registry.url,
 			item: item,
 		});
-		file.contents = result.code ?? file.contents;
+		file.content = result.code ?? file.content;
 	}
 
-	return file.contents;
+	return file.content;
 }
 
 export function getTargetPath(
@@ -640,11 +640,11 @@ export type UpdatedFile = {
 	itemName: string;
 	registryUrl: string;
 	filePath: string;
-	contents: string;
+	content: string;
 } & (
 	| {
 			type: 'update';
-			oldContents: string;
+			oldContent: string;
 	  }
 	| {
 			type: 'create';
@@ -702,7 +702,7 @@ export async function prepareUpdates({
 			if (file.type === 'registry:test' && !options.withTests) continue;
 
 			const filePath = getTargetPath(file, { itemPath, options });
-			file.contents = await transformRemoteContent(file, {
+			file.content = await transformRemoteContent(file, {
 				item,
 				languages: configResult?.config.languages ?? DEFAULT_LANGS,
 				options,
@@ -715,15 +715,15 @@ export async function prepareUpdates({
 			if (fs.existsSync(filePath)) {
 				const originalContents = fs.readFileSync(filePath, 'utf-8');
 
-				if (originalContents === file.contents) {
+				if (originalContents === file.content) {
 					continue;
 				}
 
 				neededFiles.push({
 					type: 'update',
-					oldContents: originalContents,
+					oldContent: originalContents,
 					filePath,
-					contents: file.contents,
+					content: file.content,
 					itemName: item.name,
 					registryUrl: item.registry.url,
 				});
@@ -731,7 +731,7 @@ export async function prepareUpdates({
 				neededFiles.push({
 					type: 'create',
 					filePath,
-					contents: file.contents,
+					content: file.content,
 					itemName: item.name,
 					registryUrl: item.registry.url,
 				});
@@ -828,10 +828,10 @@ export async function updateFiles({
 	for (const file of files) {
 		if (file.type === 'create' || options.overwrite) {
 			fs.mkdirSync(path.dirname(file.filePath), { recursive: true });
-			fs.writeFileSync(file.filePath, file.contents);
+			fs.writeFileSync(file.filePath, file.content);
 			updatedFiles.push(path.relative(options.cwd, file.filePath));
 		} else {
-			const changes = diffLines(file.oldContents, file.contents);
+			const changes = diffLines(file.oldContent, file.content);
 			const relativePath = path.relative(options.cwd, file.filePath);
 			const formattedDiff = formatDiff({
 				from: `${file.registryUrl}/${file.itemName}`,
@@ -871,7 +871,7 @@ export async function updateFiles({
 
 			if (confirmResult === 'no') continue;
 
-			fs.writeFileSync(file.filePath, file.contents);
+			fs.writeFileSync(file.filePath, file.content);
 			updatedFiles.push(path.relative(options.cwd, file.filePath));
 		}
 	}

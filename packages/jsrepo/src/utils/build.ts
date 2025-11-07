@@ -59,7 +59,7 @@ export type ResolvedItem = {
 
 export type RegistryFile = {
 	path: string;
-	contents: string;
+	content: string;
 	type?: RegistryFileType;
 	/** Templates for resolving imports when adding items to users projects. This way users can add their items anywhere and things will just work. */
 	_imports_: UnresolvedImport[];
@@ -120,7 +120,7 @@ export type ResolvedFile = {
 	localDependencies: LocalDependency[];
 	dependencies: RemoteDependency[];
 	devDependencies: RemoteDependency[];
-	contents: string;
+	content: string;
 	target?: string;
 };
 
@@ -295,7 +295,7 @@ export async function resolveFiles(
 				dependencies,
 				devDependencies,
 				localDependencies,
-				contents,
+				content: contents,
 			});
 		} else {
 			const files = fs.readdirSync(filePath);
@@ -468,7 +468,7 @@ export async function resolveRegistryItem(
 
 			files.push({
 				path: resolvedFile.path,
-				contents: resolvedFile.contents,
+				content: resolvedFile.content,
 				type: resolvedFile.type,
 				_imports_,
 			});

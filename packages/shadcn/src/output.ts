@@ -88,7 +88,7 @@ export function output(options: OutputOptions): Output {
 							type: getType(file.type) as any,
 							path: file.path,
 							target: file.target,
-							content: file.contents,
+							content: file.content,
 						};
 					}),
 					envVars: item.envVars,

@@ -83,13 +83,16 @@ export const RepositoryOutputFileSchema = z.object({
 	path: z.string(),
 	type: z.string().optional(),
 	relativePath: z.string(),
-	_imports_: z.array(
-		z.object({
-			import: z.string(),
-			item: z.string(),
-			meta: z.record(z.string(), z.unknown()),
-		})
-	),
+	_imports_: z
+		.array(
+			z.object({
+				import: z.string(),
+				item: z.string(),
+				meta: z.record(z.string(), z.unknown()),
+			})
+		)
+		.optional()
+		.default([]),
 	target: z.string().optional(),
 });
 

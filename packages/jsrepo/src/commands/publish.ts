@@ -281,7 +281,7 @@ async function publishRegistry(
 
 	const pack = tar.pack();
 	for (const file of files) {
-		pack.entry({ name: file.name }, file.contents);
+		pack.entry({ name: file.name }, file.content);
 	}
 	pack.finalize();
 
@@ -329,10 +329,10 @@ async function publishRegistry(
 }
 
 function collectRegistryFiles(buildResult: BuildResult, cwd: string) {
-	const files: { name: string; contents: string }[] = [];
+	const files: { name: string; content: string }[] = [];
 	const readmePath = path.join(cwd, 'README.md');
 	if (fs.existsSync(readmePath)) {
-		files.push({ name: 'README.md', contents: fs.readFileSync(readmePath, 'utf-8') });
+		files.push({ name: 'README.md', content: fs.readFileSync(readmePath, 'utf-8') });
 	}
 
 	const manifest: DistributedOutputManifest = {
@@ -366,7 +366,7 @@ function collectRegistryFiles(buildResult: BuildResult, cwd: string) {
 	};
 	files.push({
 		name: MANIFEST_FILE,
-		contents: JSON.stringify(manifest),
+		content: JSON.stringify(manifest),
 	});
 
 	for (const item of buildResult.items) {
@@ -377,7 +377,7 @@ function collectRegistryFiles(buildResult: BuildResult, cwd: string) {
 			add: item.add,
 			files: item.files.map((file) => ({
 				type: file.type,
-				contents: file.contents,
+				content: file.content,
 				path: path.relative(path.join(cwd, item.basePath), path.join(cwd, file.path)),
 				_imports_: file._imports_,
 				target: file.target,
@@ -389,7 +389,7 @@ function collectRegistryFiles(buildResult: BuildResult, cwd: string) {
 		};
 		files.push({
 			name: `${item.name}.json`,
-			contents: JSON.stringify(outputItem),
+			content: JSON.stringify(outputItem),
 		});
 	}
 
