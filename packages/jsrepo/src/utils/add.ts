@@ -567,11 +567,13 @@ export function getTargetPath(
 	return filePath;
 }
 
+export type RegistryItemWithContent = ItemRepository | ItemDistributed;
+
 export async function resolveAndFetchAllItems(
 	wantedItems: ResolvedWantedItem[]
 ): Promise<
 	Result<
-		Array<ItemRepository | ItemDistributed>,
+		Array<RegistryItemWithContent>,
 		| RegistryItemNotFoundError
 		| RegistryItemFetchError
 		| RegistryFileFetchError

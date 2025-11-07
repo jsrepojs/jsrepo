@@ -13,9 +13,7 @@ describe('server', () => {
 		const expectedTools = [
 			'add_item_to_project',
 			'view_registry_item',
-
-			// features that haven't been implemented yet
-			'search_items_in_registry',
+			'list_items_in_registry',
 		];
 
 		const toolNames = listResult.tools.map((t) => t.name);
