@@ -295,7 +295,7 @@ async function publishRegistry(
 				'content-encoding': 'gzip',
 				'x-api-key': token,
 				'x-dry-run': options.dryRun ? '1' : '0',
-				'x-access': registry.access ?? 'private',
+				'x-access': registry.access ?? 'public',
 			},
 			method: 'POST',
 		});

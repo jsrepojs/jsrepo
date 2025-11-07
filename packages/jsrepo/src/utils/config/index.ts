@@ -83,7 +83,7 @@ export type RegistryMeta = {
 	 *  - "private" - The registry will be visible to only you
 	 *  - "marketplace" - The registry will purchasable on the jsrepo.com marketplace
 	 *
-	 *  @default "private"
+	 *  @default "public"
 	 */
 	access?: 'public' | 'private' | 'marketplace';
 };

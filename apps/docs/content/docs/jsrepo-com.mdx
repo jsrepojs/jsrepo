@@ -1,11 +1,11 @@
 ---
 title: jsrepo.com
-description: The jsrepo.com website.
+description: A registry for your registries.
 ---
 
 [jsrepo.com](https://jsrepo.com) is a centralized source registry for registries. Much like npm is for packages, **jsrepo.com** is for registries.
 
-Like npm you publish your registry to [jsrepo.com](https://jsrepo.com) with the `jsrepo publish` command and then other developers can add your code to their projects with the `jsrepo add` command.
+Like npm, you publish your registry to [jsrepo.com](https://jsrepo.com) with the `jsrepo publish` command and then other developers can add your code to their projects with the `jsrepo add` command.
 
 ## The benefits of jsrepo.com
 
@@ -13,3 +13,120 @@ Like npm you publish your registry to [jsrepo.com](https://jsrepo.com) with the 
 - Easy installation - You can add your registry to your project with the simple `@<scope>/<registry>` syntax.
 - Private registries - You can easily publish private registries and share them with your team for free.
 - Marketplace - You can monetize your registry by selling it on the marketplace.
+
+## Publishing your registry
+
+If you already have a registry that can be built with **jsrepo** then there are only a few steps to publishing it to **jsrepo.com**. If not then checkout the [create a registry](/docs/create-a-registry) guide to get started.
+
+<Steps>
+
+<Step>
+    ### Create an account
+    Go to [jsrepo.com](https://jsrepo.com) and create an account.
+</Step>
+
+<Step>
+    ### Claim a scope
+    Once you have an account navigate to `/account/scopes/new` to [claim a scope](https://www.jsrepo.com/account/scopes/new). 
+    
+    Scopes are used to group your registries together and are required to publish your registry.
+
+    When users add your registry the scope will be the first part of the registry name: `@<scope>/<registry>`.
+</Step>
+
+<Step>
+    ### Authenticate with jsrepo.com
+    Run the following command to authenticate with jsrepo.com:
+
+    ```sh
+    jsrepo auth jsrepo
+    ```
+
+    You will be prompted to finish the sign in in your browser and then you will be authenticated.
+</Step>
+
+<Step>
+    ### Prepare your registry
+    Decide on a name for your registry and add it to your `jsrepo.config.ts` file:
+
+    ```ts title="jsrepo.config.ts"
+    import { defineConfig } from "jsrepo";
+
+    export default defineConfig({
+        registry: {
+            name: "@my-scope/my-registry", // [!code ++]
+            // ...
+        },
+    });
+    ```
+
+    Next you need to provide the version or your registry that will be published. If you want **jsrepo** to pull from the version in your `package.json` file just provide `package` as the version:
+
+    ```ts title="jsrepo.config.ts"
+    import { defineConfig } from "jsrepo";
+
+    export default defineConfig({
+        registry: {
+            name: "@my-scope/my-registry",
+            version: "1.0.0", // [!code ++]
+            // or take the version from the `package.json` file
+            version: "package", // [!code ++]
+            // ...
+        },
+    });
+    ```
+
+    (Optional) Now is also a good time to add any other metadata you want to your registry:
+
+    ```ts title="jsrepo.config.ts"
+    import { defineConfig } from "jsrepo";
+
+    export default defineConfig({
+        registry: {
+            name: "@my-scope/my-registry",
+            description: "My first registry", // [!code ++]
+            homepage: "https://my-registry.com", // [!code ++]
+            repository: "https://github.com/my-scope/my-registry", // [!code ++]
+            bugs: "https://github.com/my-scope/my-registry/issues", // [!code ++]
+            authors: ["Aidan Bleser"], // [!code ++]
+            tags: ["first-registry"], // [!code ++]
+            // ...
+        },
+    });
+    ```
+
+    (Optional) By default your registry will be published as public so anyone can see and use it. You can change the access level to `"private"` or `"marketplace"` by setting the `access` property:
+
+    ```ts title="jsrepo.config.ts"
+    import { defineConfig } from "jsrepo";
+
+    export default defineConfig({
+        registry: {
+            name: "@my-scope/my-registry",
+            access: "private", // [!code ++]
+        },
+    });
+    ```
+</Step>
+
+<Step>
+    ### Publish your registry
+    Run the following command to publish your registry:
+
+    ```sh
+    jsrepo publish
+    ```
+</Step>
+
+<Step>
+    ### Start adding items to your project
+    Run the following command to add items to your project:
+
+    ```sh
+    jsrepo add --registry @my-scope/my-registry
+    # or 
+    jsrepo init @my-scope/my-registry
+    ```
+</Step>
+
+</Steps>

@@ -3,32 +3,46 @@ title: Introduction
 description: Why we built jsrepo.
 ---
 
-> shadcn, but for everyone 😄
+import Link from "next/link";
 
-**jsrepo** is a language agnostic CLI for distributing code. [shadcn/ui](https://ui.shadcn.com) proved that distributing code in a way that allows consumers to own the source is an extremely powerful pattern, **jsrepo** helps more people adopt this pattern by making it incredibly easy to distribute code from any language and source.
+
+[shadcn/ui](https://ui.shadcn.com) proved that distributing code in a way that allows consumers to own the source is an extremely powerful pattern. Since then registries have become a common way to distribute reusable components.
+
+As more and more registries start to emerge it became clear that there was a need for a more powerful toolchain to help manage and distribute these registries. That's where **jsrepo** comes in...
+
+**jsrepo** is a toolchain for distributing your code. It gives powerful tools to both registry owners and consumers. 
+
+**Registry owners...**
+- Don't want to have to write their own CLI and build system to distribute their code
+- Want to be able to test and verify that their registry will work for their users before they publish it
+- Want to be able to host their registries privately without having to write their own hosting solution
+
+**Registry consumers...**
+- Want to quickly add items from a registry to their project and start using them without having to even look at the code
+- Want to be able to easily update their items with visibility to what as changed
+- Want to be able to install and manage code from multiple registries in a single project
+- Want an easy way to authenticate to private registries
+
+**jsrepo...**
+- Provides a powerful CLI for building and distributing your registry
+- Prevents you from publishing broken or unusable registries
+- Provides provider adapters to allow you to host your registry publicly or privately anywhere you want
+- Automatically resolves dependencies to other items so your items always come ready to use
+- Provides an interactive update command to easily update your items with visibility to what as changed
+- Allows you to authenticate to private registries with `jsrepo auth`
 
 <Accordion type="single" collapsible>
 	<AccordionItem value="q-1">
 		<AccordionTrigger>Is this trying to replace npm?</AccordionTrigger>
 		<AccordionContent className="flex flex-col gap-4 text-balance">
-			No, **jsrepo** won't replace npm but is perfect for distributing code like leftPad that probably shouldn't
-			be a package but you also shouldn't have to rewrite every time.
+			No, **jsrepo** won't replace npm, but it's perfect for distributing code like leftPad that probably shouldn't
+			be a package but also shouldn't have to be rewritten every time.
 		</AccordionContent>
 	</AccordionItem>
 	<AccordionItem value="q-2">
-		<AccordionTrigger>Why would I use this over the shadcn CLI?</AccordionTrigger>
+		<AccordionTrigger>Is this shadcn compatible?</AccordionTrigger>
 		<AccordionContent className="flex flex-col gap-4 text-balance">
-			**jsrepo** is language agnostic and is built to handle multiple registries in the same project. You also
-			aren't limited to just distributing your code from your own website you can also distribute it from most major git
-			providers (GitHub, GitLab, Bitbucket, etc).
+			**jsrepo** is partially **shadcn** compatible. You can add and update items from **shadcn** with zero configuration needed, however imports are not currently resolved so you will have to update them manually. If you want to make your **jsrepo** registry **shadcn** compatible you can take a look at the <Link href="/docs/outputs/shadcn" className='text-(--tw-prose-links) font-medium underline underline-offset-[3.5px] decoration-[1.5px]'>@shadcn/jsrepo</Link> package.
 		</AccordionContent>
 	</AccordionItem>
 </Accordion>
-
-## Where to Start?
-
-<Cards>
-	<Card href="/docs/create-a-registry" icon={<PlusIcon />} title="Create your first registry">
-		Create a jsrepo registry in &lt;5 minutes
-	</Card>
-</Cards>
