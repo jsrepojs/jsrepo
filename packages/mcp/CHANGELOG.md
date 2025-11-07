@@ -1,5 +1,11 @@
 # @jsrepo/mcp
 
+## 0.0.1-beta.7
+### Patch Changes
+
+
+- rename `search` tool to `list` and make searching optional ([#649](https://github.com/jsrepojs/jsrepo/pull/649))
+
 ## 0.0.1-beta.6
 ### Patch Changes
 
