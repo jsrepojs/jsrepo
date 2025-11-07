@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.0-beta.5
+### Patch Changes
+
+
+- feat: add `optionally-on-init` add option ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
 ## 3.0.0-beta.4
 ### Patch Changes
 
