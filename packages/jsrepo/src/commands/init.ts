@@ -15,6 +15,7 @@ import {
 import { DEFAULT_PROVIDERS } from '@/providers';
 import {
 	getPathsForItems,
+	normalizeItemTypeForPath,
 	prepareUpdates,
 	type ResolvedRegistry,
 	resolveAndFetchAllItems,
@@ -398,7 +399,9 @@ async function initDefaultPaths(
 		options: InitOptions;
 	}
 ) {
-	const types = Array.from(new Set(registry.manifest.items.map((item) => item.type)));
+	const types = Array.from(
+		new Set(registry.manifest.items.map((item) => normalizeItemTypeForPath(item.type)))
+	);
 
 	let paths = config?.paths ?? {};
 
@@ -421,16 +424,15 @@ async function initDefaultPaths(
 		}
 
 		if (configurePaths.length > 0) {
-			for (const category of configurePaths) {
-				const configuredValue =
-					paths[category] ?? registry.manifest.defaultPaths?.[category];
+			for (const type of configurePaths) {
+				const configuredValue = paths[type] ?? registry.manifest.defaultPaths?.[type];
 
 				const categoryPath = await text({
-					message: `Where should ${category} be added in your project?`,
+					message: `Where should ${type} be added in your project?`,
 					validate(value) {
 						if (!value || value.trim() === '') return 'Please provide a value';
 					},
-					placeholder: configuredValue ? configuredValue : `./src/${category}`,
+					placeholder: configuredValue ? configuredValue : `./src/${type}`,
 					defaultValue: configuredValue,
 					initialValue: configuredValue,
 				});
@@ -440,7 +442,7 @@ async function initDefaultPaths(
 					process.exit(0);
 				}
 
-				paths[category] = categoryPath;
+				paths[type] = categoryPath;
 			}
 		}
 	}

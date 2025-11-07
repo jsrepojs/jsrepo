@@ -445,7 +445,8 @@ export async function getBlockLocation(
 	}
 ): Promise<Result<{ resolvedPath: string; path: string }, NoPathProvidedError>> {
 	const defaultPath = paths['*'];
-	const path = paths[block.name] ?? paths[block.type];
+	const type = normalizeItemTypeForPath(block.type);
+	const path = paths[block.name] ?? paths[type];
 	if (!path) {
 		if (defaultPath) {
 			return ok({
@@ -456,14 +457,13 @@ export async function getBlockLocation(
 		}
 
 		// we just error in non-interactive mode
-		if (nonInteractive)
-			return err(new NoPathProvidedError({ item: block.name, type: block.type }));
+		if (nonInteractive) return err(new NoPathProvidedError({ item: block.name, type }));
 
 		const blocksPath = await text({
-			message: `Where would you like to add ${pc.cyan(block.type)}?`,
-			placeholder: `./src/${block.type}`,
-			initialValue: `./src/${block.type}`,
-			defaultValue: `./src/${block.type}`,
+			message: `Where would you like to add ${pc.cyan(type)}?`,
+			placeholder: `./src/${type}`,
+			initialValue: `./src/${type}`,
+			defaultValue: `./src/${type}`,
 			validate(value) {
 				if (!value || value.trim() === '') return 'Please provide a value';
 			},
@@ -609,8 +609,9 @@ export async function getPathsForItems({
 	});
 	// get any paths that are not already set
 	for (const item of items) {
+		const type = normalizeItemTypeForPath(item.type);
 		// the item name can be used to override the target
-		const itemPath = resolvedPaths[`${item.type}/${item.name}`] ?? resolvedPaths[item.type];
+		const itemPath = resolvedPaths[`${type}/${item.name}`] ?? resolvedPaths[type];
 		if (itemPath !== undefined) continue;
 		const result = await getBlockLocation(item, {
 			paths: resolvedPaths,
@@ -625,9 +626,9 @@ export async function getPathsForItems({
 			return err(result.error);
 		}
 		const { path: originalPath, resolvedPath } = result.value;
-		resolvedPaths[item.type] = resolvedPath;
+		resolvedPaths[type] = resolvedPath;
 		if (config) {
-			config.paths[item.type] = originalPath;
+			config.paths[type] = originalPath;
 		}
 	}
 
@@ -695,7 +696,8 @@ export async function prepareUpdates({
 	let neededEnvVars: Record<string, string> | undefined;
 
 	for (const item of items) {
-		const itemPath = itemPaths[`${item.type}/${item.name}`]!;
+		const type = normalizeItemTypeForPath(item.type);
+		const itemPath = itemPaths[`${type}/${item.name}`]!;
 		for (const file of item.files) {
 			if (file.type === 'registry:example' && !options.withExamples) continue;
 			if (file.type === 'registry:doc' && !options.withDocs) continue;
@@ -895,18 +897,18 @@ export function getItemPaths(
 > {
 	return items.reduce(
 		(acc, item) => {
-			const path = resolvedPaths[`${item.type}/${item.name}`] ?? resolvedPaths[item.type]!;
+			const type = normalizeItemTypeForPath(item.type);
+			const path = resolvedPaths[`${type}/${item.name}`] ?? resolvedPaths[type]!;
 			// we know that if the resolved path is not the same that the user is using an alias
 			const alias =
-				(config?.paths[`${item.type}/${item.name}`] &&
-				config?.paths[`${item.type}/${item.name}`] !==
-					resolvedPaths[`${item.type}/${item.name}`]
-					? config.paths[`${item.type}/${item.name}`]
+				(config?.paths[`${type}/${item.name}`] &&
+				config?.paths[`${type}/${item.name}`] !== resolvedPaths[`${type}/${item.name}`]
+					? config.paths[`${type}/${item.name}`]
 					: undefined) ??
-				(config?.paths[item.type] && config?.paths[item.type] !== resolvedPaths[item.type]
-					? config.paths[item.type]
+				(config?.paths[type] && config?.paths[type] !== resolvedPaths[type]
+					? config.paths[type]
 					: undefined);
-			acc[`${item.type}/${item.name}`] = {
+			acc[`${type}/${item.name}`] = {
 				path,
 				alias,
 			};
@@ -920,4 +922,14 @@ export function getItemPaths(
 			}
 		>
 	);
+}
+
+/**
+ * Normalizes the item type for the path. We strip the `registry:` prefix if it exists.
+ * @param type
+ * @returns
+ */
+export function normalizeItemTypeForPath(type: RegistryItemType) {
+	if (type.startsWith('registry:')) return type.slice('registry:'.length);
+	return type;
 }
