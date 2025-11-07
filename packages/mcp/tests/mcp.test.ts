@@ -15,7 +15,7 @@ describe('server', () => {
 			'view_registry_item',
 
 			// features that haven't been implemented yet
-			'search_items_in_registry',
+			'list_items_in_registry',
 		];
 
 		const toolNames = listResult.tools.map((t) => t.name);
