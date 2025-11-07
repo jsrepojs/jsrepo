@@ -1,5 +1,23 @@
 # jsrepo
 
+## 3.0.0-beta.4
+### Patch Changes
+
+
+- feat: remove `registry:` prefix from item types ([#645](https://github.com/jsrepojs/jsrepo/pull/645))
+
+
+- feat: `publish` command ([#645](https://github.com/jsrepojs/jsrepo/pull/645))
+
+
+- breaking: rename `contents` -> `content` for shadcn compatibility ([#645](https://github.com/jsrepojs/jsrepo/pull/645))
+
+
+- breaking: Rename `remoteDependencies` -> `dependencies` and `devDependencies` for improved shadcn compatibility ([#645](https://github.com/jsrepojs/jsrepo/pull/645))
+
+
+- feat: `publish` command ([#645](https://github.com/jsrepojs/jsrepo/pull/645))
+
 ## 3.0.0-beta.3
 ### Patch Changes
 
