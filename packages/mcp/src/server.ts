@@ -119,6 +119,7 @@ server.tool(
 			options: { cwd: options.cwd, yes: true },
 		});
 		if (getPathsForItemsResult.isErr()) {
+			// give the llm a way to fix the error
 			return {
 				content: [
 					{
@@ -272,8 +273,9 @@ server.tool(
 
 server.tool(
 	{
-		name: 'search_items_in_registry',
-		description: 'Search for a registry item.',
+		name: 'list_items_in_registry',
+		description:
+			'List items in a registry. You can optionally provide a query to filter the results.',
 		schema: z.object({
 			cwd: commonOptions.cwd,
 			registries: z
@@ -281,7 +283,7 @@ server.tool(
 				.describe(
 					'The registries to search for items in. i.e. ["github/ieedan/std", "@ieedan/std"]'
 				),
-			query: z.string().describe('The query to search for. i.e. "math"'),
+			query: z.string().optional().describe('The query to search for. i.e. "math"'),
 			limit: z
 				.number()
 				.optional()
@@ -315,35 +317,39 @@ server.tool(
 			registry.manifest.items.map((item) => ({ item, registry }))
 		);
 
-		// filter items by query
+		let results: typeof candidateItems;
+		if (query) {
+			const sortedResults = fuzzysort.go(query, candidateItems, {
+				keys: ['item.name', 'item.description', 'item.type'],
+			});
 
-		const results = fuzzysort.go(query, candidateItems, {
-			keys: ['item.name', 'item.description', 'item.type'],
-		});
+			if (sortedResults.length === 0) {
+				return {
+					content: [
+						{
+							type: 'text',
+							text: dedent`
+							No results found for "${query}".
+							`,
+						},
+					],
+				};
+			}
 
-		if (results.length === 0) {
-			return {
-				content: [
-					{
-						type: 'text',
-						text: dedent`
-						No results found for "${query}".
-						`,
-					},
-				],
-			};
+			results = sortedResults.map((result) => result.obj);
+		} else {
+			results = candidateItems;
 		}
 
-		const cutResults = results
-			.slice(offset, Math.min(offset + limit, results.length))
-			.map((result) => result.obj);
+		const cutResults = results.slice(offset, Math.min(offset + limit, results.length));
 
 		function displayItem(item: (typeof candidateItems)[number]) {
 			return dedent`
-			## ${item.item.name} - ${item.item.type}
-			${item.item.description}
+			## ${item.registry.url}/${item.item.name} - ${item.item.type}
+			${item.item.description ?? ''}
 
-			Registry: ${item.registry.url}
+			Files: 
+			${item.item.files.map((file) => `- ${file.path}`).join('\n')}
 			`;
 		}
 
@@ -367,7 +373,7 @@ server.tool(
 function displayItemDetails(item: RegistryItemWithContent): string {
 	return dedent`
 	# ${item.name} - ${item.type}
-	${item.description}
+	${item.description ?? ''}
 
 	## Files
 	${item.files
