@@ -1,8 +1,10 @@
 export {
 	fetchAllResolvedItems,
 	getPathsForItems,
+	normalizeItemTypeForPath,
 	parseWantedItems,
 	prepareUpdates,
+	type RegistryItemWithContent,
 	resolveAndFetchAllItems,
 	resolveRegistries,
 	resolveTree,

@@ -3,10 +3,12 @@ import dedent from 'dedent';
 import fuzzysort from 'fuzzysort';
 import {
 	getPathsForItems,
+	normalizeItemTypeForPath,
 	OptionallyInstalledRegistryTypes,
 	prepareUpdates,
 	promptAddEnvVars,
 	RegistryItemNotFoundError,
+	type RegistryItemWithContent,
 	resolveAndFetchAllItems,
 	updateFiles,
 } from 'jsrepo';
@@ -60,21 +62,6 @@ server.tool(
 			withDocs: z.boolean().optional().describe('Add items with docs.'),
 			withTests: z.boolean().optional().describe('Add items with tests.'),
 		}),
-		outputSchema: z.object({
-			addedItems: z.array(
-				z.object({
-					name: z.string(),
-					description: z.string().optional(),
-					type: z.string(),
-					files: z.array(
-						z.object({
-							code: z.string(),
-							path: z.string(),
-						})
-					),
-				})
-			),
-		}),
 	},
 	async ({ itemNames, ...options }) => {
 		const configResult = await loadConfigSearch({
@@ -126,18 +113,36 @@ server.tool(
 			}
 		);
 
-		const { itemPaths, resolvedPaths } = (
-			await getPathsForItems({
-				items,
-				config: configResult?.config,
-				options: { cwd: options.cwd, yes: true },
-			})
-		).match(
-			(value) => value,
-			(error) => {
-				throw error;
-			}
-		);
+		const getPathsForItemsResult = await getPathsForItems({
+			items,
+			config: configResult?.config,
+			options: { cwd: options.cwd, yes: true },
+		});
+		if (getPathsForItemsResult.isErr()) {
+			return {
+				content: [
+					{
+						type: 'text',
+						text: dedent`
+						Failed to get paths for items: ${getPathsForItemsResult.error.message}.
+						You will need to add the paths to the users config file (if they aren't already added) like so:
+						\`\`\`
+						import { defineConfig } from "jsrepo";
+
+						export default defineConfig({
+							// ...
+							paths: {
+							    // ...
+								${items.map((item) => `"${normalizeItemTypeForPath(item.type)}": "put the expected path here",`).join('\n')}
+							},
+						});
+						\`\`\`
+						`,
+					},
+				],
+			};
+		}
+		const { itemPaths, resolvedPaths } = getPathsForItemsResult.value;
 
 		const { neededDependencies, neededEnvVars, neededFiles } = (
 			await prepareUpdates({
@@ -174,17 +179,13 @@ server.tool(
 		});
 
 		return {
-			structuredContent: {
-				addedItems: items.map((item) => ({
-					name: item.name,
-					description: item.description,
-					type: item.type,
-					files: item.files?.map((file) => ({
-						code: file.content,
-						path: file.path,
-					})),
-				})),
-			},
+			content: [
+				{
+					type: 'text',
+					text: dedent`Added ${items.length} items to the users project:
+					${items.map((item) => displayItemDetails(item)).join('\n')}`,
+				},
+			],
 		};
 	}
 );
@@ -262,51 +263,7 @@ server.tool(
 			content: [
 				{
 					type: 'text',
-					text: dedent`
-					# ${itemResult.name} - ${itemResult.type}
-					${itemResult.description}
-
-					## Files
-					${itemResult.files
-						?.filter(
-							(file) =>
-								file.type === undefined ||
-								!(OptionallyInstalledRegistryTypes as unknown as string[]).includes(
-									file.type
-								)
-						)
-						.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
-						.join('\n')}
-
-					## Dependencies
-					${itemResult.dependencies?.map((dependency) => `- ${typeof dependency === 'string' ? dependency : dependency.name}`).join('\n')}
-
-					## Examples
-					${itemResult.files
-						?.filter((file) => file.type === 'registry:example')
-						.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
-						.join('\n')}
-
-					## Docs
-					${itemResult.files
-						?.filter((file) => file.type === 'registry:doc')
-						.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
-						.join('\n')}
-
-					## Tests
-					${itemResult.files
-						?.filter((file) => file.type === 'registry:test')
-						.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
-						.join('\n')}
-
-					## Environment Variables
-					Environment variables are required for the item to work. Blank variables will need to be filled in.
-					\`\`\`env
-					${Object.entries(itemResult.envVars ?? {})
-						.map(([name, value]) => `${name}="${value}"`)
-						.join('\n')}
-					\`\`\`
-					`,
+					text: displayItemDetails(itemResult),
 				},
 			],
 		};
@@ -406,5 +363,51 @@ server.tool(
 		};
 	}
 );
+
+function displayItemDetails(item: RegistryItemWithContent): string {
+	return dedent`
+	# ${item.name} - ${item.type}
+	${item.description}
+
+	## Files
+	${item.files
+		?.filter(
+			(file) =>
+				file.type === undefined ||
+				!(OptionallyInstalledRegistryTypes as unknown as string[]).includes(file.type)
+		)
+		.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
+		.join('\n')}
+
+	## Dependencies
+	${item.dependencies?.map((dependency) => `- ${typeof dependency === 'string' ? dependency : dependency.name}`).join('\n')}
+
+	## Examples
+	${item.files
+		?.filter((file) => file.type === 'registry:example')
+		.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
+		.join('\n')}
+
+	## Docs
+	${item.files
+		?.filter((file) => file.type === 'registry:doc')
+		.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
+		.join('\n')}
+
+	## Tests
+	${item.files
+		?.filter((file) => file.type === 'registry:test')
+		.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
+		.join('\n')}
+
+	## Environment Variables
+	Environment variables are required for the item to work. Blank variables will need to be filled in.
+	\`\`\`env
+	${Object.entries(item.envVars ?? {})
+		.map(([name, value]) => `${name}="${value}"`)
+		.join('\n')}
+	\`\`\`
+	`;
+}
 
 export { server };
