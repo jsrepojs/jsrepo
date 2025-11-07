@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.0-beta.6
+### Patch Changes
+
+
+- fix: Exit with the correct code for `publish` and `build` commands ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
 ## 3.0.0-beta.5
 ### Patch Changes
 
