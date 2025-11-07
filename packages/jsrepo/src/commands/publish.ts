@@ -77,6 +77,11 @@ export const publish = new Command('publish')
 		);
 
 		outro(formatResult(result));
+
+        // if any of the registries failed to publish, exit with an error
+        if (result.publishedRegistries.some((registry) => !registry.skipped && registry.result.isErr())) {
+            process.exit(1);
+        }
 	});
 
 export type PublishCommandResult = {

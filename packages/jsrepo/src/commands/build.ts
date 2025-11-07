@@ -67,7 +67,13 @@ export const build = new Command('build')
 					configResult.config
 				)
 			);
+
 			outro(formatResult(result, { type: 'build' }));
+
+			// if any of the registries failed to build, exit with an error
+			if (result.results.some((result) => result.isErr())) {
+				process.exit(1);
+			}
 		}
 	});
 
