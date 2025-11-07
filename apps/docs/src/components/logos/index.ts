@@ -13,6 +13,9 @@ import { OpenAI } from "./openai";
 import { VSCode } from "./vscode";
 import { Cursor } from "./cursor";
 import { Shadcn } from "./shadcn";
+import { Biomejs } from "./biome";
+import { Prettier } from "./prettier";
+import { NPM } from "./npm";
 
 export {
 	GitHub as GitHubLogo,
@@ -30,4 +33,7 @@ export {
 	VSCode as VSCodeLogo,
 	Cursor as CursorLogo,
 	Shadcn as ShadcnLogo,
+	Biomejs as BiomeLogo,
+	Prettier as PrettierLogo,
+	NPM as NpmLogo,
 };

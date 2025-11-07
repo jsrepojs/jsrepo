@@ -5,6 +5,7 @@ import { BadgeCheckIcon, CodeIcon, SettingsIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tooltip";
 
 import { cn } from "@/lib/utils";
+import { NpmLogo } from "../logos";
 
 const badgeVariants = cva(
 	"inline-flex items-center justify-center rounded-full border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
@@ -90,6 +91,35 @@ function DefaultBadge({ className, ...props }: Omit<React.ComponentProps<typeof 
 	);
 }
 
+function NpmBadge({
+	packageName,
+	className,
+	...props
+}: Omit<React.ComponentProps<typeof Badge>, "variant"> & { packageName: string }) {
+	return (
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<a
+					href={`https://npmjs.com/package/${packageName}`}
+					className="flex place-items-center justify-center not-prose"
+				>
+					<Badge
+						variant="secondary"
+						className={cn("text-muted-foreground cursor-default", className)}
+						{...props}
+					>
+						<span>{packageName}</span>
+						<NpmLogo className="size-3" />
+					</Badge>
+				</a>
+			</TooltipTrigger>
+			<TooltipContent>
+				<p>Available on npm.</p>
+			</TooltipContent>
+		</Tooltip>
+	);
+}
+
 function BadgeGroup({ className, ...props }: React.ComponentProps<"div">) {
 	return (
 		<TooltipProvider>
@@ -98,4 +128,4 @@ function BadgeGroup({ className, ...props }: React.ComponentProps<"div">) {
 	);
 }
 
-export { Badge, badgeVariants, SourceBadge, OfficialBadge, DefaultBadge, BadgeGroup };
+export { Badge, badgeVariants, SourceBadge, OfficialBadge, DefaultBadge, BadgeGroup, NpmBadge };

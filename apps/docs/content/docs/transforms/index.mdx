@@ -5,12 +5,15 @@ description: Modify code before it is added to your project.
 
 Transforms are a way to modify code before it's added to your project. You can use transforms to format code, add comments, or any other code modification you can think of.
 
-Transforms are also plugable so you can create your own and share them with the community. Here are a few of the officially supported transforms:
-
-| Package                      | Description                                                         | Source                                                                                                        |
-| ---------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `@jsrepo/transform-prettier` | Format code before it's added to your project using Prettier       | [<GitHubLogo className="size-4" />](https://github.com/jsrepojs/jsrepo/tree/main/packages/transform-prettier) |
-| `@jsrepo/transform-biome`    | Format code before it's added to your project using Biome | [<GitHubLogo className="size-4" />](https://github.com/jsrepojs/jsrepo/tree/main/packages/transform-biome)    |
+Transforms are also pluggable so you can create your own and share them with the community. Here are a few of the officially supported transforms:
+<Cards>
+	<Card href="/docs/transforms/prettier" icon={<PrettierLogo />} title="@jsrepo/transform-prettier">
+		Format code before it's added to your project using **Prettier**.
+	</Card>
+	<Card href="/docs/transforms/biome" icon={<BiomeLogo />} title="@jsrepo/transform-biome">
+		Format code before it's added to your project using **Biome**.
+	</Card>
+</Cards>
 
 ## Adding transforms
 
