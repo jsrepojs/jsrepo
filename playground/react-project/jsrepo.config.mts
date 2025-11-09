@@ -1,12 +1,14 @@
-import { defineConfig } from "jsrepo";
+import { defineConfig } from 'jsrepo';
+import stripTypes from '@jsrepo/transform-strip-types';
 
 export default defineConfig({
-	registries: ["http://localhost:3000/registry-kit/react"],
-	paths: {
+    // configure where stuff comes from here
+    registries: ['http://localhost:3000/registry-kit/react'],
+    // configure were stuff goes here
+    paths: {
 		component: 'src/components/ui',
 		block: 'src/components',
-		lib: 'src/lib',
-		global: 'src/utils',
-		utils: 'lib/utils'
+		lib: 'src/lib'
 	},
+	transforms: [stripTypes()]
 });

@@ -17,6 +17,7 @@
 		"tailwind-merge": "^3.3.1"
 	},
 	"devDependencies": {
+		"@jsrepo/transform-strip-types": "workspace:*",
 		"@tailwindcss/postcss": "^4",
 		"@types/node": "^20",
 		"@types/react": "^19",

@@ -209,7 +209,6 @@ export type RegistryItemFile = {
 
 export type TransformOptions = {
 	cwd: string;
-	fileName: string;
 	registryUrl: string;
 	item: {
 		name: string;
@@ -218,7 +217,11 @@ export type TransformOptions = {
 };
 
 export type Transform = {
-	transform: (code: string, options: TransformOptions) => Promise<{ code?: string }>;
+	transform: (opts: {
+		code: string;
+		fileName: string;
+		options: TransformOptions;
+	}) => Promise<{ code?: string; fileName?: string }>;
 };
 
 export function defineConfig(config: Partial<Config> | (() => Partial<Config>)): Config {

@@ -31,6 +31,7 @@ import {
 	RegistryItemFetchError,
 	RegistryItemNotFoundError,
 	RegistryNotProvidedError,
+	Unreachable,
 	type ZodError,
 } from './errors';
 import { parsePackageName } from './parse-package-name';
@@ -504,21 +505,19 @@ export async function transformRemoteContent(
 		languages,
 		options,
 		config,
-		filePath,
 		itemPaths,
 	}: {
 		item: FetchedItem;
 		languages: Language[];
 		options: { cwd: string };
 		config: Config | undefined;
-		filePath: string;
 		itemPaths: Record<string, { path: string; alias?: string }>;
 	}
-) {
+): Promise<FileWithContents> {
 	const lang = languages.find((lang) => lang.canResolveDependencies(file.path));
 	const transformations = await lang?.transformImports(file._imports_, {
 		cwd: options.cwd,
-		targetPath: filePath,
+		targetPath: file.path,
 		getItemPath: (item) => {
 			for (const key of Object.keys(itemPaths)) {
 				// this will only ever match one item since items cannot have duplicate names
@@ -526,24 +525,27 @@ export async function transformRemoteContent(
 					return itemPaths[key]!;
 				}
 			}
-			// we should never get here
-			throw new Error(`Item path not found for ${item}`);
+			throw new Unreachable();
 		},
 	});
 	for (const transformation of transformations ?? []) {
 		file.content = file.content.replace(transformation.pattern, transformation.replacement);
 	}
 	for (const transform of config?.transforms ?? []) {
-		const result = await transform.transform(file.content, {
-			cwd: options.cwd,
-			fileName: filePath,
-			registryUrl: item.registry.url,
-			item: item,
+		const result = await transform.transform({
+			code: file.content,
+			fileName: file.path,
+			options: {
+				cwd: options.cwd,
+				registryUrl: item.registry.url,
+				item: item,
+			},
 		});
 		file.content = result.code ?? file.content;
+		file.path = result.fileName ?? file.path;
 	}
 
-	return file.content;
+	return file;
 }
 
 export function getTargetPath(
@@ -707,24 +709,23 @@ export async function prepareUpdates({
 	for (const item of items) {
 		const type = normalizeItemTypeForPath(item.type);
 		const itemPath = itemPaths[`${type}/${item.name}`]!;
-		for (const file of item.files) {
+		for (let file of item.files) {
 			if (file.type === 'registry:example' && !options.withExamples) continue;
 			if (file.type === 'registry:doc' && !options.withDocs) continue;
 			if (file.type === 'registry:test' && !options.withTests) continue;
 
-			const filePath = getTargetPath(file, { itemPath, options });
-			file.content = await transformRemoteContent(file, {
+			file.path = getTargetPath(file, { itemPath, options });
+			file = await transformRemoteContent(file, {
 				item,
 				languages: configResult?.config.languages ?? DEFAULT_LANGS,
 				options,
 				config: configResult?.config,
-				filePath,
 				itemPaths,
 			});
 
 			// check if the file needs to be updated
-			if (fs.existsSync(filePath)) {
-				const originalContents = fs.readFileSync(filePath, 'utf-8');
+			if (fs.existsSync(file.path)) {
+				const originalContents = fs.readFileSync(file.path, 'utf-8');
 
 				if (originalContents === file.content) {
 					continue;
@@ -733,7 +734,7 @@ export async function prepareUpdates({
 				neededFiles.push({
 					type: 'update',
 					oldContent: originalContents,
-					filePath,
+					filePath: file.path,
 					content: file.content,
 					itemName: item.name,
 					registryUrl: item.registry.url,
@@ -741,7 +742,7 @@ export async function prepareUpdates({
 			} else {
 				neededFiles.push({
 					type: 'create',
-					filePath,
+					filePath: file.path,
 					content: file.content,
 					itemName: item.name,
 					registryUrl: item.registry.url,

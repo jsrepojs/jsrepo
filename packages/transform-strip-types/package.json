@@ -38,6 +38,7 @@
 		"build": "tsdown",
 		"dev": "tsdown --watch",
 		"check": "tsc --noEmit",
+		"test": "vitest",
 		"bundle-analyze": "FORCE_COLOR=1 node ../../bundle-analyzer/dist/index.js analyze ."
 	},
 	"packageManager": "pnpm@10.17.1",
@@ -45,9 +46,11 @@
 		"jsrepo": "workspace:*"
 	},
 	"devDependencies": {
+		"@svecosystem/strip-types": "^0.0.4",
 		"@types/node": "catalog:",
 		"sucrase": "^3.35.0",
 		"tsdown": "catalog:",
-		"typescript": "catalog:"
+		"typescript": "catalog:",
+		"vitest": "catalog:"
 	}
 }

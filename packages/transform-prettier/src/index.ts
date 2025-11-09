@@ -28,10 +28,10 @@ export default function (options: Options = {}): Transform {
 	);
 
 	return {
-		transform: async (code, opts) => {
+		transform: async ({ code, fileName }) => {
 			const config = await configPromise;
 
-			return { code: await tryFormat(code, { fileName: opts.fileName, config }) };
+			return { code: await tryFormat(code, { fileName: fileName, config }) };
 		},
 	};
 }
