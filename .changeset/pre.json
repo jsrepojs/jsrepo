@@ -8,7 +8,10 @@
 		"@jsrepo/transform-prettier": "0.0.0",
 		"@jsrepo/transform-javascript": "0.0.0",
 		"@jsrepo/shadcn": "0.0.0",
-		"@jsrepo/docs": "0.0.0"
+		"@jsrepo/docs": "0.0.0",
+		"@playground/project": "0.0.0",
+		"@playground/react-project": "0.1.0",
+		"@playground/registry": "0.0.0"
 	},
 	"changesets": [
 		"all-files-film",
@@ -21,6 +24,7 @@
 		"empty-guests-wait",
 		"frank-tips-tease",
 		"hot-lies-buy",
+		"little-tables-cheer",
 		"many-guests-crash",
 		"plenty-onions-press",
 		"silent-rivers-knock",
