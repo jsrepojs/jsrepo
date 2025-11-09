@@ -447,9 +447,6 @@ importers:
         specifier: ^3.3.1
         version: 3.3.1
     devDependencies:
-      '@jsrepo/transform-javascript':
-        specifier: workspace:*
-        version: link:../../packages/transform-javascript
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.1.16
