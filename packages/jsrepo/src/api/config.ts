@@ -10,5 +10,6 @@ export {
 	type RegistryItemType,
 	type Transform,
 	type TransformOptions,
+	type RegistryConfigArgs,
 } from '@/utils/config';
 export { loadConfigSearch } from '@/utils/config/utils';

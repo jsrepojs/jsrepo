@@ -61,7 +61,7 @@
 		}
 	},
 	"bin": "./dist/bin.js",
-	"main": "./dist/index.js",
+	"main": "./dist/api/index.js",
 	"files": [
 		"dist/**/*",
 		"!dist/**/*.map"

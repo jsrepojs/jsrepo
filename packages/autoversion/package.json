@@ -1,0 +1,62 @@
+{
+	"name": "@jsrepo/autoversion",
+	"description": "A CLI to add shared code from remote repositories.",
+	"version": "0.0.0",
+	"license": "MIT",
+	"homepage": "https://v3.jsrepo.dev",
+	"author": {
+		"name": "Aidan Bleser",
+		"url": "https://github.com/ieedan"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/jsrepojs/jsrepo"
+	},
+	"bugs": {
+		"url": "https://github.com/jsrepojs/jsrepo/issues"
+	},
+	"keywords": [
+		"jsrepo",
+		"autoversion"
+	],
+	"type": "module",
+	"bin": "./dist/bin.js",
+	"files": [
+		"dist/**/*",
+		"!dist/**/*.map"
+	],
+	"scripts": {
+		"start": "node ./dist/bin.js",
+		"build": "tsdown",
+		"dev": "tsdown --watch",
+		"check": "tsc --noEmit",
+		"test": "vitest",
+		"bundle-analyze": "FORCE_COLOR=1 node ../../bundle-analyzer/dist/index.js analyze ."
+	},
+	"packageManager": "pnpm@10.20.0",
+	"peerDependencies": {
+		"jsrepo": "workspace:*"
+	},
+	"dependencies": {
+		"commander": "^14.0.2",
+		"oxc-parser": "^0.96.0"
+	},
+	"devDependencies": {
+		"@clack/prompts": "1.0.0-alpha.6",
+		"@types/node": "catalog:",
+		"@types/semver": "^7.7.1",
+		"css-dependency": "^0.0.3",
+		"is-unicode-supported": "^2.1.0",
+		"magic-string": "^0.30.21",
+		"nevereverthrow": "^0.3.0",
+		"package-manager-detector": "^1.5.0",
+		"pathe": "^2.0.3",
+		"picocolors": "catalog:",
+		"semver": "^7.7.3",
+		"tsdown": "catalog:",
+		"typescript": "catalog:",
+		"vite": "^7.2.0",
+		"vitest": "catalog:",
+		"zod": "catalog:"
+	}
+}
