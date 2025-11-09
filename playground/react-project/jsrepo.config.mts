@@ -1,5 +1,5 @@
 import { defineConfig } from 'jsrepo';
-import stripTypes from '@jsrepo/transform-strip-types';
+import stripTypes from '@jsrepo/transform-javascript';
 
 export default defineConfig({
     // configure where stuff comes from here

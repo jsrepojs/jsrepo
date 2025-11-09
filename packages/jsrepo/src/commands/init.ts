@@ -69,7 +69,7 @@ export const init = new Command('init')
 	.argument('[registries...]', 'The registries to initialize.')
 	.option(
 		'--js',
-		'Initialize the project and automatically add the @jsrepo/transform-strip-types transform plugin.',
+		'Initialize the project and automatically add the @jsrepo/transform-javascript transform plugin.',
 		false
 	)
 	.addOption(commonOptions.cwd)
@@ -146,7 +146,7 @@ export async function runInit(
 			plugins: [
 				{
 					name: 'stripTypes',
-					packageName: '@jsrepo/transform-strip-types',
+					packageName: '@jsrepo/transform-javascript',
 					version: undefined,
 				},
 			],
@@ -172,7 +172,7 @@ export async function runInit(
 						...(options.js
 							? [
 									{
-										name: '@jsrepo/transform-strip-types',
+										name: '@jsrepo/transform-javascript',
 									},
 								]
 							: []),
@@ -248,7 +248,7 @@ export async function runInit(
 					...(options.js
 						? [
 								{
-									name: '@jsrepo/transform-strip-types',
+									name: '@jsrepo/transform-javascript',
 								},
 							]
 						: []),

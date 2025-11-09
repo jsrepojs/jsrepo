@@ -1,0 +1,31 @@
+---
+title: JavaScript
+description: Transform TypeScript registry items into JavaScript before adding them to your project.
+---
+
+<BadgeGroup>
+	<SourceBadge path="packages/transform-javascript/src/index.ts" />
+	<OfficialBadge />
+</BadgeGroup>
+
+The [@jsrepo/transform-javascript](https://npmjs.com/package/@jsrepo/transform-javascript) package is a transform plugin for **jsrepo** that converts TypeScript registry items into JavaScript before adding them to your project.
+
+## Installation
+
+```sh
+jsrepo config transform javascript
+# or initialize any jsrepo project with the --js flag
+jsrepo init @ieedan/std --js
+```
+
+This will automatically install the transform and add it to your config:
+
+```ts
+import { defineConfig } from "jsrepo";
+import javascript from "@jsrepo/transform-javascript"; // [!code ++]
+
+export default defineConfig({
+	// ...
+	transforms: [javascript()], // [!code ++]
+});
+```

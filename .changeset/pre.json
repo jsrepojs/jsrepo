@@ -6,7 +6,7 @@
 		"@jsrepo/mcp": "0.0.0",
 		"@jsrepo/transform-biome": "0.0.0",
 		"@jsrepo/transform-prettier": "0.0.0",
-		"@jsrepo/transform-strip-types": "0.0.0",
+		"@jsrepo/transform-javascript": "0.0.0",
 		"@jsrepo/shadcn": "0.0.0",
 		"@jsrepo/docs": "0.0.0"
 	},

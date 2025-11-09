@@ -322,8 +322,8 @@ export const OFFICIAL_PLUGINS = [
 		name: '@jsrepo/transform-biome',
 	},
 	{
-		shorthand: 'strip-types',
-		name: '@jsrepo/transform-strip-types',
+		shorthand: 'javascript',
+		name: '@jsrepo/transform-javascript',
 	},
 ];
 

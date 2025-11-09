@@ -366,26 +366,7 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
-  packages/transform-prettier:
-    dependencies:
-      jsrepo:
-        specifier: workspace:*
-        version: link:../jsrepo
-      prettier:
-        specifier: 3.x
-        version: 3.6.2
-    devDependencies:
-      '@types/node':
-        specifier: 'catalog:'
-        version: 24.10.0
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.15.12(@arethetypeswrong/core@0.18.2)(typescript@5.9.3)
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
-
-  packages/transform-strip-types:
+  packages/transform-javascript:
     dependencies:
       jsrepo:
         specifier: workspace:*
@@ -409,6 +390,25 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.0)(jiti@2.6.1)(lightningcss@1.30.2)(msw@2.11.6(@types/node@24.10.0)(typescript@5.9.3))
+
+  packages/transform-prettier:
+    dependencies:
+      jsrepo:
+        specifier: workspace:*
+        version: link:../jsrepo
+      prettier:
+        specifier: 3.x
+        version: 3.6.2
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.10.0
+      tsdown:
+        specifier: 'catalog:'
+        version: 0.15.12(@arethetypeswrong/core@0.18.2)(typescript@5.9.3)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
 
   playground/prettier-project:
     dependencies:
@@ -447,9 +447,9 @@ importers:
         specifier: ^3.3.1
         version: 3.3.1
     devDependencies:
-      '@jsrepo/transform-strip-types':
+      '@jsrepo/transform-javascript':
         specifier: workspace:*
-        version: link:../../packages/transform-strip-types
+        version: link:../../packages/transform-javascript
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.1.16
