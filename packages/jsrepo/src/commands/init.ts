@@ -59,6 +59,7 @@ export const schema = defaultCommandOptionsSchema.extend({
 	verbose: z.boolean(),
 	expand: z.boolean(),
 	maxUnchanged: z.number(),
+	js: z.boolean(),
 });
 
 export type InitOptions = z.infer<typeof schema>;
@@ -66,6 +67,11 @@ export type InitOptions = z.infer<typeof schema>;
 export const init = new Command('init')
 	.description('Initialize a new jsrepo project.')
 	.argument('[registries...]', 'The registries to initialize.')
+	.option(
+		'--js',
+		'Initialize the project and automatically add the @jsrepo/transform-javascript transform plugin.',
+		false
+	)
 	.addOption(commonOptions.cwd)
 	.addOption(commonOptions.yes)
 	.addOption(commonOptions.verbose)
@@ -135,6 +141,22 @@ export async function runInit(
 		hasJsrepo = false;
 	}
 
+	if (options.js) {
+		const addPluginsToConfigResult = await addPluginsToConfig({
+			plugins: [
+				{
+					name: 'stripTypes',
+					packageName: '@jsrepo/transform-javascript',
+					version: undefined,
+				},
+			],
+			key: 'transforms',
+			config: { path: configPath, code: configCode },
+		});
+		if (addPluginsToConfigResult.isErr()) return err(addPluginsToConfigResult.error);
+		configCode = addPluginsToConfigResult.value;
+	}
+
 	if (registriesArg.length === 0) {
 		if (config !== null) return err(new AlreadyInitializedError());
 
@@ -144,7 +166,18 @@ export async function runInit(
 
 		if (!hasJsrepo) {
 			await promptInstallDependencies(
-				{ dependencies: [], devDependencies: [] },
+				{
+					dependencies: [],
+					devDependencies: [
+						...(options.js
+							? [
+									{
+										name: '@jsrepo/transform-javascript',
+									},
+								]
+							: []),
+					],
+				},
 				{ configPath, options }
 			);
 		}
@@ -208,7 +241,19 @@ export async function runInit(
 
 	if (neededDeps.size > 0) {
 		await promptInstallDependencies(
-			{ dependencies: [], devDependencies: Array.from(neededDeps) },
+			{
+				dependencies: [],
+				devDependencies: [
+					...Array.from(neededDeps),
+					...(options.js
+						? [
+								{
+									name: '@jsrepo/transform-javascript',
+								},
+							]
+						: []),
+				],
+			},
 			{
 				options: { yes: true },
 				configPath,

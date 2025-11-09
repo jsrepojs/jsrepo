@@ -39,7 +39,8 @@ export type CLIError =
 	| NoProviderFoundError
 	| MissingPeerDependencyError
 	| InvalidRegistryNameError
-	| InvalidRegistryVersionError;
+	| InvalidRegistryVersionError
+	| Unreachable;
 
 export class JsrepoError extends Error {
 	private readonly suggestion: string;
@@ -124,8 +125,12 @@ export class RegistryItemFetchError extends JsrepoError {
 	constructor(error: unknown, options: { registry: string; item: string }) {
 		super(
 			error instanceof ProviderFetchError
-				? `Error fetching ${pc.bold(`${options.registry}/${options.item}`)} from ${pc.bold(error.resourcePath)}: ${error.message}`
-				: `Error fetching ${options.registry}/${options.item}: ${error instanceof Error ? error.message : String(error)}`,
+				? `Error fetching ${pc.bold(`${options.registry}/${options.item}`)} from ${pc.bold(
+						error.resourcePath
+					)}: ${error.message}`
+				: `Error fetching ${options.registry}/${options.item}: ${
+						error instanceof Error ? error.message : String(error)
+					}`,
 			{
 				suggestion: 'Please try again.',
 			}
@@ -165,7 +170,9 @@ export class MultipleRegistriesError extends JsrepoError {
 				.map((r, i) => `${i === registries.length - 1 ? 'and ' : ''}${r}`)
 				.join(', ')} contain ${pc.bold(itemName)}.`,
 			{
-				suggestion: `You will have to be more specific by providing the registry url like: ${pc.bold(`\`${registries[0]}/${itemName}\``)}.`,
+				suggestion: `You will have to be more specific by providing the registry url like: ${pc.bold(
+					`\`${registries[0]}/${itemName}\``
+				)}.`,
 			}
 		);
 	}
@@ -306,7 +313,11 @@ export class InvalidDependencyError extends BuildError {
 		dependency,
 		registryName,
 		itemName,
-	}: { dependency: string; registryName: string; itemName: string }) {
+	}: {
+		dependency: string;
+		registryName: string;
+		itemName: string;
+	}) {
 		super(`Invalid dependency: ${pc.bold(dependency)} for ${pc.bold(itemName)}.`, {
 			registryName,
 			suggestion: 'Please ensure the dependency is a valid npm package name.',
@@ -327,7 +338,9 @@ export class DuplicateFileReferenceError extends BuildError {
 		registryName: string;
 	}) {
 		super(
-			`Duplicate file reference: ${pc.bold(path)} is in both ${pc.bold(`${parent.type}/${parent.name}`)} and ${pc.bold(`${duplicateParent.type}/${duplicateParent.name}`)}.`,
+			`Duplicate file reference: ${pc.bold(path)} is in both ${pc.bold(
+				`${parent.type}/${parent.name}`
+			)} and ${pc.bold(`${duplicateParent.type}/${duplicateParent.name}`)}.`,
 			{
 				registryName,
 				suggestion: 'Please ensure the file is not referenced multiple times.',
@@ -476,7 +489,9 @@ export class MissingPeerDependencyError extends JsrepoError {
 export class InvalidRegistryNameError extends JsrepoError {
 	constructor(registryName: string) {
 		super(
-			`Invalid registry name: ${pc.bold(registryName)} is not a valid name. The name should be provided as ${pc.bold(`\`@<scope>/<registry>\``)}.`,
+			`Invalid registry name: ${pc.bold(
+				registryName
+			)} is not a valid name. The name should be provided as ${pc.bold(`\`@<scope>/<registry>\``)}.`,
 			{
 				suggestion: 'Please check the registry name and try again.',
 			}
@@ -492,11 +507,26 @@ export class InvalidRegistryVersionError extends JsrepoError {
 			});
 		} else {
 			super(
-				`Invalid version for ${pc.bold(registryName)}: ${pc.bold(registryVersion)} is not a valid version. The version should be provided as ${pc.bold(`\`<major>.<minor>.<patch>\``)}.`,
+				`Invalid version for ${pc.bold(registryName)}: ${pc.bold(
+					registryVersion
+				)} is not a valid version. The version should be provided as ${pc.bold(
+					`\`<major>.<minor>.<patch>\``
+				)}.`,
 				{
 					suggestion: 'Please check the registry version and try again.',
 				}
 			);
 		}
+	}
+}
+
+/**
+ * This error is thrown when a code path should be unreachable.
+ */
+export class Unreachable extends JsrepoError {
+	constructor() {
+		super('This code path should be unreachable.', {
+			suggestion: 'This is a bug, please report it.',
+		});
 	}
 }

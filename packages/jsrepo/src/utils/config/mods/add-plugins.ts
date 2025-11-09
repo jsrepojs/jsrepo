@@ -321,6 +321,10 @@ export const OFFICIAL_PLUGINS = [
 		shorthand: 'biome',
 		name: '@jsrepo/transform-biome',
 	},
+	{
+		shorthand: 'javascript',
+		name: '@jsrepo/transform-javascript',
+	},
 ];
 
 export function parsePlugins(
@@ -342,8 +346,10 @@ export function parsePluginName(
 ): Result<Plugin, InvalidPluginError> {
 	const officialPlugin = OFFICIAL_PLUGINS.find((p) => p.shorthand === plugin);
 	if (officialPlugin) {
+		const parsedPlugin = parsePluginName(officialPlugin.name, key);
+		if (parsedPlugin.isErr()) return err(parsedPlugin.error);
 		return ok({
-			name: officialPlugin.shorthand,
+			name: parsedPlugin.value.name,
 			packageName: officialPlugin.name,
 			version: undefined,
 		});

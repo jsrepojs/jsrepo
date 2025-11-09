@@ -18,9 +18,9 @@ import type { Transform } from 'jsrepo';
  */
 export default function (): Transform {
 	return {
-		transform: async (code, opts) => {
+		transform: async ({ code, fileName, options }) => {
 			return {
-				code: await tryFormat(code, { fileName: opts.fileName, cwd: opts.cwd }),
+				code: await tryFormat(code, { fileName: fileName, cwd: options.cwd }),
 			};
 		},
 	};
