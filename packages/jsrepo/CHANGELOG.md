@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.0-beta.7
+### Patch Changes
+
+
+- update `transform` api to allow for renaming files ([#651](https://github.com/jsrepojs/jsrepo/pull/651))
+
 ## 3.0.0-beta.6
 ### Patch Changes
 

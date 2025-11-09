@@ -1,7 +1,7 @@
 {
 	"name": "@jsrepo/shadcn",
 	"description": "A package to help you distribute your jsrepo registry as a shadcn registry.",
-	"version": "0.0.1-beta.6",
+	"version": "0.0.1-beta.7",
 	"license": "MIT",
 	"homepage": "https://v3.jsrepo.dev/docs/outputs/shadcn",
 	"author": {
