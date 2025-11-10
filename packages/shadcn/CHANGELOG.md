@@ -1,5 +1,11 @@
 # @jsrepo/shadcn
 
+## 0.0.1-beta.10
+### Patch Changes
+
+
+- fix: Add `title` to `ShadcnRegistryItem` ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
 ## 0.0.1-beta.9
 ### Patch Changes
 
