@@ -39,6 +39,7 @@ export type PackageJson = {
 	scripts: Record<string, string>;
 	dependencies: Record<string, string>;
 	devDependencies: Record<string, string>;
+	type: string;
 	// rest props
 	[key: string]: unknown;
 };

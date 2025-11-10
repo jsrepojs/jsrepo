@@ -102,7 +102,7 @@ function FeatureAccordionSection() {
 					<Terminal className="border-none text-start h-[368px] [&>pre]:w-full *:data-[slot='terminal-header']:hidden w-full">
 						<TypingAnimation>&gt; jsrepo init</TypingAnimation>
 
-						<AnimatedSpan className="text-green-500">✔ Wrote config to jsrepo.config.mts</AnimatedSpan>
+						<AnimatedSpan className="text-green-500">✔ Wrote config to jsrepo.config.ts</AnimatedSpan>
 
 						<AnimatedSpan className="text-green-500">✔ Installed dependencies.</AnimatedSpan>
 

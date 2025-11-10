@@ -36,7 +36,7 @@ Next we can configure the registry with the `registry` key.
 
 Let's start by giving the registry a name:
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 
 export default defineConfig({
@@ -48,7 +48,7 @@ export default defineConfig({
 
 Next let's add the items we just created to the registry:
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 
 export default defineConfig({
@@ -81,7 +81,7 @@ export default defineConfig({
 
 For now we will use the `repository` output for our registry so let's add it to our config:
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 import { repository } from "jsrepo/outputs"; // [!code ++]
 
@@ -105,7 +105,7 @@ This will create a `registry.json` file at the root of our project that contains
 
 To test our registry locally we can use the `fs` provider. Let's add it to our config:
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 import { repository } from "jsrepo/outputs";
 import { fs } from "jsrepo/providers"; // [!code ++]
@@ -124,7 +124,7 @@ jsrepo init fs://./
 
 This will add the registry to the `registries` key in our config file:
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 import { repository } from "jsrepo/outputs";
 import { fs } from "jsrepo/providers";
@@ -159,7 +159,7 @@ Many times you may not want certain dependencies to be installed with your regis
 
 For this you can use the `excludeDeps` key of your registry config.
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 
 export default defineConfig({
@@ -178,7 +178,7 @@ We mentioned this briefly above but you can configure when an item is added in t
 - `"when-needed"` - Not listed and only added when another item is added that depends on it
 - `"when-added"` - Added when the user selects it to be added
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 
 export default defineConfig({
@@ -205,7 +205,7 @@ There are a few common things you may want to automatically configure in the use
 
 You can configure the `defaultPaths` key of your registry config to configure the default paths for items or item types to be added to in the user's project.
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 
 export default defineConfig({
@@ -222,7 +222,7 @@ export default defineConfig({
 
 You can also configure the `plugins` key to automatically install plugins to the user's project when they initialize your registry.
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 
 export default defineConfig({
@@ -242,7 +242,7 @@ Sometimes your registry items may require environment variables to work.
 
 For this you can define the `envVars` key of that particular item:
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 
 export default defineConfig({
@@ -283,7 +283,7 @@ However until now there wasn't an easy way to do this.
 
 **jsrepo** solves this by allowing you to define multiple registries in the same config:
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 
 export default defineConfig({
@@ -302,7 +302,7 @@ export default defineConfig({
 
 You can then use the `outputs` api to define where each registry should be output to:
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 import { distributed } from "jsrepo/outputs";
 
@@ -334,7 +334,7 @@ In **jsrepo v3** we are giving the control back to you allowing you to write you
 
 To do this simply pass a function to the `registry` key that returns a registry config:
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 // define your own custom function
 import { getItems } from "./getItems";
@@ -351,7 +351,7 @@ export default defineConfig({
 
 Oh and of course you can also pass an array of functions:
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 // define your own custom function
 import { getItems } from "./getItems";

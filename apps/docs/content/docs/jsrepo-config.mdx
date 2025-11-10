@@ -17,7 +17,7 @@ jsrepo init
 
 This will initialize a blank config in your project.
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 
 export default defineConfig({
@@ -70,7 +70,7 @@ Next you can configure the paths for the items you want to add. (These are the t
 
 Once you have configured the paths any items that were specified by the registry author to add upon initialization will be added to your project. And the resulting config should look like this:
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 import prettier from "@jsrepo/transform-prettier";
 
@@ -102,7 +102,7 @@ jsrepo config language jsrepo-language-<language>
 
 This will automatically install the plugin and add it to your config:
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 import prettier from "@jsrepo/transform-prettier"; // [!code ++]
 
@@ -125,7 +125,7 @@ As your config grows this will continue to work (so long as you don't use some r
 
 Languages are how **jsrepo** knows how to parse and transform code. You can read more about the supported languages [here](/docs/languages).
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 import { js } from "jsrepo/languages";
 
@@ -138,7 +138,7 @@ export default defineConfig({
 
 Paths are how **jsrepo** knows where to put items in your project. Paths can either reference a type of item or a specific item.
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 
 export default defineConfig({
@@ -154,7 +154,7 @@ export default defineConfig({
 
 Providers are how **jsrepo** knows where to fetch items from. You can read more about providers [here](/docs/providers).
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 import { fs } from "jsrepo/providers";
 
@@ -167,7 +167,7 @@ export default defineConfig({
 
 Registries are the default locations that items will be fetched from when you run **jsrepo** commands.
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 
 export default defineConfig({
@@ -179,7 +179,7 @@ export default defineConfig({
 
 The `registry` option allows you to define your own registry or registries. You can learn more about creating your own registry [here](/docs/create-a-registry).
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 
 export default defineConfig({
@@ -191,7 +191,7 @@ export default defineConfig({
 
 Transforms allow you to make modifications to code before it is added to your project this is where you might add formatting, and other code modifications. You can read more about transforms [here](/docs/transforms).
 
-```ts title="jsrepo.config.mts"
+```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 import prettier from "@jsrepo/transform-prettier";
 

@@ -107,10 +107,18 @@ export async function runInit(
 ): Promise<Result<void, CLIError>> {
 	const { verbose: _, spinner } = initLogging({ options });
 
+	const packagePath = path.join(options.cwd, 'package.json');
+
+	const packageJsonResult = tryGetPackage(packagePath);
+	if (packageJsonResult.isErr()) return err(new NoPackageJsonFoundError());
+	const packageJson = packageJsonResult.value;
+
 	let { config, path: configPath } = configResult ?? {
 		config: null,
-		// default to mts so that we don't give warnings to users that don't have `"type": "module"` in their package.json
-		path: path.join(options.cwd, 'jsrepo.config.mts'),
+		path: path.join(
+			options.cwd,
+			packageJson.type === 'module' ? 'jsrepo.config.ts' : 'jsrepo.config.mts'
+		),
 	};
 	const providers = config?.providers ?? DEFAULT_PROVIDERS;
 
@@ -121,12 +129,6 @@ export async function runInit(
 		configCode = fs.readFileSync(configPath, 'utf-8');
 	}
 
-	const packagePath = path.join(options.cwd, 'package.json');
-
-	const packageJsonResult = tryGetPackage(packagePath);
-	if (packageJsonResult.isErr()) return err(new NoPackageJsonFoundError());
-
-	const packageJson = packageJsonResult.value;
 	let hasJsrepo = true;
 	if (
 		packageJson.dependencies?.jsrepo === undefined &&
