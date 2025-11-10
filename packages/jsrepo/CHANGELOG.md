@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.0-beta.8
+### Patch Changes
+
+
+- shadcn-compat: add `title` to registry items config ([#653](https://github.com/jsrepojs/jsrepo/pull/653))
+
 ## 3.0.0-beta.7
 ### Patch Changes
 
