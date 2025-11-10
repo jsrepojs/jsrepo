@@ -111,7 +111,7 @@ export type UnresolvedFile = {
 	parent: ParentItem;
 	path: string;
 	type?: RegistryFileType;
-	dependencyResolution?: 'auto' | 'manual';
+	dependencyResolution: 'auto' | 'manual';
 	target?: string;
 };
 
@@ -119,6 +119,7 @@ export type ResolvedFile = {
 	parent: ParentItem;
 	path: string;
 	type?: RegistryFileType;
+	dependencyResolution: 'auto' | 'manual';
 	localDependencies: LocalDependency[];
 	dependencies: RemoteDependency[];
 	devDependencies: RemoteDependency[];
@@ -194,7 +195,8 @@ export async function buildRegistry(
 			const basePath = getItemBasePath(item);
 			return {
 				...file,
-				dependencyResolution: file.dependencyResolution ?? item.dependencyResolution,
+				dependencyResolution:
+					file.dependencyResolution ?? item.dependencyResolution ?? 'auto',
 				parent: {
 					name: item.name,
 					type: item.type,
@@ -270,7 +272,7 @@ export async function resolveFiles(
 			let dependencies: RemoteDependency[] = [];
 			let devDependencies: RemoteDependency[] = [];
 			let localDependencies: LocalDependency[] = [];
-			if (file.dependencyResolution !== 'manual') {
+			if (file.dependencyResolution === 'auto') {
 				const language = config.languages.find((language) =>
 					language.canResolveDependencies(file.path)
 				);
@@ -414,7 +416,8 @@ export async function resolveRegistryItem(
 							registryName: registryName,
 						})
 					);
-				await resolveFileDependencies(resolvedFile);
+				const resolvedResult = await resolveFileDependencies(resolvedFile);
+				if (resolvedResult.isErr()) return err(resolvedResult.error);
 			}
 		} else {
 			const resolvedFile = resolvedFiles.get(path.normalize(file.path));
@@ -426,46 +429,56 @@ export async function resolveRegistryItem(
 						registryName: registryName,
 					})
 				);
-			await resolveFileDependencies(resolvedFile);
+			const resolvedResult = await resolveFileDependencies(resolvedFile);
+			if (resolvedResult.isErr()) return err(resolvedResult.error);
 		}
 
-		async function resolveFileDependencies(resolvedFile: ResolvedFile) {
+		async function resolveFileDependencies(
+			resolvedFile: ResolvedFile
+		): Promise<Result<void, BuildError>> {
 			const _imports_: UnresolvedImport[] = [];
-			if (item.dependencyResolution !== 'manual') {
-				for (const dependency of resolvedFile.dependencies) {
-					if (isLocalDependency(dependency)) {
-						const localDependency = resolvedFiles.get(
-							path.normalize(path.relative(cwd, dependency.fileName))
-						);
-						if (localDependency) {
-							// never self reference
-							if (localDependency.parent.name !== item.name) {
-								registryDependencies.add(localDependency.parent.name);
-							}
-
-							_imports_.push({
-								import: dependency.import,
-								item: localDependency.parent.name,
-								meta: await dependency.createTemplate(localDependency),
-							});
-						} else {
-							// only error if in strict mode
-							if (item.strict === false) continue;
-							return err(
-								new ImportedFileNotResolvedError({
-									referencedFile: dependency.fileName,
-									fileName: resolvedFile.path,
-									item: item.name,
-									registryName: registryName,
-								})
-							);
+			if (resolvedFile.dependencyResolution === 'auto') {
+				for (const dependency of resolvedFile.localDependencies) {
+					const localDependency = resolvedFiles.get(
+						path.normalize(path.relative(cwd, dependency.fileName))
+					);
+					if (localDependency) {
+						// never self reference
+						if (localDependency.parent.name !== item.name) {
+							registryDependencies.add(localDependency.parent.name);
 						}
+
+						_imports_.push({
+							import: dependency.import,
+							item: localDependency.parent.name,
+							meta: await dependency.createTemplate(localDependency),
+						});
 					} else {
-						dependencies.set(
-							`${dependency.ecosystem}:${dependency.name}@${dependency.version}`,
-							dependency
+						// only error if in strict mode
+						if (item.strict === false) continue;
+						return err(
+							new ImportedFileNotResolvedError({
+								referencedFile: dependency.fileName,
+								fileName: resolvedFile.path,
+								item: item.name,
+								registryName: registryName,
+							})
 						);
 					}
+				}
+
+				for (const dependency of resolvedFile.dependencies) {
+					dependencies.set(
+						`${dependency.ecosystem}:${dependency.name}@${dependency.version}`,
+						dependency
+					);
+				}
+
+				for (const dependency of resolvedFile.devDependencies) {
+					devDependencies.set(
+						`${dependency.ecosystem}:${dependency.name}@${dependency.version}`,
+						dependency
+					);
 				}
 			}
 
@@ -476,6 +489,8 @@ export async function resolveRegistryItem(
 				type: resolvedFile.type,
 				_imports_,
 			});
+
+			return ok();
 		}
 	}
 
