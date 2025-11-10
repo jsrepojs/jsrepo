@@ -5,9 +5,6 @@
 
 A package to help you distribute your jsrepo registry as a shadcn registry.
 
-> [!WARNING]
-> Users can only use the **shadcn** CLI to add items from a registry output by this plugin.
-
 ## Usage
 
 Install the package:
