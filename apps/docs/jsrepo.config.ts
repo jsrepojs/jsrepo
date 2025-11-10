@@ -28,34 +28,6 @@ export default defineConfig({
 		},
 		items: [
 			{
-				name: "demo",
-				type: "block",
-				add: "when-added",
-				files: [
-					{
-						path: "src/components/registry-kit/demo.tsx",
-					},
-					{
-						path: "src/components/registry-kit/demo-example.tsx",
-						type: "registry:example",
-					}
-				],
-				envVars: {
-					DATABASE_URL: 'https://example.com/database',
-					DATABASE_SECRET_TOKEN: ""
-				}
-			},
-			{
-				name: "tabs",
-				type: "component",
-				add: "when-needed",
-				files: [
-					{
-						path: "src/components/ui/tabs.tsx",
-					},
-				],
-			},
-			{
 				name: "utils",
 				type: "lib",
 				add: "on-init",
