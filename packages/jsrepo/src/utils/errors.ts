@@ -233,9 +233,13 @@ export class NoPathProvidedError extends JsrepoError {
 
 export class BuildError extends JsrepoError {
 	readonly registryName: string;
-	constructor(message: string, options: { registryName: string; suggestion: string }) {
+	constructor(
+		message: string,
+		options: { registryName: string; suggestion: string; docsLink?: string }
+	) {
 		super(message, {
 			suggestion: options.suggestion,
+			docsLink: options.docsLink,
 		});
 		this.registryName = options.registryName;
 	}
@@ -246,6 +250,7 @@ export class NoOutputsError extends BuildError {
 		super(`No outputs were defined in the registry ${pc.bold(registryName)}.`, {
 			registryName,
 			suggestion: 'Please define at least one output using the `registry.outputs` key.',
+			docsLink: 'https://v3.jsrepo.dev/docs/outputs',
 		});
 	}
 }
