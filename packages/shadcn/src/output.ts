@@ -44,6 +44,7 @@ export function output(options: OutputOptions): Output {
 				items: buildResult.items.map((item) => {
 					return {
 						name: item.name,
+						title: item.title,
 						description: item.description,
 						// validated above
 						type: getType(item.type) as Registry['items'][number]['type'],
@@ -80,6 +81,7 @@ export function output(options: OutputOptions): Output {
 				return {
 					$schema: 'https://ui.shadcn.com/schema/registry-item.json',
 					name: item.name,
+					title: item.title,
 					description: item.description,
 					type: getType(item.type) as RegistryItem['type'],
 					files: item.files.map((file) => {

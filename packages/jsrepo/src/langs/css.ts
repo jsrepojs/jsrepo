@@ -31,12 +31,18 @@ export function css({ allowTailwindDirectives = true }: Partial<CssOptions> = {}
 		canResolveDependencies: (fileName) =>
 			fileName.endsWith('.css') || fileName.endsWith('.scss') || fileName.endsWith('.sass'),
 		resolveDependencies: async (code, opts) => {
-			const imports = c.parse(code, { allowTailwindDirectives });
-			if (imports.isErr())
+			const importsResult = c.parse(code, { allowTailwindDirectives });
+			if (importsResult.isErr())
 				return { localDependencies: [], dependencies: [], devDependencies: [] };
+			let imports = importsResult.unwrap();
+
+			// filter out http imports
+			imports = imports.filter(
+				(imp) => !imp.module.startsWith('https://') && !imp.module.startsWith('http://')
+			);
 
 			return resolveImports(
-				imports.unwrap().map((imp) => imp.module),
+				imports.map((imp) => imp.module),
 				opts
 			);
 		},
