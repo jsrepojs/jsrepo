@@ -22,6 +22,8 @@ export type ShadcnRegistry = {
 
 export type ShadcnRegistryItem = {
 	name: string;
+	/** Human readable title of the item */
+	title?: string;
 	type: ShadcnRegistryItemType;
 	description?: string;
 	files: Array<
