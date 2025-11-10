@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.0-beta.9
+### Patch Changes
+
+
+- fix: Add `docsLink` to `NoOutputsError` ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
 ## 3.0.0-beta.8
 ### Patch Changes
 
