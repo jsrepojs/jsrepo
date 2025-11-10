@@ -1,11 +1,13 @@
+"use client";
+
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
-import { BadgeCheckIcon, CodeIcon, SettingsIcon } from "lucide-react";
+import { BadgeCheckIcon, CodeIcon, Download, SettingsIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tooltip";
 
 import { cn } from "@/lib/utils";
-import { NpmLogo } from "../logos";
+import { useQuery } from "@tanstack/react-query";
 
 const badgeVariants = cva(
 	"inline-flex items-center justify-center rounded-full border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
@@ -52,8 +54,8 @@ function SourceBadge({
 			className="flex place-items-center justify-center not-prose"
 		>
 			<Badge variant="secondary" className={cn("text-muted-foreground", className)} {...props}>
-				<span>Source</span>
 				<CodeIcon className="size-3" />
+				<span>Source</span>
 			</Badge>
 		</a>
 	);
@@ -64,8 +66,8 @@ function OfficialBadge({ className, ...props }: Omit<React.ComponentProps<typeof
 		<Tooltip>
 			<TooltipTrigger asChild>
 				<Badge variant="secondary" className={cn("text-muted-foreground cursor-default", className)} {...props}>
-					<span>Official</span>
 					<BadgeCheckIcon className="size-3" />
+					<span>Official</span>
 				</Badge>
 			</TooltipTrigger>
 			<TooltipContent>
@@ -80,8 +82,8 @@ function DefaultBadge({ className, ...props }: Omit<React.ComponentProps<typeof 
 		<Tooltip>
 			<TooltipTrigger asChild>
 				<Badge variant="secondary" className={cn("text-muted-foreground cursor-default", className)} {...props}>
-					<span>Default</span>
 					<SettingsIcon className="size-3" />
+					<span>Default</span>
 				</Badge>
 			</TooltipTrigger>
 			<TooltipContent>
@@ -91,11 +93,40 @@ function DefaultBadge({ className, ...props }: Omit<React.ComponentProps<typeof 
 	);
 }
 
+type DownloadsResponse = {
+	downloads: number;
+	start: string;
+	end: string;
+	package: string;
+};
+
 function NpmBadge({
 	packageName,
 	className,
 	...props
 }: Omit<React.ComponentProps<typeof Badge>, "variant"> & { packageName: string }) {
+	const query = useQuery({
+		queryKey: ["npm", packageName],
+		queryFn: async () => {
+			try {
+				const response = await fetch(`https://api.npmjs.org/downloads/point/last-month/${packageName}`);
+
+				if (!response.ok) {
+					return 0;
+				}
+
+				const data = (await response.json()) as DownloadsResponse;
+
+				return data.downloads;
+			} catch {
+				return 0;
+			}
+		},
+		staleTime: 1000 * 60 * 60 * 24, // 24 hours
+		refetchOnMount: false,
+		refetchOnWindowFocus: false,
+	});
+
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
@@ -103,13 +134,9 @@ function NpmBadge({
 					href={`https://npmjs.com/package/${packageName}`}
 					className="flex place-items-center justify-center not-prose"
 				>
-					<Badge
-						variant="secondary"
-						className={cn("text-muted-foreground cursor-default", className)}
-						{...props}
-					>
-						<span>{packageName}</span>
-						<NpmLogo className="size-3" />
+					<Badge variant="secondary" className={cn("text-muted-foreground", className)} {...props}>
+						<Download className="size-3" />
+						<span>{query.data ?? 0}/month</span>
 					</Badge>
 				</a>
 			</TooltipTrigger>

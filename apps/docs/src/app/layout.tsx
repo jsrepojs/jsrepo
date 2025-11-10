@@ -1,7 +1,7 @@
 import "@/app/global.css";
-import { RootProvider } from "fumadocs-ui/provider/next";
 import { Manrope, IBM_Plex_Mono } from "next/font/google";
 import Script from "next/script";
+import { App } from "./app-client";
 
 const fontSans = Manrope({
 	subsets: ["latin"],
@@ -29,7 +29,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
 						data-website-id="c8df5723-7064-489a-ae4b-723c8534340c"
 					/>
 				)}
-				<RootProvider>{children}</RootProvider>
+				<App>{children}</App>
 			</body>
 		</html>
 	);
