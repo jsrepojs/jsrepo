@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.0-beta.10
+### Patch Changes
+
+
+- fix: Create config at `.mts` only if `type: "module"` is not set in package.json ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
 ## 3.0.0-beta.9
 ### Patch Changes
 
