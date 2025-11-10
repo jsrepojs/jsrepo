@@ -45,6 +45,7 @@ export type Ecosystem = LooseAutocomplete<'js'>;
 
 export type ResolvedItem = {
 	name: string;
+	title?: string;
 	type: RegistryItemType;
 	description?: string;
 	files: RegistryFile[];
@@ -480,6 +481,7 @@ export async function resolveRegistryItem(
 
 	return ok({
 		name: item.name,
+		title: item.title,
 		type: item.type,
 		description: item.description,
 		basePath: getItemBasePath(item) ?? '',

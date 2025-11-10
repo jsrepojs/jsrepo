@@ -49,6 +49,7 @@ export function repository({ format }: RepositoryOutputOptions = {}): Output {
 				defaultPaths: buildResult.defaultPaths,
 				items: buildResult.items.map((item) => ({
 					name: item.name,
+					title: item.title,
 					description: item.description,
 					type: item.type,
 					add: item.add,
@@ -100,6 +101,7 @@ export type RepositoryOutputFile = z.infer<typeof RepositoryOutputFileSchema>;
 
 export const RepositoryOutputManifestItemSchema = z.object({
 	name: z.string(),
+	title: z.string().optional(),
 	description: z.string().optional(),
 	type: z.string(),
 	registryDependencies: z.array(z.string()).optional(),

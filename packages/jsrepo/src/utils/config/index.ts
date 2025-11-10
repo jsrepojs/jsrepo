@@ -127,8 +127,10 @@ export const RegistryItemAddSchema = z.enum([
 export type RegistryItemAdd = z.infer<typeof RegistryItemAddSchema>;
 
 export type RegistryItem = {
-	/** The name of the item. Spaces are NOT allowed. */
+	/** The name of the item. MUST be unique. Spaces are NOT allowed. */
 	name: string;
+	/** Human readable title of the item */
+	title?: string;
 	/** The type of the item. This can be any string. Users will configure their paths based on this type. */
 	type: RegistryItemType;
 	/** The description of the item not user visible but great for LLMs. */
