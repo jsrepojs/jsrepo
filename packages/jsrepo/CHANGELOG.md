@@ -1,5 +1,14 @@
 # jsrepo
 
+## 3.0.0-beta.13
+### Patch Changes
+
+
+- fix: make peer deps less agressive ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: ensure dev dependencies are added ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
 ## 3.0.0-beta.12
 ### Patch Changes
 
