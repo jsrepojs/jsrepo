@@ -5,7 +5,7 @@ import { svelte } from '@/langs/svelte';
 
 const CWD = path.join(__dirname, '../fixtures/langs/svelte');
 
-describe('js', () => {
+describe('svelte', () => {
 	it('should resolve dependencies', async () => {
 		const warn = vi.fn();
 		const code = fs.readFileSync(path.join(CWD, 'page.svelte'), 'utf-8');

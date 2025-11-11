@@ -345,20 +345,20 @@ export async function transformImports(
 		const filePathRelativeToItem = imp.meta.filePathRelativeToItem as string | undefined;
 		if (!filePathRelativeToItem) continue;
 
-		const originalParsed = path.parse(imp.import);
-		const filePathRelativeToItemParsed = path.parse(filePathRelativeToItem);
-
-		// this way we maintain the same extension as the original import whether it's .js, .ts or nothing
-		const filePathRelativeToItemWithExtension = `${filePathRelativeToItem.slice(
-			0,
-			-filePathRelativeToItemParsed.ext.length
-		)}${originalParsed.ext}`;
+		const { dir: filePathRelativeToItemDir, name: filePathRelativeToItemName } =
+			path.parse(filePathRelativeToItem);
+		// this handles the case where the import is referencing an index file but by the directory name instead of the index file itself
+		// for example: './utils/math' instead of './utils/math/index.ts'
+		const baseName =
+			filePathRelativeToItemName === 'index' && path.parse(imp.import).name !== 'index'
+				? ''
+				: path.basename(imp.import);
 
 		// if relative make it relative
 		if (itemPath.alias === undefined) {
 			const relative = path.relative(
 				path.dirname(destDir),
-				path.join(opts.cwd, itemPath.path, filePathRelativeToItemWithExtension)
+				path.join(opts.cwd, itemPath.path, filePathRelativeToItemDir, baseName)
 			);
 
 			transformedImports.push({
@@ -373,7 +373,7 @@ export async function transformImports(
 		transformedImports.push({
 			pattern: createImportPattern(imp.import),
 			replacement: createReplacement(
-				path.join(itemPath.alias, filePathRelativeToItemWithExtension)
+				path.join(itemPath.alias, filePathRelativeToItemDir, baseName)
 			),
 		});
 	}
