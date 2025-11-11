@@ -3,18 +3,20 @@ title: Registry Kit
 description: A toolkit for your registry.
 ---
 
-import { JsrepoAdd } from '@/components/registry-kit/ui/jsrepo-add'
+import { Add } from '@/components/registry-kit/ui/add'
+import { Download } from '@/components/registry-kit/ui/download'
 import { Demo, DemoPreview, DemoCode, DemoActions, DemoTabs } from '@/components/registry-kit/ui/demo'
 
 <Demo>
     <DemoActions>
         <DemoTabs />
-        <JsrepoAdd item="jsrepo-add" registry="@registry-kit/react" />
+        <Add item="add" registry="@registry-kit/react" />
+        <Download item="result" registry="@ieedan/std" />
     </DemoActions>
     <DemoPreview>
-        <JsrepoAdd item="jsrepo-add" registry="@registry-kit/react" />
+        <Add item="add" registry="@registry-kit/react" />
     </DemoPreview>
-    <DemoCode code={`import { JsrepoAdd } from '@/components/registry-kit/ui/jsrepo-add';
+    <DemoCode code={`import { Add } from '@/components/registry-kit/ui/add';
     
-<JsrepoAdd item="jsrepo-add" registry="@registry-kit/react" />`} />
+<Add item="jsrepo-add" registry="@registry-kit/react" />`} />
 </Demo>

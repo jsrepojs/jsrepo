@@ -14,13 +14,13 @@ import { PnpmLogo } from "../logos/pnpm";
 import { NpmLogo } from "../logos/npm";
 import { YarnLogo } from "../logos/yarn";
 import { BunLogo } from "../logos/bun";
-import { useState } from "react";
 import { resolveCommand } from "package-manager-detector/commands";
+import { useAgentSelection } from "@/components/registry-kit/hooks/use-local-storage";
 
-export function JsrepoAdd({ item, registry }: { item: string; registry: string }) {
+export function Add({ item, registry }: { item: string; registry: string }) {
 	const [copyAdd, copiedAdd] = useCopyToClipboard(1000);
 	const [copyInit, copiedInit] = useCopyToClipboard(1000);
-	const [agent, setAgent] = useState<"pnpm" | "npm" | "yarn" | "bun">("pnpm");
+	const [agent, setAgent] = useAgentSelection();
 
 	const addCommand = resolveCommand(agent, "execute", ["jsrepo", "add", `${registry}/${item}`]);
 	const initCommand = resolveCommand(agent, "execute", ["jsrepo", "init", registry]);
@@ -32,13 +32,13 @@ export function JsrepoAdd({ item, registry }: { item: string; registry: string }
 				className="[&_svg]:size-3.5 flex-1 flex place-items-center rounded-l-md pr-2 hover:bg-accent transition-colors"
 			>
 				<div className="flex items-center justify-center size-9">
-					<CheckIcon className={cn("scale-0 transition-all absolute", copiedAdd && "scale-100")} />
+					<CheckIcon className={cn("scale-0 ease-out transition-all absolute", copiedAdd && "scale-100")} />
 					<AgentLogo
 						agent={agent}
-						className={cn("scale-100 transition-all absolute", copiedAdd && "scale-0")}
+						className={cn("scale-100 ease-out transition-all absolute", copiedAdd && "scale-0")}
 					/>
 				</div>
-				<span className="text-xs text-muted-foreground font-mono">
+				<span className="text-xs font-mono">
 					{[addCommand?.command, ...(addCommand?.args ?? [])].join(" ")}
 				</span>
 			</button>
@@ -56,7 +56,7 @@ export function JsrepoAdd({ item, registry }: { item: string; registry: string }
 						</span>
 						<div className="flex items-center gap-1 [&_svg]:size-3">
 							<span className="text-xs text-muted-foreground text-start">Init registry</span>
-							<CheckIcon className={cn("scale-0 transition-all", copiedInit && "scale-100")} />
+							<CheckIcon className={cn("scale-0 ease-out transition-all", copiedInit && "scale-100")} />
 						</div>
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
