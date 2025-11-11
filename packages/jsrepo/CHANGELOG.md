@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.0-beta.12
+### Patch Changes
+
+
+- fix: Fixed an issue where files with multiple dots i.e. foo.bar.ts were not resolved correctly ([#659](https://github.com/jsrepojs/jsrepo/pull/659))
+
 ## 3.0.0-beta.11
 ### Patch Changes
 
