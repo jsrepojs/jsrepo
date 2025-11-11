@@ -1,5 +1,11 @@
 # @jsrepo/mcp
 
+## 0.0.1-beta.14
+### Patch Changes
+
+- Updated dependencies [[`c168a33`](https://github.com/jsrepojs/jsrepo/commit/c168a33477541ff026a7247736a14c6dad4efa53), [`9f93eae`](https://github.com/jsrepojs/jsrepo/commit/9f93eae1cad08f934f4c50c45f5a70538c487a63)]:
+  - jsrepo@3.0.0-beta.13
+
 ## 0.0.1-beta.13
 ### Patch Changes
 
