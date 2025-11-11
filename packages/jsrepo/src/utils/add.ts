@@ -727,18 +727,16 @@ export async function prepareUpdates({
 			if (fs.existsSync(file.path)) {
 				const originalContents = fs.readFileSync(file.path, 'utf-8');
 
-				if (originalContents === file.content) {
-					continue;
+				if (originalContents !== file.content) {
+					neededFiles.push({
+						type: 'update',
+						oldContent: originalContents,
+						filePath: file.path,
+						content: file.content,
+						itemName: item.name,
+						registryUrl: item.registry.url,
+					});
 				}
-
-				neededFiles.push({
-					type: 'update',
-					oldContent: originalContents,
-					filePath: file.path,
-					content: file.content,
-					itemName: item.name,
-					registryUrl: item.registry.url,
-				});
 			} else {
 				neededFiles.push({
 					type: 'create',
