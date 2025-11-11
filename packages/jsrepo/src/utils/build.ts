@@ -45,24 +45,24 @@ export type Ecosystem = LooseAutocomplete<'js'>;
 
 export type ResolvedItem = {
 	name: string;
-	title?: string;
+	title: string | undefined;
 	type: RegistryItemType;
-	description?: string;
+	description: string | undefined;
 	files: RegistryFile[];
 	basePath: string;
 	/** Dependencies to other items in the registry */
-	registryDependencies?: string[];
+	registryDependencies: string[] | undefined;
 	/** Dependencies to code located in a remote repository to be installed later with a package manager. */
-	dependencies?: RemoteDependency[];
-	devDependencies?: RemoteDependency[];
+	dependencies: RemoteDependency[] | undefined;
+	devDependencies: RemoteDependency[] | undefined;
 	add: RegistryItemAdd;
-	envVars?: Record<string, string>;
+	envVars: Record<string, string> | undefined;
 };
 
 export type RegistryFile = {
 	path: string;
 	content: string;
-	type?: RegistryFileType;
+	type: RegistryFileType | undefined;
 	/** Templates for resolving imports when adding items to users projects. This way users can add their items anywhere and things will just work. */
 	_imports_: UnresolvedImport[];
 	target?: string;
@@ -294,7 +294,6 @@ export async function resolveFiles(
 					log.warn(`Couldn't find a language to resolve dependencies for ${file.path}.`);
 				}
 			}
-
 			resolvedFiles.set(normalizedPath, {
 				...file,
 				dependencies,
@@ -509,6 +508,7 @@ export async function resolveRegistryItem(
 		files,
 		registryDependencies: Array.from(registryDependencies),
 		dependencies: Array.from(dependencies.values()),
+		devDependencies: Array.from(devDependencies.values()),
 		add: item.add ?? 'when-added',
 		envVars: item.envVars,
 	});
