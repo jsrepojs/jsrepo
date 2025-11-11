@@ -1,5 +1,11 @@
 # @jsrepo/shadcn
 
+## 0.0.1-beta.16
+### Patch Changes
+
+- Updated dependencies [[`7541537`](https://github.com/jsrepojs/jsrepo/commit/754153741b409e92e867d306c2b0999a64f74b6d)]:
+  - jsrepo@3.0.0-beta.15
+
 ## 0.0.1-beta.15
 ### Patch Changes
 

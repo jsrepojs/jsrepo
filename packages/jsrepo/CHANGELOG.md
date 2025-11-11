@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.0-beta.15
+### Patch Changes
+
+
+- fix: ensure dependencies are properly installed ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
 ## 3.0.0-beta.14
 ### Patch Changes
 
