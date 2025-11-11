@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.0-beta.14
+### Patch Changes
+
+
+- fix: ensure dependencies are still installed even if file content is the same ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
 ## 3.0.0-beta.13
 ### Patch Changes
 
