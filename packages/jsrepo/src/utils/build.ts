@@ -443,9 +443,15 @@ export async function resolveRegistryItem(
 						path.normalize(path.relative(cwd, dependency.fileName))
 					);
 					if (localDependency) {
-						// never self reference
-						if (localDependency.parent.name !== item.name) {
+						const selfReference = localDependency.parent.name === item.name;
+						// only add to registry dependencies if not a self reference
+						if (!selfReference) {
 							registryDependencies.add(localDependency.parent.name);
+						}
+						
+						// we don't need to resolve relative imports that reference the same item
+						if (selfReference && dependency.import.startsWith('.')) {
+							continue;
 						}
 
 						_imports_.push({
