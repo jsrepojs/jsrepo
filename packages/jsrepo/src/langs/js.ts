@@ -1,26 +1,31 @@
-import fs from "node:fs";
-import { builtinModules } from "node:module";
-import escapeStringRegexp from "escape-string-regexp";
-import { err, ok, type Result } from "nevereverthrow";
-import { parseAsync } from "oxc-parser";
-import { detect, resolveCommand } from "package-manager-detector";
-import path from "pathe";
-import pc from "picocolors";
+import fs from 'node:fs';
+import { builtinModules } from 'node:module';
+import escapeStringRegexp from 'escape-string-regexp';
+import { err, ok, type Result } from 'nevereverthrow';
+import { parseAsync } from 'oxc-parser';
+import { detect, resolveCommand } from 'package-manager-detector';
+import path from 'pathe';
+import pc from 'picocolors';
 import type {
 	ImportTransform,
 	InstallDependenciesOptions,
 	Language,
 	ResolveDependenciesOptions,
 	TransformImportsOptions,
-} from "@/langs/types";
-import type { LocalDependency, RemoteDependency, ResolvedFile, UnresolvedImport } from "@/utils/build";
-import { findNearestPackageJson, shouldInstall } from "@/utils/package";
-import { parsePackageName } from "@/utils/parse-package-name";
-import { runCommands } from "@/utils/prompts";
-import { createPathsMatcher, tryGetTsconfig } from "@/utils/tsconfig";
-import { validateNpmPackageName } from "@/utils/validate-npm-package-name";
+} from '@/langs/types';
+import type {
+	LocalDependency,
+	RemoteDependency,
+	ResolvedFile,
+	UnresolvedImport,
+} from '@/utils/build';
+import { findNearestPackageJson, shouldInstall } from '@/utils/package';
+import { parsePackageName } from '@/utils/parse-package-name';
+import { runCommands } from '@/utils/prompts';
+import { createPathsMatcher, tryGetTsconfig } from '@/utils/tsconfig';
+import { validateNpmPackageName } from '@/utils/validate-npm-package-name';
 
-const SUPPORTED_EXTENSIONS = [".js", ".ts", ".jsx", ".tsx", ".mjs", ".mts"] as const;
+const SUPPORTED_EXTENSIONS = ['.js', '.ts', '.jsx', '.tsx', '.mjs', '.mts'] as const;
 
 // biome-ignore lint/complexity/noBannedTypes: leave me alone for a minute
 export type JsOptions = {};
@@ -30,12 +35,14 @@ export type JsOptions = {};
  */
 export function js(_options: JsOptions = {}): Language {
 	return {
-		name: "javascript",
-		canResolveDependencies: (fileName) => SUPPORTED_EXTENSIONS.some((ext) => fileName.endsWith(ext)),
-		resolveDependencies: async (code, opts) => resolveImports(await getImports(code, opts.fileName), opts),
+		name: 'javascript',
+		canResolveDependencies: (fileName) =>
+			SUPPORTED_EXTENSIONS.some((ext) => fileName.endsWith(ext)),
+		resolveDependencies: async (code, opts) =>
+			resolveImports(await getImports(code, opts.fileName), opts),
 		transformImports: async (imports, opts) =>
 			transformImports(imports as (UnresolvedImport & ImportTemplate)[], opts),
-		canInstallDependencies: (ecosystem) => ecosystem === "js",
+		canInstallDependencies: (ecosystem) => ecosystem === 'js',
 		installDependencies: async (deps, opts) => installDependencies(deps, opts),
 	};
 }
@@ -61,9 +68,9 @@ export async function resolveImports(
 
 	for (const specifier of imports) {
 		// don't resolve node builtins or node: imports
-		if (builtinModules.includes(specifier) || specifier.startsWith("node:")) continue;
+		if (builtinModules.includes(specifier) || specifier.startsWith('node:')) continue;
 
-		if (specifier.startsWith(".")) {
+		if (specifier.startsWith('.')) {
 			const actualPath = path.resolve(opts.cwd, path.dirname(opts.fileName), specifier);
 
 			const mod = searchForModule(actualPath);
@@ -103,7 +110,7 @@ export async function resolveImports(
 				if (opts.excludeDeps.includes(depInfo.name)) continue;
 
 				remoteDeps.push({
-					ecosystem: "js",
+					ecosystem: 'js',
 					name: depInfo.name,
 					version: depInfo.version,
 				});
@@ -127,7 +134,10 @@ export async function resolveImports(
 	};
 }
 
-function createImportTemplate(resolvedFile: ResolvedFile, { cwd }: { import: string; cwd: string }): ImportTemplate {
+function createImportTemplate(
+	resolvedFile: ResolvedFile,
+	{ cwd }: { import: string; cwd: string }
+): ImportTemplate {
 	return {
 		filePathRelativeToItem: path.relative(
 			path.join(cwd, resolvedFile.parent.basePath),
@@ -172,7 +182,7 @@ export async function getImports(code: string, fileName: string): Promise<string
  */
 function searchForModule(
 	modPath: string
-): { path: string; prettyPath: string; type: "file" | "directory" } | undefined {
+): { path: string; prettyPath: string; type: 'file' | 'directory' } | undefined {
 	if (fs.existsSync(modPath)) {
 		const isIndex = fs.statSync(modPath).isDirectory();
 
@@ -180,22 +190,22 @@ function searchForModule(
 			return {
 				path: modPath,
 				prettyPath: modPath,
-				type: "file",
+				type: 'file',
 			};
 		}
 
-		const indexPath = searchForModule(path.join(modPath, "index.js"));
+		const indexPath = searchForModule(path.join(modPath, 'index.js'));
 
 		if (indexPath === undefined) return undefined;
 
 		return {
 			path: indexPath.path,
 			prettyPath: modPath,
-			type: isIndex ? "directory" : "file",
+			type: isIndex ? 'directory' : 'file',
 		};
 	}
 
-	const containing = path.join(modPath, "../");
+	const containing = path.join(modPath, '../');
 
 	// if containing folder doesn't exist this can't exist
 	if (!fs.existsSync(containing)) return undefined;
@@ -203,10 +213,10 @@ function searchForModule(
 	const modParsed = path.parse(modPath);
 
 	// sometimes it will point to .js because it will resolve in prod but not for us
-	if (modParsed.ext === ".js") {
+	if (modParsed.ext === '.js') {
 		const newPath = `${modPath.slice(0, modPath.length - 3)}.ts`;
 
-		if (fs.existsSync(newPath)) return { path: newPath, prettyPath: modPath, type: "file" };
+		if (fs.existsSync(newPath)) return { path: newPath, prettyPath: modPath, type: 'file' };
 	}
 
 	const files = fs.readdirSync(containing);
@@ -224,7 +234,7 @@ function searchForModule(
 			return {
 				path: filePath,
 				prettyPath: prettyPath,
-				type: fs.statSync(filePath).isDirectory() ? "directory" : "file",
+				type: fs.statSync(filePath).isDirectory() ? 'directory' : 'file',
 			};
 		}
 	}
@@ -257,7 +267,8 @@ function tryResolveLocalAlias(
 			return ok({
 				fileName: foundMod.path,
 				import: mod,
-				createTemplate: (resolvedDependency) => createImportTemplate(resolvedDependency, { import: mod, cwd }),
+				createTemplate: (resolvedDependency) =>
+					createImportTemplate(resolvedDependency, { import: mod, cwd }),
 			});
 		}
 	}
@@ -284,7 +295,8 @@ function resolveRemoteDeps(
 	const packageResult = findNearestPackageJson(path.dirname(filePath));
 
 	if (packageResult) {
-		const { devDependencies: packageDevDependencies, dependencies: packageDependencies } = packageResult.package;
+		const { devDependencies: packageDevDependencies, dependencies: packageDependencies } =
+			packageResult.package;
 
 		for (const dep of deps) {
 			const resolved = dependencies.filter((d) => d.name === dep.name);
@@ -333,12 +345,13 @@ export async function transformImports(
 		const filePathRelativeToItem = imp.meta.filePathRelativeToItem as string | undefined;
 		if (!filePathRelativeToItem) continue;
 
-		const { dir: filePathRelativeToItemDir, name: filePathRelativeToItemName } = path.parse(filePathRelativeToItem);
+		const { dir: filePathRelativeToItemDir, name: filePathRelativeToItemName } =
+			path.parse(filePathRelativeToItem);
 		// this handles the case where the import is referencing an index file but by the directory name instead of the index file itself
 		// for example: './utils/math' instead of './utils/math/index.ts'
 		const baseName =
-			filePathRelativeToItemName === "index" && path.parse(imp.import).name !== "index"
-				? ""
+			filePathRelativeToItemName === 'index' && path.parse(imp.import).name !== 'index'
+				? ''
 				: path.basename(imp.import);
 
 		// if relative make it relative
@@ -350,14 +363,18 @@ export async function transformImports(
 
 			transformedImports.push({
 				pattern: createImportPattern(imp.import),
-				replacement: createReplacement(relative.startsWith(".") ? relative : `./${relative}`),
+				replacement: createReplacement(
+					relative.startsWith('.') ? relative : `./${relative}`
+				),
 			});
 			continue;
 		}
 
 		transformedImports.push({
 			pattern: createImportPattern(imp.import),
-			replacement: createReplacement(path.join(itemPath.alias, filePathRelativeToItemDir, baseName)),
+			replacement: createReplacement(
+				path.join(itemPath.alias, filePathRelativeToItemDir, baseName)
+			),
 		});
 	}
 
@@ -366,7 +383,7 @@ export async function transformImports(
 
 function createImportPattern(literal: string): RegExp {
 	// eventually we can use RegExp.escape I assume as soon as polyfills are available
-	return new RegExp(`(['"])${escapeStringRegexp(literal)}\\1`, "g");
+	return new RegExp(`(['"])${escapeStringRegexp(literal)}\\1`, 'g');
 }
 
 function createReplacement(replacement: string): string {
@@ -379,11 +396,11 @@ export async function installDependencies(
 ): Promise<void> {
 	const packageResult = findNearestPackageJson(cwd);
 	if (!packageResult) return;
-	const pm = (await detect({ cwd }))?.agent ?? "npm";
+	const pm = (await detect({ cwd }))?.agent ?? 'npm';
 
 	// this is only if no dependencies were provided
 	if (dependencies.dependencies.length === 0 && dependencies.devDependencies.length === 0) {
-		const installCmd = resolveCommand(pm, "install", []);
+		const installCmd = resolveCommand(pm, 'install', []);
 
 		if (installCmd === null) return;
 
@@ -393,7 +410,8 @@ export async function installDependencies(
 			cwd,
 			messages: {
 				success: () => `Installed dependencies`,
-				error: (err) => `Failed to install dependencies: ${err instanceof Error ? err.message : err}`,
+				error: (err) =>
+					`Failed to install dependencies: ${err instanceof Error ? err.message : err}`,
 			},
 		});
 		return;
@@ -405,20 +423,26 @@ export async function installDependencies(
 
 	if (deps.length === 0 && devDeps.length === 0) return;
 
-	const add = resolveCommand(pm, "add", [...deps.map((d) => `${d.name}${d.version ? `@${d.version}` : ""}`)]);
-	const addDev = resolveCommand(pm, "add", [
-		"-D",
-		...devDeps.map((d) => `${d.name}${d.version ? `@${d.version}` : ""}`),
+	const add = resolveCommand(pm, 'add', [
+		...deps.map((d) => `${d.name}${d.version ? `@${d.version}` : ''}`),
+	]);
+	const addDev = resolveCommand(pm, 'add', [
+		'-D',
+		...devDeps.map((d) => `${d.name}${d.version ? `@${d.version}` : ''}`),
 	]);
 
 	await runCommands({
 		title: `Installing dependencies with ${pm}...`,
-		commands: [...(add && deps.length > 0 ? [add] : []), ...(addDev && devDeps.length > 0 ? [addDev] : [])],
+		commands: [
+			...(add && deps.length > 0 ? [add] : []),
+			...(addDev && devDeps.length > 0 ? [addDev] : []),
+		],
 		cwd,
 		messages: {
 			success: () =>
-				`Installed ${pc.cyan(deps.map((d) => `${d.name}${d.version ? `@${d.version}` : ""}`).join(", "))}`,
-			error: (err) => `Failed to install dependencies: ${err instanceof Error ? err.message : err}`,
+				`Installed ${pc.cyan(deps.map((d) => `${d.name}${d.version ? `@${d.version}` : ''}`).join(', '))}`,
+			error: (err) =>
+				`Failed to install dependencies: ${err instanceof Error ? err.message : err}`,
 		},
 	});
 }

@@ -448,7 +448,7 @@ export async function resolveRegistryItem(
 						if (!selfReference) {
 							registryDependencies.add(localDependency.parent.name);
 						}
-						
+
 						// we don't need to resolve relative imports that reference the same item
 						if (selfReference && dependency.import.startsWith('.')) {
 							continue;
