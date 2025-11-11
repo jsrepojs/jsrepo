@@ -234,7 +234,7 @@ export async function promptInstallDependenciesByEcosystem(
 
 	const languages = config?.languages ?? DEFAULT_LANGS;
 
-	if (Object.keys(dependenciesByEcosystem).length === 0) return [];
+	if (dependenciesByEcosystem.size === 0) return [];
 
 	let install = options.yes;
 	if (!options.yes) {
@@ -261,7 +261,10 @@ export async function promptInstallDependenciesByEcosystem(
 		}
 	}
 
-	return dependenciesByEcosystem ? Object.values(dependenciesByEcosystem).flat() : [];
+	return Array.from(dependenciesByEcosystem.values()).flatMap((v) => [
+		...v.dependencies,
+		...v.devDependencies,
+	]);
 }
 
 export async function runCommands({

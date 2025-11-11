@@ -727,16 +727,18 @@ export async function prepareUpdates({
 			if (fs.existsSync(file.path)) {
 				const originalContents = fs.readFileSync(file.path, 'utf-8');
 
-				if (originalContents !== file.content) {
-					neededFiles.push({
-						type: 'update',
-						oldContent: originalContents,
-						filePath: file.path,
-						content: file.content,
-						itemName: item.name,
-						registryUrl: item.registry.url,
-					});
+				if (originalContents === file.content) {
+					continue;
 				}
+
+				neededFiles.push({
+					type: 'update',
+					oldContent: originalContents,
+					filePath: file.path,
+					content: file.content,
+					itemName: item.name,
+					registryUrl: item.registry.url,
+				});
 			} else {
 				neededFiles.push({
 					type: 'create',
@@ -747,6 +749,7 @@ export async function prepareUpdates({
 				});
 			}
 		}
+
 		// add any dependencies
 		for (const remoteDependency of item.dependencies ?? []) {
 			if (typeof remoteDependency === 'string') {
@@ -770,6 +773,7 @@ export async function prepareUpdates({
 				neededDependencies.add(remoteDependency);
 			}
 		}
+
 		for (const remoteDevDependency of item.devDependencies ?? []) {
 			if (typeof remoteDevDependency === 'string') {
 				const parsedResult = parsePackageName(remoteDevDependency);
@@ -792,6 +796,7 @@ export async function prepareUpdates({
 				neededDevDependencies.add(remoteDevDependency);
 			}
 		}
+
 		// add any env vars
 		for (const [name, value] of Object.entries(item.envVars ?? {})) {
 			if (neededEnvVars === undefined) {

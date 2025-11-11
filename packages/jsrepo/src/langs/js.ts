@@ -43,7 +43,7 @@ export function js(_options: JsOptions = {}): Language {
 		transformImports: async (imports, opts) =>
 			transformImports(imports as (UnresolvedImport & ImportTemplate)[], opts),
 		canInstallDependencies: (ecosystem) => ecosystem === 'js',
-		installDependencies: async (deps, opts) => installDependencies(deps, opts),
+		installDependencies: (deps, opts) => installDependencies(deps, opts),
 	};
 }
 
@@ -440,7 +440,7 @@ export async function installDependencies(
 		cwd,
 		messages: {
 			success: () =>
-				`Installed ${pc.cyan(deps.map((d) => `${d.name}${d.version ? `@${d.version}` : ''}`).join(', '))}`,
+				`Installed ${pc.cyan([...deps, ...devDeps].map((d) => `${d.name}${d.version ? `@${d.version}` : ''}`).join(', '))}`,
 			error: (err) =>
 				`Failed to install dependencies: ${err instanceof Error ? err.message : err}`,
 		},
