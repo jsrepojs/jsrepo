@@ -125,7 +125,10 @@ export async function resolveImports(
 		);
 	}
 
-	const { dependencies, devDependencies } = resolveRemoteDeps(remoteDeps, opts.fileName);
+	const { dependencies, devDependencies } = resolveRemoteDeps(
+		remoteDeps,
+		path.join(opts.cwd, opts.fileName)
+	);
 
 	return {
 		localDependencies: localDeps,

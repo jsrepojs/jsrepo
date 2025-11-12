@@ -16,7 +16,8 @@
 			"!**/node_modules",
 			"!**/docs",
 			"!**/temp-test",
-			"!**/playground"
+			"!**/playground",
+			"!**/tests/fixtures/**/*"
 		]
 	},
 	"assist": { "actions": { "source": { "organizeImports": "on" } } },

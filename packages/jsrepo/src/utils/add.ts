@@ -267,7 +267,13 @@ export type ItemDistributed = DistributedOutputItem & { registry: ResolvedRegist
  */
 export function resolveTree(
 	wantedItems: ResolvedWantedItem[],
-	{ resolvedItems }: { resolvedItems: Map<string, ResolvedItem> }
+	{
+		resolvedItems,
+		options,
+	}: {
+		resolvedItems: Map<string, ResolvedItem>;
+		options: { withExamples: boolean; withDocs: boolean; withTests: boolean };
+	}
 ): Result<ResolvedItem[], RegistryItemNotFoundError> {
 	for (const wantedItem of wantedItems) {
 		if (resolvedItems.has(wantedItem.item.name)) continue;
@@ -288,7 +294,32 @@ export function resolveTree(
 			});
 		}
 
-		const resolvedRegistryDependencies = resolveTree(needsResolving, { resolvedItems });
+		// ensure we also add any registry dependencies of added files
+		for (const file of wantedItem.item.files) {
+			if (file.type === 'registry:example' && !options.withExamples) continue;
+			if (file.type === 'registry:doc' && !options.withDocs) continue;
+			if (file.type === 'registry:test' && !options.withTests) continue;
+
+			for (const registryDependency of file.registryDependencies ?? []) {
+				if (resolvedItems.has(registryDependency)) continue;
+				const item = wantedItem.registry.manifest.items.find(
+					(i) => i.name === registryDependency
+				);
+				if (!item)
+					return err(
+						new RegistryItemNotFoundError(registryDependency, wantedItem.registry.url)
+					);
+				needsResolving.push({
+					registry: wantedItem.registry,
+					item,
+				});
+			}
+		}
+
+		const resolvedRegistryDependencies = resolveTree(needsResolving, {
+			resolvedItems,
+			options,
+		});
 		if (resolvedRegistryDependencies.isErr()) return err(resolvedRegistryDependencies.error);
 		for (const resolvedItem of resolvedRegistryDependencies.value) {
 			resolvedItems.set(resolvedItem.name, resolvedItem);
@@ -572,7 +603,12 @@ export function getTargetPath(
 export type RegistryItemWithContent = ItemRepository | ItemDistributed;
 
 export async function resolveAndFetchAllItems(
-	wantedItems: ResolvedWantedItem[]
+	wantedItems: ResolvedWantedItem[],
+	{
+		options,
+	}: {
+		options: { withExamples: boolean; withDocs: boolean; withTests: boolean };
+	}
 ): Promise<
 	Result<
 		Array<RegistryItemWithContent>,
@@ -582,7 +618,7 @@ export async function resolveAndFetchAllItems(
 		| InvalidJSONError
 	>
 > {
-	const resolvedResult = resolveTree(wantedItems, { resolvedItems: new Map() });
+	const resolvedResult = resolveTree(wantedItems, { resolvedItems: new Map(), options });
 	if (resolvedResult.isErr()) return err(resolvedResult.error);
 	const resolvedItems = resolvedResult.value;
 
@@ -722,6 +758,13 @@ export async function prepareUpdates({
 				config: configResult?.config,
 				itemPaths,
 			});
+
+			for (const dependency of file.dependencies ?? []) {
+				neededDependencies.add(dependency);
+			}
+			for (const dependency of file.devDependencies ?? []) {
+				neededDevDependencies.add(dependency);
+			}
 
 			// check if the file needs to be updated
 			if (fs.existsSync(file.path)) {

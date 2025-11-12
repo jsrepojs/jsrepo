@@ -359,6 +359,7 @@ function collectRegistryFiles(buildResult: BuildResult, cwd: string) {
 		defaultPaths: buildResult.defaultPaths,
 		items: buildResult.items.map((item) => ({
 			name: item.name,
+			title: item.title,
 			description: item.description,
 			type: item.type,
 			add: item.add,
@@ -370,6 +371,9 @@ function collectRegistryFiles(buildResult: BuildResult, cwd: string) {
 				type: file.type,
 				path: path.relative(path.join(cwd, item.basePath), path.join(cwd, file.path)),
 				target: file.target,
+				registryDependencies: file.registryDependencies,
+				dependencies: file.dependencies,
+				devDependencies: file.devDependencies,
 			})),
 		})),
 	};
@@ -381,6 +385,7 @@ function collectRegistryFiles(buildResult: BuildResult, cwd: string) {
 	for (const item of buildResult.items) {
 		const outputItem: DistributedOutputItem = {
 			name: item.name,
+			title: item.title,
 			description: item.description,
 			type: item.type,
 			add: item.add,
@@ -390,6 +395,9 @@ function collectRegistryFiles(buildResult: BuildResult, cwd: string) {
 				path: path.relative(path.join(cwd, item.basePath), path.join(cwd, file.path)),
 				_imports_: file._imports_,
 				target: file.target,
+				registryDependencies: file.registryDependencies,
+				dependencies: file.dependencies,
+				devDependencies: file.devDependencies,
 			})),
 			registryDependencies: item.registryDependencies,
 			dependencies: item.dependencies,

@@ -1,0 +1,8 @@
+{
+	"name": "test",
+	"private": true,
+	"type": "module",
+	"dependencies": {
+		"chalk": "^5.6.2"
+	}
+}

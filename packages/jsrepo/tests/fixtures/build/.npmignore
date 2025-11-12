@@ -1,0 +1,6 @@
+# This is a test fixture - ignore node_modules and lock files
+node_modules
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+

@@ -6,6 +6,12 @@ export interface Output {
 	clean(opts: { cwd: string }): Promise<void>;
 }
 
+export const RemoteDependencySchema = z.object({
+	ecosystem: z.string(),
+	name: z.string(),
+	version: z.string().optional(),
+});
+
 export const RegistryPluginSchema = z.object({
 	package: z.string(),
 	version: z.string().optional(),
