@@ -461,7 +461,15 @@ export async function fetchAllResolvedItems(
 	return ok(finalItems);
 }
 
-/** Tries to get the path for an item. If the path is not set, it will prompt the user for a path. */
+/**
+ * Tries to get the path for an item. If the path is not set, it will prompt the user for a path.
+ *
+ * @remarks the only async "work" is prompting the user for a path if they don't have a path set.
+ *
+ * @param item
+ * @param param1
+ * @returns
+ */
 export async function getItemLocation(
 	item: { name: string; type: RegistryItemType; files: { path: string; target?: string }[] },
 	{
@@ -589,15 +597,13 @@ export function getTargetPath(
 		options: { cwd: string };
 	}
 ) {
-	let filePath: string;
 	if (file.target) {
-		filePath = path.join(options.cwd, file.target);
+		return path.join(options.cwd, file.target);
 	} else if ('relativePath' in file && typeof file.relativePath === 'string') {
-		filePath = path.join(options.cwd, itemPath.path, file.relativePath);
+		return path.join(options.cwd, itemPath.path, file.relativePath);
 	} else {
-		filePath = path.join(options.cwd, itemPath.path, file.path);
+		return path.join(options.cwd, itemPath.path, file.path);
 	}
-	return filePath;
 }
 
 export type RegistryItemWithContent = ItemRepository | ItemDistributed;
