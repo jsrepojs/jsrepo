@@ -51,6 +51,8 @@ export default defineConfig({
             },
 			{
 				name: 'button',
+                title: 'Button',
+                description: 'An awesome button component',
 				type: 'component',
 				files: [
 					{

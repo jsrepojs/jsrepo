@@ -9,8 +9,6 @@ export default defineConfig({
 		},
 	},
 	test: {
-		exclude: [
-			'**/tests/fixtures/**',
-		],
+		include: ['tests/**/*.test.ts', '!tests/fixtures/**/*.test.ts'],
 	},
 });
