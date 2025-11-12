@@ -143,17 +143,17 @@ jsrepo add logger
 
 ## Deploying your registry
 
-Now that we have a working registry we can deploy it to wherever we want. Take a look at the [providers](/docs/providers) docs for the full list of hosting options. 
+This is the end of the basic guide.
 
-Each provider has a guide on how to deploy your registry to that particular platform.
+Now that you have a working registry you can deploy it wherever you want! Take a look at the [providers](/docs/providers) docs for the full list of hosting options. 
 
-This is the end of the basic guide. You can now start adding items to your registry and deploying it to your favorite hosting platform.
+For more advanced usage you can continue reading below...
 
 ## Advanced Usage
 
 Now that we have covered the basics of creating a registry we can start to explore some of the features that make **jsrepo** so powerful.
 
-### Exclude deps
+### Excluding dependencies
 
 Many times you may not want certain dependencies to be installed with your registry items. For instance if you import `useState` from `react` you probably don't want to force users to install `react` with your registry.
 
@@ -170,11 +170,16 @@ export default defineConfig({
 });
 ```
 
+<Callout type="info">
+    It's good practice to put your framework in the `excludeDeps` list whether that be `react`, `vue`, `svelte` etc.
+</Callout>
+
 ### Configure when an item is added
 
 We mentioned this briefly above but you can configure when an item is added in the user's project by setting the `add` key an item.
 
 - `"on-init"` - Added on registry init or when it's needed by another item
+- `"optionally-on-init"` - Users are prompted to add the item when initializing the registry
 - `"when-needed"` - Not listed and only added when another item is added that depends on it
 - `"when-added"` - Added when the user selects it to be added
 
@@ -193,15 +198,13 @@ export default defineConfig({
 });
 ```
 
-<Callout type="info">
-    It's good practice to put your framework in the `excludeDeps` list whether that be `react`, `vue`, `svelte`, or `next` etc.
-</Callout>
-
 ### Configuring the user's project
 
 There are a few common things you may want to automatically configure in the user's project when they first initialize your registry.
 
 #### Default Paths
+
+Default paths are just that, the default locations for which items types or specific items should be added to in the user's project.
 
 You can configure the `defaultPaths` key of your registry config to configure the default paths for items or item types to be added to in the user's project.
 
@@ -211,16 +214,18 @@ import { defineConfig } from "jsrepo";
 export default defineConfig({
 	registry: {
         // ...
-		defaultPaths: {
-			component: "src/components/ui",
-		},
+		defaultPaths: { // [!code ++]
+			component: "src/components/ui", // [!code ++]
+            // you can of course also configure a specific item by referencing it by `<type>/<name>` // [!code ++]
+            "ui/button": "src/components/ui/button", // [!code ++]
+		}, // [!code ++]
 	},
 });
 ```
 
 #### Plugins
 
-You can also configure the `plugins` key to automatically install plugins to the user's project when they initialize your registry.
+You can configure the `plugins` key to automatically install plugins to the user's project when they initialize your registry.
 
 ```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
@@ -229,7 +234,7 @@ export default defineConfig({
 	registry: {
 		plugins: {
             languages: [{ package: "jsrepo-language-go" }], // [!code ++]
-            // by setting the optional key to true the user will be prompted to install the plugin if it is not already installed.
+            // by setting the optional key to true the user will be prompted to install the plugin if it is not already installed. // [!code ++]
 			transforms: [{ package: "@jsrepo/transform-prettier", optional: true }], // [!code ++]
 		},
 	},
@@ -259,10 +264,10 @@ export default defineConfig({
                         path: 'src/db.ts',
                     }
                 ],
-                envVars: {
-                    DATABASE_URL: "https://example.com/database",
-                    DATABASE_SECRET_TOKEN: "",
-                },
+                envVars: { // [!code ++]
+                    DATABASE_URL: "https://example.com/database", // [!code ++]
+                    DATABASE_SECRET_TOKEN: "", // [!code ++]
+                }, // [!code ++]
             }
         ]
 	},
@@ -274,6 +279,76 @@ Environment variables will be added to the users `.env.local` or `.env` file.
 If you leave an environment variable blank the user will be prompted to add a value for it.
 
 Values you configure here will ***never*** overwrite existing values in the user's env file.
+
+### Special file types
+
+There are a few special file types that are supported by **jsrepo**. 
+
+- `registry:example` - An example file 
+- `registry:doc` - A documentation file
+- `registry:test` - A test file
+
+These files are optionally installed when adding/updating an item by specifying the `--with-examples`, `--with-docs`, or `--with-tests` flags. 
+
+<Callout type="info">
+    These files are also made available to LLMs when using the `@jsrepo/mcp` server.
+</Callout>
+
+You can specify the type of a file when you define it on an item:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+        // ...
+		items: [
+			{
+				// ...
+				files: [
+					{
+						path: "src/example.ts",
+						type: "registry:example", // [!code ++]
+					},
+				],
+			}
+		]
+	},
+});
+```
+
+Files with any of the 3 special types will only install their dependencies when added to a users project.
+
+For example if you have a `registry:test` file that depends on `vitest`. `vitest` will only be installed to the users project when the user provides the `--with-tests` flag.
+
+Similarly if that same file was to depend on another item in the registry. Then that item will only be installed to the users project when the test file is added.
+
+This allows you to add **documentation**, **examples**, and **tests** to your registry without forcing the user to install them.
+
+You can also manually define dependencies of a file:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+		items: [
+			{
+				// ...
+                files: [
+					{
+						path: "src/example.ts",
+						type: "registry:test",
+                        dependencies: ["chalk"], // [!code ++]
+                        devDependencies: ["vitest"], // [!code ++]
+                        registryDependencies: ["logger"], // [!code ++]
+					},
+				],
+			}
+        ]
+    }
+});
+```
 
 ### Distributing multiple registries
 
@@ -309,13 +384,13 @@ import { distributed } from "jsrepo/outputs";
 export default defineConfig({
 	registry: [
         {
-            name: '@my-registry/typescript',
-            outputs: [distributed({ dir: "./public/r/ts" })], // [!code ++]
+            name: '@my-registry/vanilla',
+            outputs: [distributed({ dir: "./public/r/v" })], // [!code ++]
             // ...
         },
         {
-            name: '@my-registry/javascript',
-            outputs: [distributed({ dir: "./public/r/js" })], // [!code ++]
+            name: '@my-registry/tailwind',
+            outputs: [distributed({ dir: "./public/r/tw" })], // [!code ++]
             // ...
         }
     ]
@@ -376,4 +451,33 @@ export default defineConfig({
 
 <Callout type="info">
     Dynamically generated registries will still work with the `--watch` flag.
+</Callout>
+
+### Supporting JavaScript and TypeScript
+
+Thanks to the **jsrepo** transforms API it's extremely straightforward to allow your users to choose between JavaScript and TypeScript when using your registry.
+
+Users can simply initialize your registry with the `--js` flag to use JavaScript:
+
+```sh
+jsrepo init @example/registry --js
+# or add the javascript plugin at any time
+jsrepo config transform javascript
+```
+
+Or add the `@jsrepo/transform-javascript` transform to their config manually:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import javascript from "@jsrepo/transform-javascript"; // [!code ++]
+
+export default defineConfig({
+	transforms: [javascript()], // [!code ++]
+});
+```
+
+This will automatically strip the types from TypeScript files and rename them to JavaScript files. You can see the full documentation for the `@jsrepo/transform-javascript` transform [here](/docs/transforms/javascript).
+
+<Callout type="warning">
+    This only works for [erasable syntax](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-8.html#the---erasablesyntaxonly-option) if you are expecting for your users to use TypeScript ensure you are using the `--erasableSyntaxOnly` option when writing your TypeScript code.
 </Callout>
