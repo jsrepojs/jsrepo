@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.0-beta.16
+### Patch Changes
+
+
+- fix: Improve robustness of builds with value optional instead of key optional and better tests ([#664](https://github.com/jsrepojs/jsrepo/pull/664))
+
 ## 3.0.0-beta.15
 ### Patch Changes
 
