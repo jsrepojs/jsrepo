@@ -43,6 +43,11 @@ describe('js', () => {
 			localDependencies: [],
 			dependencies: [],
 			devDependencies: [],
+			manualDependencies: {
+				registryDependencies: [],
+				dependencies: [],
+				devDependencies: [],
+			},
 		});
 		expect(addTemplate).toEqual({ filePathRelativeToItem: 'math/add.ts' });
 		const subtractTemplate = await result.localDependencies[1]?.createTemplate({
@@ -53,6 +58,11 @@ describe('js', () => {
 			localDependencies: [],
 			dependencies: [],
 			devDependencies: [],
+			manualDependencies: {
+				registryDependencies: [],
+				dependencies: [],
+				devDependencies: [],
+			},
 		});
 		expect(subtractTemplate).toEqual({ filePathRelativeToItem: 'math/subtract.ts' });
 		const stdoutTemplate = await result.localDependencies[2]?.createTemplate({
@@ -63,6 +73,11 @@ describe('js', () => {
 			localDependencies: [],
 			dependencies: [],
 			devDependencies: [],
+			manualDependencies: {
+				registryDependencies: [],
+				dependencies: [],
+				devDependencies: [],
+			},
 		});
 		expect(stdoutTemplate).toEqual({ filePathRelativeToItem: 'stdout.ts' });
 	});

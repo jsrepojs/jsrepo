@@ -11,6 +11,10 @@ description: Transform TypeScript registry items into JavaScript before adding t
 
 The [@jsrepo/transform-javascript](https://npmjs.com/package/@jsrepo/transform-javascript) package is a transform plugin for **jsrepo** that converts TypeScript registry items into JavaScript before adding them to your project.
 
+<Callout type="warning">
+    This only works for [erasable syntax](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-8.html#the---erasablesyntaxonly-option).
+</Callout>
+
 ## Installation
 
 ```sh
@@ -29,4 +33,23 @@ export default defineConfig({
 	// ...
 	transforms: [javascript()], // [!code ++]
 });
+```
+
+This plugin will then transform any registry items written in TypeScript into JavaScript before adding them to your project.
+
+**Before:**
+
+```ts title="math/add.ts"
+export function add(a: number, b: number): number {
+	return a + b;
+}
+```
+
+**After:**
+
+```ts title="math/add.js"
+export function add(a: number, b: number): number { // [!code --]
+export function add(a, b) { // [!code ++]
+	return a + b;
+}
 ```

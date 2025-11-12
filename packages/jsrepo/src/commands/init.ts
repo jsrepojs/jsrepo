@@ -310,7 +310,9 @@ export async function runInit(
 			`Fetching ${pc.cyan(itemsToAdd.map((item) => item.item.name).join(', '))}...`
 		);
 
-		const itemsResult = await resolveAndFetchAllItems(itemsToAdd);
+		const itemsResult = await resolveAndFetchAllItems(itemsToAdd, {
+			options: { withExamples: false, withDocs: false, withTests: false },
+		});
 		if (itemsResult.isErr()) {
 			spinner.stop('Failed to fetch items');
 			return err(itemsResult.error);

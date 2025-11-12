@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'pathe';
 import { z } from 'zod';
-import { type Output, RegistryPluginsSchema } from '@/outputs/types';
+import { type Output, RegistryPluginsSchema, RemoteDependencySchema } from '@/outputs/types';
 import { MANIFEST_FILE } from '@/utils/build';
 import { RegistryItemAddSchema, RegistryMetaSchema } from '@/utils/config';
 import { stringify } from '@/utils/json';
@@ -61,6 +61,7 @@ export function distributed({ dir, format }: DistributedOutputOptions): Output {
 					add: item.add,
 					registryDependencies: item.registryDependencies,
 					dependencies: item.dependencies,
+					devDependencies: item.devDependencies,
 					envVars: item.envVars,
 					files: item.files.map((file) => ({
 						type: file.type,
@@ -69,6 +70,9 @@ export function distributed({ dir, format }: DistributedOutputOptions): Output {
 							path.join(cwd, file.path)
 						),
 						target: file.target,
+						registryDependencies: file.registryDependencies,
+						dependencies: file.dependencies,
+						devDependencies: file.devDependencies,
 					})),
 				})),
 			};
@@ -93,9 +97,13 @@ export function distributed({ dir, format }: DistributedOutputOptions): Output {
 						),
 						_imports_: file._imports_,
 						target: file.target,
+						registryDependencies: file.registryDependencies,
+						dependencies: file.dependencies,
+						devDependencies: file.devDependencies,
 					})),
 					registryDependencies: item.registryDependencies,
 					dependencies: item.dependencies,
+					devDependencies: item.devDependencies,
 					envVars: item.envVars,
 				};
 				files.push({
@@ -131,52 +139,36 @@ export function distributed({ dir, format }: DistributedOutputOptions): Output {
 
 export const DistributedOutputManifestFileSchema = z.object({
 	path: z.string(),
-	type: z.string().optional(),
-	target: z.string().optional(),
+	type: z.union([z.string(), z.undefined()]),
+	target: z.union([z.string(), z.undefined()]),
+	registryDependencies: z.union([z.array(z.string()), z.undefined()]),
+	dependencies: z.union([z.array(RemoteDependencySchema), z.undefined()]),
+	devDependencies: z.union([z.array(RemoteDependencySchema), z.undefined()]),
 });
 
 export type DistributedOutputManifestFile = z.infer<typeof DistributedOutputManifestFileSchema>;
 
 export const DistributedOutputManifestItemSchema = z.object({
 	name: z.string(),
-	title: z.string().optional(),
-	description: z.string().optional(),
+	title: z.union([z.string(), z.undefined()]),
+	description: z.union([z.string(), z.undefined()]),
 	type: z.string(),
-	registryDependencies: z.array(z.string()).optional(),
-	add: RegistryItemAddSchema.optional(),
-	dependencies: z
-		.array(
-			z.union([
-				z.object({
-					ecosystem: z.string(),
-					name: z.string(),
-					version: z.string().optional(),
-				}),
-				z.string(),
-			])
-		)
-		.optional(),
-	devDependencies: z
-		.array(
-			z.union([
-				z.object({
-					ecosystem: z.string(),
-					name: z.string(),
-					version: z.string().optional(),
-				}),
-				z.string(),
-			])
-		)
-		.optional(),
-	envVars: z.record(z.string(), z.string()).optional(),
-	files: z.array(DistributedOutputManifestFileSchema).optional().default([]),
+	registryDependencies: z.union([z.array(z.string()), z.undefined()]),
+	add: z.union([RegistryItemAddSchema, z.undefined()]),
+	dependencies: z.union([z.array(z.union([RemoteDependencySchema, z.string()])), z.undefined()]),
+	devDependencies: z.union([
+		z.array(z.union([RemoteDependencySchema, z.string()])),
+		z.undefined(),
+	]),
+	envVars: z.union([z.record(z.string(), z.string()), z.undefined()]),
+	files: z.union([z.array(DistributedOutputManifestFileSchema), z.undefined()]).default([]),
 });
 
 export const DistributedOutputManifestSchema = RegistryMetaSchema.extend({
-	type: z.literal('distributed').optional().default('distributed'),
-	plugins: RegistryPluginsSchema.optional(),
+	type: z.union([z.literal('distributed'), z.undefined()]).default('distributed'),
+	plugins: z.union([RegistryPluginsSchema, z.undefined()]),
 	items: z.array(DistributedOutputManifestItemSchema),
-	defaultPaths: z.record(z.string(), z.string()).optional(),
+	defaultPaths: z.union([z.record(z.string(), z.string()), z.undefined()]),
 });
 
 export type DistributedOutputManifest = z.infer<typeof DistributedOutputManifestSchema>;
@@ -184,53 +176,39 @@ export type DistributedOutputManifest = z.infer<typeof DistributedOutputManifest
 export const DistributedOutputFileSchema = z.object({
 	path: z.string(),
 	content: z.string(),
-	type: z.string().optional(),
+	type: z.union([z.string(), z.undefined()]),
 	_imports_: z
-		.array(
-			z.object({
-				import: z.string(),
-				item: z.string(),
-				meta: z.record(z.string(), z.unknown()),
-			})
-		)
-		.optional()
+		.union([
+			z.array(
+				z.object({
+					import: z.string(),
+					item: z.string(),
+					meta: z.record(z.string(), z.unknown()),
+				})
+			),
+			z.undefined(),
+		])
 		.default([]),
-	target: z.string().optional(),
+	target: z.union([z.string(), z.undefined()]),
+	registryDependencies: z.union([z.array(z.string()), z.undefined()]),
+	dependencies: z.union([z.array(RemoteDependencySchema), z.undefined()]),
+	devDependencies: z.union([z.array(RemoteDependencySchema), z.undefined()]),
 });
 
 export const DistributedOutputItemSchema = z.object({
 	name: z.string(),
-	title: z.string().optional(),
-	description: z.string().optional(),
+	title: z.union([z.string(), z.undefined()]),
+	description: z.union([z.string(), z.undefined()]),
 	type: z.string(),
-	registryDependencies: z.array(z.string()).optional(),
-	add: RegistryItemAddSchema.optional(),
-	dependencies: z
-		.array(
-			z.union([
-				z.object({
-					ecosystem: z.string(),
-					name: z.string(),
-					version: z.string().optional(),
-				}),
-				z.string(),
-			])
-		)
-		.optional(),
-	devDependencies: z
-		.array(
-			z.union([
-				z.object({
-					ecosystem: z.string(),
-					name: z.string(),
-					version: z.string().optional(),
-				}),
-				z.string(),
-			])
-		)
-		.optional(),
-	envVars: z.record(z.string(), z.string()).optional(),
-	files: z.array(DistributedOutputFileSchema).optional().default([]),
+	registryDependencies: z.union([z.array(z.string()), z.undefined()]),
+	add: z.union([RegistryItemAddSchema, z.undefined()]),
+	dependencies: z.union([z.array(z.union([RemoteDependencySchema, z.string()])), z.undefined()]),
+	devDependencies: z.union([
+		z.array(z.union([RemoteDependencySchema, z.string()])),
+		z.undefined(),
+	]),
+	envVars: z.union([z.record(z.string(), z.string()), z.undefined()]),
+	files: z.union([z.array(DistributedOutputFileSchema), z.undefined()]).default([]),
 });
 
 export type DistributedOutputItem = z.infer<typeof DistributedOutputItemSchema>;

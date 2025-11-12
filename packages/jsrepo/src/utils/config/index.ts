@@ -160,6 +160,9 @@ export type RegistryItem = {
 	 * Provide a list of dependencies to be installed with the item. If dependencies are provided as a string they will be assumed to be a js dependency.
 	 */
 	dependencies?: (RemoteDependency | string)[];
+	/**
+	 * Provide a list of devDependencies to be installed with the item. If dependencies are provided as a string they will be assumed to be a js dependency.
+	 */
 	devDependencies?: (RemoteDependency | string)[];
 	/**
 	 * Controls when the item will be added to the project.
@@ -207,6 +210,25 @@ export type RegistryItemFile = {
 	 * The target path for this file in the users project. Overrides all other path settings.
 	 */
 	target?: string;
+	/**
+	 * Dependencies to other items in the registry. For many languages these can be automatically detected but can also be nice if there is another item you need that cannot be detected. They should be in the format of `<name>`.
+	 * @example
+	 * ```ts
+	 * {
+	 *  // ...
+	 *  registryDependencies: ["<name>"]
+	 * }
+	 * ```
+	 */
+	registryDependencies?: string[];
+	/**
+	 * Provide a list of dependencies to be installed with the item. If dependencies are provided as a string they will be assumed to be a js dependency.
+	 */
+	dependencies?: (RemoteDependency | string)[];
+	/**
+	 * Provide a list of devDependencies to be installed with the item. If dependencies are provided as a string they will be assumed to be a js dependency.
+	 */
+	devDependencies?: (RemoteDependency | string)[];
 };
 
 export type TransformOptions = {

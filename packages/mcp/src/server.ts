@@ -106,7 +106,15 @@ server.tool(
 			}
 		);
 
-		const items = (await resolveAndFetchAllItems(resolvedWantedItems)).match(
+		const items = (
+			await resolveAndFetchAllItems(resolvedWantedItems, {
+				options: {
+					withExamples: options.withExamples ?? false,
+					withDocs: options.withDocs ?? false,
+					withTests: options.withTests ?? false,
+				},
+			})
+		).match(
 			(value) => value,
 			(error) => {
 				throw error;
@@ -247,7 +255,15 @@ server.tool(
 			}
 		);
 
-		const items = (await resolveAndFetchAllItems(resolvedWantedItems)).match(
+		const items = (
+			await resolveAndFetchAllItems(resolvedWantedItems, {
+				options: {
+					withExamples: false,
+					withDocs: false,
+					withTests: false,
+				},
+			})
+		).match(
 			(value) => value,
 			(error) => {
 				throw error;
