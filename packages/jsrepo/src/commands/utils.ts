@@ -54,6 +54,7 @@ export async function tryCommand<T, E extends JsrepoError>(
 		if (result.isErr()) return error(result.error);
 		return result.value;
 	} catch (e) {
+		if (e instanceof JsrepoError) error(e);
 		error(
 			new JsrepoError(e instanceof Error ? e.message : String(e), {
 				suggestion: 'Please try again.',

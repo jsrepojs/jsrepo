@@ -6,6 +6,7 @@ import { parseAsync } from 'oxc-parser';
 import { detect, resolveCommand } from 'package-manager-detector';
 import path from 'pathe';
 import pc from 'picocolors';
+import { ModuleNotFoundError } from '@/api';
 import type {
 	ImportTransform,
 	InstallDependenciesOptions,
@@ -39,7 +40,7 @@ export function js(_options: JsOptions = {}): Language {
 		canResolveDependencies: (fileName) =>
 			SUPPORTED_EXTENSIONS.some((ext) => fileName.endsWith(ext)),
 		resolveDependencies: async (code, opts) =>
-			resolveImports(await getImports(code, opts.fileName), opts),
+			resolveImports(await getImports(code, opts), opts),
 		transformImports: async (imports, opts) =>
 			transformImports(imports as (UnresolvedImport & ImportTemplate)[], opts),
 		canInstallDependencies: (ecosystem) => ecosystem === 'js',
@@ -91,7 +92,9 @@ export async function resolveImports(
 			cwd: opts.cwd,
 		});
 
-		if (!localDep.isErr() && localDep.value !== null) {
+		if (localDep.isErr()) throw new ModuleNotFoundError(specifier, { fileName: opts.fileName });
+
+		if (localDep.value !== null) {
 			const dep = localDep.value;
 
 			if (dep) {
@@ -149,8 +152,11 @@ function createImportTemplate(
 	};
 }
 
-export async function getImports(code: string, fileName: string): Promise<string[]> {
-	const result = await parseAsync(fileName, code);
+export async function getImports(
+	code: string,
+	opts: ResolveDependenciesOptions
+): Promise<string[]> {
+	const result = await parseAsync(opts.fileName, code);
 
 	const modules: string[] = [];
 
@@ -161,10 +167,23 @@ export async function getImports(code: string, fileName: string): Promise<string
 
 	// handle dynamic imports
 	for (const imp of result.module.dynamicImports) {
-		// trims the codes and gets the module
-		const mod = code.slice(imp.moduleRequest.start + 1, imp.moduleRequest.end - 1);
+		const fullImport = code.slice(imp.moduleRequest.start, imp.moduleRequest.end);
+		const parsedImport = await parseAsync(opts.fileName, fullImport);
 
-		modules.push(mod);
+		// we can't resolve dynamic imports that are not literals so we just skip them and warn the user
+		if (parsedImport.program.body[0]?.type === 'ExpressionStatement') {
+			if (parsedImport.program.body[0].expression.type === 'Literal') {
+				// trim quotes from the start and end
+				modules.push(code.slice(imp.moduleRequest.start + 1, imp.moduleRequest.end - 1));
+				continue;
+			}
+		}
+
+		opts.warn(
+			`Skipping ${pc.cyan(fullImport)} from ${pc.bold(
+				opts.fileName
+			)}. Reason: Unresolvable syntax. 💡 consider manually including the modules expected to be resolved by this import in your registry dependencies.`
+		);
 	}
 
 	// handle `export x from y` syntax
@@ -187,9 +206,8 @@ function searchForModule(
 	modPath: string
 ): { path: string; prettyPath: string; type: 'file' | 'directory' } | undefined {
 	if (fs.existsSync(modPath)) {
-		const isIndex = fs.statSync(modPath).isDirectory();
-
-		if (!isIndex) {
+		// if it's already pointing to a file then return it
+		if (!fs.statSync(modPath).isDirectory()) {
 			return {
 				path: modPath,
 				prettyPath: modPath,
@@ -199,12 +217,24 @@ function searchForModule(
 
 		const indexPath = searchForModule(path.join(modPath, 'index.js'));
 
-		if (indexPath === undefined) return undefined;
+		if (indexPath !== undefined) {
+			return {
+				path: indexPath.path,
+				prettyPath: modPath,
+				type: 'file',
+			};
+		}
+
+		// it's also possible to reference a file without providing the extension
+
+		const filePath = searchForModule(`${modPath}.js`);
+
+		if (filePath === undefined) return undefined;
 
 		return {
-			path: indexPath.path,
+			path: filePath.path,
 			prettyPath: modPath,
-			type: isIndex ? 'directory' : 'file',
+			type: 'file',
 		};
 	}
 
@@ -252,7 +282,7 @@ function tryResolveLocalAlias(
 ): Result<LocalDependency | null, string> {
 	const configResult = tryGetTsconfig(path.join(cwd, fileName));
 
-	if (configResult.isErr()) return err(configResult.error);
+	if (configResult.isErr()) return ok(null);
 
 	const config = configResult.value;
 
@@ -264,6 +294,8 @@ function tryResolveLocalAlias(
 		// if the mod is actually remote the returns paths will be empty
 		const paths = matcher(mod);
 
+		if (paths.length === 0) return ok(null);
+
 		for (const modPath of paths) {
 			const foundMod = searchForModule(modPath);
 			if (!foundMod) continue;
@@ -274,6 +306,8 @@ function tryResolveLocalAlias(
 					createImportTemplate(resolvedDependency, { import: mod, cwd }),
 			});
 		}
+
+		return err('Module not found');
 	}
 
 	return ok(null);
@@ -443,7 +477,11 @@ export async function installDependencies(
 		cwd,
 		messages: {
 			success: () =>
-				`Installed ${pc.cyan([...deps, ...devDeps].map((d) => `${d.name}${d.version ? `@${d.version}` : ''}`).join(', '))}`,
+				`Installed ${pc.cyan(
+					[...deps, ...devDeps]
+						.map((d) => `${d.name}${d.version ? `@${d.version}` : ''}`)
+						.join(', ')
+				)}`,
 			error: (err) =>
 				`Failed to install dependencies: ${err instanceof Error ? err.message : err}`,
 		},

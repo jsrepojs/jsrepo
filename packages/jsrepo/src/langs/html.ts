@@ -87,7 +87,10 @@ export function html({
 									const codeNode = n.childNodes[0];
 									if (codeNode && 'nodeName' in codeNode && 'value' in codeNode) {
 										const code = codeNode.value as string;
-										const imps = await getImports(code, `${opts.fileName}.ts`);
+										const imps = await getImports(code, {
+											...opts,
+											fileName: `${opts.fileName}.ts`,
+										});
 										imports.push(...imps);
 									}
 								}

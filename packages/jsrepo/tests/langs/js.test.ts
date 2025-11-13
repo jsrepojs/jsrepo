@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'pathe';
 import { describe, expect, it, vi } from 'vitest';
-import { js } from '@/langs/js';
+import { getImports, js } from '@/langs/js';
 
 const CWD = path.join(__dirname, '../fixtures/langs/js');
 
@@ -165,5 +165,43 @@ describe('js', () => {
 				replacement: '$1$lib/utils/math/add.js$1',
 			},
 		]);
+	});
+});
+
+describe('getImports', () => {
+	it('should get all the correct imports', async () => {
+		const code = `import { add } from './math/add';
+export { subtract } from './math/subtract';
+
+const thing = import('./thing');`;
+		const warn = vi.fn();
+		const result = await getImports(code, {
+			fileName: 'logger.ts',
+			cwd: CWD,
+			excludeDeps: [],
+			warn,
+		});
+
+		expect(result).toStrictEqual(['./math/add', './thing', './math/subtract']);
+	});
+
+	it('should skip and warn on unresolvable dynamic imports', async () => {
+		const code = `import { add } from './math/add';
+export { subtract } from './math/subtract';
+
+const thing = import('./thing');
+
+const foo = 'bar';
+const thing2 = import(\`foos/\${foo}\`);`;
+		const warn = vi.fn();
+		const result = await getImports(code, {
+			fileName: 'logger.ts',
+			cwd: CWD,
+			excludeDeps: [],
+			warn,
+		});
+
+		expect(result).toStrictEqual(['./math/add', './thing', './math/subtract']);
+		expect(warn).toHaveBeenCalledOnce();
 	});
 });

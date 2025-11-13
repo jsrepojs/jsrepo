@@ -45,7 +45,7 @@ export function vue(_options: VueOptions = {}): Language {
 			const imports = await Promise.all(
 				neededScripts.map(async (script) => {
 					return await resolveImports(
-						await getImports(script, `${opts.fileName}.ts`),
+						await getImports(script, { ...opts, fileName: `${opts.fileName}.ts` }),
 						opts
 					);
 				})

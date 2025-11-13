@@ -9,6 +9,7 @@ import {
 	parseAsync,
 	Visitor,
 } from 'oxc-parser';
+import { vi } from 'vitest';
 import { getImports } from '@/langs/js';
 import { kebabToCamel } from '@/utils/casing';
 import {
@@ -308,7 +309,13 @@ export async function neededPlugins({
 	};
 	plugins: RegistryPlugin[];
 }): Promise<RegistryPlugin[]> {
-	const imports = await getImports(config.code, config.path);
+	const fn = vi.fn();
+	const imports = await getImports(config.code, {
+		fileName: config.path,
+		cwd: process.cwd(),
+		excludeDeps: [],
+		warn: fn,
+	});
 	return plugins.filter((plugin) => !imports.includes(plugin.package));
 }
 
