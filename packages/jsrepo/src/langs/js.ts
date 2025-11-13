@@ -92,23 +92,20 @@ export async function resolveImports(
 			cwd: opts.cwd,
 		});
 
-		let parsed: ReturnType<typeof parsePackageName>;
-		if (localDep.isOk()) {
-			if (localDep.value !== null) {
-				const dep = localDep.value;
+		if (localDep.isOk() && localDep.value !== null) {
+			const dep = localDep.value;
 
-				if (dep) {
-					localDeps.push(dep);
-					continue;
-				}
+			if (dep) {
+				localDeps.push(dep);
+				continue;
 			}
+		}
 
-			parsed = parsePackageName(specifier);
-		} else {
-			parsed = parsePackageName(specifier);
-			// if the specifier is not a valid package either then we know it's unresolvable and we throw an error
-			if (parsed.isErr())
-				throw new ModuleNotFoundError(specifier, { fileName: opts.fileName });
+		const parsed = parsePackageName(specifier);
+
+		// if the specifier is not a valid package either then we know it's unresolvable and we throw an error
+		if (parsed.isErr() && localDep.isErr()) {
+			throw new ModuleNotFoundError(specifier, { fileName: opts.fileName });
 		}
 
 		if (!parsed.isErr()) {
