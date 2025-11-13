@@ -46,7 +46,7 @@ describe('buildRegistry', () => {
 	});
 
 	it('should have the correct number of items', () => {
-		expect(firstRegistry.items).toHaveLength(5);
+		expect(firstRegistry.items).toHaveLength(6);
 	});
 
 	describe('math item', () => {
@@ -128,8 +128,10 @@ describe('buildRegistry', () => {
 			expect(stdoutItem.add).toBe('when-added');
 		});
 
-		it('should have no dependencies', () => {
-			expect(stdoutItem.registryDependencies).toStrictEqual([]);
+		it('should have the correct dependencies', () => {
+			// this also implicitly test that the utils item is properly detected
+			// since utils has the same name as the utils directory it can be tricky to resolve when importing it without an extension
+			expect(stdoutItem.registryDependencies).toStrictEqual(['utils']);
 			expect(stdoutItem.dependencies).toStrictEqual([]);
 			expect(stdoutItem.devDependencies).toStrictEqual([]);
 		});

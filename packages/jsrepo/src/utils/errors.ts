@@ -245,6 +245,14 @@ export class BuildError extends JsrepoError {
 	}
 }
 
+export class ModuleNotFoundError extends JsrepoError {
+	constructor(mod: string, { fileName }: { fileName: string }) {
+		super(`Module referenced by ${pc.bold(fileName)}: ${pc.bold(mod)} not found.`, {
+			suggestion: 'Please ensure the module exists.',
+		});
+	}
+}
+
 export class NoOutputsError extends BuildError {
 	constructor({ registryName }: { registryName: string }) {
 		super(`No outputs were defined in the registry ${pc.bold(registryName)}.`, {
