@@ -1,5 +1,14 @@
 # jsrepo
 
+## 3.0.0-beta.17
+### Patch Changes
+
+
+- fix: Skip and warn the user for dynamic imports with unresolvable syntax ([#666](https://github.com/jsrepojs/jsrepo/pull/666))
+
+
+- fix: Improve errors for invalid imports. ([#666](https://github.com/jsrepojs/jsrepo/pull/666))
+
 ## 3.0.0-beta.16
 ### Patch Changes
 
