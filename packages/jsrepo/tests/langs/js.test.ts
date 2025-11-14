@@ -2,15 +2,18 @@ import fs from 'node:fs';
 import path from 'pathe';
 import { describe, expect, it, vi } from 'vitest';
 import { getImports, js } from '@/langs/js';
+import { joinAbsolute } from '@/utils/path';
+import type { AbsolutePath, ItemRelativePath } from '@/utils/types';
 
-const CWD = path.join(__dirname, '../fixtures/langs/js');
+const CWD = path.join(__dirname, '../fixtures/langs/js') as AbsolutePath;
 
 describe('js', () => {
 	it('should resolve dependencies', async () => {
 		const warn = vi.fn();
-		const code = fs.readFileSync(path.join(CWD, 'logger.ts'), 'utf-8');
+		const absolutePath = joinAbsolute(CWD, 'logger.ts');
+		const code = fs.readFileSync(absolutePath, 'utf-8');
 		const result = await js().resolveDependencies(code, {
-			fileName: 'logger.ts',
+			fileName: absolutePath,
 			cwd: CWD,
 			excludeDeps: [],
 			warn,
@@ -23,9 +26,10 @@ describe('js', () => {
 
 	it('should resolve dependencies to the correct path', async () => {
 		const warn = vi.fn();
-		const code = fs.readFileSync(path.join(CWD, 'print-answer.ts'), 'utf-8');
+		const absolutePath = joinAbsolute(CWD, 'print-answer.ts');
+		const code = fs.readFileSync(absolutePath, 'utf-8');
 		const result = await js().resolveDependencies(code, {
-			fileName: 'print-answer.ts',
+			fileName: joinAbsolute(CWD, 'print-answer.ts'),
 			cwd: CWD,
 			excludeDeps: [],
 			warn,
@@ -34,59 +38,14 @@ describe('js', () => {
 		expect(result.localDependencies[0]?.import).toBe('./math/add');
 		expect(result.localDependencies[1]?.import).toBe('./math/subtract');
 		expect(result.localDependencies[2]?.import).toBe('./stdout');
-
-		const addTemplate = await result.localDependencies[0]?.createTemplate({
-			content: code,
-			path: path.join(CWD, 'math/add.ts'),
-			parent: { name: 'add', type: 'util', basePath: CWD },
-			dependencyResolution: 'auto',
-			localDependencies: [],
-			dependencies: [],
-			devDependencies: [],
-			manualDependencies: {
-				registryDependencies: [],
-				dependencies: [],
-				devDependencies: [],
-			},
-		});
-		expect(addTemplate).toEqual({ filePathRelativeToItem: 'math/add.ts' });
-		const subtractTemplate = await result.localDependencies[1]?.createTemplate({
-			content: code,
-			path: path.join(CWD, 'math/subtract.ts'),
-			parent: { name: 'add', type: 'util', basePath: CWD },
-			dependencyResolution: 'auto',
-			localDependencies: [],
-			dependencies: [],
-			devDependencies: [],
-			manualDependencies: {
-				registryDependencies: [],
-				dependencies: [],
-				devDependencies: [],
-			},
-		});
-		expect(subtractTemplate).toEqual({ filePathRelativeToItem: 'math/subtract.ts' });
-		const stdoutTemplate = await result.localDependencies[2]?.createTemplate({
-			content: code,
-			path: path.join(CWD, 'stdout.ts'),
-			parent: { name: 'print-answer', type: 'util', basePath: CWD },
-			dependencyResolution: 'auto',
-			localDependencies: [],
-			dependencies: [],
-			devDependencies: [],
-			manualDependencies: {
-				registryDependencies: [],
-				dependencies: [],
-				devDependencies: [],
-			},
-		});
-		expect(stdoutTemplate).toEqual({ filePathRelativeToItem: 'stdout.ts' });
 	});
 
 	it('should exclude excluded dependencies', async () => {
 		const warn = vi.fn();
-		const code = fs.readFileSync(path.join(CWD, 'logger.ts'), 'utf-8');
+		const absolutePath = joinAbsolute(CWD, 'logger.ts');
+		const code = fs.readFileSync(absolutePath, 'utf-8');
 		const result = await js().resolveDependencies(code, {
-			fileName: 'logger.ts',
+			fileName: absolutePath,
 			cwd: CWD,
 			excludeDeps: ['picocolors'],
 			warn,
@@ -103,28 +62,32 @@ describe('js', () => {
 				{
 					import: '$lib/components/ui/button',
 					item: 'button',
-					meta: { filePathRelativeToItem: 'button/index.ts' },
+					file: { type: 'util', path: 'button/index.ts' as ItemRelativePath },
+					meta: {},
 				},
 				{
 					import: '$lib/hooks/use-clipboard.svelte',
 					item: 'use-clipboard',
-					meta: { filePathRelativeToItem: 'use-clipboard.svelte.ts' },
+					file: { type: 'util', path: 'use-clipboard.svelte.ts' as ItemRelativePath },
+					meta: {},
 				},
 				{
 					import: '$lib/utils.js',
 					item: 'utils',
-					meta: { filePathRelativeToItem: 'utils.ts' },
+					file: { type: 'util', path: 'utils.ts' as ItemRelativePath },
+					meta: {},
 				},
 				{
 					import: '../../utils/math/add.js',
 					item: 'math',
-					meta: { filePathRelativeToItem: 'math/add.ts' },
+					file: { type: 'util', path: 'math/add.ts' as ItemRelativePath },
+					meta: {},
 				},
 			],
 			{
 				cwd: CWD,
 				getItemPath: (item) => {
-					switch (item) {
+					switch (item.item) {
 						case 'button':
 							return {
 								path: 'src/lib/components/shadcn-svelte-extras/ui',
@@ -144,7 +107,10 @@ describe('js', () => {
 						}
 					}
 				},
-				targetPath: 'src/lib/components/ui/copy-button/copy-button.svelte',
+				targetPath: joinAbsolute(
+					CWD,
+					'src/lib/components/ui/copy-button/copy-button.svelte'
+				),
 			}
 		);
 		expect(result).toStrictEqual([
@@ -176,9 +142,7 @@ export { subtract } from './math/subtract';
 const thing = import('./thing');`;
 		const warn = vi.fn();
 		const result = await getImports(code, {
-			fileName: 'logger.ts',
-			cwd: CWD,
-			excludeDeps: [],
+			fileName: joinAbsolute(CWD, 'logger.ts'),
 			warn,
 		});
 
@@ -195,9 +159,7 @@ const foo = 'bar';
 const thing2 = import(\`foos/\${foo}\`);`;
 		const warn = vi.fn();
 		const result = await getImports(code, {
-			fileName: 'logger.ts',
-			cwd: CWD,
-			excludeDeps: [],
+			fileName: joinAbsolute(CWD, 'logger.ts'),
 			warn,
 		});
 

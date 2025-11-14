@@ -16,8 +16,8 @@
 			"!**/node_modules",
 			"!**/docs",
 			"!**/temp-test",
-			"!**/playground",
-			"!**/tests/fixtures/**/*"
+			"!**/tests/fixtures/**/*",
+			"!*.svelte"
 		]
 	},
 	"assist": { "actions": { "source": { "organizeImports": "on" } } },
@@ -118,5 +118,16 @@
 				"lineWidth": 100
 			}
 		}
-	]
+	],
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
+	},
+	"html": {
+		"experimentalFullSupportEnabled": true,
+		"formatter": {
+			"indentScriptAndStyle": true
+		}
+	}
 }

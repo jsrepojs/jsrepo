@@ -2,15 +2,18 @@ import fs from 'node:fs';
 import path from 'pathe';
 import { describe, expect, it, vi } from 'vitest';
 import { svelte } from '@/langs/svelte';
+import { joinAbsolute } from '@/utils/path';
+import type { AbsolutePath } from '@/utils/types';
 
-const CWD = path.join(__dirname, '../fixtures/langs/svelte');
+const CWD = path.join(__dirname, '../fixtures/langs/svelte') as AbsolutePath;
 
 describe('svelte', () => {
 	it('should resolve dependencies', async () => {
 		const warn = vi.fn();
-		const code = fs.readFileSync(path.join(CWD, 'page.svelte'), 'utf-8');
+		const absolutePath = joinAbsolute(CWD, 'page.svelte');
+		const code = fs.readFileSync(absolutePath, 'utf-8');
 		const result = await svelte().resolveDependencies(code, {
-			fileName: 'page.svelte',
+			fileName: absolutePath,
 			cwd: CWD,
 			excludeDeps: [],
 			warn,
@@ -23,9 +26,10 @@ describe('svelte', () => {
 
 	it('should exclude excluded dependencies', async () => {
 		const warn = vi.fn();
-		const code = fs.readFileSync(path.join(CWD, 'page.svelte'), 'utf-8');
+		const absolutePath = joinAbsolute(CWD, 'page.svelte');
+		const code = fs.readFileSync(absolutePath, 'utf-8');
 		const result = await svelte().resolveDependencies(code, {
-			fileName: 'page.svelte',
+			fileName: absolutePath,
 			cwd: CWD,
 			excludeDeps: ['svelte'],
 			warn,

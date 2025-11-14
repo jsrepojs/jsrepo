@@ -2,7 +2,7 @@
 
 import { cva } from 'class-variance-authority';
 import {
-  FileIcon,
+  FileIcon as LucideFileIcon,
   FolderIcon,
   FolderOpenIcon,
 } from 'lucide-react';
@@ -13,6 +13,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from './ui/collapsible';
+import { JavaScriptLogo, SvelteLogo, TypeScriptLogo, VueLogo } from './logos';
 
 const itemVariants = cva(
   'flex flex-row items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-fd-accent hover:text-fd-accent-foreground [&_svg]:size-4',
@@ -52,16 +53,31 @@ export interface FolderProps extends HTMLAttributes<HTMLDivElement> {
 
 export function File({
   name,
-  icon = <FileIcon />,
   className,
   ...rest
 }: FileProps): React.ReactElement {
   return (
     <div className={cn(itemVariants({ className }))} {...rest}>
-      {icon}
+      <FileIcon name={name} />
       {name}
     </div>
   );
+}
+
+export function FileIcon({ name }: { name: string }) {
+  const extension = name.includes('.') ? name.split('.').pop() : null;
+  switch (extension) {
+    case 'svelte':
+      return <SvelteLogo />;
+    case 'js':
+      return <JavaScriptLogo />;
+    case 'ts':
+      return <TypeScriptLogo />;
+    case 'vue':
+      return <VueLogo />;
+    default:
+      return <LucideFileIcon />;
+  }
 }
 
 export function Folder({

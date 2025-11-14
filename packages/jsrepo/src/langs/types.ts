@@ -1,21 +1,23 @@
 import type { Ecosystem, LocalDependency, RemoteDependency, UnresolvedImport } from '@/utils/build';
+import type { RegistryItemType } from '@/utils/config';
+import type { AbsolutePath, ItemRelativePath } from '@/utils/types';
 
 export type ResolveDependenciesOptions = {
-	fileName: string;
-	cwd: string;
+	fileName: AbsolutePath;
+	cwd: AbsolutePath;
 	excludeDeps: string[];
 	warn: (log: string) => void;
 };
 
 export type InstallDependenciesOptions = {
-	cwd: string;
+	cwd: AbsolutePath;
 };
 
 export type TransformImportsOptions = {
-	cwd: string;
+	cwd: AbsolutePath;
 	/** The path of the file that the imports will be transformed for. */
 	targetPath: string;
-	getItemPath(item: string): {
+	getItemPath(opts: { item: string; file: { type: RegistryItemType; path: ItemRelativePath } }): {
 		/** The resolved path of the dependency. */
 		path: string;
 		/** The alias of the dependency. */

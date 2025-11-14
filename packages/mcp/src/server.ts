@@ -4,7 +4,6 @@ import fuzzysort from 'fuzzysort';
 import {
 	getPathsForItems,
 	normalizeItemTypeForPath,
-	OptionallyInstalledRegistryTypes,
 	prepareUpdates,
 	promptAddEnvVars,
 	RegistryItemNotFoundError,
@@ -14,6 +13,7 @@ import {
 } from 'jsrepo';
 import { loadConfigSearch } from 'jsrepo/config';
 import { DEFAULT_PROVIDERS } from 'jsrepo/providers';
+import type { AbsolutePath } from 'jsrepo/utils';
 import {
 	parseWantedItems,
 	promptInstallDependenciesByEcosystem,
@@ -65,7 +65,7 @@ server.tool(
 	},
 	async ({ itemNames, ...options }) => {
 		const configResult = await loadConfigSearch({
-			cwd: options.cwd,
+			cwd: options.cwd as AbsolutePath,
 			promptForContinueIfNull: false,
 		});
 
@@ -84,7 +84,7 @@ server.tool(
 
 		const resolvedRegistries = (
 			await resolveRegistries(neededRegistries, {
-				cwd: options.cwd,
+				cwd: options.cwd as AbsolutePath,
 				providers,
 			})
 		).match(
@@ -124,7 +124,7 @@ server.tool(
 		const getPathsForItemsResult = await getPathsForItems({
 			items,
 			config: configResult?.config,
-			options: { cwd: options.cwd, yes: true },
+			options: { cwd: options.cwd as AbsolutePath, yes: true },
 		});
 		if (getPathsForItemsResult.isErr()) {
 			// give the llm a way to fix the error
@@ -157,7 +157,7 @@ server.tool(
 			await prepareUpdates({
 				configResult,
 				options: {
-					cwd: options.cwd,
+					cwd: options.cwd as AbsolutePath,
 					yes: true,
 					withExamples: options.withExamples ?? false,
 					withDocs: options.withDocs ?? false,
@@ -180,10 +180,12 @@ server.tool(
 		});
 
 		if (neededEnvVars)
-			await promptAddEnvVars(neededEnvVars, { options: { cwd: options.cwd, yes: true } });
+			await promptAddEnvVars(neededEnvVars, {
+				options: { cwd: options.cwd as AbsolutePath, yes: true },
+			});
 
 		await promptInstallDependenciesByEcosystem(neededDependencies, {
-			options: { cwd: options.cwd, yes: true },
+			options: { cwd: options.cwd as AbsolutePath, yes: true },
 			config: configResult?.config,
 		});
 
@@ -214,7 +216,7 @@ server.tool(
 	},
 	async ({ cwd, item }) => {
 		const configResult = await loadConfigSearch({
-			cwd,
+			cwd: cwd as AbsolutePath,
 			promptForContinueIfNull: false,
 		});
 
@@ -233,7 +235,7 @@ server.tool(
 
 		const resolvedRegistries = (
 			await resolveRegistries(neededRegistries, {
-				cwd,
+				cwd: cwd as AbsolutePath,
 				providers,
 			})
 		).match(
@@ -311,7 +313,7 @@ server.tool(
 		const limit = l ?? 10;
 		const offset = o ?? 0;
 		const configResult = await loadConfigSearch({
-			cwd,
+			cwd: cwd as AbsolutePath,
 			promptForContinueIfNull: false,
 		});
 
@@ -319,7 +321,7 @@ server.tool(
 
 		const resolvedRegistries = (
 			await resolveRegistries(registries, {
-				cwd,
+				cwd: cwd as AbsolutePath,
 				providers,
 			})
 		).match(
@@ -393,11 +395,7 @@ function displayItemDetails(item: RegistryItemWithContent): string {
 
 	## Files
 	${item.files
-		?.filter(
-			(file) =>
-				file.type === undefined ||
-				!(OptionallyInstalledRegistryTypes as unknown as string[]).includes(file.type)
-		)
+		?.filter((file) => file.role === undefined || file.role === 'file')
 		.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
 		.join('\n')}
 
@@ -406,19 +404,19 @@ function displayItemDetails(item: RegistryItemWithContent): string {
 
 	## Examples
 	${item.files
-		?.filter((file) => file.type === 'registry:example')
+		?.filter((file) => file.role === 'example')
 		.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
 		.join('\n')}
 
 	## Docs
 	${item.files
-		?.filter((file) => file.type === 'registry:doc')
+		?.filter((file) => file.role === 'doc')
 		.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
 		.join('\n')}
 
 	## Tests
 	${item.files
-		?.filter((file) => file.type === 'registry:test')
+		?.filter((file) => file.role === 'test')
 		.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
 		.join('\n')}
 

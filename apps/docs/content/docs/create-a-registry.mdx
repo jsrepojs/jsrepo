@@ -153,6 +153,204 @@ For more advanced usage you can continue reading below...
 
 Now that we have covered the basics of creating a registry we can start to explore some of the features that make **jsrepo** so powerful.
 
+### Files
+
+We showed you how to include files in the registry earlier by referencing them by their path but there's much more to know!
+
+#### File types
+
+Files can have any type that an item can. If you don't provide a type the file will simply inherit the type from the parent item.
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+		items: [
+			{
+				// ...
+                files: [
+                    {
+                        path: "src/example.ts",
+                        type: "utils", // [!code ++]
+                    }
+                ]
+			}
+		]
+	}
+});
+```
+
+#### File dependencies
+
+Just like items you can set the `dependencyResolution` to `manual` and manually specify the dependencies of a file.
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+		items: [
+			{
+				// ...
+                files: [
+                    {
+                        path: "src/example.ts",
+                        dependencyResolution: "manual", // [!code ++]
+                        dependencies: ["chalk"], // [!code ++]
+                    }
+                ]
+			}
+		]
+	}
+});
+```
+
+#### File roles
+
+There are a few file roles that are supported by **jsrepo**. 
+
+- `file` - The default (doesn't need to be specified always installed)
+- `example` - An example file 
+- `doc` - A documentation file
+- `test` - A test file
+
+`example`, `doc`, and `test` files are optionally installed when adding/updating an item by specifying the `--with-examples`, `--with-docs`, or `--with-tests` flags. 
+
+<Callout type="info">
+    These files are also made available to LLMs when using the `@jsrepo/mcp` server.
+</Callout>
+
+You can specify the role of a file when you define it on an item:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+        // ...
+		items: [
+			{
+				// ...
+				files: [
+					{
+						path: "src/example.ts",
+						role: "example", // [!code ++]
+					},
+				],
+			}
+		]
+	},
+});
+```
+
+Files with any of the 3 special roles will only install their dependencies when added to a users project.
+
+For example if you have a file with `role: "test"` that depends on `vitest`. `vitest` will only be installed to the users project when the user provides the `--with-tests` flag.
+
+Similarly if that same file was to depend on another item in the registry. Then that item will only be installed to the users project when the test file is added.
+
+This allows you to add **documentation**, **examples**, and **tests** to your registry without forcing the user to install them.
+
+#### Folders
+
+When using frameworks like **Svelte** you are forced to define *one component per file* which will require you to bundle all your files into a folder. In cases like this you need to be able to include folders in your registry.
+
+Doing this is intuitive in **jsrepo**.
+
+Lets take for example, this **Empty** component:
+
+import { Files, Folder, File } from "@/components/files";
+
+<Files>
+	<Folder name="src" defaultOpen>
+		<Folder name="components" defaultOpen>
+			<Folder name="ui" defaultOpen>
+				<Folder name="empty" defaultOpen>
+					<File name="empty-content.svelte" />
+					<File name="empty-description.svelte" />
+					<File name="empty-header.svelte" />
+					<File name="empty-media.svelte" />
+					<File name="empty-title.svelte" />
+                    <File name="empty.svelte" />
+					<File name="index.ts" />
+				</Folder>
+			</Folder>
+		</Folder>
+	</Folder>
+</Files>
+
+We can simply reference the folder path and **jsrepo** will automatically include all the files in the folder:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+		items: [
+			{
+				name: 'empty',
+				type: 'ui',
+				files: [
+					{
+						path: 'src/components/ui/empty', // [!code ++]
+					},
+				],
+			},
+		],
+	},
+});
+```
+
+All the files in the folder will be included in the registry automatically and when users add them they will be added together under the `empty` folder.
+
+If you need to configure the files that are included in a folder you can use the `files` key on folder. This is also useful if you need to change properties like the `role` or `dependencyResolution` of a particular file.
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+		items: [
+			{
+				// ...
+				files: [
+					{
+						path: 'src/components/ui/empty', // [!code ++]
+                        files: [ // [!code ++]
+                            { // [!code ++]
+                                // file paths are relative to the parent folder path so this turns into `src/components/ui/empty/empty-content.svelte` // [!code ++]
+                                path: 'empty-content.svelte', // [!code ++]
+                                // you can also configure other properties like the `role` or `dependencyResolution` of a particular file. // [!code ++]
+                                dependencyResolution: 'manual', // [!code ++]
+                            }, // [!code ++]
+                            { // [!code ++]
+                                path: 'empty-description.svelte', // [!code ++]
+                            }, // [!code ++]
+                            { // [!code ++]
+                                path: 'empty-header.svelte', // [!code ++]
+                            }, // [!code ++]
+                            { // [!code ++]
+                                path: 'empty-media.svelte', // [!code ++]
+                            }, // [!code ++]
+                            { // [!code ++]
+                                path: 'empty-title.svelte', // [!code ++]
+                            }, // [!code ++]
+                            { // [!code ++]
+                                path: 'empty.svelte', // [!code ++]
+                            }, // [!code ++]
+                            { // [!code ++]
+                                path: 'index.ts', // [!code ++]
+                            }, // [!code ++]
+                        ], // [!code ++]
+					},
+				],
+			},
+		],
+	});
+});
+```
+
 ### Excluding dependencies
 
 Many times you may not want certain dependencies to be installed with your registry items. For instance if you import `useState` from `react` you probably don't want to force users to install `react` with your registry.
@@ -279,76 +477,6 @@ Environment variables will be added to the users `.env.local` or `.env` file.
 If you leave an environment variable blank the user will be prompted to add a value for it.
 
 Values you configure here will ***never*** overwrite existing values in the user's env file.
-
-### Special file types
-
-There are a few special file types that are supported by **jsrepo**. 
-
-- `registry:example` - An example file 
-- `registry:doc` - A documentation file
-- `registry:test` - A test file
-
-These files are optionally installed when adding/updating an item by specifying the `--with-examples`, `--with-docs`, or `--with-tests` flags. 
-
-<Callout type="info">
-    These files are also made available to LLMs when using the `@jsrepo/mcp` server.
-</Callout>
-
-You can specify the type of a file when you define it on an item:
-
-```ts title="jsrepo.config.ts"
-import { defineConfig } from "jsrepo";
-
-export default defineConfig({
-	registry: {
-        // ...
-		items: [
-			{
-				// ...
-				files: [
-					{
-						path: "src/example.ts",
-						type: "registry:example", // [!code ++]
-					},
-				],
-			}
-		]
-	},
-});
-```
-
-Files with any of the 3 special types will only install their dependencies when added to a users project.
-
-For example if you have a `registry:test` file that depends on `vitest`. `vitest` will only be installed to the users project when the user provides the `--with-tests` flag.
-
-Similarly if that same file was to depend on another item in the registry. Then that item will only be installed to the users project when the test file is added.
-
-This allows you to add **documentation**, **examples**, and **tests** to your registry without forcing the user to install them.
-
-You can also manually define dependencies of a file:
-
-```ts title="jsrepo.config.ts"
-import { defineConfig } from "jsrepo";
-
-export default defineConfig({
-	registry: {
-		items: [
-			{
-				// ...
-                files: [
-					{
-						path: "src/example.ts",
-						type: "registry:test",
-                        dependencies: ["chalk"], // [!code ++]
-                        devDependencies: ["vitest"], // [!code ++]
-                        registryDependencies: ["logger"], // [!code ++]
-					},
-				],
-			}
-        ]
-    }
-});
-```
 
 ### Distributing multiple registries
 

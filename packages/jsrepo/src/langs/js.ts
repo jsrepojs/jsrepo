@@ -1,4 +1,3 @@
-import fs from 'node:fs';
 import { builtinModules } from 'node:module';
 import escapeStringRegexp from 'escape-string-regexp';
 import { err, ok, type Result } from 'nevereverthrow';
@@ -14,16 +13,14 @@ import type {
 	ResolveDependenciesOptions,
 	TransformImportsOptions,
 } from '@/langs/types';
-import type {
-	LocalDependency,
-	RemoteDependency,
-	ResolvedFile,
-	UnresolvedImport,
-} from '@/utils/build';
+import type { LocalDependency, RemoteDependency, UnresolvedImport } from '@/utils/build';
+import { existsSync, readdirSync, statSync } from '@/utils/fs';
 import { findNearestPackageJson, shouldInstall } from '@/utils/package';
 import { parsePackageName } from '@/utils/parse-package-name';
+import { dirname, joinAbsolute } from '@/utils/path';
 import { runCommands } from '@/utils/prompts';
 import { createPathsMatcher, tryGetTsconfig } from '@/utils/tsconfig';
+import type { AbsolutePath } from '@/utils/types';
 import { validateNpmPackageName } from '@/utils/validate-npm-package-name';
 
 const SUPPORTED_EXTENSIONS = ['.js', '.ts', '.jsx', '.tsx', '.mjs', '.mts'] as const;
@@ -42,14 +39,11 @@ export function js(_options: JsOptions = {}): Language {
 		resolveDependencies: async (code, opts) =>
 			resolveImports(await getImports(code, opts), opts),
 		transformImports: async (imports, opts) =>
-			transformImports(imports as (UnresolvedImport & ImportTemplate)[], opts),
+			transformImports(imports as UnresolvedImport[], opts),
 		canInstallDependencies: (ecosystem) => ecosystem === 'js',
 		installDependencies: (deps, opts) => installDependencies(deps, opts),
 	};
 }
-
-/** The template that will be used to resolve the import on the client */
-export type ImportTemplate = { filePathRelativeToItem: string };
 
 /**
  * Resolves dependencies for javascript and typescript.
@@ -72,7 +66,7 @@ export async function resolveImports(
 		if (builtinModules.includes(specifier) || specifier.startsWith('node:')) continue;
 
 		if (specifier.startsWith('.')) {
-			const actualPath = path.resolve(opts.cwd, path.dirname(opts.fileName), specifier);
+			const actualPath = joinAbsolute(dirname(opts.fileName), specifier);
 
 			const mod = searchForModule(actualPath);
 			if (mod === undefined) continue;
@@ -80,8 +74,7 @@ export async function resolveImports(
 			localDeps.push({
 				fileName: mod.path,
 				import: specifier,
-				createTemplate: (resolvedDependency) =>
-					createImportTemplate(resolvedDependency, { import: specifier, cwd: opts.cwd }),
+				createTemplate: () => ({}),
 			});
 			continue;
 		}
@@ -132,7 +125,7 @@ export async function resolveImports(
 
 	const { dependencies, devDependencies } = resolveRemoteDeps(
 		remoteDeps,
-		path.join(opts.cwd, opts.fileName)
+		joinAbsolute(opts.cwd, opts.fileName)
 	);
 
 	return {
@@ -142,23 +135,17 @@ export async function resolveImports(
 	};
 }
 
-function createImportTemplate(
-	resolvedFile: ResolvedFile,
-	{ cwd }: { import: string; cwd: string }
-): ImportTemplate {
-	return {
-		filePathRelativeToItem: path.relative(
-			path.join(cwd, resolvedFile.parent.basePath),
-			path.join(cwd, resolvedFile.path)
-		),
-	};
-}
-
 export async function getImports(
 	code: string,
-	opts: ResolveDependenciesOptions
+	{
+		fileName,
+		warn,
+	}: {
+		fileName: ResolveDependenciesOptions['fileName'];
+		warn: ResolveDependenciesOptions['warn'];
+	}
 ): Promise<string[]> {
-	const result = await parseAsync(opts.fileName, code);
+	const result = await parseAsync(fileName, code);
 
 	const modules: string[] = [];
 
@@ -170,7 +157,7 @@ export async function getImports(
 	// handle dynamic imports
 	for (const imp of result.module.dynamicImports) {
 		const fullImport = code.slice(imp.moduleRequest.start, imp.moduleRequest.end);
-		const parsedImport = await parseAsync(opts.fileName, fullImport);
+		const parsedImport = await parseAsync(fileName, fullImport);
 
 		// we can't resolve dynamic imports that are not literals so we just skip them and warn the user
 		if (parsedImport.program.body[0]?.type === 'ExpressionStatement') {
@@ -181,9 +168,9 @@ export async function getImports(
 			}
 		}
 
-		opts.warn(
+		warn(
 			`Skipping ${pc.cyan(fullImport)} from ${pc.bold(
-				opts.fileName
+				fileName
 			)}. Reason: Unresolvable syntax. 💡 consider manually including the modules expected to be resolved by this import in your registry dependencies.`
 		);
 	}
@@ -205,11 +192,11 @@ export async function getImports(
  * @param path
  */
 function searchForModule(
-	modPath: string
-): { path: string; prettyPath: string; type: 'file' | 'directory' } | undefined {
-	if (fs.existsSync(modPath)) {
+	modPath: AbsolutePath
+): { path: AbsolutePath; prettyPath: string; type: 'file' | 'directory' } | undefined {
+	if (existsSync(modPath)) {
 		// if it's already pointing to a file then return it
-		if (!fs.statSync(modPath).isDirectory()) {
+		if (!statSync(modPath)._unsafeUnwrap().isDirectory()) {
 			return {
 				path: modPath,
 				prettyPath: modPath,
@@ -217,7 +204,7 @@ function searchForModule(
 			};
 		}
 
-		const indexPath = searchForModule(path.join(modPath, 'index.js'));
+		const indexPath = searchForModule(joinAbsolute(modPath, 'index.js'));
 
 		if (indexPath !== undefined) {
 			return {
@@ -229,7 +216,7 @@ function searchForModule(
 
 		// it's also possible to reference a file without providing the extension
 
-		const filePath = searchForModule(`${modPath}.js`);
+		const filePath = searchForModule(`${modPath}.js` as AbsolutePath);
 
 		if (filePath === undefined) return undefined;
 
@@ -240,28 +227,30 @@ function searchForModule(
 		};
 	}
 
-	const containing = path.join(modPath, '../');
+	const containing = joinAbsolute(modPath, '../');
 
 	// if containing folder doesn't exist this can't exist
-	if (!fs.existsSync(containing)) return undefined;
+	if (!existsSync(containing)) return undefined;
 
 	const modParsed = path.parse(modPath);
 
 	// sometimes it will point to .js because it will resolve in prod but not for us
 	if (modParsed.ext === '.js') {
-		const newPath = `${modPath.slice(0, modPath.length - 3)}.ts`;
+		const newPath = `${modPath.slice(0, modPath.length - 3)}.ts` as AbsolutePath;
 
-		if (fs.existsSync(newPath)) return { path: newPath, prettyPath: modPath, type: 'file' };
+		if (existsSync(newPath)) return { path: newPath, prettyPath: modPath, type: 'file' };
 	}
 
-	const files = fs.readdirSync(containing);
+	const filesResult = readdirSync(containing);
+	if (filesResult.isErr()) return undefined;
+	const files = filesResult.value;
 
 	for (const file of files) {
 		const fileParsed = path.parse(file);
 
 		// this way the extension doesn't matter
 		if (fileParsed.name === modParsed.base) {
-			const filePath = path.join(containing, file);
+			const filePath = joinAbsolute(containing, file);
 
 			// we remove the extension since it wasn't included by the user
 			const prettyPath = filePath.slice(0, filePath.length - fileParsed.ext.length);
@@ -269,7 +258,7 @@ function searchForModule(
 			return {
 				path: filePath,
 				prettyPath: prettyPath,
-				type: fs.statSync(filePath).isDirectory() ? 'directory' : 'file',
+				type: statSync(filePath)._unsafeUnwrap().isDirectory() ? 'directory' : 'file',
 			};
 		}
 	}
@@ -280,9 +269,9 @@ function searchForModule(
 /** Tries to resolve the modules as an alias using the tsconfig. */
 function tryResolveLocalAlias(
 	mod: string,
-	{ fileName, cwd }: { fileName: string; cwd: string }
+	{ fileName, cwd }: { fileName: string; cwd: AbsolutePath }
 ): Result<LocalDependency | null, string> {
-	const configResult = tryGetTsconfig(path.join(cwd, fileName));
+	const configResult = tryGetTsconfig(joinAbsolute(cwd, fileName));
 
 	if (configResult.isErr()) return ok(null);
 
@@ -299,13 +288,12 @@ function tryResolveLocalAlias(
 		if (paths.length === 0) return ok(null);
 
 		for (const modPath of paths) {
-			const foundMod = searchForModule(modPath);
+			const foundMod = searchForModule(modPath as AbsolutePath);
 			if (!foundMod) continue;
 			return ok({
 				fileName: foundMod.path,
 				import: mod,
-				createTemplate: (resolvedDependency) =>
-					createImportTemplate(resolvedDependency, { import: mod, cwd }),
+				createTemplate: () => ({}),
 			});
 		}
 
@@ -324,14 +312,14 @@ function tryResolveLocalAlias(
  */
 function resolveRemoteDeps(
 	deps: RemoteDependency[],
-	filePath: string
+	filePath: AbsolutePath
 ): { dependencies: RemoteDependency[]; devDependencies: RemoteDependency[] } {
 	if (deps.length === 0) return { dependencies: [], devDependencies: [] };
 
 	const dependencies: RemoteDependency[] = [];
 	const devDependencies: RemoteDependency[] = [];
 
-	const packageResult = findNearestPackageJson(path.dirname(filePath));
+	const packageResult = findNearestPackageJson(dirname(filePath));
 
 	if (packageResult) {
 		const { devDependencies: packageDevDependencies, dependencies: packageDependencies } =
@@ -379,13 +367,12 @@ export async function transformImports(
 	const transformedImports: ImportTransform[] = [];
 
 	for (const imp of imports) {
-		const itemPath = opts.getItemPath(imp.item);
+		const itemPath = opts.getItemPath({ item: imp.item, file: imp.file });
 		if (!itemPath) continue;
-		const filePathRelativeToItem = imp.meta.filePathRelativeToItem as string | undefined;
-		if (!filePathRelativeToItem) continue;
 
-		const { dir: filePathRelativeToItemDir, name: filePathRelativeToItemName } =
-			path.parse(filePathRelativeToItem);
+		const { dir: filePathRelativeToItemDir, name: filePathRelativeToItemName } = path.parse(
+			imp.file.path
+		);
 		// this handles the case where the import is referencing an index file but by the directory name instead of the index file itself
 		// for example: './utils/math' instead of './utils/math/index.ts'
 		const baseName =

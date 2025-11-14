@@ -19,6 +19,7 @@ import {
 	InvalidPluginError,
 } from '@/utils/errors';
 import { parsePackageName } from '@/utils/parse-package-name';
+import type { AbsolutePath } from '@/utils/types';
 import type { RegistryPlugin } from '..';
 
 class VisitorState {
@@ -304,7 +305,7 @@ export async function neededPlugins({
 	config,
 }: {
 	config: {
-		path: string;
+		path: AbsolutePath;
 		code: string;
 	};
 	plugins: RegistryPlugin[];
@@ -312,8 +313,6 @@ export async function neededPlugins({
 	const fn = vi.fn();
 	const imports = await getImports(config.code, {
 		fileName: config.path,
-		cwd: process.cwd(),
-		excludeDeps: [],
 		warn: fn,
 	});
 	return plugins.filter((plugin) => !imports.includes(plugin.package));

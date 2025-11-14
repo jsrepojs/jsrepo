@@ -1,4 +1,3 @@
-import fs from 'node:fs';
 import { Command } from 'commander';
 import { err, ok, type Result } from 'nevereverthrow';
 import path from 'pathe';
@@ -15,7 +14,9 @@ import type { Config } from '@/utils/config';
 import { addPluginsToConfig, parsePlugins } from '@/utils/config/mods/add-plugins';
 import { loadConfigSearch } from '@/utils/config/utils';
 import { type CLIError, ConfigNotFoundError } from '@/utils/errors';
+import { readFileSync, writeFileSync } from '@/utils/fs';
 import { intro, outro, promptInstallDependencies } from '@/utils/prompts';
+import type { AbsolutePath } from '@/utils/types';
 
 export const schema = defaultCommandOptionsSchema.extend({
 	yes: z.boolean(),
@@ -46,7 +47,12 @@ export const language = new Command('language')
 			runLanguage(
 				languages,
 				// this way if the config is found in a higher directory we base everything off of that directory
-				{ ...options, cwd: configResult ? path.dirname(configResult.path) : options.cwd },
+				{
+					...options,
+					cwd: configResult
+						? (path.dirname(configResult.path) as AbsolutePath)
+						: options.cwd,
+				},
 				configResult
 			)
 		);
@@ -62,14 +68,16 @@ export type ConfigAddLanguageCommandResult = {
 export async function runLanguage(
 	languagesArg: string[],
 	options: ConfigAddLanguageOptions,
-	config: { config: Config; path: string }
+	config: { config: Config; path: AbsolutePath }
 ): Promise<Result<ConfigAddLanguageCommandResult, CLIError>> {
 	const start = performance.now();
 
 	const languagesResult = parsePlugins(languagesArg, 'language');
 	if (languagesResult.isErr()) return err(languagesResult.error);
 	const languages = languagesResult.value;
-	const code = fs.readFileSync(config.path, 'utf-8');
+	const codeResult = readFileSync(config.path);
+	if (codeResult.isErr()) return err(codeResult.error);
+	const code = codeResult.value;
 
 	const newCodeResult = await addPluginsToConfig({
 		plugins: languages,
@@ -79,7 +87,8 @@ export async function runLanguage(
 	if (newCodeResult.isErr()) return err(newCodeResult.error);
 	const newCode = newCodeResult.value;
 
-	fs.writeFileSync(config.path, newCode);
+	const writeResult = writeFileSync(config.path, newCode);
+	if (writeResult.isErr()) return err(writeResult.error);
 
 	await promptInstallDependencies(
 		{ devDependencies: languages, dependencies: [] },

@@ -1,9 +1,10 @@
 import { z } from 'zod';
+import type { AbsolutePath } from '@/api';
 import type { BuildResult } from '@/utils/build';
 
 export interface Output {
-	output(buildResult: BuildResult, opts: { cwd: string }): Promise<void>;
-	clean(opts: { cwd: string }): Promise<void>;
+	output(buildResult: BuildResult, opts: { cwd: AbsolutePath }): Promise<void>;
+	clean(opts: { cwd: AbsolutePath }): Promise<void>;
 }
 
 export const RemoteDependencySchema = z.object({

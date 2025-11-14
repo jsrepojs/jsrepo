@@ -2,6 +2,7 @@ import { cancel, confirm, isCancel } from '@clack/prompts';
 import { err, ok, ResultAsync } from 'nevereverthrow';
 import path from 'pathe';
 import { createConfigLoader } from 'unconfig';
+import type { AbsolutePath } from '@/api/utils';
 import type { Config } from '@/utils/config';
 import { ConfigNotFoundError, FailedToLoadConfigError } from '@/utils/errors';
 import { createPathsMatcher, type PathsMatcher, tryGetTsconfig } from '@/utils/tsconfig';
@@ -70,14 +71,14 @@ export async function loadConfigSearch({
 	cwd,
 	promptForContinueIfNull,
 }: {
-	cwd: string;
+	cwd: AbsolutePath;
 	promptForContinueIfNull: boolean;
-}): Promise<{ config: Config; path: string } | null> {
+}): Promise<{ config: Config; path: AbsolutePath } | null> {
 	// search all supported config names and return the first one that exists
 	const loadResult = await _createConfigLoader({ cwd }).load();
 
 	if (loadResult.sources.length > 0) {
-		return { config: loadResult.config, path: loadResult.sources[0] ?? '' };
+		return { config: loadResult.config, path: loadResult.sources[0]! as AbsolutePath };
 	}
 
 	let shouldContinue = !promptForContinueIfNull;
@@ -104,7 +105,7 @@ export async function loadConfigSearch({
 	return null;
 }
 
-export function getPathsMatcher({ cwd }: { cwd: string }): PathsMatcher {
+export function getPathsMatcher({ cwd }: { cwd: AbsolutePath }): PathsMatcher {
 	const tsConfig = tryGetTsconfig(cwd).unwrapOr(null);
 	return tsConfig ? createPathsMatcher(tsConfig, { cwd }) : null;
 }

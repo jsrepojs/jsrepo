@@ -1,7 +1,9 @@
-import fs from 'node:fs';
 import path from 'pathe';
 import type { CreateOptions, Provider, ProviderFactory } from '@/providers/types';
 import { ProviderFetchError } from '@/utils/errors';
+import { readFileSync } from '@/utils/fs';
+import { joinAbsolute } from '@/utils/path';
+import type { AbsolutePath } from '@/utils/types';
 
 export type FsOptions = {
 	/** In case you want all your registry paths to be relative to a base directory. */
@@ -41,7 +43,7 @@ function _fs(options: FsOptions = {}): ProviderFactory {
 export { _fs as fs };
 
 type FsState = {
-	path: string;
+	path: AbsolutePath;
 };
 
 class Fs implements Provider {
@@ -51,10 +53,10 @@ class Fs implements Provider {
 	) {}
 
 	async fetch(resourcePath: string): Promise<string> {
-		const filePath = path.join(this.state.path, resourcePath);
+		const filePath = joinAbsolute(this.state.path, resourcePath);
 
 		try {
-			return fs.readFileSync(filePath, 'utf-8');
+			return readFileSync(filePath)._unsafeUnwrap();
 		} catch (error) {
 			const resourcePathStr = path.isAbsolute(filePath)
 				? filePath
@@ -72,18 +74,18 @@ class Fs implements Provider {
 		createOpts: CreateOptions
 	): Promise<Provider> {
 		const actualUrl = url.slice(5);
-		let p: string;
+		let p: AbsolutePath;
 		if (opts.baseDir) {
 			if (opts.baseDir.startsWith('.')) {
-				p = path.join(createOpts.cwd, opts.baseDir, actualUrl);
+				p = joinAbsolute(createOpts.cwd, opts.baseDir, actualUrl);
 			} else {
-				p = path.join(opts.baseDir, actualUrl);
+				p = joinAbsolute(opts.baseDir as AbsolutePath, actualUrl);
 			}
 		} else {
 			if (actualUrl.startsWith('.')) {
-				p = path.join(createOpts.cwd, actualUrl);
+				p = joinAbsolute(createOpts.cwd, actualUrl);
 			} else {
-				p = actualUrl;
+				p = actualUrl as AbsolutePath;
 			}
 		}
 

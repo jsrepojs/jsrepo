@@ -16,6 +16,7 @@ import { Shadcn } from "./shadcn";
 import { Biomejs } from "./biome";
 import { Prettier } from "./prettier";
 import { NPM } from "./npm";
+import { TypeScript } from "./typescript";
 
 export {
 	GitHub as GitHubLogo,
@@ -36,4 +37,5 @@ export {
 	Biomejs as BiomeLogo,
 	Prettier as PrettierLogo,
 	NPM as NpmLogo,
+	TypeScript as TypeScriptLogo,
 };

@@ -1,6 +1,7 @@
 import * as parse5 from 'parse5';
 import { getImports, installDependencies, resolveImports, transformImports } from '@/langs/js';
 import type { Language } from '@/langs/types';
+import type { AbsolutePath } from '@/utils/types';
 
 export type HtmlOptions = {
 	scripts: {
@@ -89,7 +90,8 @@ export function html({
 										const code = codeNode.value as string;
 										const imps = await getImports(code, {
 											...opts,
-											fileName: `${opts.fileName}.ts`,
+											// weird and hacky ik but this is an easy way to get oxc to parse the code as ts
+											fileName: `${opts.fileName}.ts` as AbsolutePath,
 										});
 										imports.push(...imps);
 									}

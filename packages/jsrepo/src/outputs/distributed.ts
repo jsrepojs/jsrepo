@@ -1,10 +1,11 @@
-import fs from 'node:fs';
-import path from 'pathe';
 import { z } from 'zod';
 import { type Output, RegistryPluginsSchema, RemoteDependencySchema } from '@/outputs/types';
-import { MANIFEST_FILE } from '@/utils/build';
-import { RegistryItemAddSchema, RegistryMetaSchema } from '@/utils/config';
+import { MANIFEST_FILE, UnresolvedImportSchema } from '@/utils/build';
+import { RegistryFileRoles, RegistryItemAddSchema, RegistryMetaSchema } from '@/utils/config';
+import { existsSync, readFileSync, rmSync, writeFileSync } from '@/utils/fs';
 import { stringify } from '@/utils/json';
+import { joinAbsolute } from '@/utils/path';
+import type { AbsolutePath, ItemRelativePath } from '@/utils/types';
 import { safeParseFromJSON } from '@/utils/zod';
 
 export type DistributedOutputOptions = {
@@ -39,7 +40,7 @@ export type DistributedOutputOptions = {
 export function distributed({ dir, format }: DistributedOutputOptions): Output {
 	return {
 		output: async (buildResult, { cwd }) => {
-			const files: { path: string; content: string }[] = [];
+			const files: { path: AbsolutePath; content: string }[] = [];
 			const manifest: DistributedOutputManifest = {
 				name: buildResult.name,
 				authors: buildResult.authors,
@@ -63,21 +64,22 @@ export function distributed({ dir, format }: DistributedOutputOptions): Output {
 					dependencies: item.dependencies,
 					devDependencies: item.devDependencies,
 					envVars: item.envVars,
-					files: item.files.map((file) => ({
-						type: file.type,
-						path: path.relative(
-							path.join(cwd, item.basePath),
-							path.join(cwd, file.path)
-						),
-						target: file.target,
-						registryDependencies: file.registryDependencies,
-						dependencies: file.dependencies,
-						devDependencies: file.devDependencies,
-					})),
+					files: item.files.map(
+						(file) =>
+							({
+								type: file.type,
+								role: file.role,
+								path: file.path,
+								target: file.target,
+								registryDependencies: file.registryDependencies,
+								dependencies: file.dependencies,
+								devDependencies: file.devDependencies,
+							}) satisfies DistributedOutputManifestFile
+					),
 				})),
 			};
 			files.push({
-				path: path.join(cwd, dir, MANIFEST_FILE),
+				path: joinAbsolute(cwd, dir, MANIFEST_FILE),
 				content: stringify(manifest, { format }),
 			});
 
@@ -88,58 +90,57 @@ export function distributed({ dir, format }: DistributedOutputOptions): Output {
 					description: item.description,
 					type: item.type,
 					add: item.add,
-					files: item.files.map((file) => ({
-						type: file.type,
-						content: file.content,
-						path: path.relative(
-							path.join(cwd, item.basePath),
-							path.join(cwd, file.path)
-						),
-						_imports_: file._imports_,
-						target: file.target,
-						registryDependencies: file.registryDependencies,
-						dependencies: file.dependencies,
-						devDependencies: file.devDependencies,
-					})),
+					files: item.files.map(
+						(file) =>
+							({
+								type: file.type,
+								role: file.role,
+								content: file.content,
+								path: file.path,
+								_imports_: file._imports_,
+								target: file.target,
+								registryDependencies: file.registryDependencies,
+								dependencies: file.dependencies,
+								devDependencies: file.devDependencies,
+							}) satisfies DistributedOutputFile
+					),
 					registryDependencies: item.registryDependencies,
 					dependencies: item.dependencies,
 					devDependencies: item.devDependencies,
 					envVars: item.envVars,
 				};
 				files.push({
-					path: path.join(cwd, dir, `${item.name}.json`),
+					path: joinAbsolute(cwd, dir, `${item.name}.json`),
 					content: stringify(outputItem, { format }),
 				});
 			}
 
 			for (const file of files) {
-				if (!fs.existsSync(path.dirname(file.path))) {
-					fs.mkdirSync(path.dirname(file.path), { recursive: true });
-				}
-				fs.writeFileSync(file.path, file.content);
+				writeFileSync(file.path, file.content);
 			}
 		},
 		clean: async ({ cwd }) => {
-			const manifestPath = path.join(cwd, dir, MANIFEST_FILE);
-			if (!fs.existsSync(manifestPath)) return;
-			const manifestResult = safeParseFromJSON(
-				DistributedOutputManifestSchema,
-				fs.readFileSync(manifestPath, 'utf-8')
-			);
+			const manifestPath = joinAbsolute(cwd, dir, MANIFEST_FILE);
+			if (!existsSync(manifestPath)) return;
+			const contentsResult = readFileSync(manifestPath as AbsolutePath);
+			if (contentsResult.isErr()) return;
+			const contents = contentsResult.value;
+			const manifestResult = safeParseFromJSON(DistributedOutputManifestSchema, contents);
 			if (manifestResult.isErr()) return;
 			const manifest = manifestResult.value;
 			for (const item of manifest.items) {
-				const itemPath = path.join(cwd, dir, `${item.name}.json`);
-				if (fs.existsSync(itemPath)) fs.rmSync(itemPath);
+				const itemPath = joinAbsolute(cwd, dir, `${item.name}.json`);
+				rmSync(itemPath);
 			}
-			fs.rmSync(manifestPath);
+			rmSync(manifestPath);
 		},
 	};
 }
 
 export const DistributedOutputManifestFileSchema = z.object({
-	path: z.string(),
-	type: z.union([z.string(), z.undefined()]),
+	path: z.string().transform((v) => v as ItemRelativePath),
+	type: z.string(),
+	role: z.union([z.union(RegistryFileRoles.map((role) => z.literal(role))), z.undefined()]),
 	target: z.union([z.string(), z.undefined()]),
 	registryDependencies: z.union([z.array(z.string()), z.undefined()]),
 	dependencies: z.union([z.array(RemoteDependencySchema), z.undefined()]),
@@ -174,26 +175,18 @@ export const DistributedOutputManifestSchema = RegistryMetaSchema.extend({
 export type DistributedOutputManifest = z.infer<typeof DistributedOutputManifestSchema>;
 
 export const DistributedOutputFileSchema = z.object({
-	path: z.string(),
+	path: z.string().transform((v) => v as ItemRelativePath),
 	content: z.string(),
-	type: z.union([z.string(), z.undefined()]),
-	_imports_: z
-		.union([
-			z.array(
-				z.object({
-					import: z.string(),
-					item: z.string(),
-					meta: z.record(z.string(), z.unknown()),
-				})
-			),
-			z.undefined(),
-		])
-		.default([]),
+	type: z.string(),
+	role: z.union([z.union(RegistryFileRoles.map((role) => z.literal(role))), z.undefined()]),
+	_imports_: z.array(UnresolvedImportSchema),
 	target: z.union([z.string(), z.undefined()]),
 	registryDependencies: z.union([z.array(z.string()), z.undefined()]),
 	dependencies: z.union([z.array(RemoteDependencySchema), z.undefined()]),
 	devDependencies: z.union([z.array(RemoteDependencySchema), z.undefined()]),
 });
+
+export type DistributedOutputFile = z.infer<typeof DistributedOutputFileSchema>;
 
 export const DistributedOutputItemSchema = z.object({
 	name: z.string(),

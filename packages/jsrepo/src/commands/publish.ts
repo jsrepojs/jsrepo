@@ -1,4 +1,3 @@
-import fs from 'node:fs';
 import { buffer } from 'node:stream/consumers';
 import { createGzip } from 'node:zlib';
 import { log } from '@clack/prompts';
@@ -34,9 +33,12 @@ import {
 	NoProviderFoundError,
 	NoRegistriesError,
 } from '@/utils/errors';
+import { existsSync, readFileSync } from '@/utils/fs';
 import { findNearestPackageJson, type PackageJson } from '@/utils/package';
+import { joinAbsolute } from '@/utils/path';
 import { initLogging, intro, outro } from '@/utils/prompts';
 import { TokenManager } from '@/utils/token-manager';
+import type { AbsolutePath } from '@/utils/types';
 
 export const schema = defaultCommandOptionsSchema.extend({
 	dryRun: z.boolean(),
@@ -71,7 +73,9 @@ export const publish = new Command('publish')
 				options: {
 					...options,
 					// this way if the config is found in a higher directory we base everything off of that directory
-					cwd: configResult ? path.dirname(configResult.path) : options.cwd,
+					cwd: configResult
+						? (path.dirname(configResult.path) as AbsolutePath)
+						: options.cwd,
 				},
 			})
 		);
@@ -286,7 +290,9 @@ async function publishRegistry(
 		options,
 	}: { token: string; provider: JsrepoProvider; options: PublishOptions }
 ): Promise<Result<{ version: string; tag?: string }, CLIError>> {
-	const files = collectRegistryFiles(registry, options.cwd);
+	const collectResult = collectRegistryFiles(registry, options.cwd);
+	if (collectResult.isErr()) return err(collectResult.error);
+	const files = collectResult.value;
 
 	const pack = tar.pack();
 	for (const file of files) {
@@ -337,11 +343,16 @@ async function publishRegistry(
 	}
 }
 
-function collectRegistryFiles(buildResult: BuildResult, cwd: string) {
+function collectRegistryFiles(
+	buildResult: BuildResult,
+	cwd: AbsolutePath
+): Result<{ name: string; content: string }[], JsrepoError> {
 	const files: { name: string; content: string }[] = [];
-	const readmePath = path.join(cwd, 'README.md');
-	if (fs.existsSync(readmePath)) {
-		files.push({ name: 'README.md', content: fs.readFileSync(readmePath, 'utf-8') });
+	const readmePath = joinAbsolute(cwd, 'README.md');
+	if (existsSync(readmePath)) {
+		const readmeContent = readFileSync(readmePath);
+		if (readmeContent.isErr()) return err(readmeContent.error);
+		files.push({ name: 'README.md', content: readmeContent.value });
 	}
 
 	const manifest: DistributedOutputManifest = {
@@ -369,7 +380,8 @@ function collectRegistryFiles(buildResult: BuildResult, cwd: string) {
 			envVars: item.envVars,
 			files: item.files.map((file) => ({
 				type: file.type,
-				path: path.relative(path.join(cwd, item.basePath), path.join(cwd, file.path)),
+				role: file.role,
+				path: file.path,
 				target: file.target,
 				registryDependencies: file.registryDependencies,
 				dependencies: file.dependencies,
@@ -391,8 +403,9 @@ function collectRegistryFiles(buildResult: BuildResult, cwd: string) {
 			add: item.add,
 			files: item.files.map((file) => ({
 				type: file.type,
+				role: file.role,
 				content: file.content,
-				path: path.relative(path.join(cwd, item.basePath), path.join(cwd, file.path)),
+				path: file.path,
 				_imports_: file._imports_,
 				target: file.target,
 				registryDependencies: file.registryDependencies,
@@ -410,7 +423,7 @@ function collectRegistryFiles(buildResult: BuildResult, cwd: string) {
 		});
 	}
 
-	return files;
+	return ok(files);
 }
 
 function formatResult(result: PublishCommandResult): string {

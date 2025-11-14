@@ -3,7 +3,7 @@ import { DEFAULT_LANGS, type Language } from '@/langs';
 import type { Output } from '@/outputs/types';
 import { DEFAULT_PROVIDERS, type ProviderFactory } from '@/providers';
 import type { RemoteDependency } from '@/utils/build';
-import type { LooseAutocomplete } from '@/utils/types';
+import type { ItemRelativePath, LooseAutocomplete, Prettify } from '@/utils/types';
 import { extract, type MaybeGetterAsync } from '@/utils/utils';
 
 export type RegistryConfigArgs = [{ cwd: string }];
@@ -115,7 +115,9 @@ export type RegistryPlugin = {
 	optional?: boolean;
 };
 
-export type RegistryItemType = LooseAutocomplete<'block' | 'component' | 'lib' | 'hook' | 'ui'>;
+export type RegistryItemType = LooseAutocomplete<
+	'block' | 'component' | 'lib' | 'hook' | 'ui' | 'page'
+>;
 
 export const RegistryItemAddSchema = z.enum([
 	'optionally-on-init',
@@ -180,25 +182,30 @@ export type RegistryItem = {
 	envVars?: Record<string, string>;
 };
 
-export const OptionallyInstalledRegistryTypes = [
-	'registry:example',
-	'registry:doc',
-	'registry:test',
-] as const;
+export const RegistryFileRoles = ['example', 'doc', 'test', 'file'] as const;
 
-export type RegistryFileType = LooseAutocomplete<(typeof OptionallyInstalledRegistryTypes)[number]>;
+export type RegistryFileRoles = (typeof RegistryFileRoles)[number];
 
 export type RegistryItemFile = {
-	/** Relative path to the file from the registry config. */
+	/** Path of the file/folder relative to registry config. */
 	path: string;
 	/**
-	 * The type of the file.
-	 *
-	 * - "registry:example" - An example file (optionally installed, great for LLMs)
-	 * - "registry:test" - A test file (optionally installed)
-	 * - "registry:doc" - A documentation file (optionally installed, great for LLMs)
+	 * The type of the file. This will determine the path that the file will be added to in the users project.
 	 */
-	type?: RegistryFileType;
+	type?: RegistryItemType;
+	/**
+	 * The role of the file.
+	 *
+	 * - "file" - A regular file (always installed)
+	 * - "example" - An example file (optionally installed, great for LLMs)
+	 * - "test" - A test file (optionally installed)
+	 * - "doc" - A documentation file (optionally installed, great for LLMs)
+	 *
+	 * If a parent folder has a role this file will inherit the role from the parent folder.
+	 *
+	 * @default "file"
+	 */
+	role?: RegistryFileRoles;
 	/**
 	 * Whether the dependency resolution should be automatic or manual.
 	 * @default "auto"
@@ -229,7 +236,20 @@ export type RegistryItemFile = {
 	 * Provide a list of devDependencies to be installed with the item. If dependencies are provided as a string they will be assumed to be a js dependency.
 	 */
 	devDependencies?: (RemoteDependency | string)[];
+	/**
+	 * Only valid as children of a folder. Allows you to individually configure each file in the folder.
+	 */
+	files?: RegistryItemFolderFile[];
 };
+
+export type RegistryItemFolderFile = Prettify<
+	Omit<RegistryItemFile, 'target' | 'type' | 'path'> & {
+		/**
+		 * Path to the file relative to the parent folder.
+		 */
+		path: string;
+	}
+>;
 
 export type TransformOptions = {
 	cwd: string;
@@ -243,9 +263,9 @@ export type TransformOptions = {
 export type Transform = {
 	transform: (opts: {
 		code: string;
-		fileName: string;
+		fileName: ItemRelativePath;
 		options: TransformOptions;
-	}) => Promise<{ code?: string; fileName?: string }>;
+	}) => Promise<{ code?: string; fileName?: ItemRelativePath }>;
 };
 
 export function defineConfig(config: Partial<Config> | (() => Partial<Config>)): Config {

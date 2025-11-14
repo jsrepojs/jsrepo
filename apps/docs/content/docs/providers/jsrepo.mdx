@@ -3,8 +3,6 @@ title: jsrepo
 description: Download and add registry items from jsrepo.com
 ---
 
-import { BadgesTable } from "@/components/badges-table";
-
 <BadgeGroup>
 	<SourceBadge path="packages/jsrepo/src/providers/jsrepo.ts" />
 	<OfficialBadge />
@@ -68,30 +66,3 @@ jsrepo publish
 
 For a more detailed guide on publishing your registry to jsrepo.com checkout the guide [here](/docs/jsrepo-com#publishing-your-registry).
 
-## Badges
-
-<BadgesTable
-	badges={[
-		{
-			alt: 'jsrepo latest version',
-			hrefTemplate: 'https://jsrepo.com/badges/{{registry}}'
-		},
-		{
-			alt: 'jsrepo downloads weekly',
-			hrefTemplate: 'https://jsrepo.com/badges/{{registry}}/dm'
-		},
-		{
-			alt: 'jsrepo downloads monthly',
-			hrefTemplate: 'https://jsrepo.com/badges/{{registry}}/dw'
-		},
-		{
-			alt: 'jsrepo downloads yearly',
-			hrefTemplate: 'https://jsrepo.com/badges/{{registry}}/dy'
-		},
-		{
-			alt: 'jsrepo registry rating',
-			hrefTemplate: 'https://jsrepo.com/badges/{{registry}}/rating'
-		}
-	]}
-	defaultRegistry="@ieedan/std"
-/>

@@ -1,0 +1,82 @@
+{
+	"name": "@example/svelte",
+	"homepage": "https://www.jsrepo.com/@example/svelte",
+	"type": "distributed",
+	"items": [
+		{
+			"name": "button",
+			"type": "ui",
+			"add": "when-added",
+			"registryDependencies": ["utils"],
+			"dependencies": [],
+			"devDependencies": [
+				{
+					"ecosystem": "js",
+					"name": "tailwind-variants",
+					"version": "^3.1.1"
+				},
+				{
+					"ecosystem": "js",
+					"name": "svelte",
+					"version": "^5.41.0"
+				}
+			],
+			"files": [
+				{
+					"type": "ui",
+					"role": "file",
+					"path": "button/button.svelte",
+					"registryDependencies": [],
+					"dependencies": [],
+					"devDependencies": []
+				},
+				{
+					"type": "ui",
+					"role": "file",
+					"path": "button/index.ts",
+					"registryDependencies": [],
+					"dependencies": [],
+					"devDependencies": []
+				},
+				{
+					"type": "page",
+					"role": "example",
+					"path": "+page.svelte",
+					"target": "src/routes/demos/button-demo/+page.svelte",
+					"registryDependencies": [],
+					"dependencies": [],
+					"devDependencies": []
+				}
+			]
+		},
+		{
+			"name": "utils",
+			"type": "lib",
+			"add": "when-added",
+			"registryDependencies": [],
+			"dependencies": [],
+			"devDependencies": [
+				{
+					"ecosystem": "js",
+					"name": "clsx",
+					"version": "^2.1.1"
+				},
+				{
+					"ecosystem": "js",
+					"name": "tailwind-merge",
+					"version": "^3.3.1"
+				}
+			],
+			"files": [
+				{
+					"type": "lib",
+					"role": "file",
+					"path": "utils.ts",
+					"registryDependencies": [],
+					"dependencies": [],
+					"devDependencies": []
+				}
+			]
+		}
+	]
+}

@@ -1,5 +1,6 @@
-import fs from 'node:fs';
-import path from 'pathe';
+import { existsSync, readFileSync } from './fs';
+import { dirname, joinAbsolute } from './path';
+import type { AbsolutePath } from './types';
 
 export const ENV_FILE_NAMES = [
 	'.env.local',
@@ -9,16 +10,20 @@ export const ENV_FILE_NAMES = [
 ] as const;
 
 export function searchForEnvFile(
-	cwd: string
-): { path: string; envVars: Record<string, string>; contents: string } | null {
+	cwd: AbsolutePath
+): { path: AbsolutePath; envVars: Record<string, string>; contents: string } | null {
 	for (const envFileName of ENV_FILE_NAMES) {
-		const envFilePath = path.join(cwd, envFileName);
-		if (!fs.existsSync(envFilePath)) continue;
-		const contents = fs.readFileSync(envFilePath, 'utf-8');
+		const envFilePath = joinAbsolute(cwd, envFileName);
+		if (!existsSync(envFilePath)) continue;
+
+		const contentsResult = readFileSync(envFilePath);
+		if (contentsResult.isErr()) continue;
+		const contents = contentsResult.value;
+
 		const envVars = parseEnvVariables(contents);
 		return { path: envFilePath, envVars, contents };
 	}
-	const newCwd = path.dirname(cwd);
+	const newCwd = dirname(cwd);
 	if (newCwd === cwd) return null;
 	return searchForEnvFile(newCwd);
 }

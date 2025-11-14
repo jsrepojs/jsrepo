@@ -1,11 +1,12 @@
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadConfigSearch } from '@/utils/config/utils';
+import type { AbsolutePath } from '@/utils/types';
 
 describe('loadConfigSearch', () => {
 	it('should load the config', async () => {
 		const config = await loadConfigSearch({
-			cwd: path.join(import.meta.dirname, '../fixtures/config/basic'),
+			cwd: path.join(__dirname, '../fixtures/config/basic') as AbsolutePath,
 			promptForContinueIfNull: false,
 		});
 
@@ -14,7 +15,7 @@ describe('loadConfigSearch', () => {
 
 	it('should load a mts config', async () => {
 		const config = await loadConfigSearch({
-			cwd: path.join(import.meta.dirname, '../fixtures/config/mts'),
+			cwd: path.join(__dirname, '../fixtures/config/mts') as AbsolutePath,
 			promptForContinueIfNull: false,
 		});
 
@@ -23,7 +24,7 @@ describe('loadConfigSearch', () => {
 
 	it('should find the config in a higher directory', async () => {
 		const config = await loadConfigSearch({
-			cwd: path.join(import.meta.dirname, '../fixtures/config/nested/lower'),
+			cwd: path.join(__dirname, '../fixtures/config/nested/lower') as AbsolutePath,
 			promptForContinueIfNull: false,
 		});
 
@@ -32,7 +33,7 @@ describe('loadConfigSearch', () => {
 
 	it('should not find the config when it does not exist', async () => {
 		const config = await loadConfigSearch({
-			cwd: path.join(import.meta.dirname, '../fixtures/config/none'),
+			cwd: path.join(__dirname, '../fixtures/config/none') as AbsolutePath,
 			promptForContinueIfNull: false,
 		});
 

@@ -3,12 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "pnpm registry:build && next build",
-    "dev": "concurrently -n registry,docs \"pnpm registry:dev\" \"next dev --turbo\"",
+    "build": "next build",
+    "dev": "next dev --turbo",
     "start": "next start",
-    "postinstall": "fumadocs-mdx",
-    "registry:build": "jsrepo build",
-    "registry:dev": "jsrepo build --watch"
+    "postinstall": "fumadocs-mdx"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -41,7 +39,6 @@
     "@types/node": "24.10.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
-    "jsrepo": "workspace:*",
     "motion": "^12.23.24",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.14",

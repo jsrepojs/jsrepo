@@ -20,15 +20,28 @@ export default defineConfig({
 				type: "utils",
 				files: [
 					{
-						path: "src/utils/math/add.ts",
+						path: "src/utils/math",
+						files: [
+							{
+								path: "add.ts",
+							},
+							{
+								path: "answer-format.ts",
+							},
+						]
 					},
 					{
-						path: "src/utils/math/answer-format.ts",
-					},
-					{
-						path: "src/utils/math/add.test.ts",
-						type: "registry:test",
-					},
+						path: 'src/utils/math',
+						role: 'test',
+						files: [
+							{
+								path: 'add.test.ts',
+							},
+							{
+								path: 'answer-format.test.ts',
+							}
+						]
+					}
 				],
 			},
 			{
@@ -62,22 +75,37 @@ export default defineConfig({
 				name: "button",
 				title: "Button",
 				description: "An awesome button component",
-				type: "component",
+				type: "ui",
 				files: [
 					{
 						path: "src/components/ui/button.tsx",
 					},
+					{
+						path: 'src/routes/demos/button-demo/page.tsx',
+						type: 'page',
+						role: 'example',
+					}
 				],
 			},
 			{
 				name: "counter",
-				type: "component",
+				type: "ui",
 				files: [
 					{
 						path: "src/components/ui/counter.svelte",
 					},
 				],
 			},
+			{
+				name: 'demo-page',
+				type: 'page',
+				files: [
+					{
+						path: 'src/routes/demo',
+						target: 'src/routes/demo'
+					}
+				]
+			}
 		],
 	},
 });

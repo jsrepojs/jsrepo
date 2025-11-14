@@ -7,11 +7,6 @@
 	"access": "public",
 	"baseBranch": "main",
 	"updateInternalDependencies": "patch",
-	"ignore": [
-		"@playground/registry",
-		"@jsrepo/docs",
-		"@playground/project",
-		"@playground/react-project"
-	],
+	"ignore": ["@jsrepo/docs", "@example/react"],
 	"prettier": false
 }

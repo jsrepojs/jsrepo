@@ -1,6 +1,7 @@
 import { getImports, installDependencies, resolveImports, transformImports } from '@/langs/js';
 import type { Language } from '@/langs/types';
 import { MissingPeerDependencyError } from '@/utils/errors';
+import type { AbsolutePath } from '@/utils/types';
 
 // biome-ignore lint/complexity/noBannedTypes: leave me alone for a minute
 export type SvelteOptions = {};
@@ -41,7 +42,11 @@ export function svelte(_options: SvelteOptions = {}): Language {
 			const imports = await Promise.all(
 				neededScripts.map(async (script) => {
 					return await resolveImports(
-						await getImports(script, { ...opts, fileName: `${opts.fileName}.ts` }),
+						await getImports(script, {
+							...opts,
+							// weird and hacky ik but this is an easy way to get oxc to parse the code as ts
+							fileName: `${opts.fileName}.ts` as AbsolutePath,
+						}),
 						opts
 					);
 				})

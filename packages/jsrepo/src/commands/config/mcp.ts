@@ -1,4 +1,3 @@
-import fs from 'node:fs';
 import os from 'node:os';
 import { cancel, isCancel, multiselect } from '@clack/prompts';
 import { Command, Option } from 'commander';
@@ -6,6 +5,7 @@ import { err, ok, type Result } from 'nevereverthrow';
 import path from 'pathe';
 import pc from 'picocolors';
 import { z } from 'zod';
+import type { AbsolutePath } from '@/api';
 import {
 	commonOptions,
 	defaultCommandOptionsSchema,
@@ -13,7 +13,9 @@ import {
 	tryCommand,
 } from '@/commands/utils';
 import { type CLIError, JsrepoError } from '@/utils/errors';
+import { existsSync, readFileSync, writeFileSync } from '@/utils/fs';
 import { stringify } from '@/utils/json';
+import { joinAbsolute } from '@/utils/path';
 import { intro, outro } from '@/utils/prompts';
 
 const supportedClients = ['cursor', 'claude', 'vscode', 'codex'] as const;
@@ -130,18 +132,13 @@ function formatClientResult({ name, result }: ClientResult, cwd: string): string
 
 interface ClientConfig {
 	name: string;
-	filePath: (cwd: string) => string;
-	writeConfig: (filePath: string) => Result<void, CLIError>;
+	filePath: (cwd: AbsolutePath) => AbsolutePath;
+	writeConfig: (filePath: AbsolutePath) => Result<void, CLIError>;
 }
 
-function writeConfig(filePath: string, content: string): Result<void, CLIError> {
+function writeConfig(filePath: AbsolutePath, content: string): Result<void, CLIError> {
 	try {
-		const dir = path.dirname(filePath);
-		if (!fs.existsSync(dir)) {
-			fs.mkdirSync(dir, { recursive: true });
-		}
-
-		fs.writeFileSync(filePath, content);
+		writeFileSync(filePath, content);
 		return ok(undefined);
 	} catch (e) {
 		return err(
@@ -182,28 +179,28 @@ export function updateTomlConfig(existingContent: string): string {
 const CLIENTS: Record<McpClient, ClientConfig> = {
 	cursor: {
 		name: 'Cursor',
-		filePath: (cwd: string) => path.join(cwd, '.cursor/mcp.json'),
-		writeConfig: (filePath: string) =>
+		filePath: (cwd: AbsolutePath) => joinAbsolute(cwd, '.cursor/mcp.json'),
+		writeConfig: (filePath: AbsolutePath) =>
 			writeConfig(filePath, stringify(MCP_SERVER_CONFIG_JSON, { format: true })),
 	},
 	claude: {
 		name: 'Claude Code',
-		filePath: (cwd: string) => path.join(cwd, '.mcp.json'),
-		writeConfig: (filePath: string) =>
+		filePath: (cwd: AbsolutePath) => joinAbsolute(cwd, '.mcp.json'),
+		writeConfig: (filePath: AbsolutePath) =>
 			writeConfig(filePath, stringify(MCP_SERVER_CONFIG_JSON, { format: true })),
 	},
 	vscode: {
 		name: 'VS Code',
-		filePath: (cwd: string) => path.join(cwd, '.vscode/mcp.json'),
-		writeConfig: (filePath: string) =>
+		filePath: (cwd: AbsolutePath) => joinAbsolute(cwd, '.vscode/mcp.json'),
+		writeConfig: (filePath: AbsolutePath) =>
 			writeConfig(filePath, stringify(MCP_SERVER_CONFIG_JSON, { format: true })),
 	},
 	codex: {
 		name: 'Codex',
-		filePath: () => path.join(os.homedir(), '.codex/config.toml'),
-		writeConfig: (filePath: string) => {
-			const existingContent = fs.existsSync(filePath)
-				? fs.readFileSync(filePath, 'utf-8')
+		filePath: () => joinAbsolute(os.homedir() as AbsolutePath, '.codex/config.toml'),
+		writeConfig: (filePath: AbsolutePath) => {
+			const existingContent = existsSync(filePath)
+				? readFileSync(filePath)._unsafeUnwrap()
 				: '';
 			const newContent = updateTomlConfig(existingContent);
 			return writeConfig(filePath, newContent);
