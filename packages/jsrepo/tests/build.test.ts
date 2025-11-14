@@ -194,7 +194,7 @@ describe('buildRegistry', () => {
 			expect(buttonItem.name).toBe('button');
 			expect(buttonItem.title).toBe('Button');
 			expect(buttonItem.description).toBe('An awesome button component');
-			expect(buttonItem.type).toBe('component');
+			expect(buttonItem.type).toBe('ui');
 			expect(buttonItem.add).toBe('when-added');
 		});
 
@@ -205,10 +205,14 @@ describe('buildRegistry', () => {
 		});
 
 		it('should have a single file', () => {
-			expect(buttonItem.files).toHaveLength(1);
+			expect(buttonItem.files).toHaveLength(2);
 			const buttonFile = buttonItem.files[0];
 			assert(buttonFile !== undefined);
 			expect(buttonFile.path).toBe('button.tsx');
+			const exampleFile = buttonItem.files.find((f) => f.path === 'page.tsx');
+			expect(exampleFile).toBeDefined();
+			expect(exampleFile!.role).toBe('example');
+			expect(exampleFile!.type).toBe('page');
 		});
 	});
 
@@ -224,7 +228,7 @@ describe('buildRegistry', () => {
 			expect(counterItem.name).toBe('counter');
 			expect(counterItem.title).toBeUndefined();
 			expect(counterItem.description).toBeUndefined();
-			expect(counterItem.type).toBe('component');
+			expect(counterItem.type).toBe('ui');
 			expect(counterItem.add).toBe('when-added');
 		});
 

@@ -493,18 +493,11 @@ async function initDefaultPaths(
 ) {
 	const types = Array.from(
 		new Set(
-			registry.manifest.items
-				// filter out items where all files have a target since we don't need to prompt the user for a path
-				.filter((item) => {
-					const allFilesHaveTargets =
-						item.files.filter((file) => file.target !== undefined).length ===
-						item.files.length;
-
-					if (allFilesHaveTargets) return false;
-
-					return true;
-				})
-				.flatMap((item) => item.files.map((file) => normalizeItemTypeForPath(file.type)))
+			registry.manifest.items.flatMap((item) =>
+				item.files
+					.filter((file) => file.target === undefined)
+					.map((file) => normalizeItemTypeForPath(file.type))
+			)
 		)
 	);
 

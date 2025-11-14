@@ -35,9 +35,10 @@
 					"devDependencies": []
 				},
 				{
-					"type": "ui",
+					"type": "page",
 					"role": "example",
-					"path": "button.example.tsx",
+					"path": "page.tsx",
+					"target": "src/app/demos/button-demo/page.tsx",
 					"registryDependencies": [],
 					"dependencies": [],
 					"devDependencies": []

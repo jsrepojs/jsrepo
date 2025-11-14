@@ -287,7 +287,7 @@ export async function collectItemFiles(
 				unresolvedFiles.push({
 					absolutePath,
 					path: path.basename(file.path) as ItemRelativePath,
-					type: item.type ?? file.type,
+					type: file.type ?? item.type,
 					role: file.role ?? 'file',
 					target: file.target,
 					dependencyResolution:

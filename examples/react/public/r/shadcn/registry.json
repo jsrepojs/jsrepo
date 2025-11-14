@@ -18,8 +18,9 @@
 					"path": "button.tsx"
 				},
 				{
-					"type": "registry:ui",
-					"path": "button.example.tsx"
+					"type": "registry:page",
+					"path": "page.tsx",
+					"target": "src/app/demos/button-demo/page.tsx"
 				}
 			]
 		},

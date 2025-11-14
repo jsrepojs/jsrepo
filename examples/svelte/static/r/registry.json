@@ -39,6 +39,15 @@
 					"registryDependencies": [],
 					"dependencies": [],
 					"devDependencies": []
+				},
+				{
+					"type": "page",
+					"role": "example",
+					"path": "+page.svelte",
+					"target": "src/routes/demos/button-demo/+page.svelte",
+					"registryDependencies": [],
+					"dependencies": [],
+					"devDependencies": []
 				}
 			]
 		},

@@ -22,11 +22,20 @@
 			"devDependencies": []
 		},
 		{
-			"type": "ui",
+			"type": "page",
 			"role": "example",
-			"content": "import { Button } from './button';\n\nexport function ButtonExample() {\n\treturn (\n\t\t<>\n\t\t\t<Button variant=\"default\">Click me</Button>\n\t\t\t<Button variant=\"destructive\" size=\"sm\">\n\t\t\t\tDelete\n\t\t\t</Button>\n\t\t</>\n\t);\n}\n",
-			"path": "button.example.tsx",
-			"_imports_": [],
+			"content": "import { Button } from '@/registry/ui/button';\n\nexport function ButtonDemoPage() {\n\treturn (\n\t\t<>\n\t\t\t<div className=\"flex place-items-center gap-2\">\n\t\t\t\t<Button variant=\"default\">Click me</Button>\n\t\t\t\t<Button variant=\"destructive\">Click me</Button>\n\t\t\t\t<Button variant=\"outline\">Click me</Button>\n\t\t\t</div>\n\t\t\t<div className=\"flex place-items-end gap-2\">\n\t\t\t\t<Button variant=\"default\" size=\"sm\">\n\t\t\t\t\tSm\n\t\t\t\t</Button>\n\t\t\t\t<Button variant=\"default\" size=\"default\">\n\t\t\t\t\tMd\n\t\t\t\t</Button>\n\t\t\t</div>\n\t\t</>\n\t);\n}\n",
+			"path": "page.tsx",
+			"_imports_": [
+				{
+					"import": "@/registry/ui/button",
+					"item": "button",
+					"meta": {
+						"filePathRelativeToItem": "button.tsx"
+					}
+				}
+			],
+			"target": "src/app/demos/button-demo/page.tsx",
 			"registryDependencies": [],
 			"dependencies": [],
 			"devDependencies": []

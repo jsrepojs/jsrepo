@@ -75,16 +75,21 @@ export default defineConfig({
 				name: "button",
 				title: "Button",
 				description: "An awesome button component",
-				type: "component",
+				type: "ui",
 				files: [
 					{
 						path: "src/components/ui/button.tsx",
 					},
+					{
+						path: 'src/routes/demos/button-demo/page.tsx',
+						type: 'page',
+						role: 'example',
+					}
 				],
 			},
 			{
 				name: "counter",
-				type: "component",
+				type: "ui",
 				files: [
 					{
 						path: "src/components/ui/counter.svelte",

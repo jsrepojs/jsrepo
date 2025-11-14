@@ -20,8 +20,10 @@ export default defineConfig({
 						path: 'src/registry/ui/button.tsx',
 					},
 					{
-						path: 'src/registry/ui/button.example.tsx',
+						path: 'src/app/demos/button-demo/page.tsx',
+						type: 'page',
 						role: 'example',
+						target: 'src/app/demos/button-demo/page.tsx',
 					},
 				],
 			},

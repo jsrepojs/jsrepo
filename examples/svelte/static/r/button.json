@@ -30,6 +30,25 @@
 			"registryDependencies": [],
 			"dependencies": [],
 			"devDependencies": []
+		},
+		{
+			"type": "page",
+			"role": "example",
+			"content": "<script lang=\"ts\">\n    import { Button } from '$lib/registry/ui/button';\n</script>\n\n<div class=\"flex place-items-center gap-2\">\n    <Button variant=\"default\">Click me</Button>\n    <Button variant=\"destructive\">Click me</Button>\n    <Button variant=\"outline\">Click me</Button>\n</div>\n<div class=\"flex place-items-end gap-2\">\n    <Button variant=\"default\" size=\"sm\">Sm</Button>\n    <Button variant=\"default\" size=\"default\">Md</Button>\n</div>\n",
+			"path": "+page.svelte",
+			"_imports_": [
+				{
+					"import": "$lib/registry/ui/button",
+					"item": "button",
+					"meta": {
+						"filePathRelativeToItem": "button/index.ts"
+					}
+				}
+			],
+			"target": "src/routes/demos/button-demo/+page.svelte",
+			"registryDependencies": [],
+			"dependencies": [],
+			"devDependencies": []
 		}
 	],
 	"registryDependencies": [

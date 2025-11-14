@@ -14,6 +14,12 @@ export default defineConfig({
 					{
 						path: 'src/lib/registry/ui/button',
 					},
+					{
+						path: 'src/routes/demos/button-demo/+page.svelte',
+						role: 'example',
+						type: 'page',
+						target: 'src/routes/demos/button-demo/+page.svelte',
+					},
 				],
 			},
 			{
