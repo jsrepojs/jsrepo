@@ -1,6 +1,6 @@
 import path from 'node:path';
 import type { Transform } from 'jsrepo';
-import * as prettier from 'prettier';
+import { type Config, format, resolveConfig } from 'prettier';
 
 export type Options = {
 	/** The name of the prettier config file to use. @default ".prettierrc" */
@@ -23,7 +23,7 @@ export type Options = {
  * @param options - The options for the transform plugin.
  */
 export default function (options: Options = {}): Transform {
-	const configPromise = prettier.resolveConfig(
+	const configPromise = resolveConfig(
 		path.join(process.cwd(), options.configFile ?? '.prettierrc')
 	);
 
@@ -38,10 +38,10 @@ export default function (options: Options = {}): Transform {
 
 function tryFormat(
 	code: string,
-	{ fileName, config }: { fileName: string; config: prettier.Config | null }
+	{ fileName, config }: { fileName: string; config: Config | null }
 ) {
 	try {
-		return prettier.format(code, { ...config, filepath: fileName });
+		return format(code, { ...config, filepath: fileName });
 	} catch {
 		return undefined;
 	}

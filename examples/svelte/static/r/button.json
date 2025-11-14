@@ -59,9 +59,7 @@
 			"devDependencies": []
 		}
 	],
-	"registryDependencies": [
-		"utils"
-	],
+	"registryDependencies": ["utils"],
 	"dependencies": [],
 	"devDependencies": [
 		{

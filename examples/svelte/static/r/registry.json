@@ -7,9 +7,7 @@
 			"name": "button",
 			"type": "ui",
 			"add": "when-added",
-			"registryDependencies": [
-				"utils"
-			],
+			"registryDependencies": ["utils"],
 			"dependencies": [],
 			"devDependencies": [
 				{

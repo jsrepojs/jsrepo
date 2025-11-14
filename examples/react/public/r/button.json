@@ -49,9 +49,7 @@
 			"devDependencies": []
 		}
 	],
-	"registryDependencies": [
-		"utils"
-	],
+	"registryDependencies": ["utils"],
 	"dependencies": [
 		{
 			"ecosystem": "js",

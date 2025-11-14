@@ -6,12 +6,8 @@
 		{
 			"name": "button",
 			"type": "registry:ui",
-			"dependencies": [
-				"react@19.2.0"
-			],
-			"registryDependencies": [
-				"utils"
-			],
+			"dependencies": ["react@19.2.0"],
+			"registryDependencies": ["utils"],
 			"files": [
 				{
 					"type": "registry:ui",

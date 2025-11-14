@@ -45,8 +45,9 @@ export default function ({ supportedExtensions = SUPPORTED_EXTENSIONS }: Options
 					fileName,
 					supportedExtensions.map((extension) => extension.ts)
 				)
-			)
+			) {
 				return { code };
+			}
 
 			if (fileName.endsWith('.svelte')) {
 				return {
