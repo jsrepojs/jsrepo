@@ -642,7 +642,11 @@ export async function getPathsForItems({
 	options,
 	continueOnNoPath = false,
 }: {
-	items: { name: string; type: RegistryItemType; files: { path: string; target?: string }[] }[];
+	items: {
+		name: string;
+		type: RegistryItemType;
+		files: { path: ItemRelativePath; type: RegistryItemType; target?: string }[];
+	}[];
 	config: Config | undefined;
 	options: { cwd: AbsolutePath; yes: boolean };
 	continueOnNoPath?: boolean;
@@ -663,26 +667,30 @@ export async function getPathsForItems({
 	});
 	// get any paths that are not already set
 	for (const item of items) {
-		const type = normalizeItemTypeForPath(item.type);
-		// the item name can be used to override the target
-		const itemPath = resolvedPaths[`${type}/${item.name}`] ?? resolvedPaths[type];
-		if (itemPath !== undefined) continue;
-		const result = await getItemLocation(item, {
-			paths: resolvedPaths,
-			nonInteractive: options.yes,
-			options,
-			matcher: pathsMatcher,
-		});
-		if (result.isErr()) {
-			if (result.error instanceof NoPathProvidedError && continueOnNoPath) {
-				continue;
+		const uniqueTypes = Array.from(
+			new Set(Array.from(item.files, (file) => normalizeItemTypeForPath(file.type)))
+		);
+		for (const type of uniqueTypes) {
+			// the item name can be used to override the target
+			const itemPath = resolvedPaths[`${type}/${item.name}`] ?? resolvedPaths[type];
+			if (itemPath !== undefined) continue;
+			const result = await getItemLocation(item, {
+				paths: resolvedPaths,
+				nonInteractive: options.yes,
+				options,
+				matcher: pathsMatcher,
+			});
+			if (result.isErr()) {
+				if (result.error instanceof NoPathProvidedError && continueOnNoPath) {
+					continue;
+				}
+				return err(result.error);
 			}
-			return err(result.error);
-		}
-		const { path: originalPath, resolvedPath } = result.value;
-		resolvedPaths[type] = resolvedPath;
-		if (config) {
-			config.paths[type] = originalPath;
+			const { path: originalPath, resolvedPath } = result.value;
+			resolvedPaths[type] = resolvedPath;
+			if (config) {
+				config.paths[type] = originalPath;
+			}
 		}
 	}
 

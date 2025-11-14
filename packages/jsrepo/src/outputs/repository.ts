@@ -85,7 +85,7 @@ export function repository({ format }: RepositoryOutputOptions = {}): Output {
 
 export const RepositoryOutputFileSchema = z.object({
 	path: z.string().transform((v) => v as ItemRelativePath),
-	type: z.union([z.string(), z.undefined()]),
+	type: z.string(),
 	role: z.union([z.union(RegistryFileRoles.map((role) => z.literal(role))), z.undefined()]),
 	relativePath: z.string().transform((v) => v as RelativeToCwdPath),
 	_imports_: z

@@ -139,7 +139,7 @@ export function distributed({ dir, format }: DistributedOutputOptions): Output {
 
 export const DistributedOutputManifestFileSchema = z.object({
 	path: z.string().transform((v) => v as ItemRelativePath),
-	type: z.union([z.string(), z.undefined()]),
+	type: z.string(),
 	role: z.union([z.union(RegistryFileRoles.map((role) => z.literal(role))), z.undefined()]),
 	target: z.union([z.string(), z.undefined()]),
 	registryDependencies: z.union([z.array(z.string()), z.undefined()]),
@@ -177,7 +177,7 @@ export type DistributedOutputManifest = z.infer<typeof DistributedOutputManifest
 export const DistributedOutputFileSchema = z.object({
 	path: z.string().transform((v) => v as ItemRelativePath),
 	content: z.string(),
-	type: z.union([z.string(), z.undefined()]),
+	type: z.string(),
 	role: z.union([z.union(RegistryFileRoles.map((role) => z.literal(role))), z.undefined()]),
 	_imports_: z
 		.union([

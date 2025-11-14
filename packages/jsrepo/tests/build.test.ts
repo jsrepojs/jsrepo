@@ -99,7 +99,9 @@ describe('buildRegistry', () => {
 			const addTestFile = mathItem.files.find((f) => f.path === 'math/add.test.ts');
 			expect(addTestFile).toBeDefined();
 			expect(addTestFile!.role).toBe('test');
-			const answerFormatTestFile = mathItem.files.find((f) => f.path === 'math/answer-format.test.ts');
+			const answerFormatTestFile = mathItem.files.find(
+				(f) => f.path === 'math/answer-format.test.ts'
+			);
 			expect(answerFormatTestFile).toBeDefined();
 			expect(answerFormatTestFile!.role).toBe('test');
 		});

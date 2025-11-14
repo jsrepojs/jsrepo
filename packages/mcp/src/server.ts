@@ -395,11 +395,7 @@ function displayItemDetails(item: RegistryItemWithContent): string {
 
 	## Files
 	${item.files
-		?.filter(
-			(file) =>
-				file.role === undefined ||
-				file.role === 'file'
-		)
+		?.filter((file) => file.role === undefined || file.role === 'file')
 		.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
 		.join('\n')}
 

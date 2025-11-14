@@ -66,8 +66,8 @@ export type RegistryFile = {
 	/** Path of the file relative to the parent item. */
 	path: ItemRelativePath;
 	content: string;
-	type: RegistryItemType | undefined;
-	role: RegistryFileRoles | undefined;
+	type: RegistryItemType;
+	role: RegistryFileRoles;
 	/** Templates for resolving imports when adding items to users projects. This way users can add their items anywhere and things will just work. */
 	_imports_: UnresolvedImport[];
 	target?: string;
