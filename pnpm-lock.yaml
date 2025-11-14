@@ -41,6 +41,9 @@ importers:
       '@svitejs/changesets-changelog-github-compact':
         specifier: ^1.2.0
         version: 1.2.0(encoding@0.1.13)
+      concurrently:
+        specifier: 'catalog:'
+        version: 9.2.1
       pkg-pr-new:
         specifier: ^0.0.60
         version: 0.0.60
