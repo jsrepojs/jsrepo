@@ -1,7 +1,6 @@
 {
-	"name": "@example/react",
-	"homepage": "https://www.jsrepo.com/@example/react",
-	"version": "package",
+	"name": "@example/svelte",
+	"homepage": "https://www.jsrepo.com/@example/svelte",
 	"type": "distributed",
 	"items": [
 		{
@@ -11,33 +10,32 @@
 			"registryDependencies": [
 				"utils"
 			],
-			"dependencies": [
-				{
-					"ecosystem": "js",
-					"name": "react",
-					"version": "19.2.0"
-				}
-			],
+			"dependencies": [],
 			"devDependencies": [
 				{
 					"ecosystem": "js",
 					"name": "tailwind-variants",
 					"version": "^3.1.1"
+				},
+				{
+					"ecosystem": "js",
+					"name": "svelte",
+					"version": "^5.41.0"
 				}
 			],
 			"files": [
 				{
 					"type": "ui",
 					"role": "file",
-					"path": "button.tsx",
+					"path": "button/button.svelte",
 					"registryDependencies": [],
 					"dependencies": [],
 					"devDependencies": []
 				},
 				{
 					"type": "ui",
-					"role": "example",
-					"path": "button.example.tsx",
+					"role": "file",
+					"path": "button/index.ts",
 					"registryDependencies": [],
 					"dependencies": [],
 					"devDependencies": []

@@ -1,1 +1,14 @@
-{"$schema":"https://ui.shadcn.com/schema/registry-item.json","name":"utils","type":"registry:lib","files":[{"type":"registry:lib","path":"utils.ts","content":"import { type ClassValue, clsx } from 'clsx';\nimport { twMerge } from 'tailwind-merge';\n\nexport function cn(...inputs: ClassValue[]) {\n\treturn twMerge(clsx(inputs));\n}\n"}],"registryDependencies":[],"dependencies":[]}
+{
+	"$schema": "https://ui.shadcn.com/schema/registry-item.json",
+	"name": "utils",
+	"type": "registry:lib",
+	"files": [
+		{
+			"type": "registry:lib",
+			"path": "utils.ts",
+			"content": "import { type ClassValue, clsx } from 'clsx';\nimport { twMerge } from 'tailwind-merge';\n\nexport function cn(...inputs: ClassValue[]) {\n\treturn twMerge(clsx(inputs));\n}\n"
+		}
+	],
+	"registryDependencies": [],
+	"dependencies": []
+}

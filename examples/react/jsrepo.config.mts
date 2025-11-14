@@ -7,7 +7,10 @@ export default defineConfig({
 		name: '@example/react',
 		version: 'package',
 		homepage: 'https://www.jsrepo.com/@example/react',
-		outputs: [distributed({ dir: './public/r' }), shadcn({ dir: './public/r/shadcn' })],
+		outputs: [
+			distributed({ dir: './public/r', format: true }),
+			shadcn({ dir: './public/r/shadcn', format: true }),
+		],
 		items: [
 			{
 				name: 'button',

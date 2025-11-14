@@ -1,1 +1,23 @@
-{"$schema":"https://ui.shadcn.com/schema/registry-item.json","name":"button","type":"registry:ui","files":[{"type":"registry:ui","path":"button.tsx","content":"import type React from 'react';\nimport { tv, type VariantProps } from 'tailwind-variants';\nimport { cn } from '@/registry/lib/utils';\n\nexport const buttonVariants = tv({\n\tbase: 'flex items-center rounded-md active:scale-98 transition-all',\n\tvariants: {\n\t\tvariant: {\n\t\t\tdefault: 'bg-primary text-primary-foreground',\n\t\t\tdestructive: 'bg-destructive text-destructive-foreground',\n\t\t\toutline: 'border border-border hover:bg-accent',\n\t\t},\n\t\tsize: {\n\t\t\tdefault: 'h-8 px-2.5',\n\t\t\tsm: 'h-7 px-2',\n\t\t},\n\t},\n});\n\nexport type Variant = VariantProps<typeof buttonVariants>['variant'];\nexport type Size = VariantProps<typeof buttonVariants>['size'];\n\nexport function Button({\n\tvariant = 'default',\n\tsize = 'default',\n\tclassName,\n\t...props\n}: React.ComponentProps<'button'> & { variant?: Variant; size?: Size }) {\n\treturn <button {...props} className={cn(buttonVariants({ variant, size }), className)} />;\n}\n"},{"type":"registry:ui","path":"button.example.tsx","content":"import { Button } from './button';\n\nexport function ButtonExample() {\n\treturn (\n\t\t<>\n\t\t\t<Button variant=\"default\">Click me</Button>\n\t\t\t<Button variant=\"destructive\" size=\"sm\">\n\t\t\t\tDelete\n\t\t\t</Button>\n\t\t</>\n\t);\n}\n"}],"registryDependencies":["utils"],"dependencies":["react@19.2.0"]}
+{
+	"$schema": "https://ui.shadcn.com/schema/registry-item.json",
+	"name": "button",
+	"type": "registry:ui",
+	"files": [
+		{
+			"type": "registry:ui",
+			"path": "button.tsx",
+			"content": "import type React from 'react';\nimport { tv, type VariantProps } from 'tailwind-variants';\nimport { cn } from '@/registry/lib/utils';\n\nexport const buttonVariants = tv({\n\tbase: 'flex items-center rounded-md active:scale-98 transition-all',\n\tvariants: {\n\t\tvariant: {\n\t\t\tdefault: 'bg-primary text-primary-foreground',\n\t\t\tdestructive: 'bg-destructive text-destructive-foreground',\n\t\t\toutline: 'border border-border hover:bg-accent',\n\t\t},\n\t\tsize: {\n\t\t\tdefault: 'h-8 px-2.5',\n\t\t\tsm: 'h-7 px-2',\n\t\t},\n\t},\n});\n\nexport type Variant = VariantProps<typeof buttonVariants>['variant'];\nexport type Size = VariantProps<typeof buttonVariants>['size'];\n\nexport function Button({\n\tvariant = 'default',\n\tsize = 'default',\n\tclassName,\n\t...props\n}: React.ComponentProps<'button'> & { variant?: Variant; size?: Size }) {\n\treturn <button {...props} className={cn(buttonVariants({ variant, size }), className)} />;\n}\n"
+		},
+		{
+			"type": "registry:ui",
+			"path": "button.example.tsx",
+			"content": "import { Button } from './button';\n\nexport function ButtonExample() {\n\treturn (\n\t\t<>\n\t\t\t<Button variant=\"default\">Click me</Button>\n\t\t\t<Button variant=\"destructive\" size=\"sm\">\n\t\t\t\tDelete\n\t\t\t</Button>\n\t\t</>\n\t);\n}\n"
+		}
+	],
+	"registryDependencies": [
+		"utils"
+	],
+	"dependencies": [
+		"react@19.2.0"
+	]
+}
