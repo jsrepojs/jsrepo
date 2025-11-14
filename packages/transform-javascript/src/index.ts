@@ -1,6 +1,7 @@
 import { strip } from '@svecosystem/strip-types';
 import type { Transform } from 'jsrepo';
 import { Unreachable } from 'jsrepo/errors';
+import type { ItemRelativePath } from 'jsrepo/utils';
 import { transform } from 'sucrase';
 
 export type FileExtension = {
@@ -71,10 +72,16 @@ function endsWithOneOf(fileName: string, extensions: string[]): boolean {
 	return extensions.some((extension) => fileName.endsWith(extension));
 }
 
-function updateFileExtension(fileName: string, extensions: FileExtension[]): string {
+function updateFileExtension(
+	fileName: ItemRelativePath,
+	extensions: FileExtension[]
+): ItemRelativePath {
 	for (const extension of extensions) {
 		if (fileName.endsWith(extension.ts)) {
-			return fileName.replace(`.${extension.ts}`, `.${extension.js ?? extension.ts}`);
+			return fileName.replace(
+				`.${extension.ts}`,
+				`.${extension.js ?? extension.ts}`
+			) as ItemRelativePath;
 		}
 	}
 	throw new Unreachable();

@@ -1,6 +1,6 @@
-import type { AbsolutePath } from '@/utils/types';
-import { azure } from 'jsrepo/providers';
 import { describe, it } from 'vitest';
+import { azure } from '@/providers';
+import type { AbsolutePath } from '@/utils/types';
 
 describe('azure', () => {
 	it('correctly resolves repository url', async () => {
