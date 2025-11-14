@@ -291,13 +291,13 @@ importers:
         specifier: ^0.96.0
         version: 0.96.0
       svelte:
-        specifier: ^5.x.x
+        specifier: ^5.0.0
         version: 5.41.4
       unconfig:
         specifier: ^7.3.3
         version: 7.3.3
       vue:
-        specifier: ^3.x.x
+        specifier: ^3.0.0
         version: 3.5.22(typescript@5.9.3)
     devDependencies:
       '@clack/prompts':

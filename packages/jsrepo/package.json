@@ -81,8 +81,8 @@
 		"unconfig": "^7.3.3"
 	},
 	"peerDependencies": {
-		"svelte": "^5.x.x",
-		"vue": "^3.x.x"
+		"svelte": "^5.0.0",
+		"vue": "^3.0.0"
 	},
 	"peerDependenciesMeta": {
 		"vue": {
