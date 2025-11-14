@@ -21,8 +21,7 @@ import {
 	resolveRegistries,
 	updateFiles,
 } from '@/utils/add';
-import { fromMap } from '@/utils/array';
-import type { RemoteDependency } from '@/utils/build';
+import type { DependencyKey, RemoteDependency } from '@/utils/build';
 import type { Config, RegistryPlugin } from '@/utils/config';
 import {
 	addPluginsToConfig,
@@ -244,16 +243,20 @@ export async function runInit(
 
 	log.success(`Wrote config to ${pc.cyan(path.relative(options.cwd, configPath))}`);
 
-	const neededDeps = new Set<RemoteDependency>(
-		fromMap(pluginChoices, (_, plugin) =>
-			plugin.install
-				? {
-						name: plugin.plugin.packageName,
-						version: plugin.plugin.version,
-						ecosystem: 'js',
-					}
-				: undefined
-		).filter((p) => p !== undefined)
+	const neededDeps = new Map<DependencyKey, RemoteDependency>(
+		Array.from(pluginChoices.values())
+			.filter((plugin) => plugin.install)
+			.map(
+				(plugin) =>
+					[
+						`js:${plugin.plugin.packageName}@${plugin.plugin.version ?? ''}`,
+						{
+							name: plugin.plugin.packageName,
+							version: plugin.plugin.version,
+							ecosystem: 'js',
+						},
+					] as [DependencyKey, RemoteDependency]
+			)
 	);
 
 	if (neededDeps.size > 0) {
@@ -261,7 +264,7 @@ export async function runInit(
 			{
 				dependencies: [],
 				devDependencies: [
-					...Array.from(neededDeps),
+					...Array.from(neededDeps.values()),
 					...(options.js
 						? [
 								{

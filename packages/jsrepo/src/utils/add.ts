@@ -12,7 +12,7 @@ import {
 } from '@/outputs/distributed';
 import type { RepositoryOutputFile } from '@/outputs/repository';
 import { fetchManifest, type Provider, type ProviderFactory } from '@/providers';
-import type { RemoteDependency } from '@/utils/build';
+import type { DependencyKey, RemoteDependency } from '@/utils/build';
 import type { Config, RegistryItemAdd, RegistryItemType } from '@/utils/config';
 import { arePathsEqual, getPathsMatcher, resolvePath, resolvePaths } from '@/utils/config/utils';
 import { formatDiff } from '@/utils/diff';
@@ -757,8 +757,8 @@ export async function prepareUpdates({
 	>
 > {
 	const neededFiles: UpdatedFile[] = [];
-	const neededDependencies = new Set<RemoteDependency>();
-	const neededDevDependencies = new Set<RemoteDependency>();
+	const neededDependencies = new Map<DependencyKey, RemoteDependency>();
+	const neededDevDependencies = new Map<DependencyKey, RemoteDependency>();
 	let neededEnvVars: Record<string, string> | undefined;
 
 	for (const item of items) {
@@ -778,10 +778,16 @@ export async function prepareUpdates({
 			});
 
 			for (const dependency of file.dependencies ?? []) {
-				neededDependencies.add(dependency);
+				neededDependencies.set(
+					`${dependency.ecosystem}:${dependency.name}@${dependency.version}`,
+					dependency
+				);
 			}
 			for (const dependency of file.devDependencies ?? []) {
-				neededDevDependencies.add(dependency);
+				neededDevDependencies.set(
+					`${dependency.ecosystem}:${dependency.name}@${dependency.version}`,
+					dependency
+				);
 			}
 
 			const filePath = getTargetPath(file, { itemPath, options });
@@ -827,13 +833,16 @@ export async function prepareUpdates({
 					);
 				const parsed = parsedResult.value;
 				// assume js ecosystem for string deps
-				neededDependencies.add({
+				neededDependencies.set(`js:${parsed.name}@${parsed.version}`, {
 					ecosystem: 'js',
 					name: parsed.name,
 					version: parsed.version,
 				});
 			} else {
-				neededDependencies.add(remoteDependency);
+				neededDependencies.set(
+					`${remoteDependency.ecosystem}:${remoteDependency.name}@${remoteDependency.version}`,
+					remoteDependency
+				);
 			}
 		}
 
@@ -850,13 +859,16 @@ export async function prepareUpdates({
 					);
 				const parsed = parsedResult.value;
 				// assume js ecosystem for string deps
-				neededDevDependencies.add({
+				neededDevDependencies.set(`js:${parsed.name}@${parsed.version}`, {
 					ecosystem: 'js',
 					name: parsed.name,
 					version: parsed.version,
 				});
 			} else {
-				neededDevDependencies.add(remoteDevDependency);
+				neededDevDependencies.set(
+					`${remoteDevDependency.ecosystem}:${remoteDevDependency.name}@${remoteDevDependency.version}`,
+					remoteDevDependency
+				);
 			}
 		}
 
@@ -881,8 +893,8 @@ export async function prepareUpdates({
 
 	return ok({
 		neededDependencies: {
-			dependencies: Array.from(neededDependencies),
-			devDependencies: Array.from(neededDevDependencies),
+			dependencies: Array.from(neededDependencies.values()),
+			devDependencies: Array.from(neededDevDependencies.values()),
 		},
 		neededEnvVars,
 		neededFiles,

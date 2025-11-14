@@ -714,15 +714,21 @@ async function resolveFileDependencies(
 
 	const _imports_: UnresolvedImport[] = [];
 
-	const dependencies = new Set<RemoteDependency>();
-	const devDependencies = new Set<RemoteDependency>();
+	const dependencies = new Map<DependencyKey, RemoteDependency>();
+	const devDependencies = new Map<DependencyKey, RemoteDependency>();
 	const registryDependencies = new Set<string>();
 
-	const fileDependencies = new Set<RemoteDependency>(
-		resolvedFile.manualDependencies.dependencies
+	const fileDependencies = new Map<DependencyKey, RemoteDependency>(
+		resolvedFile.manualDependencies.dependencies.map((dep) => [
+			`${dep.ecosystem}:${dep.name}@${dep.version}`,
+			dep,
+		])
 	);
-	const fileDevDependencies = new Set<RemoteDependency>(
-		resolvedFile.manualDependencies.devDependencies
+	const fileDevDependencies = new Map<DependencyKey, RemoteDependency>(
+		resolvedFile.manualDependencies.devDependencies.map((dep) => [
+			`${dep.ecosystem}:${dep.name}@${dep.version}`,
+			dep,
+		])
 	);
 	const fileRegistryDependencies = new Set<string>(
 		resolvedFile.manualDependencies.registryDependencies
@@ -772,17 +778,29 @@ async function resolveFileDependencies(
 
 		for (const dependency of resolvedFile.dependencies) {
 			if (optionalFileType) {
-				fileDependencies.add(dependency);
+				fileDependencies.set(
+					`${dependency.ecosystem}:${dependency.name}@${dependency.version}`,
+					dependency
+				);
 			} else {
-				dependencies.add(dependency);
+				dependencies.set(
+					`${dependency.ecosystem}:${dependency.name}@${dependency.version}`,
+					dependency
+				);
 			}
 		}
 
 		for (const dependency of resolvedFile.devDependencies) {
 			if (optionalFileType) {
-				fileDevDependencies.add(dependency);
+				fileDevDependencies.set(
+					`${dependency.ecosystem}:${dependency.name}@${dependency.version}`,
+					dependency
+				);
 			} else {
-				devDependencies.add(dependency);
+				devDependencies.set(
+					`${dependency.ecosystem}:${dependency.name}@${dependency.version}`,
+					dependency
+				);
 			}
 		}
 	}
@@ -797,11 +815,11 @@ async function resolveFileDependencies(
 			role: resolvedFile.role,
 			_imports_,
 			registryDependencies: Array.from(fileRegistryDependencies),
-			dependencies: Array.from(fileDependencies),
-			devDependencies: Array.from(fileDevDependencies),
+			dependencies: Array.from(fileDependencies.values()),
+			devDependencies: Array.from(fileDevDependencies.values()),
 		},
-		dependencies: Array.from(dependencies),
-		devDependencies: Array.from(devDependencies),
+		dependencies: Array.from(dependencies.values()),
+		devDependencies: Array.from(devDependencies.values()),
 		registryDependencies: Array.from(registryDependencies),
 	});
 }
@@ -817,7 +835,7 @@ export function toRemoteDependencies(
 	dependencies: (string | RemoteDependency)[],
 	{ registryName, itemName }: { registryName: string; itemName: string }
 ): Result<RemoteDependency[], BuildError> {
-	const remoteDependencies = new Set<RemoteDependency>();
+	const remoteDependencies = new Map<DependencyKey, RemoteDependency>();
 	for (const dependency of dependencies) {
 		let dep: RemoteDependency;
 		if (typeof dependency === 'string') {
@@ -827,9 +845,9 @@ export function toRemoteDependencies(
 		} else {
 			dep = dependency;
 		}
-		remoteDependencies.add(dep);
+		remoteDependencies.set(`${dep.ecosystem}:${dep.name}@${dep.version}`, dep);
 	}
-	return ok(Array.from(remoteDependencies));
+	return ok(Array.from(remoteDependencies.values()));
 }
 
 /**
