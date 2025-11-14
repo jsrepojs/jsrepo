@@ -1,5 +1,14 @@
 # jsrepo
 
+## 3.0.0-beta.18
+### Patch Changes
+
+
+- fix: peer deps ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- refactor the way that files are added to users projects ([#668](https://github.com/jsrepojs/jsrepo/pull/668))
+
 ## 3.0.0-beta.17
 ### Patch Changes
 
