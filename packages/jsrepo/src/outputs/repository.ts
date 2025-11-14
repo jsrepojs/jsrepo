@@ -56,19 +56,19 @@ export function repository({ format }: RepositoryOutputOptions = {}): Output {
 					registryDependencies: item.registryDependencies,
 					dependencies: item.dependencies,
 					devDependencies: item.devDependencies,
-					files: item.files.map((file) => ({
-						type: file.type,
-						path: file.path,
-						relativePath: path.relative(
-							path.join(cwd, item.basePath),
-							path.join(cwd, file.path)
-						),
-						_imports_: file._imports_,
-						target: file.target,
-						registryDependencies: file.registryDependencies,
-						dependencies: file.dependencies,
-						devDependencies: file.devDependencies,
-					})),
+					files: item.files.map(
+						(file) =>
+							({
+								type: file.type,
+								path: file.path,
+								relativePath: path.relative(cwd, file.absolutePath),
+								_imports_: file._imports_,
+								target: file.target,
+								registryDependencies: file.registryDependencies,
+								dependencies: file.dependencies,
+								devDependencies: file.devDependencies,
+							}) satisfies RepositoryOutputFile
+					),
 					envVars: item.envVars,
 				})),
 			};

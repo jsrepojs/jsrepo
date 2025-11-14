@@ -63,17 +63,17 @@ export function distributed({ dir, format }: DistributedOutputOptions): Output {
 					dependencies: item.dependencies,
 					devDependencies: item.devDependencies,
 					envVars: item.envVars,
-					files: item.files.map((file) => ({
-						type: file.type,
-						path: path.relative(
-							path.join(cwd, item.basePath),
-							path.join(cwd, file.path)
-						),
-						target: file.target,
-						registryDependencies: file.registryDependencies,
-						dependencies: file.dependencies,
-						devDependencies: file.devDependencies,
-					})),
+					files: item.files.map(
+						(file) =>
+							({
+								type: file.type,
+								path: file.path,
+								target: file.target,
+								registryDependencies: file.registryDependencies,
+								dependencies: file.dependencies,
+								devDependencies: file.devDependencies,
+							}) satisfies DistributedOutputManifestFile
+					),
 				})),
 			};
 			files.push({
@@ -88,19 +88,19 @@ export function distributed({ dir, format }: DistributedOutputOptions): Output {
 					description: item.description,
 					type: item.type,
 					add: item.add,
-					files: item.files.map((file) => ({
-						type: file.type,
-						content: file.content,
-						path: path.relative(
-							path.join(cwd, item.basePath),
-							path.join(cwd, file.path)
-						),
-						_imports_: file._imports_,
-						target: file.target,
-						registryDependencies: file.registryDependencies,
-						dependencies: file.dependencies,
-						devDependencies: file.devDependencies,
-					})),
+					files: item.files.map(
+						(file) =>
+							({
+								type: file.type,
+								content: file.content,
+								path: file.path,
+								_imports_: file._imports_,
+								target: file.target,
+								registryDependencies: file.registryDependencies,
+								dependencies: file.dependencies,
+								devDependencies: file.devDependencies,
+							}) satisfies DistributedOutputFile
+					),
 					registryDependencies: item.registryDependencies,
 					dependencies: item.dependencies,
 					devDependencies: item.devDependencies,
@@ -194,6 +194,8 @@ export const DistributedOutputFileSchema = z.object({
 	dependencies: z.union([z.array(RemoteDependencySchema), z.undefined()]),
 	devDependencies: z.union([z.array(RemoteDependencySchema), z.undefined()]),
 });
+
+export type DistributedOutputFile = z.infer<typeof DistributedOutputFileSchema>;
 
 export const DistributedOutputItemSchema = z.object({
 	name: z.string(),

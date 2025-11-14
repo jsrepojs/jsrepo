@@ -38,6 +38,14 @@ export default defineConfig({
 					{
 						path: "src/components/registry-kit/demo-example.tsx",
 						type: "registry:example",
+					},
+					{
+						path: 'src/components/registry-kit/demo',
+						files: [
+							{
+								path: 'demo.tsx',
+							}
+						]
 					}
 				],
 				envVars: {

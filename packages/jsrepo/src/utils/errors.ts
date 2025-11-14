@@ -28,7 +28,6 @@ export type CLIError =
 	| InvalidRegistryDependencyError
 	| DuplicateFileReferenceError
 	| FileNotFoundError
-	| FileNotResolvedError
 	| ImportedFileNotResolvedError
 	| InvalidPluginError
 	| InvalidKeyTypeError
@@ -379,19 +378,6 @@ export class FileNotFoundError extends BuildError {
 				suggestion: 'Please ensure the file exists.',
 			}
 		);
-	}
-}
-
-export class FileNotResolvedError extends BuildError {
-	constructor({
-		file,
-		item,
-		registryName,
-	}: { file: string; item: string; registryName: string }) {
-		super(`File not resolved: ${pc.bold(file)} in item ${pc.bold(item)}.`, {
-			registryName,
-			suggestion: 'Please ensure the file is resolved.',
-		});
 	}
 }
 
