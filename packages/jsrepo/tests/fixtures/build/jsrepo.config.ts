@@ -28,12 +28,20 @@ export default defineConfig({
 							{
 								path: "answer-format.ts",
 							},
-							{
-								path: "add.test.ts",
-								type: 'registry:test'
-							},
 						]
 					},
+					{
+						path: 'src/utils/math',
+						role: 'test',
+						files: [
+							{
+								path: 'add.test.ts',
+							},
+							{
+								path: 'answer-format.test.ts',
+							}
+						]
+					}
 				],
 			},
 			{

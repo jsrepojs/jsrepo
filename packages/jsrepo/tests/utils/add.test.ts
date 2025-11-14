@@ -177,6 +177,7 @@ export const RESOLVED_REGISTRY = {
 				files: [
 					{
 						path: 'result.ts' as ItemRelativePath,
+						role: 'file',
 						type: undefined,
 						target: undefined,
 						registryDependencies: undefined,
@@ -185,7 +186,8 @@ export const RESOLVED_REGISTRY = {
 					},
 					{
 						path: 'result.test.ts' as ItemRelativePath,
-						type: 'registry:test',
+						role: 'test',
+						type: undefined,
 						target: undefined,
 						registryDependencies: ['add'],
 						dependencies: undefined,
@@ -206,6 +208,7 @@ export const RESOLVED_REGISTRY = {
 				files: [
 					{
 						path: 'types.ts' as ItemRelativePath,
+						role: 'file',
 						type: undefined,
 						target: undefined,
 						registryDependencies: undefined,
@@ -227,6 +230,7 @@ export const RESOLVED_REGISTRY = {
 				files: [
 					{
 						path: 'add.ts' as ItemRelativePath,
+						role: 'file',
 						type: undefined,
 						target: undefined,
 						registryDependencies: undefined,

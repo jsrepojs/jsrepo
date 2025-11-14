@@ -380,6 +380,7 @@ function collectRegistryFiles(
 			envVars: item.envVars,
 			files: item.files.map((file) => ({
 				type: file.type,
+				role: file.role,
 				path: file.path,
 				target: file.target,
 				registryDependencies: file.registryDependencies,
@@ -402,6 +403,7 @@ function collectRegistryFiles(
 			add: item.add,
 			files: item.files.map((file) => ({
 				type: file.type,
+				role: file.role,
 				content: file.content,
 				path: file.path,
 				_imports_: file._imports_,

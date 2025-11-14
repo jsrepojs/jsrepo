@@ -75,11 +75,12 @@ describe('buildRegistry', () => {
 		});
 
 		it('should have correct files', () => {
-			expect(mathItem.files).toHaveLength(3);
+			expect(mathItem.files).toHaveLength(4);
 			expect(mathItem.files.map((f) => f.path)).toEqual([
 				'math/add.ts',
 				'math/answer-format.ts',
 				'math/add.test.ts',
+				'math/answer-format.test.ts',
 			]);
 		});
 
@@ -95,9 +96,12 @@ describe('buildRegistry', () => {
 		});
 
 		it('should detect test file type', () => {
-			const testFile = mathItem.files.find((f) => f.path === 'math/add.test.ts');
-			expect(testFile).toBeDefined();
-			expect(testFile!.type).toBe('registry:test');
+			const addTestFile = mathItem.files.find((f) => f.path === 'math/add.test.ts');
+			expect(addTestFile).toBeDefined();
+			expect(addTestFile!.role).toBe('test');
+			const answerFormatTestFile = mathItem.files.find((f) => f.path === 'math/answer-format.test.ts');
+			expect(answerFormatTestFile).toBeDefined();
+			expect(answerFormatTestFile!.role).toBe('test');
 		});
 
 		it('should detect dependencies in test files and separate them from the main item', () => {

@@ -5,7 +5,7 @@ import pc from 'picocolors';
 import type {
 	Config,
 	RegistryConfig,
-	RegistryFileType,
+	RegistryFileRoles,
 	RegistryItem,
 	RegistryItemAdd,
 	RegistryItemFolderFile,
@@ -66,7 +66,8 @@ export type RegistryFile = {
 	/** Path of the file relative to the parent item. */
 	path: ItemRelativePath;
 	content: string;
-	type: RegistryFileType | undefined;
+	type: RegistryItemType | undefined;
+	role: RegistryFileRoles | undefined;
 	/** Templates for resolving imports when adding items to users projects. This way users can add their items anywhere and things will just work. */
 	_imports_: UnresolvedImport[];
 	target?: string;
@@ -127,7 +128,8 @@ export type UnresolvedFile = {
 	 */
 	path: ItemRelativePath;
 	parent: ParentItem;
-	type: RegistryFileType | undefined;
+	type: RegistryItemType | undefined;
+	role: RegistryFileRoles | undefined;
 	dependencyResolution: 'auto' | 'manual';
 	registryDependencies: string[] | undefined;
 	dependencies: (string | RemoteDependency)[] | undefined;
@@ -145,7 +147,8 @@ export type ResolvedFile = {
 	 */
 	path: ItemRelativePath;
 	parent: ParentItem;
-	type: RegistryFileType;
+	type: RegistryItemType;
+	role: RegistryFileRoles;
 	dependencyResolution: 'auto' | 'manual';
 	localDependencies: LocalDependency[];
 	dependencies: RemoteDependency[];
@@ -285,6 +288,7 @@ export async function collectItemFiles(
 					absolutePath,
 					path: path.basename(file.path) as ItemRelativePath,
 					type: item.type ?? file.type,
+					role: file.role ?? 'file',
 					target: file.target,
 					dependencyResolution:
 						file.dependencyResolution ?? item.dependencyResolution ?? 'auto',
@@ -324,9 +328,10 @@ export async function collectItemFiles(
 			const subFilesResult = collectFolderFiles(files ?? [], {
 				parent: {
 					type: file.type ?? item.type,
+					role: file.role ?? 'file',
 					target: file.target,
 					dependencyResolution: item.dependencyResolution ?? 'auto',
-					parent: {
+					parentItem: {
 						name: item.name,
 						type: item.type,
 						registryName,
@@ -358,10 +363,11 @@ function collectFolderFiles(
 		cwd,
 	}: {
 		parent: {
-			type: RegistryFileType;
+			type: RegistryItemType;
+			role: RegistryFileRoles;
 			target: string | undefined;
 			dependencyResolution: 'auto' | 'manual';
-			parent: ParentItem;
+			parentItem: ParentItem;
 			path: ItemRelativePath;
 			absolutePath: AbsolutePath;
 		};
@@ -376,10 +382,10 @@ function collectFolderFiles(
 				new FileNotFoundError({
 					path: absolutePath,
 					parent: {
-						name: parent.parent.name,
-						type: parent.parent.type,
+						name: parent.parentItem.name,
+						type: parent.parentItem.type,
 					},
-					registryName: parent.parent.registryName,
+					registryName: parent.parentItem.registryName,
 				})
 			);
 		}
@@ -389,10 +395,11 @@ function collectFolderFiles(
 			unresolvedFiles.push({
 				absolutePath,
 				path: path.join(parent.path, f.path) as ItemRelativePath,
-				type: f.type ?? parent.type,
+				type: parent.type,
+				role: f.role ?? parent.role,
 				target: parent.target ? path.join(parent.target, f.path) : undefined,
 				dependencyResolution: f.dependencyResolution ?? parent.dependencyResolution,
-				parent: parent.parent,
+				parent: parent.parentItem,
 				registryDependencies: f.registryDependencies,
 				dependencies: f.dependencies,
 				devDependencies: f.devDependencies,
@@ -409,9 +416,9 @@ function collectFolderFiles(
 			if (readdirResult.isErr())
 				return err(
 					new BuildError(
-						`Error reading directory: ${pc.bold(absolutePath)} referenced by ${pc.bold(parent.parent.name)}`,
+						`Error reading directory: ${pc.bold(absolutePath)} referenced by ${pc.bold(parent.parentItem.name)}`,
 						{
-							registryName: parent.parent.registryName,
+							registryName: parent.parentItem.registryName,
 							suggestion: 'Please ensure the directory exists and is readable.',
 						}
 					)
@@ -423,9 +430,10 @@ function collectFolderFiles(
 
 		const subFilesResult = collectFolderFiles(files ?? [], {
 			parent: {
-				parent: parent.parent,
+				parentItem: parent.parentItem,
 				target: parent.target ? path.join(parent.target, f.path) : undefined,
-				type: f.type ?? parent.type,
+				type: parent.type,
+				role: f.role ?? parent.role,
 				dependencyResolution: parent.dependencyResolution,
 				path: joinRelative(parent.path, f.path),
 				absolutePath: joinAbsolute(parent.absolutePath, f.path),
@@ -543,6 +551,7 @@ async function resolveFile(
 		path: file.path,
 		// inherit the type from the parent item
 		type: file.type ?? file.parent.type,
+		role: file.role ?? 'file',
 		parent: file.parent,
 		target: file.target,
 		dependencyResolution: file.dependencyResolution,
@@ -678,7 +687,7 @@ async function resolveFileDependencies(
 		BuildError
 	>
 > {
-	const optionalFileType = isOptionalFileType(resolvedFile.type);
+	const optionalFileType = isOptionalFileType(resolvedFile.role);
 
 	const _imports_: UnresolvedImport[] = [];
 
@@ -759,6 +768,7 @@ async function resolveFileDependencies(
 			path: resolvedFile.path,
 			content: resolvedFile.content,
 			type: resolvedFile.type,
+			role: resolvedFile.role,
 			_imports_,
 			registryDependencies: Array.from(fileRegistryDependencies),
 			dependencies: Array.from(fileDependencies),
@@ -818,7 +828,7 @@ export function stringToRemoteDependency(
 }
 
 export function isOptionalFileType(
-	type: RegistryFileType | undefined
-): type is 'registry:example' | 'registry:doc' | 'registry:test' {
-	return type === 'registry:example' || type === 'registry:doc' || type === 'registry:test';
+	role: RegistryFileRoles | undefined
+): role is 'example' | 'doc' | 'test' {
+	return role === 'example' || role === 'doc' || role === 'test';
 }

@@ -182,30 +182,30 @@ export type RegistryItem = {
 	envVars?: Record<string, string>;
 };
 
-export const OptionallyInstalledRegistryTypes = [
-	'registry:example',
-	'registry:doc',
-	'registry:test',
-] as const;
+export const RegistryFileRoles = ['example', 'doc', 'test', 'file'] as const;
 
-export type OptionallyInstalledRegistryFileType = (typeof OptionallyInstalledRegistryTypes)[number];
-
-export type RegistryFileType = LooseAutocomplete<OptionallyInstalledRegistryFileType>;
+export type RegistryFileRoles = (typeof RegistryFileRoles)[number];
 
 export type RegistryItemFile = {
 	/** Path of the file/folder relative to registry config. */
 	path: string;
 	/**
-	 * The type of the file.
-	 *
-	 * - "registry:example" - An example file (optionally installed, great for LLMs)
-	 * - "registry:test" - A test file (optionally installed)
-	 * - "registry:doc" - A documentation file (optionally installed, great for LLMs)
-	 *
-	 * If not provided it will inherit the type from the parent item.
-	 *
+	 * The type of the file. This will determine the path that the file will be added to in the users project.
 	 */
-	type?: RegistryItemType | RegistryFileType;
+	type?: RegistryItemType;
+	/**
+	 * The role of the file.
+	 *
+	 * - "file" - A regular file (always installed)
+	 * - "example" - An example file (optionally installed, great for LLMs)
+	 * - "test" - A test file (optionally installed)
+	 * - "doc" - A documentation file (optionally installed, great for LLMs)
+	 *
+	 * If a parent folder has a role this file will inherit the role from the parent folder.
+	 *
+	 * @default "file"
+	 */
+	role?: RegistryFileRoles;
 	/**
 	 * Whether the dependency resolution should be automatic or manual.
 	 * @default "auto"
@@ -248,17 +248,6 @@ export type RegistryItemFolderFile = Prettify<
 		 * Path to the file relative to the parent folder.
 		 */
 		path: string;
-		/**
-		 * The type of the file.
-		 *
-		 * - "registry:example" - An example file (optionally installed, great for LLMs)
-		 * - "registry:test" - A test file (optionally installed)
-		 * - "registry:doc" - A documentation file (optionally installed, great for LLMs)
-		 *
-		 * If not provided it will inherit the type from the parent item.
-		 *
-		 */
-		type?: OptionallyInstalledRegistryFileType;
 	}
 >;
 

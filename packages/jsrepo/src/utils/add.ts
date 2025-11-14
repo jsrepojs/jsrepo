@@ -299,9 +299,9 @@ export function resolveTree(
 
 		// ensure we also add any registry dependencies of added files
 		for (const file of wantedItem.item.files) {
-			if (file.type === 'registry:example' && !options.withExamples) continue;
-			if (file.type === 'registry:doc' && !options.withDocs) continue;
-			if (file.type === 'registry:test' && !options.withTests) continue;
+			if (file.role === 'example' && !options.withExamples) continue;
+			if (file.role === 'doc' && !options.withDocs) continue;
+			if (file.role === 'test' && !options.withTests) continue;
 
 			for (const registryDependency of file.registryDependencies ?? []) {
 				if (resolvedItems.has(registryDependency)) continue;
@@ -753,9 +753,9 @@ export async function prepareUpdates({
 		const type = normalizeItemTypeForPath(item.type);
 		const itemPath = itemPaths[`${type}/${item.name}`]!;
 		for (let file of item.files) {
-			if (file.type === 'registry:example' && !options.withExamples) continue;
-			if (file.type === 'registry:doc' && !options.withDocs) continue;
-			if (file.type === 'registry:test' && !options.withTests) continue;
+			if (file.role === 'example' && !options.withExamples) continue;
+			if (file.role === 'doc' && !options.withDocs) continue;
+			if (file.role === 'test' && !options.withTests) continue;
 
 			file = await transformRemoteContent(file, {
 				item,

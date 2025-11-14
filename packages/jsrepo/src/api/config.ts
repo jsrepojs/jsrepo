@@ -2,8 +2,8 @@ export type { RemoteDependency } from '@/utils/build';
 export {
 	type Config,
 	defineConfig,
-	OptionallyInstalledRegistryTypes,
 	type RegistryConfig,
+	RegistryFileRoles as OptionallyInstalledRegistryTypes,
 	type RegistryItem,
 	type RegistryItemAdd,
 	type RegistryItemFile,

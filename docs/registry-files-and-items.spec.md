@@ -77,11 +77,11 @@ const item = {
             // we automatically get all the files and they are added to the target path as <target>/<file>
         },
 
-        // registry:example|doc|test files are still supported
+        // example|doc|test files are still supported
         // they will be added to the doc|test|example path as configured by the user
         {
             path: 'src/demos/demo.svelte',
-            type: 'registry:example',
+            role: 'example',
         },
 	],
 };
