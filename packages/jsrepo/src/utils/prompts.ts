@@ -1,4 +1,3 @@
-import fs from 'node:fs';
 import {
 	intro as _intro,
 	spinner as _spinner,
@@ -10,16 +9,20 @@ import {
 	text,
 } from '@clack/prompts';
 import isUnicodeSupported from 'is-unicode-supported';
+import { err, ok, type Result } from 'nevereverthrow';
 import type { ResolvedCommand } from 'package-manager-detector';
 import path from 'pathe';
 import pc from 'picocolors';
 import { x } from 'tinyexec';
 import pkg from '@/../package.json';
-import { type Config, DEFAULT_LANGS } from '@/api';
+import { type AbsolutePath, type Config, DEFAULT_LANGS } from '@/api';
 import { installDependencies } from '@/langs/js';
 import type { RemoteDependency } from '@/utils/build';
 import { searchForEnvFile, updateEnvFile } from '@/utils/env';
 import { findNearestPackageJson, shouldInstall } from '@/utils/package';
+import type { JsrepoError } from './errors';
+import { writeFileSync } from './fs';
+import { dirname, joinAbsolute } from './path';
 
 export const isTTY = process.stdout.isTTY;
 
@@ -133,7 +136,7 @@ export async function promptInstallDependencies(
 				})),
 			},
 			{
-				cwd: path.dirname(configPath),
+				cwd: dirname(configPath as AbsolutePath),
 			}
 		);
 	}
@@ -141,8 +144,8 @@ export async function promptInstallDependencies(
 
 export async function promptAddEnvVars(
 	neededEnvVars: Record<string, string>,
-	{ options }: { options: { yes: boolean; cwd: string } }
-): Promise<Record<string, string> | undefined> {
+	{ options }: { options: { yes: boolean; cwd: AbsolutePath } }
+): Promise<Result<Record<string, string> | undefined, JsrepoError>> {
 	const envFile = searchForEnvFile(options.cwd);
 
 	const updatedEnvVars: Record<string, string> = {};
@@ -176,22 +179,26 @@ export async function promptAddEnvVars(
 		}
 	}
 
-	if (Object.keys(updatedEnvVars).length === 0) return undefined;
+	if (Object.keys(updatedEnvVars).length === 0) return ok(undefined);
 
 	const newContents = updateEnvFile(envFile?.contents ?? '', updatedEnvVars);
-	const envFilePath = envFile?.path ?? path.join(options.cwd, '.env.local');
-	fs.writeFileSync(envFilePath, newContents);
+	const envFilePath = envFile?.path ?? joinAbsolute(options.cwd, '.env.local');
+	const writeResult = writeFileSync(envFilePath, newContents);
+	if (writeResult.isErr()) return err(writeResult.error);
 
 	log.success(
 		`Added environment variables to ${pc.cyan(path.relative(options.cwd, envFilePath))}`
 	);
 
-	return updatedEnvVars;
+	return ok(updatedEnvVars);
 }
 
 export async function promptInstallDependenciesByEcosystem(
 	neededDependencies: { dependencies: RemoteDependency[]; devDependencies: RemoteDependency[] },
-	{ options, config }: { options: { cwd: string; yes: boolean }; config: Config | undefined }
+	{
+		options,
+		config,
+	}: { options: { cwd: AbsolutePath; yes: boolean }; config: Config | undefined }
 ): Promise<RemoteDependency[]> {
 	// we can fast path the js dependencies since we support js out of the box
 	const deps = shouldInstall(

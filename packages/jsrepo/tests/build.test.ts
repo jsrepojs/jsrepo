@@ -3,8 +3,9 @@ import { assert, beforeAll, describe, expect, it } from 'vitest';
 import { loadConfigSearch } from '@/api';
 import { forEachRegistry } from '@/commands/utils';
 import { type BuildResult, buildRegistry, type ResolvedItem } from '@/utils/build';
+import type { AbsolutePath } from '@/utils/types';
 
-const cwd = path.join(__dirname, './fixtures/build');
+const cwd = path.join(__dirname, './fixtures/build') as AbsolutePath;
 
 describe('buildRegistry', () => {
 	let firstRegistry: BuildResult;
@@ -62,7 +63,6 @@ describe('buildRegistry', () => {
 			expect(mathItem.title).toBeUndefined();
 			expect(mathItem.description).toBeUndefined();
 			expect(mathItem.type).toBe('utils');
-			expect(mathItem.basePath).toBe('src/utils/math');
 			expect(mathItem.add).toBe('when-added');
 		});
 
@@ -76,17 +76,15 @@ describe('buildRegistry', () => {
 
 		it('should have correct files', () => {
 			expect(mathItem.files).toHaveLength(3);
-			expect(mathItem.files.map((f) => f.path)).toStrictEqual([
-				'src/utils/math/add.ts',
-				'src/utils/math/answer-format.ts',
-				'src/utils/math/add.test.ts',
+			expect(mathItem.files.map((f) => f.path)).toEqual([
+				'math/add.ts',
+				'math/answer-format.ts',
+				'math/add.test.ts',
 			]);
 		});
 
 		it('should detect registry imports in files', () => {
-			const answerFormatFile = mathItem.files.find(
-				(f) => f.path === 'src/utils/math/answer-format.ts'
-			);
+			const answerFormatFile = mathItem.files.find((f) => f.path === 'math/answer-format.ts');
 			expect(answerFormatFile).toBeDefined();
 			expect(answerFormatFile!._imports_).toHaveLength(1);
 			expect(answerFormatFile!._imports_[0]).toMatchObject({
@@ -97,13 +95,13 @@ describe('buildRegistry', () => {
 		});
 
 		it('should detect test file type', () => {
-			const testFile = mathItem.files.find((f) => f.path === 'src/utils/math/add.test.ts');
+			const testFile = mathItem.files.find((f) => f.path === 'math/add.test.ts');
 			expect(testFile).toBeDefined();
 			expect(testFile!.type).toBe('registry:test');
 		});
 
 		it('should detect dependencies in test files and separate them from the main item', () => {
-			const testFile = mathItem.files.find((f) => f.path === 'src/utils/math/add.test.ts');
+			const testFile = mathItem.files.find((f) => f.path === 'math/add.test.ts');
 			expect(testFile).toBeDefined();
 			expect(testFile!.dependencies).toStrictEqual([
 				{ ecosystem: 'js', name: 'vitest', version: undefined },
@@ -124,7 +122,6 @@ describe('buildRegistry', () => {
 			expect(stdoutItem.title).toBeUndefined();
 			expect(stdoutItem.description).toBeUndefined();
 			expect(stdoutItem.type).toBe('utils');
-			expect(stdoutItem.basePath).toBe('src/utils');
 			expect(stdoutItem.add).toBe('when-added');
 		});
 
@@ -140,7 +137,7 @@ describe('buildRegistry', () => {
 			expect(stdoutItem.files).toHaveLength(1);
 			const stdoutFile = stdoutItem.files[0];
 			assert(stdoutFile !== undefined);
-			expect(stdoutFile.path).toBe('src/utils/stdout.ts');
+			expect(stdoutFile.path).toBe('stdout.ts');
 		});
 	});
 
@@ -157,7 +154,6 @@ describe('buildRegistry', () => {
 			expect(shikiItem.title).toBeUndefined();
 			expect(shikiItem.description).toBeUndefined();
 			expect(shikiItem.type).toBe('utils');
-			expect(shikiItem.basePath).toBe('src/utils');
 			expect(shikiItem.add).toBe('when-added');
 		});
 
@@ -176,7 +172,7 @@ describe('buildRegistry', () => {
 			expect(shikiItem.files).toHaveLength(1);
 			const shikiFile = shikiItem.files[0];
 			assert(shikiFile !== undefined);
-			expect(shikiFile.path).toBe('src/utils/shiki.ts');
+			expect(shikiFile.path).toBe('shiki.ts');
 		});
 	});
 
@@ -193,7 +189,6 @@ describe('buildRegistry', () => {
 			expect(buttonItem.title).toBe('Button');
 			expect(buttonItem.description).toBe('An awesome button component');
 			expect(buttonItem.type).toBe('component');
-			expect(buttonItem.basePath).toBe('src/components/ui');
 			expect(buttonItem.add).toBe('when-added');
 		});
 
@@ -207,7 +202,7 @@ describe('buildRegistry', () => {
 			expect(buttonItem.files).toHaveLength(1);
 			const buttonFile = buttonItem.files[0];
 			assert(buttonFile !== undefined);
-			expect(buttonFile.path).toBe('src/components/ui/button.tsx');
+			expect(buttonFile.path).toBe('button.tsx');
 		});
 	});
 
@@ -224,7 +219,6 @@ describe('buildRegistry', () => {
 			expect(counterItem.title).toBeUndefined();
 			expect(counterItem.description).toBeUndefined();
 			expect(counterItem.type).toBe('component');
-			expect(counterItem.basePath).toBe('src/components/ui');
 			expect(counterItem.add).toBe('when-added');
 		});
 
@@ -238,7 +232,7 @@ describe('buildRegistry', () => {
 			expect(counterItem.files).toHaveLength(1);
 			const counterFile = counterItem.files[0];
 			assert(counterFile !== undefined);
-			expect(counterFile.path).toBe('src/components/ui/counter.svelte');
+			expect(counterFile.path).toBe('counter.svelte');
 		});
 
 		it('should detect registry imports in files', () => {
@@ -248,7 +242,7 @@ describe('buildRegistry', () => {
 			expect(counterFile._imports_[0]).toMatchObject({
 				import: '../../utils/math/add',
 				item: 'math',
-				meta: { filePathRelativeToItem: 'add.ts' },
+				meta: { filePathRelativeToItem: 'math/add.ts' },
 			});
 		});
 	});

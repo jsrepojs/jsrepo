@@ -5,13 +5,14 @@ import pc from 'picocolors';
 import { z } from 'zod';
 import type { Config, RegistryConfig, RegistryConfigArgs } from '@/utils/config';
 import { InvalidOptionsError, JsrepoError } from '@/utils/errors';
+import type { AbsolutePath } from '@/utils/types';
 import { extractAsync } from '@/utils/utils';
 import { safeValidate } from '@/utils/zod';
 
 export const TRACE_ENV_VAR = 'JSREPO_TRACE';
 
 export const defaultCommandOptionsSchema = z.object({
-	cwd: z.string(),
+	cwd: z.string().transform((v) => v as AbsolutePath),
 });
 
 export const commonOptions = {

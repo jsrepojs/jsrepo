@@ -20,14 +20,19 @@ export default defineConfig({
 				type: "utils",
 				files: [
 					{
-						path: "src/utils/math/add.ts",
-					},
-					{
-						path: "src/utils/math/answer-format.ts",
-					},
-					{
-						path: "src/utils/math/add.test.ts",
-						type: "registry:test",
+						path: "src/utils/math",
+						files: [
+							{
+								path: "add.ts",
+							},
+							{
+								path: "answer-format.ts",
+							},
+							{
+								path: "add.test.ts",
+								type: 'registry:test'
+							},
+						]
 					},
 				],
 			},

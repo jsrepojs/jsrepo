@@ -11,6 +11,7 @@ import type {
 	text,
 } from '@clack/prompts';
 import type pc from 'picocolors';
+import type { AbsolutePath } from '@/utils/types';
 
 export type FetchOptions = {
 	token: string | undefined;
@@ -20,7 +21,7 @@ export type FetchOptions = {
 export type CreateOptions = {
 	token: string | undefined;
 	fetch?: typeof fetch;
-	cwd: string;
+	cwd: AbsolutePath;
 };
 
 export type Prompts = {

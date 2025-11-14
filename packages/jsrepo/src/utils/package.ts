@@ -1,26 +1,28 @@
-import fs from 'node:fs';
 import os from 'node:os';
 import { err, ok, type Result } from 'nevereverthrow';
 import path from 'pathe';
 import semver from 'semver';
+import type { AbsolutePath } from '@/api/utils';
 import type { RemoteDependency } from '@/utils/build';
+import { existsSync, readFileSync } from './fs';
+import { dirname, joinAbsolute } from './path';
 
 export function findNearestPackageJson(
-	cwd: string
-): { path: string; package: Partial<PackageJson> } | undefined {
+	cwd: AbsolutePath
+): { path: AbsolutePath; package: Partial<PackageJson> } | undefined {
 	if (cwd === os.homedir() || cwd === path.parse(cwd).root) return undefined;
 
-	const packagePath = path.join(cwd, 'package.json');
-	if (fs.existsSync(packagePath))
+	const packagePath = joinAbsolute(cwd, 'package.json');
+	if (existsSync(packagePath))
 		return {
 			path: packagePath,
 			package: getPackage(packagePath),
 		};
 
-	return findNearestPackageJson(path.dirname(cwd));
+	return findNearestPackageJson(dirname(cwd));
 }
 
-export function tryGetPackage(path: string): Result<Partial<PackageJson>, string> {
+export function tryGetPackage(path: AbsolutePath): Result<Partial<PackageJson>, string> {
 	try {
 		return ok(getPackage(path));
 	} catch (error) {
@@ -28,8 +30,8 @@ export function tryGetPackage(path: string): Result<Partial<PackageJson>, string
 	}
 }
 
-function getPackage(path: string): Partial<PackageJson> {
-	return JSON.parse(fs.readFileSync(path).toString());
+function getPackage(path: AbsolutePath): Partial<PackageJson> {
+	return JSON.parse(readFileSync(path)._unsafeUnwrap().toString());
 }
 
 export type PackageJson = {

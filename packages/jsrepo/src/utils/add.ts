@@ -1,4 +1,3 @@
-import fs from 'node:fs';
 import { cancel, isCancel, select, text } from '@clack/prompts';
 import { diffLines } from 'diff';
 import { err, ok, type Result } from 'nevereverthrow';
@@ -23,6 +22,7 @@ import {
 	InvalidDependencyError,
 	type InvalidJSONError,
 	InvalidRegistryError,
+	type JsrepoError,
 	type ManifestFetchError,
 	MultipleRegistriesError,
 	NoPathProvidedError,
@@ -34,9 +34,12 @@ import {
 	Unreachable,
 	type ZodError,
 } from './errors';
+import { existsSync, readFileSync, writeFileSync } from './fs';
 import { parsePackageName } from './parse-package-name';
+import { joinAbsolute } from './path';
 import { VERTICAL_LINE } from './prompts';
 import { TokenManager } from './token-manager';
+import type { AbsolutePath, ItemRelativePath } from './types';
 
 export type ResolvedRegistry = {
 	url: string;
@@ -54,7 +57,7 @@ export type ResolvedRegistry = {
  */
 export async function resolveRegistries(
 	registries: string[],
-	{ cwd, providers }: { cwd: string; providers: ProviderFactory[] }
+	{ cwd, providers }: { cwd: AbsolutePath; providers: ProviderFactory[] }
 ): Promise<
 	Result<
 		Map<string, ResolvedRegistry>,
@@ -548,7 +551,7 @@ export async function transformRemoteContent(
 	}: {
 		item: FetchedItem;
 		languages: Language[];
-		options: { cwd: string };
+		options: { cwd: AbsolutePath };
 		config: Config | undefined;
 		itemPaths: Record<string, { path: string; alias?: string }>;
 	}
@@ -588,21 +591,19 @@ export async function transformRemoteContent(
 }
 
 export function getTargetPath(
-	file: { path: string; relativePath?: string; target?: string },
+	file: { path: ItemRelativePath; target?: string },
 	{
 		itemPath,
 		options,
 	}: {
 		itemPath: { path: string };
-		options: { cwd: string };
+		options: { cwd: AbsolutePath };
 	}
-) {
+): AbsolutePath {
 	if (file.target) {
-		return path.join(options.cwd, file.target);
-	} else if ('relativePath' in file && typeof file.relativePath === 'string') {
-		return path.join(options.cwd, itemPath.path, file.relativePath);
+		return joinAbsolute(options.cwd, file.target);
 	} else {
-		return path.join(options.cwd, itemPath.path, file.path);
+		return joinAbsolute(options.cwd, itemPath.path, file.path);
 	}
 }
 
@@ -643,7 +644,7 @@ export async function getPathsForItems({
 }: {
 	items: { name: string; type: RegistryItemType; files: { path: string; target?: string }[] }[];
 	config: Config | undefined;
-	options: { cwd: string; yes: boolean };
+	options: { cwd: AbsolutePath; yes: boolean };
 	continueOnNoPath?: boolean;
 }): Promise<
 	Result<
@@ -693,7 +694,7 @@ export async function getPathsForItems({
 export type UpdatedFile = {
 	itemName: string;
 	registryUrl: string;
-	filePath: string;
+	filePath: AbsolutePath;
 	content: string;
 } & (
 	| {
@@ -720,7 +721,7 @@ export async function prepareUpdates({
 }: {
 	configResult: { path: string; config: Config } | null;
 	options: {
-		cwd: string;
+		cwd: AbsolutePath;
 		yes: boolean;
 		withExamples: boolean;
 		withDocs: boolean;
@@ -756,7 +757,6 @@ export async function prepareUpdates({
 			if (file.type === 'registry:doc' && !options.withDocs) continue;
 			if (file.type === 'registry:test' && !options.withTests) continue;
 
-			file.path = getTargetPath(file, { itemPath, options });
 			file = await transformRemoteContent(file, {
 				item,
 				languages: configResult?.config.languages ?? DEFAULT_LANGS,
@@ -772,9 +772,11 @@ export async function prepareUpdates({
 				neededDevDependencies.add(dependency);
 			}
 
+			const filePath = getTargetPath(file, { itemPath, options });
+
 			// check if the file needs to be updated
-			if (fs.existsSync(file.path)) {
-				const originalContents = fs.readFileSync(file.path, 'utf-8');
+			if (existsSync(filePath)) {
+				const originalContents = readFileSync(filePath)._unsafeUnwrap();
 
 				if (originalContents === file.content) {
 					continue;
@@ -783,7 +785,7 @@ export async function prepareUpdates({
 				neededFiles.push({
 					type: 'update',
 					oldContent: originalContents,
-					filePath: file.path,
+					filePath,
 					content: file.content,
 					itemName: item.name,
 					registryUrl: item.registry.url,
@@ -791,7 +793,7 @@ export async function prepareUpdates({
 			} else {
 				neededFiles.push({
 					type: 'create',
-					filePath: file.path,
+					filePath,
 					content: file.content,
 					itemName: item.name,
 					registryUrl: item.registry.url,
@@ -887,12 +889,12 @@ export async function updateFiles({
 		expand: boolean;
 		maxUnchanged: number;
 	};
-}): Promise<string[]> {
+}): Promise<Result<string[], JsrepoError>> {
 	const updatedFiles: string[] = [];
 	for (const file of files) {
 		if (file.type === 'create' || options.overwrite) {
-			fs.mkdirSync(path.dirname(file.filePath), { recursive: true });
-			fs.writeFileSync(file.filePath, file.content);
+			const writeResult = writeFileSync(file.filePath, file.content);
+			if (writeResult.isErr()) return err(writeResult.error);
 			updatedFiles.push(path.relative(options.cwd, file.filePath));
 		} else {
 			const changes = diffLines(file.oldContent, file.content);
@@ -935,11 +937,12 @@ export async function updateFiles({
 
 			if (confirmResult === 'no') continue;
 
-			fs.writeFileSync(file.filePath, file.content);
+			const writeResult = writeFileSync(file.filePath, file.content);
+			if (writeResult.isErr()) return err(writeResult.error);
 			updatedFiles.push(path.relative(options.cwd, file.filePath));
 		}
 	}
-	return updatedFiles;
+	return ok(updatedFiles);
 }
 
 export function getItemPaths(

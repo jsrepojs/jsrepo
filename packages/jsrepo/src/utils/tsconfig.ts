@@ -1,8 +1,10 @@
-import fs from 'node:fs';
 import { createPathsMatcher, getTsconfig, type TsConfigResult } from 'get-tsconfig';
 import { err, ok, type Result } from 'nevereverthrow';
 import path from 'pathe';
 import pc from 'picocolors';
+import type { AbsolutePath } from '@/utils/types';
+import { existsSync, statSync } from './fs';
+import { dirname, joinAbsolute } from './path';
 
 /** Attempts to get the js/tsconfig file for the searched path
  *
@@ -37,7 +39,7 @@ export type PathsMatcher = ((specifier: string) => string[]) | null;
 
 export function _createPathsMatcher(
 	configResult: TsConfigResult,
-	{ cwd }: { cwd: string }
+	{ cwd }: { cwd: AbsolutePath }
 ): PathsMatcher {
 	const matcher = createPathsMatcher(configResult);
 
@@ -47,16 +49,16 @@ export function _createPathsMatcher(
 
 	// resolve tsconfig references
 	for (const configPath of configResult.config.references) {
-		const configPathOrDir = path.join(cwd, configPath.path);
+		const configPathOrDir = joinAbsolute(cwd, configPath.path);
 
-		if (!fs.existsSync(configPathOrDir)) continue;
+		if (!existsSync(configPathOrDir)) continue;
 
-		let directory: string;
+		let directory: AbsolutePath;
 		let fileName = 'tsconfig.json';
 
 		// references can be a file or a directory https://www.typescriptlang.org/docs/handbook/project-references.html
-		if (fs.statSync(configPathOrDir).isFile()) {
-			directory = path.dirname(configPathOrDir);
+		if (statSync(configPathOrDir)._unsafeUnwrap().isFile()) {
+			directory = dirname(configPathOrDir);
 			fileName = path.basename(configPathOrDir);
 		} else {
 			directory = configPathOrDir;

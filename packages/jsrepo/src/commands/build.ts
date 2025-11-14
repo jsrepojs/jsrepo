@@ -1,4 +1,4 @@
-import fs from 'node:fs';
+import { type FSWatcher, watch } from 'node:fs';
 import { Command } from 'commander';
 import { err, ok, type Result } from 'nevereverthrow';
 import path from 'pathe';
@@ -24,6 +24,7 @@ import {
 	NoRegistriesError,
 } from '@/utils/errors';
 import { intro, isTTY, outro } from '@/utils/prompts';
+import type { AbsolutePath } from '@/utils/types';
 import { debounced } from '@/utils/utils';
 
 export const schema = defaultCommandOptionsSchema.extend({
@@ -62,7 +63,9 @@ export const build = new Command('build')
 					// this way if the config is found in a higher directory we base everything off of that directory
 					{
 						...options,
-						cwd: configResult ? path.dirname(configResult.path) : options.cwd,
+						cwd: configResult
+							? (path.dirname(configResult.path) as AbsolutePath)
+							: options.cwd,
 					},
 					configResult.config
 				)
@@ -152,7 +155,7 @@ async function runWatch(
 
 	const ac = new AbortController();
 
-	const watchers = new Map<string, fs.FSWatcher>();
+	const watchers = new Map<string, FSWatcher>();
 
 	let buildActive = true;
 
@@ -266,7 +269,7 @@ function createWatcher(
 	path: string,
 	{ onChange, signal }: { onChange?: () => void; signal: AbortSignal }
 ) {
-	return fs.watch(path, { recursive: true, signal }, (eventType) => {
+	return watch(path, { recursive: true, signal }, (eventType) => {
 		if (eventType === 'change') {
 			onChange?.();
 		}

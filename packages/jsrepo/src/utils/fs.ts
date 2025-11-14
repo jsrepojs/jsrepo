@@ -19,6 +19,13 @@ export function readFileSync(p: AbsolutePath): Result<string, JsrepoError> {
 	}
 }
 
+/**
+ * Write to a file. Automatically creates the directory recursively if it doesn't exist.
+ *
+ * @param p
+ * @param data
+ * @returns
+ */
 export function writeFileSync(p: AbsolutePath, data: string): Result<void, JsrepoError> {
 	try {
 		const res = mkdirSync(dirname(p) as AbsolutePath);
@@ -68,6 +75,12 @@ export function mkdirSync(p: AbsolutePath): Result<void, JsrepoError> {
 	}
 }
 
+/**
+ * Removes a file if it exists.
+ *
+ * @param p
+ * @returns
+ */
 export function rmSync(p: AbsolutePath): Result<void, JsrepoError> {
 	try {
 		if (!existsSync(p)) return ok();

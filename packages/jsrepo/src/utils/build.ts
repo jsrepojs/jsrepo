@@ -93,7 +93,7 @@ export type RemoteDependency = {
 
 export type LocalDependency = {
 	/** The file name of the dependency. */
-	fileName: string;
+	fileName: AbsolutePath;
 	/** The import string used to reference the dependency in the file. */
 	import: string;
 	/** A function that will resolve a template that can be used to transform the import on the client */
@@ -266,7 +266,7 @@ export async function collectItemFiles(
 		// all these files are at the root of the item and therefore should have absolute paths
 		for (const file of item.files) {
 			const absolutePath = joinAbsolute(cwd, file.path);
-			if (existsSync(absolutePath)) {
+			if (!existsSync(absolutePath)) {
 				return err(
 					new FileNotFoundError({
 						path: absolutePath,
@@ -284,7 +284,7 @@ export async function collectItemFiles(
 				unresolvedFiles.push({
 					absolutePath,
 					path: path.basename(file.path) as ItemRelativePath,
-					type: file.type,
+					type: item.type ?? file.type,
 					target: file.target,
 					dependencyResolution:
 						file.dependencyResolution ?? item.dependencyResolution ?? 'auto',
@@ -305,12 +305,11 @@ export async function collectItemFiles(
 			if (file.files) {
 				files = file.files;
 			} else {
-				const dirPath = joinAbsolute(cwd, file.path);
-				const readdirResult = readdirSync(dirPath);
+				const readdirResult = readdirSync(absolutePath);
 				if (readdirResult.isErr())
 					return err(
 						new BuildError(
-							`Error reading directory: ${pc.bold(dirPath)} referenced by ${pc.bold(item.name)}`,
+							`Error reading directory: ${pc.bold(absolutePath)} referenced by ${pc.bold(item.name)}`,
 							{
 								registryName,
 								suggestion: 'Please ensure the directory exists and is readable.',
@@ -324,14 +323,16 @@ export async function collectItemFiles(
 
 			const subFilesResult = collectFolderFiles(files ?? [], {
 				parent: {
-					type: item.type,
+					type: file.type ?? item.type,
 					dependencyResolution: item.dependencyResolution ?? 'auto',
 					parent: {
 						name: item.name,
 						type: item.type,
 						registryName,
 					},
-					path: file.path as ItemRelativePath,
+					// we use the basename of the folder
+					path: path.basename(file.path) as ItemRelativePath,
+					absolutePath: absolutePath,
 				},
 				cwd,
 			});
@@ -360,14 +361,15 @@ function collectFolderFiles(
 			dependencyResolution: 'auto' | 'manual';
 			parent: ParentItem;
 			path: ItemRelativePath;
+			absolutePath: AbsolutePath;
 		};
 		cwd: AbsolutePath;
 	}
 ): Result<UnresolvedFile[], BuildError> {
 	const unresolvedFiles: UnresolvedFile[] = [];
 	for (const f of files) {
-		const absolutePath = joinAbsolute(cwd, parent.path, f.path);
-		if (existsSync(absolutePath)) {
+		const absolutePath = joinAbsolute(parent.absolutePath, f.path);
+		if (!existsSync(absolutePath)) {
 			return err(
 				new FileNotFoundError({
 					path: absolutePath,
@@ -380,13 +382,12 @@ function collectFolderFiles(
 			);
 		}
 
-		const isFile = statSync(absolutePath)._unsafeUnwrap().isDirectory();
+		const isFile = statSync(absolutePath)._unsafeUnwrap().isFile();
 		if (isFile) {
 			unresolvedFiles.push({
 				absolutePath,
 				path: path.join(parent.path, f.path) as ItemRelativePath,
-				// subfiles cannot have a type, or target
-				type: undefined,
+				type: f.type ?? parent.type,
 				target: undefined,
 				dependencyResolution: f.dependencyResolution ?? parent.dependencyResolution,
 				parent: parent.parent,
@@ -402,12 +403,11 @@ function collectFolderFiles(
 		if (f.files) {
 			files = f.files;
 		} else {
-			const dirPath = joinAbsolute(cwd, f.path);
-			const readdirResult = readdirSync(dirPath);
+			const readdirResult = readdirSync(absolutePath);
 			if (readdirResult.isErr())
 				return err(
 					new BuildError(
-						`Error reading directory: ${pc.bold(dirPath)} referenced by ${pc.bold(parent.parent.name)}`,
+						`Error reading directory: ${pc.bold(absolutePath)} referenced by ${pc.bold(parent.parent.name)}`,
 						{
 							registryName: parent.parent.registryName,
 							suggestion: 'Please ensure the directory exists and is readable.',
@@ -421,8 +421,11 @@ function collectFolderFiles(
 
 		const subFilesResult = collectFolderFiles(files ?? [], {
 			parent: {
-				...parent,
+				parent: parent.parent,
+				type: f.type ?? parent.type,
+				dependencyResolution: parent.dependencyResolution,
 				path: joinRelative(parent.path, f.path),
+				absolutePath: joinAbsolute(parent.absolutePath, f.path),
 			},
 			cwd,
 		});
@@ -660,11 +663,7 @@ export async function resolveRegistryItem(
 
 async function resolveFileDependencies(
 	resolvedFile: ResolvedFile,
-	{
-		resolvedFiles,
-		item,
-		cwd,
-	}: { resolvedFiles: ResolvedFiles; item: RegistryItem; cwd: AbsolutePath }
+	{ resolvedFiles, item }: { resolvedFiles: ResolvedFiles; item: RegistryItem; cwd: AbsolutePath }
 ): Promise<
 	Result<
 		{
@@ -696,9 +695,7 @@ async function resolveFileDependencies(
 
 	if (resolvedFile.dependencyResolution === 'auto') {
 		for (const dependency of resolvedFile.localDependencies) {
-			const localDependency = resolvedFiles.get(
-				normalizeAbsolute(path.relative(cwd, dependency.fileName) as AbsolutePath)
-			);
+			const localDependency = resolvedFiles.get(normalizeAbsolute(dependency.fileName));
 			if (localDependency) {
 				const selfReference = localDependency.parent.name === item.name;
 				// only add to registry dependencies if not a self reference
@@ -723,6 +720,7 @@ async function resolveFileDependencies(
 			} else {
 				// only error if in strict mode
 				if (item.strict === false) continue;
+				console.dir(resolvedFiles.keys(), { depth: null });
 				return err(
 					new ImportedFileNotResolvedError({
 						referencedFile: dependency.fileName,

@@ -1,7 +1,4 @@
-import fs from 'node:fs';
-import { err, ok, type Result } from 'nevereverthrow';
 import path from 'pathe';
-import { JsrepoError } from './errors';
 import type { AbsolutePath, Branded, ItemRelativePath } from './types';
 
 /**
@@ -34,4 +31,10 @@ export function joinRelative(p: ItemRelativePath, ...paths: string[]): ItemRelat
  */
 export function dirname(p: AbsolutePath): AbsolutePath {
 	return path.dirname(p) as AbsolutePath;
+}
+
+export type RelativeToCwdPath = Branded<ItemRelativePath, 'relativeToCwdPath'>;
+
+export function relativeToCwd(cwd: AbsolutePath, p: AbsolutePath): RelativeToCwdPath {
+	return path.relative(cwd, p) as RelativeToCwdPath;
 }

@@ -3,7 +3,7 @@ import { DEFAULT_LANGS, type Language } from '@/langs';
 import type { Output } from '@/outputs/types';
 import { DEFAULT_PROVIDERS, type ProviderFactory } from '@/providers';
 import type { RemoteDependency } from '@/utils/build';
-import type { LooseAutocomplete, Prettify } from '@/utils/types';
+import type { ItemRelativePath, LooseAutocomplete, Prettify } from '@/utils/types';
 import { extract, type MaybeGetterAsync } from '@/utils/utils';
 
 export type RegistryConfigArgs = [{ cwd: string }];
@@ -188,9 +188,9 @@ export const OptionallyInstalledRegistryTypes = [
 	'registry:test',
 ] as const;
 
-export type RegistryFileType =
-	| LooseAutocomplete<(typeof OptionallyInstalledRegistryTypes)[number]>
-	| RegistryItemType;
+export type OptionallyInstalledRegistryFileType = (typeof OptionallyInstalledRegistryTypes)[number];
+
+export type RegistryFileType = LooseAutocomplete<OptionallyInstalledRegistryFileType>;
 
 export type RegistryItemFile = {
 	/** Path of the file/folder relative to registry config. */
@@ -248,6 +248,17 @@ export type RegistryItemFolderFile = Prettify<
 		 * Path to the file relative to the parent folder.
 		 */
 		path: string;
+		/**
+		 * The type of the file.
+		 *
+		 * - "registry:example" - An example file (optionally installed, great for LLMs)
+		 * - "registry:test" - A test file (optionally installed)
+		 * - "registry:doc" - A documentation file (optionally installed, great for LLMs)
+		 *
+		 * If not provided it will inherit the type from the parent item.
+		 *
+		 */
+		type?: OptionallyInstalledRegistryFileType;
 	}
 >;
 
@@ -263,9 +274,9 @@ export type TransformOptions = {
 export type Transform = {
 	transform: (opts: {
 		code: string;
-		fileName: string;
+		fileName: ItemRelativePath;
 		options: TransformOptions;
-	}) => Promise<{ code?: string; fileName?: string }>;
+	}) => Promise<{ code?: string; fileName?: ItemRelativePath }>;
 };
 
 export function defineConfig(config: Partial<Config> | (() => Partial<Config>)): Config {

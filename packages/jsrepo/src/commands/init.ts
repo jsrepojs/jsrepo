@@ -1,4 +1,3 @@
-import fs from 'node:fs';
 import { cancel, confirm, isCancel, log, multiselect, text } from '@clack/prompts';
 import { Command } from 'commander';
 import { err, ok, type Result } from 'nevereverthrow';
@@ -43,7 +42,9 @@ import {
 	type InvalidPluginError,
 	NoPackageJsonFoundError,
 } from '@/utils/errors';
+import { readFileSync, writeFileSync } from '@/utils/fs';
 import { tryGetPackage } from '@/utils/package';
+import { joinAbsolute } from '@/utils/path';
 import {
 	initLogging,
 	intro,
@@ -52,6 +53,7 @@ import {
 	promptInstallDependencies,
 	promptInstallDependenciesByEcosystem,
 } from '@/utils/prompts';
+import type { AbsolutePath } from '@/utils/types';
 
 export const schema = defaultCommandOptionsSchema.extend({
 	yes: z.boolean(),
@@ -92,7 +94,12 @@ export const init = new Command('init')
 			runInit(
 				registries,
 				// this way if the config is found in a higher directory we base everything off of that directory
-				{ ...options, cwd: configResult ? path.dirname(configResult.path) : options.cwd },
+				{
+					...options,
+					cwd: configResult
+						? (path.dirname(configResult.path) as AbsolutePath)
+						: options.cwd,
+				},
 				configResult
 			)
 		);
@@ -103,11 +110,11 @@ export const init = new Command('init')
 export async function runInit(
 	registriesArg: string[],
 	options: InitOptions,
-	configResult: { config: Config; path: string } | null
+	configResult: { config: Config; path: AbsolutePath } | null
 ): Promise<Result<void, CLIError>> {
 	const { verbose: _, spinner } = initLogging({ options });
 
-	const packagePath = path.join(options.cwd, 'package.json');
+	const packagePath = joinAbsolute(options.cwd, 'package.json');
 
 	const packageJsonResult = tryGetPackage(packagePath);
 	if (packageJsonResult.isErr()) return err(new NoPackageJsonFoundError());
@@ -115,7 +122,7 @@ export async function runInit(
 
 	let { config, path: configPath } = configResult ?? {
 		config: null,
-		path: path.join(
+		path: joinAbsolute(
 			options.cwd,
 			packageJson.type === 'module' ? 'jsrepo.config.ts' : 'jsrepo.config.mts'
 		),
@@ -126,7 +133,9 @@ export async function runInit(
 	if (config === null) {
 		configCode = initBlankConfig();
 	} else {
-		configCode = fs.readFileSync(configPath, 'utf-8');
+		const configCodeResult = readFileSync(configPath);
+		if (configCodeResult.isErr()) return err(configCodeResult.error);
+		configCode = configCodeResult.value;
 	}
 
 	let hasJsrepo = true;
@@ -139,7 +148,11 @@ export async function runInit(
 		}
 		packageJson.devDependencies.jsrepo = `^${pkg.version}`;
 
-		fs.writeFileSync(packagePath, JSON.stringify(packageJson, null, '\t'));
+		const writePackageJsonResult = writeFileSync(
+			packagePath,
+			JSON.stringify(packageJson, null, '\t')
+		);
+		if (writePackageJsonResult.isErr()) return err(writePackageJsonResult.error);
 		hasJsrepo = false;
 	}
 
@@ -162,7 +175,8 @@ export async function runInit(
 	if (registriesArg.length === 0) {
 		if (config !== null) return err(new AlreadyInitializedError());
 
-		fs.writeFileSync(configPath, configCode);
+		const writeConfigResult = writeFileSync(configPath, configCode);
+		if (writeConfigResult.isErr()) return err(writeConfigResult.error);
 
 		log.success(`Wrote config to ${pc.cyan(path.relative(options.cwd, configPath))}`);
 
@@ -225,7 +239,8 @@ export async function runInit(
 	if (addRegistriesToConfigResult.isErr()) return err(addRegistriesToConfigResult.error);
 	configCode = addRegistriesToConfigResult.value;
 
-	fs.writeFileSync(configPath, configCode);
+	const writeConfigResult = writeFileSync(configPath, configCode);
+	if (writeConfigResult.isErr()) return err(writeConfigResult.error);
 
 	log.success(`Wrote config to ${pc.cyan(path.relative(options.cwd, configPath))}`);
 
@@ -345,7 +360,9 @@ export async function runInit(
 			updatedPaths,
 		} = prepareUpdatesResult.value;
 
-		const updatedFiles = await updateFiles({ files: neededFiles, options });
+		const updatedFilesResult = await updateFiles({ files: neededFiles, options });
+		if (updatedFilesResult.isErr()) return err(updatedFilesResult.error);
+		const updatedFiles = updatedFilesResult.value;
 
 		log.success(`Updated ${pc.green(updatedFiles.length)} files`);
 
@@ -371,7 +388,8 @@ export async function runInit(
 		if (updateConfigPathsResult.isErr()) return err(updateConfigPathsResult.error);
 		configCode = updateConfigPathsResult.value;
 
-		fs.writeFileSync(configPath, configCode);
+		const writeConfigResult = writeFileSync(configPath, configCode);
+		if (writeConfigResult.isErr()) return err(writeConfigResult.error);
 
 		log.success(`Updated paths`);
 	}
@@ -391,7 +409,7 @@ async function initRegistry(
 		config,
 	}: {
 		configCode: string;
-		configPath: string;
+		configPath: AbsolutePath;
 		options: InitOptions;
 		pluginChoices: Map<string, { install: boolean; plugin: Plugin }>;
 		config: Config | null;
@@ -429,7 +447,7 @@ async function initPlugins(
 		pluginChoices,
 	}: {
 		configCode: string;
-		configPath: string;
+		configPath: AbsolutePath;
 		options: InitOptions;
 		pluginChoices: Map<string, { install: boolean; plugin: Plugin }>;
 	}
@@ -553,7 +571,7 @@ async function getWantedPlugins(
 		pluginChoices: Map<string, { install: boolean; plugin: Plugin }>;
 		options: InitOptions;
 		type: 'provider' | 'transform' | 'language';
-		config: { path: string; code: string };
+		config: { path: AbsolutePath; code: string };
 	}
 ): Promise<Result<Plugin[], InvalidPluginError>> {
 	const wantedPlugins: Plugin[] = [];

@@ -15,7 +15,7 @@ export type InstallDependenciesOptions = {
 export type TransformImportsOptions = {
 	cwd: AbsolutePath;
 	/** The path of the file that the imports will be transformed for. */
-	targetPath: AbsolutePath;
+	targetPath: string;
 	getItemPath(item: string): {
 		/** The resolved path of the dependency. */
 		path: string;

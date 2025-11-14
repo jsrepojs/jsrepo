@@ -1,4 +1,3 @@
-import fs from 'node:fs';
 import { cancel, groupMultiselect, isCancel, multiselect } from '@clack/prompts';
 import { Command } from 'commander';
 import { err, ok, type Result } from 'nevereverthrow';
@@ -30,6 +29,7 @@ import type { Config } from '@/utils/config';
 import { updateConfigPaths } from '@/utils/config/mods/update-paths';
 import { loadConfigSearch } from '@/utils/config/utils';
 import { type CLIError, InvalidRegistryError, RegistryNotProvidedError } from '@/utils/errors';
+import { readFileSync } from '@/utils/fs';
 import {
 	initLogging,
 	intro,
@@ -37,6 +37,7 @@ import {
 	promptAddEnvVars,
 	promptInstallDependenciesByEcosystem,
 } from '@/utils/prompts';
+import type { AbsolutePath } from '@/utils/types';
 
 export const schema = defaultCommandOptionsSchema.extend({
 	yes: z.boolean(),
@@ -84,7 +85,10 @@ export const add = new Command('add')
 			runAdd(
 				blockNames,
 				// this way if the config is found in a higher directory we base everything off of that directory
-				{ ...options, cwd: config ? path.dirname(config.path) : options.cwd },
+				{
+					...options,
+					cwd: config ? (path.dirname(config.path) as AbsolutePath) : options.cwd,
+				},
 				config
 			)
 		);
@@ -103,7 +107,7 @@ export type AddCommandResult = {
 export async function runAdd(
 	itemsArg: string[],
 	options: AddOptions,
-	configResult: { path: string; config: Config } | null
+	configResult: { path: AbsolutePath; config: Config } | null
 ): Promise<Result<AddCommandResult, CLIError>> {
 	const { verbose: _, spinner } = initLogging({ options });
 
@@ -281,10 +285,14 @@ export async function runAdd(
 	const { neededDependencies, neededEnvVars, neededFiles, updatedPaths } =
 		prepareUpdatesResult.value;
 
-	const updatedFiles = await updateFiles({ files: neededFiles, options });
+	const updatedFilesResult = await updateFiles({ files: neededFiles, options });
+	if (updatedFilesResult.isErr()) return err(updatedFilesResult.error);
+	const updatedFiles = updatedFilesResult.value;
 
 	if (configResult && updatedPaths) {
-		const configCode = fs.readFileSync(configResult.path, 'utf-8');
+		const configCodeResult = readFileSync(configResult.path);
+		if (configCodeResult.isErr()) return err(configCodeResult.error);
+		const configCode = configCodeResult.value;
 		await updateConfigPaths(updatedPaths, {
 			config: { path: configResult.path, code: configCode },
 		});
@@ -292,7 +300,9 @@ export async function runAdd(
 
 	let updatedEnvVars: Record<string, string> | undefined;
 	if (neededEnvVars) {
-		updatedEnvVars = await promptAddEnvVars(neededEnvVars, { options });
+		const promptAddEnvVarsResult = await promptAddEnvVars(neededEnvVars, { options });
+		if (promptAddEnvVarsResult.isErr()) return err(promptAddEnvVarsResult.error);
+		updatedEnvVars = promptAddEnvVarsResult.value;
 	}
 
 	const updatedDependencies = await promptInstallDependenciesByEcosystem(neededDependencies, {

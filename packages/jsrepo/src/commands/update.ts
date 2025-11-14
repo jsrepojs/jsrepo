@@ -1,4 +1,3 @@
-import fs from 'node:fs';
 import { cancel, isCancel, multiselect } from '@clack/prompts';
 import { Command } from 'commander';
 import { err, ok, type Result } from 'nevereverthrow';
@@ -33,6 +32,7 @@ import type { Config } from '@/utils/config';
 import { updateConfigPaths } from '@/utils/config/mods/update-paths';
 import { loadConfigSearch } from '@/utils/config/utils';
 import { type CLIError, ConfigNotFoundError, NoItemsToUpdateError } from '@/utils/errors';
+import { existsSync, readFileSync } from '@/utils/fs';
 import {
 	initLogging,
 	intro,
@@ -40,6 +40,7 @@ import {
 	promptAddEnvVars,
 	promptInstallDependenciesByEcosystem,
 } from '@/utils/prompts';
+import type { AbsolutePath } from '@/utils/types';
 
 export const schema = defaultCommandOptionsSchema.extend({
 	yes: z.boolean(),
@@ -88,7 +89,7 @@ export const update = new Command('update')
 			runUpdate(
 				blockNames,
 				// this way if the config is found in a higher directory we base everything off of that directory
-				{ ...options, cwd: path.dirname(config.path) },
+				{ ...options, cwd: path.dirname(config.path) as AbsolutePath },
 				config
 			)
 		);
@@ -107,7 +108,7 @@ export type UpdateCommandResult = {
 export async function runUpdate(
 	itemsArg: string[],
 	options: UpdateOptions,
-	configResult: { path: string; config: Config } | null
+	configResult: { path: AbsolutePath; config: Config } | null
 ): Promise<Result<UpdateCommandResult, CLIError>> {
 	const { verbose: _, spinner } = initLogging({ options });
 
@@ -200,7 +201,7 @@ export async function runUpdate(
 
 			for (const file of item.files) {
 				const filePath = getTargetPath(file, { itemPath: { path: itemPath }, options });
-				if (!fs.existsSync(filePath)) continue;
+				if (!existsSync(filePath)) continue;
 				updateCandidates.push({ item: { ...item, registry }, registry });
 				break;
 			}
@@ -270,10 +271,14 @@ export async function runUpdate(
 	const { neededDependencies, neededEnvVars, neededFiles, updatedPaths } =
 		prepareUpdatesResult.value;
 
-	const updatedFiles = await updateFiles({ files: neededFiles, options });
+	const updatedFilesResult = await updateFiles({ files: neededFiles, options });
+	if (updatedFilesResult.isErr()) return err(updatedFilesResult.error);
+	const updatedFiles = updatedFilesResult.value;
 
 	if (configResult && updatedPaths) {
-		const configCode = fs.readFileSync(configResult.path, 'utf-8');
+		const configCodeResult = readFileSync(configResult.path);
+		if (configCodeResult.isErr()) return err(configCodeResult.error);
+		const configCode = configCodeResult.value;
 		await updateConfigPaths(updatedPaths, {
 			config: { path: configResult.path, code: configCode },
 		});
@@ -281,7 +286,9 @@ export async function runUpdate(
 
 	let updatedEnvVars: Record<string, string> | undefined;
 	if (neededEnvVars) {
-		updatedEnvVars = await promptAddEnvVars(neededEnvVars, { options });
+		const promptAddEnvVarsResult = await promptAddEnvVars(neededEnvVars, { options });
+		if (promptAddEnvVarsResult.isErr()) return err(promptAddEnvVarsResult.error);
+		updatedEnvVars = promptAddEnvVarsResult.value;
 	}
 
 	const updatedDependencies = await promptInstallDependenciesByEcosystem(neededDependencies, {

@@ -1,10 +1,11 @@
-import fs from 'node:fs';
-import path from 'pathe';
 import { z } from 'zod';
 import { type Output, RegistryPluginsSchema, RemoteDependencySchema } from '@/outputs/types';
 import { MANIFEST_FILE } from '@/utils/build';
 import { RegistryItemAddSchema, RegistryMetaSchema } from '@/utils/config';
+import { rmSync, writeFileSync } from '@/utils/fs';
 import { stringify } from '@/utils/json';
+import { joinAbsolute, type RelativeToCwdPath, relativeToCwd } from '@/utils/path';
+import type { ItemRelativePath } from '@/utils/types';
 
 export type RepositoryOutputOptions = {
 	/** Whether or not to format the output. @default false */
@@ -61,7 +62,7 @@ export function repository({ format }: RepositoryOutputOptions = {}): Output {
 							({
 								type: file.type,
 								path: file.path,
-								relativePath: path.relative(cwd, file.absolutePath),
+								relativePath: relativeToCwd(cwd, file.absolutePath),
 								_imports_: file._imports_,
 								target: file.target,
 								registryDependencies: file.registryDependencies,
@@ -73,20 +74,18 @@ export function repository({ format }: RepositoryOutputOptions = {}): Output {
 				})),
 			};
 
-			fs.writeFileSync(path.join(cwd, MANIFEST_FILE), stringify(manifest, { format }));
+			writeFileSync(joinAbsolute(cwd, MANIFEST_FILE), stringify(manifest, { format }));
 		},
 		clean: async ({ cwd }) => {
-			const manifestPath = path.join(cwd, MANIFEST_FILE);
-			if (!fs.existsSync(manifestPath)) return;
-			fs.rmSync(manifestPath);
+			rmSync(joinAbsolute(cwd, MANIFEST_FILE));
 		},
 	};
 }
 
 export const RepositoryOutputFileSchema = z.object({
-	path: z.string(),
+	path: z.string().transform((v) => v as ItemRelativePath),
 	type: z.union([z.string(), z.undefined()]),
-	relativePath: z.string(),
+	relativePath: z.string().transform((v) => v as RelativeToCwdPath),
 	_imports_: z
 		.union([
 			z.array(

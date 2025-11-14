@@ -13,6 +13,7 @@ import {
 	RegistryItemNotFoundError,
 	RegistryNotProvidedError,
 } from '@/utils/errors';
+import type { AbsolutePath, ItemRelativePath } from '@/utils/types';
 
 describe('parseWantedItems', () => {
 	it('should parse fully qualified items', () => {
@@ -175,7 +176,7 @@ export const RESOLVED_REGISTRY = {
 				dependencies: [],
 				files: [
 					{
-						path: 'result.ts',
+						path: 'result.ts' as ItemRelativePath,
 						type: undefined,
 						target: undefined,
 						registryDependencies: undefined,
@@ -183,7 +184,7 @@ export const RESOLVED_REGISTRY = {
 						devDependencies: undefined,
 					},
 					{
-						path: 'result.test.ts',
+						path: 'result.test.ts' as ItemRelativePath,
 						type: 'registry:test',
 						target: undefined,
 						registryDependencies: ['add'],
@@ -204,7 +205,7 @@ export const RESOLVED_REGISTRY = {
 				dependencies: [],
 				files: [
 					{
-						path: 'types.ts',
+						path: 'types.ts' as ItemRelativePath,
 						type: undefined,
 						target: undefined,
 						registryDependencies: undefined,
@@ -225,7 +226,7 @@ export const RESOLVED_REGISTRY = {
 				dependencies: [],
 				files: [
 					{
-						path: 'add.ts',
+						path: 'add.ts' as ItemRelativePath,
 						type: undefined,
 						target: undefined,
 						registryDependencies: undefined,
@@ -297,11 +298,11 @@ describe('getTargetPath', () => {
 	it('should get the target path for a distributed file', () => {
 		const result = getTargetPath(
 			{
-				path: 'result.ts',
+				path: 'result.ts' as ItemRelativePath,
 			},
 			{
 				itemPath: { path: 'src' },
-				options: { cwd: '' },
+				options: { cwd: '' as AbsolutePath },
 			}
 		);
 
@@ -311,12 +312,12 @@ describe('getTargetPath', () => {
 	it('should get the target path for a distributed file with a target path', () => {
 		const result = getTargetPath(
 			{
-				path: 'result.ts',
+				path: 'result.ts' as ItemRelativePath,
 				target: 'src/result/result.ts',
 			},
 			{
 				itemPath: { path: 'src' },
-				options: { cwd: '' },
+				options: { cwd: '' as AbsolutePath },
 			}
 		);
 
@@ -326,12 +327,11 @@ describe('getTargetPath', () => {
 	it('should get the target path for a distributed file with a relative path', () => {
 		const result = getTargetPath(
 			{
-				path: 'result.ts',
-				relativePath: 'result.ts',
+				path: 'result.ts' as ItemRelativePath,
 			},
 			{
 				itemPath: { path: 'src/result' },
-				options: { cwd: '' },
+				options: { cwd: '' as AbsolutePath },
 			}
 		);
 
