@@ -4,7 +4,6 @@ import fuzzysort from 'fuzzysort';
 import {
 	getPathsForItems,
 	normalizeItemTypeForPath,
-	OptionallyInstalledRegistryTypes,
 	prepareUpdates,
 	promptAddEnvVars,
 	RegistryItemNotFoundError,
@@ -398,8 +397,8 @@ function displayItemDetails(item: RegistryItemWithContent): string {
 	${item.files
 		?.filter(
 			(file) =>
-				file.type === undefined ||
-				!(OptionallyInstalledRegistryTypes as unknown as string[]).includes(file.type)
+				file.role === undefined ||
+				file.role === 'file'
 		)
 		.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
 		.join('\n')}
@@ -409,19 +408,19 @@ function displayItemDetails(item: RegistryItemWithContent): string {
 
 	## Examples
 	${item.files
-		?.filter((file) => file.type === 'registry:example')
+		?.filter((file) => file.role === 'example')
 		.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
 		.join('\n')}
 
 	## Docs
 	${item.files
-		?.filter((file) => file.type === 'registry:doc')
+		?.filter((file) => file.role === 'doc')
 		.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
 		.join('\n')}
 
 	## Tests
 	${item.files
-		?.filter((file) => file.type === 'registry:test')
+		?.filter((file) => file.role === 'test')
 		.map((file) => `\`\`\`${file.path}\n${file.content}\n\`\`\``)
 		.join('\n')}
 

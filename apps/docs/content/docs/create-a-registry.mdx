@@ -280,13 +280,13 @@ If you leave an environment variable blank the user will be prompted to add a va
 
 Values you configure here will ***never*** overwrite existing values in the user's env file.
 
-### Special file types
+### Special file roles
 
-There are a few special file types that are supported by **jsrepo**. 
+There are a few special file roles that are supported by **jsrepo**. 
 
-- `registry:example` - An example file 
-- `registry:doc` - A documentation file
-- `registry:test` - A test file
+- `example` - An example file 
+- `doc` - A documentation file
+- `test` - A test file
 
 These files are optionally installed when adding/updating an item by specifying the `--with-examples`, `--with-docs`, or `--with-tests` flags. 
 
@@ -294,7 +294,7 @@ These files are optionally installed when adding/updating an item by specifying 
     These files are also made available to LLMs when using the `@jsrepo/mcp` server.
 </Callout>
 
-You can specify the type of a file when you define it on an item:
+You can specify the role of a file when you define it on an item:
 
 ```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
@@ -308,7 +308,7 @@ export default defineConfig({
 				files: [
 					{
 						path: "src/example.ts",
-						type: "registry:example", // [!code ++]
+						role: "example", // [!code ++]
 					},
 				],
 			}
@@ -317,9 +317,9 @@ export default defineConfig({
 });
 ```
 
-Files with any of the 3 special types will only install their dependencies when added to a users project.
+Files with any of the 3 special roles will only install their dependencies when added to a users project.
 
-For example if you have a `registry:test` file that depends on `vitest`. `vitest` will only be installed to the users project when the user provides the `--with-tests` flag.
+For example if you have a file with `role: "test"` that depends on `vitest`. `vitest` will only be installed to the users project when the user provides the `--with-tests` flag.
 
 Similarly if that same file was to depend on another item in the registry. Then that item will only be installed to the users project when the test file is added.
 
@@ -335,10 +335,10 @@ export default defineConfig({
 		items: [
 			{
 				// ...
-                files: [
+				files: [
 					{
 						path: "src/example.ts",
-						type: "registry:test",
+						role: "test",
                         dependencies: ["chalk"], // [!code ++]
                         devDependencies: ["vitest"], // [!code ++]
                         registryDependencies: ["logger"], // [!code ++]

@@ -37,7 +37,7 @@ export default defineConfig({
 					},
 					{
 						path: "src/components/registry-kit/demo-example.tsx",
-						type: "registry:example",
+						role: "example",
 					},
 					{
 						path: 'src/components/registry-kit/demo',
