@@ -8,7 +8,9 @@
 		"@jsrepo/transform-prettier": "0.0.0",
 		"@jsrepo/transform-javascript": "0.0.0",
 		"@jsrepo/shadcn": "0.0.0",
-		"@jsrepo/docs": "0.0.0"
+		"@jsrepo/docs": "0.0.0",
+		"@example/react": "0.1.0",
+		"@example/svelte": "0.0.1"
 	},
 	"changesets": [
 		"afraid-crews-drop",
@@ -17,6 +19,7 @@
 		"clear-rice-peel",
 		"clear-states-pull",
 		"cozy-knives-help",
+		"cyan-swans-serve",
 		"early-carrots-punch",
 		"early-loops-cheat",
 		"eighty-lights-go",
@@ -42,6 +45,7 @@
 		"thin-stars-send",
 		"tidy-carpets-cry",
 		"wacky-suns-go",
+		"wicked-pots-search",
 		"wise-lions-hide"
 	]
 }
