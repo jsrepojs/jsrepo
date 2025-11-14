@@ -1,7 +1,7 @@
 {
 	"name": "@jsrepo/transform-biome",
 	"description": "A transform plugin for jsrepo to format code with biome.",
-	"version": "0.0.1-beta.18",
+	"version": "0.0.1-beta.19",
 	"license": "MIT",
 	"homepage": "https://v3.jsrepo.dev",
 	"author": {
