@@ -3,12 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "pnpm registry:build && next build",
+    "build": "next build",
     "dev": "concurrently -n registry,docs \"pnpm registry:dev\" \"next dev --turbo\"",
     "start": "next start",
-    "postinstall": "fumadocs-mdx",
-    "registry:build": "jsrepo build",
-    "registry:dev": "jsrepo build --watch"
+    "postinstall": "fumadocs-mdx"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
