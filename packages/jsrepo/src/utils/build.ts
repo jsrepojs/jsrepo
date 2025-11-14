@@ -1,7 +1,7 @@
-import fs from 'node:fs';
 import { log } from '@clack/prompts';
 import { err, ok, type Result } from 'nevereverthrow';
 import path from 'pathe';
+import pc from 'picocolors';
 import type {
 	Config,
 	RegistryConfig,
@@ -13,9 +13,9 @@ import type {
 	RegistryMeta,
 	RegistryPlugin,
 } from '@/utils/config';
-import type { Branded, LooseAutocomplete } from '@/utils/types';
+import type { AbsolutePath, ItemRelativePath, LooseAutocomplete } from '@/utils/types';
 import {
-	type BuildError,
+	BuildError,
 	DuplicateFileReferenceError,
 	DuplicateItemNameError,
 	FileNotFoundError,
@@ -27,19 +27,11 @@ import {
 	NoListedItemsError,
 	SelfReferenceError,
 } from './errors';
+import { existsSync, readdirSync, readFileSync, statSync } from './fs';
 import { parsePackageName } from './parse-package-name';
+import { joinAbsolute, joinRelative, type NormalizedAbsolutePath, normalizeAbsolute } from './path';
 
 export const MANIFEST_FILE = 'registry.json';
-
-/**
- * An absolute path to a file. Can be used to immediately read the file.
- */
-export type AbsolutePath = Branded<string, 'absolutePath'>;
-
-/**
- * A path relative to the parent item.
- */
-export type ItemRelativePath = Branded<string, 'itemRelativePath'>;
 
 export type BuildResult = RegistryMeta & {
 	plugins?: {
@@ -167,6 +159,8 @@ export type ResolvedFile = {
 	target: string | undefined;
 };
 
+export type ResolvedFiles = Map<NormalizedAbsolutePath, ResolvedFile>;
+
 /**
  * Validates the registry config
  * @param registry
@@ -219,7 +213,7 @@ export async function validateRegistryConfig(
 
 export async function buildRegistry(
 	registry: RegistryConfig,
-	{ options, config }: { options: { cwd: string }; config: Config }
+	{ options, config }: { options: { cwd: AbsolutePath }; config: Config }
 ): Promise<Result<BuildResult, BuildError>> {
 	const result = await validateRegistryConfig(registry);
 	if (result.isErr()) return err(result.error);
@@ -265,14 +259,14 @@ export async function buildRegistry(
  */
 export async function collectItemFiles(
 	items: RegistryItem[],
-	{ cwd, registryName }: { cwd: string; registryName: string }
+	{ cwd, registryName }: { cwd: AbsolutePath; registryName: string }
 ): Promise<Result<UnresolvedFile[], BuildError>> {
 	const unresolvedFiles: UnresolvedFile[] = [];
 	for (const item of items) {
 		// all these files are at the root of the item and therefore should have absolute paths
 		for (const file of item.files) {
-			const absolutePath = path.join(cwd, file.path) as AbsolutePath;
-			if (fs.existsSync(absolutePath)) {
+			const absolutePath = joinAbsolute(cwd, file.path);
+			if (existsSync(absolutePath)) {
 				return err(
 					new FileNotFoundError({
 						path: absolutePath,
@@ -285,7 +279,7 @@ export async function collectItemFiles(
 				);
 			}
 
-			const isFile = fs.statSync(absolutePath).isFile();
+			const isFile = statSync(absolutePath)._unsafeUnwrap().isFile();
 			if (isFile) {
 				unresolvedFiles.push({
 					absolutePath,
@@ -307,15 +301,26 @@ export async function collectItemFiles(
 				continue;
 			}
 
-			const files: RegistryItemFolderFile[] = file.files
-				? // if files are provided, use them
-					file.files
-				: // if not read files from the folder
-					fs
-						.readdirSync(path.join(cwd, file.path))
-						.map((f) => ({
-							path: f,
-						}));
+			let files: RegistryItemFolderFile[];
+			if (file.files) {
+				files = file.files;
+			} else {
+				const dirPath = joinAbsolute(cwd, file.path);
+				const readdirResult = readdirSync(dirPath);
+				if (readdirResult.isErr())
+					return err(
+						new BuildError(
+							`Error reading directory: ${pc.bold(dirPath)} referenced by ${pc.bold(item.name)}`,
+							{
+								registryName,
+								suggestion: 'Please ensure the directory exists and is readable.',
+							}
+						)
+					);
+				files = readdirResult.value.map((f) => ({
+					path: f,
+				}));
+			}
 
 			const subFilesResult = collectFolderFiles(files ?? [], {
 				parent: {
@@ -356,13 +361,13 @@ function collectFolderFiles(
 			parent: ParentItem;
 			path: ItemRelativePath;
 		};
-		cwd: string;
+		cwd: AbsolutePath;
 	}
 ): Result<UnresolvedFile[], BuildError> {
 	const unresolvedFiles: UnresolvedFile[] = [];
 	for (const f of files) {
-		const absolutePath = path.join(cwd, parent.path, f.path) as AbsolutePath;
-		if (fs.existsSync(absolutePath)) {
+		const absolutePath = joinAbsolute(cwd, parent.path, f.path);
+		if (existsSync(absolutePath)) {
 			return err(
 				new FileNotFoundError({
 					path: absolutePath,
@@ -375,7 +380,7 @@ function collectFolderFiles(
 			);
 		}
 
-		const isFile = fs.statSync(absolutePath).isDirectory();
+		const isFile = statSync(absolutePath)._unsafeUnwrap().isDirectory();
 		if (isFile) {
 			unresolvedFiles.push({
 				absolutePath,
@@ -393,20 +398,31 @@ function collectFolderFiles(
 			continue;
 		}
 
-		const files: RegistryItemFolderFile[] = f.files
-			? // if files are provided, use them
-				f.files
-			: // if not read files from the folder
-				fs
-					.readdirSync(absolutePath)
-					.map((f) => ({
-						path: f,
-					}));
+		let files: RegistryItemFolderFile[];
+		if (f.files) {
+			files = f.files;
+		} else {
+			const dirPath = joinAbsolute(cwd, f.path);
+			const readdirResult = readdirSync(dirPath);
+			if (readdirResult.isErr())
+				return err(
+					new BuildError(
+						`Error reading directory: ${pc.bold(dirPath)} referenced by ${pc.bold(parent.parent.name)}`,
+						{
+							registryName: parent.parent.registryName,
+							suggestion: 'Please ensure the directory exists and is readable.',
+						}
+					)
+				);
+			files = readdirResult.value.map((f) => ({
+				path: f,
+			}));
+		}
 
 		const subFilesResult = collectFolderFiles(files ?? [], {
 			parent: {
 				...parent,
-				path: path.join(parent.path, f.path) as ItemRelativePath,
+				path: joinRelative(parent.path, f.path),
 			},
 			cwd,
 		});
@@ -420,18 +436,18 @@ export async function resolveFiles(
 	files: UnresolvedFile[],
 	{
 		cwd,
-		resolvedFiles = new Map(),
+		resolvedFiles = new Map<NormalizedAbsolutePath, ResolvedFile>(),
 		config,
 		registry,
 	}: {
-		cwd: string;
+		cwd: AbsolutePath;
 		config: Config;
 		registry: RegistryConfig;
-		resolvedFiles?: Map<string, ResolvedFile>;
+		resolvedFiles?: ResolvedFiles;
 	}
-): Promise<Result<Map<string, ResolvedFile>, BuildError>> {
+): Promise<Result<ResolvedFiles, BuildError>> {
 	for (const file of files) {
-		const normalizedPath = path.normalize(file.absolutePath);
+		const normalizedPath = normalizeAbsolute(file.absolutePath);
 		const previouslyResolvedFile = resolvedFiles.get(normalizedPath);
 		if (previouslyResolvedFile) {
 			return err(
@@ -444,11 +460,10 @@ export async function resolveFiles(
 			);
 		}
 
-		const filePath = path.join(cwd, file.path);
-		if (!fs.existsSync(filePath)) {
+		if (!existsSync(file.absolutePath)) {
 			return err(
 				new FileNotFoundError({
-					path: filePath,
+					path: file.absolutePath,
 					parent: file.parent,
 					registryName: registry.name,
 				})
@@ -464,9 +479,20 @@ export async function resolveFiles(
 
 async function resolveFile(
 	file: UnresolvedFile,
-	{ cwd, config, registry }: { cwd: string; config: Config; registry: RegistryConfig }
+	{ cwd, config, registry }: { cwd: AbsolutePath; config: Config; registry: RegistryConfig }
 ): Promise<Result<ResolvedFile, BuildError>> {
-	const content = fs.readFileSync(file.absolutePath, 'utf-8');
+	const contentResult = readFileSync(file.absolutePath);
+	if (contentResult.isErr())
+		return err(
+			new BuildError(
+				`Failed to read file ${pc.bold(file.absolutePath)} referenced by ${pc.bold(file.parent.name)}`,
+				{
+					registryName: registry.name,
+					suggestion: 'Please ensure the file exists and is readable.',
+				}
+			)
+		);
+	const content = contentResult.value;
 
 	const manualDependencies = toRemoteDependencies(file.dependencies ?? [], {
 		registryName: registry.name,
@@ -530,13 +556,13 @@ export async function resolveRegistryItems(
 	items: RegistryItem[],
 	{
 		cwd,
-		resolvedItems = new Map(),
+		resolvedItems = new Map<string, ResolvedItem>(),
 		resolvedFiles,
 		registryName,
 	}: {
-		cwd: string;
+		cwd: AbsolutePath;
 		resolvedItems?: Map<string, ResolvedItem>;
-		resolvedFiles: Map<string, ResolvedFile>;
+		resolvedFiles: ResolvedFiles;
 		registryName: string;
 	}
 ): Promise<Result<Map<string, ResolvedItem>, BuildError>> {
@@ -561,9 +587,9 @@ export async function resolveRegistryItem(
 		resolvedFiles,
 		registryName,
 	}: {
-		cwd: string;
+		cwd: AbsolutePath;
 		resolvedItems: Map<string, ResolvedItem>;
-		resolvedFiles: Map<string, ResolvedFile>;
+		resolvedFiles: ResolvedFiles;
 		registryName: string;
 	}
 ): Promise<Result<ResolvedItem, BuildError>> {
@@ -638,7 +664,7 @@ async function resolveFileDependencies(
 		resolvedFiles,
 		item,
 		cwd,
-	}: { resolvedFiles: Map<string, ResolvedFile>; item: RegistryItem; cwd: string }
+	}: { resolvedFiles: ResolvedFiles; item: RegistryItem; cwd: AbsolutePath }
 ): Promise<
 	Result<
 		{
@@ -671,7 +697,7 @@ async function resolveFileDependencies(
 	if (resolvedFile.dependencyResolution === 'auto') {
 		for (const dependency of resolvedFile.localDependencies) {
 			const localDependency = resolvedFiles.get(
-				path.normalize(path.relative(cwd, dependency.fileName))
+				normalizeAbsolute(path.relative(cwd, dependency.fileName) as AbsolutePath)
 			);
 			if (localDependency) {
 				const selfReference = localDependency.parent.name === item.name;

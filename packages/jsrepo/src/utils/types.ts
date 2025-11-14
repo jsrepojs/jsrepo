@@ -16,3 +16,13 @@ type Brand<B extends string> = { [brand]: B };
  * ```
  */
 export type Branded<T, B extends string> = T & Brand<B>;
+
+/**
+ * An absolute path to a file. Can be used to immediately read the file.
+ */
+export type AbsolutePath = Branded<string, 'absolutePath'>;
+
+/**
+ * A path relative to the parent item.
+ */
+export type ItemRelativePath = Branded<string, 'itemRelativePath'>;

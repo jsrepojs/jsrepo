@@ -12,3 +12,4 @@ export {
 	updateFiles,
 } from '@/utils/add';
 export { promptAddEnvVars, promptInstallDependenciesByEcosystem } from '@/utils/prompts';
+export type { AbsolutePath, ItemRelativePath } from '@/utils/types';
