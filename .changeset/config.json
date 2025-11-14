@@ -8,10 +8,8 @@
 	"baseBranch": "main",
 	"updateInternalDependencies": "patch",
 	"ignore": [
-		"@playground/registry",
 		"@jsrepo/docs",
-		"@playground/project",
-		"@playground/react-project"
+		"@example/react"
 	],
 	"prettier": false
 }

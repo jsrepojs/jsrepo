@@ -10,15 +10,7 @@
 		"attributePosition": "auto"
 	},
 	"files": {
-		"includes": [
-			"**",
-			"!**/dist",
-			"!**/node_modules",
-			"!**/docs",
-			"!**/temp-test",
-			"!**/playground",
-			"!**/tests/fixtures/**/*"
-		]
+		"includes": ["**", "!**/dist", "!**/node_modules", "!**/docs", "!**/temp-test", "!**/tests/fixtures/**/*"]
 	},
 	"assist": { "actions": { "source": { "organizeImports": "on" } } },
 	"linter": {
@@ -118,5 +110,10 @@
 				"lineWidth": 100
 			}
 		}
-	]
+	],
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
+	}
 }

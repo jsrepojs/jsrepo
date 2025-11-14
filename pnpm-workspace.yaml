@@ -1,6 +1,6 @@
 packages:
   - "packages/*"
-  - "playground/*"
+  - "examples/*"
   - "apps/*"
   - "bundle-analyzer"
 

@@ -1,0 +1,30 @@
+{
+  "name": "@example/react",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm build:registry && next dev",
+    "build": "pnpm build:registry && next build",
+    "start": "pnpm build:registry && next start",
+    "build:registry": "jsrepo build"
+  },
+  "dependencies": {
+    "next": "16.0.3",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
+  },
+  "devDependencies": {
+    "@jsrepo/shadcn": "workspace:*",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "babel-plugin-react-compiler": "1.0.0",
+    "clsx": "^2.1.1",
+    "jsrepo": "workspace:*",
+    "tailwind-merge": "^3.3.1",
+    "tailwind-variants": "^3.1.1",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
