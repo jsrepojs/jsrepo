@@ -504,7 +504,7 @@ async function initDefaultPaths(
 
 					return true;
 				})
-				.map((item) => normalizeItemTypeForPath(item.type))
+				.flatMap((item) => item.files.map((file) => normalizeItemTypeForPath(file.type)))
 		)
 	);
 
