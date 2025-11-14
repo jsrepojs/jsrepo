@@ -324,6 +324,7 @@ export async function collectItemFiles(
 			const subFilesResult = collectFolderFiles(files ?? [], {
 				parent: {
 					type: file.type ?? item.type,
+					target: file.target,
 					dependencyResolution: item.dependencyResolution ?? 'auto',
 					parent: {
 						name: item.name,
@@ -358,6 +359,7 @@ function collectFolderFiles(
 	}: {
 		parent: {
 			type: RegistryFileType;
+			target: string | undefined;
 			dependencyResolution: 'auto' | 'manual';
 			parent: ParentItem;
 			path: ItemRelativePath;
@@ -388,7 +390,7 @@ function collectFolderFiles(
 				absolutePath,
 				path: path.join(parent.path, f.path) as ItemRelativePath,
 				type: f.type ?? parent.type,
-				target: undefined,
+				target: parent.target ? path.join(parent.target, f.path) : undefined,
 				dependencyResolution: f.dependencyResolution ?? parent.dependencyResolution,
 				parent: parent.parent,
 				registryDependencies: f.registryDependencies,
@@ -422,6 +424,7 @@ function collectFolderFiles(
 		const subFilesResult = collectFolderFiles(files ?? [], {
 			parent: {
 				parent: parent.parent,
+				target: parent.target ? path.join(parent.target, f.path) : undefined,
 				type: f.type ?? parent.type,
 				dependencyResolution: parent.dependencyResolution,
 				path: joinRelative(parent.path, f.path),

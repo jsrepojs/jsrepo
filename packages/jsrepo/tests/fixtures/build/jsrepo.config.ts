@@ -83,6 +83,16 @@ export default defineConfig({
 					},
 				],
 			},
+			{
+				name: 'demo-page',
+				type: 'page',
+				files: [
+					{
+						path: 'src/routes/demo',
+						target: 'src/routes/demo'
+					}
+				]
+			}
 		],
 	},
 });

@@ -47,7 +47,7 @@ describe('buildRegistry', () => {
 	});
 
 	it('should have the correct number of items', () => {
-		expect(firstRegistry.items).toHaveLength(6);
+		expect(firstRegistry.items).toHaveLength(7);
 	});
 
 	describe('math item', () => {
@@ -244,6 +244,32 @@ describe('buildRegistry', () => {
 				item: 'math',
 				meta: { filePathRelativeToItem: 'math/add.ts' },
 			});
+		});
+	});
+
+	describe('demo-page item', () => {
+		let demoPageItem: ResolvedItem;
+
+		beforeAll(() => {
+			demoPageItem = firstRegistry.items.find((item) => item.name === 'demo-page')!;
+			assert(demoPageItem !== undefined);
+		});
+
+		it('should have correct basic properties', () => {
+			expect(demoPageItem.name).toBe('demo-page');
+			expect(demoPageItem.title).toBeUndefined();
+			expect(demoPageItem.description).toBeUndefined();
+			expect(demoPageItem.type).toBe('page');
+			expect(demoPageItem.add).toBe('when-added');
+		});
+
+		it('should have the page files', () => {
+			const serverFile = demoPageItem.files.find((f) => f.path === 'demo/+page.server.ts');
+			expect(serverFile).toBeDefined();
+			expect(serverFile!.target).toBe('src/routes/demo/+page.server.ts');
+			const clientFile = demoPageItem.files.find((f) => f.path === 'demo/+page.svelte');
+			expect(clientFile).toBeDefined();
+			expect(clientFile!.target).toBe('src/routes/demo/+page.svelte');
 		});
 	});
 });
