@@ -9,6 +9,9 @@ catalogs:
     '@types/node':
       specifier: ^24.10.0
       version: 24.10.0
+    concurrently:
+      specifier: ^9.2.1
+      version: 9.2.1
     picocolors:
       specifier: ^1.1.1
       version: 1.1.1
@@ -38,9 +41,6 @@ importers:
       '@svitejs/changesets-changelog-github-compact':
         specifier: ^1.2.0
         version: 1.2.0(encoding@0.1.13)
-      concurrently:
-        specifier: ^9.2.1
-        version: 9.2.1
       pkg-pr-new:
         specifier: ^0.0.60
         version: 0.0.60
@@ -215,6 +215,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      concurrently:
+        specifier: 'catalog:'
+        version: 9.2.1
       jsrepo:
         specifier: workspace:*
         version: link:../../packages/jsrepo
@@ -248,6 +251,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      concurrently:
+        specifier: 'catalog:'
+        version: 9.2.1
       jsrepo:
         specifier: workspace:*
         version: link:../../packages/jsrepo
