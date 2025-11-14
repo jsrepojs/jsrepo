@@ -47,7 +47,7 @@ describe('buildRegistry', () => {
 	});
 
 	it('should have the correct number of items', () => {
-		expect(firstRegistry.items).toHaveLength(7);
+		expect(firstRegistry.items).toHaveLength(8);
 	});
 
 	describe('math item', () => {
@@ -282,6 +282,53 @@ describe('buildRegistry', () => {
 			const clientFile = demoPageItem.files.find((f) => f.path === 'demo/+page.svelte');
 			expect(clientFile).toBeDefined();
 			expect(clientFile!.target).toBe('src/routes/demo/+page.svelte');
+		});
+	});
+
+	describe('empty item', () => {
+		let emptyItem: ResolvedItem;
+
+		beforeAll(() => {
+			emptyItem = firstRegistry.items.find((item) => item.name === 'empty')!;
+			assert(emptyItem !== undefined);
+		});
+
+		it('should have correct basic properties', () => {
+			expect(emptyItem.name).toBe('empty');
+			expect(emptyItem.title).toBeUndefined();
+			expect(emptyItem.description).toBeUndefined();
+			expect(emptyItem.type).toBe('ui');
+			expect(emptyItem.add).toBe('when-added');
+		});
+
+		it('should have the correct files', () => {
+			expect(emptyItem.files).toHaveLength(3);
+			const emptyContentFile = emptyItem.files.find(
+				(f) => f.path === 'empty/empty-content.svelte'
+			);
+			expect(emptyContentFile).toBeDefined();
+			expect(emptyContentFile!.role).toBe('file');
+			expect(emptyContentFile!.type).toBe('ui');
+			const emptyFile = emptyItem.files.find((f) => f.path === 'empty/empty.svelte');
+			expect(emptyFile).toBeDefined();
+			expect(emptyFile!.role).toBe('file');
+			expect(emptyFile!.type).toBe('ui');
+			const indexFile = emptyItem.files.find((f) => f.path === 'empty/index.ts');
+			expect(indexFile).toBeDefined();
+			expect(indexFile!.role).toBe('file');
+			expect(indexFile!.type).toBe('ui');
+		});
+
+		it('should not have duplicated dependencies', () => {
+			expect(emptyItem.registryDependencies).toStrictEqual([]);
+			expect(emptyItem.dependencies).toStrictEqual([
+				{
+					ecosystem: 'js',
+					name: '@lucide/svelte',
+					version: undefined,
+				},
+			]);
+			expect(emptyItem.devDependencies).toStrictEqual([]);
 		});
 	});
 });

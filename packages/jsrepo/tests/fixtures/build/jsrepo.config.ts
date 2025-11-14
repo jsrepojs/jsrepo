@@ -88,6 +88,15 @@ export default defineConfig({
 				],
 			},
 			{
+				name: "empty",
+				type: "ui",
+				files: [
+					{
+						path: "src/components/ui/empty",
+					},
+				],
+			},
+			{
 				name: "counter",
 				type: "ui",
 				files: [

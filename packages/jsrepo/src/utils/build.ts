@@ -608,6 +608,8 @@ export async function resolveRegistryItems(
 	return ok(resolvedItems);
 }
 
+export type DependencyKey = `${Ecosystem}:${string}@${string}`;
+
 export async function resolveRegistryItem(
 	item: RegistryItem,
 	{
@@ -633,14 +635,21 @@ export async function resolveRegistryItem(
 		itemName: item.name,
 	});
 	if (dependenciesResult.isErr()) return err(dependenciesResult.error);
-	const dependencies = new Set(dependenciesResult.value);
+	const dependencies = new Map<DependencyKey, RemoteDependency>(
+		dependenciesResult.value.map((dep) => [`${dep.ecosystem}:${dep.name}@${dep.version}`, dep])
+	);
 
 	const devDependenciesResult = toRemoteDependencies(item.devDependencies ?? [], {
 		registryName,
 		itemName: item.name,
 	});
 	if (devDependenciesResult.isErr()) return err(devDependenciesResult.error);
-	const devDependencies = new Set(devDependenciesResult.value);
+	const devDependencies = new Map<DependencyKey, RemoteDependency>(
+		devDependenciesResult.value.map((dep) => [
+			`${dep.ecosystem}:${dep.name}@${dep.version}`,
+			dep,
+		])
+	);
 
 	const itemFiles = Array.from(resolvedFiles.values()).filter(
 		(file) => file.parent.name === item.name
@@ -663,10 +672,10 @@ export async function resolveRegistryItem(
 		files.push(file);
 
 		for (const dep of deps) {
-			dependencies.add(dep);
+			dependencies.set(`${dep.ecosystem}:${dep.name}@${dep.version}`, dep);
 		}
 		for (const dep of devDeps) {
-			devDependencies.add(dep);
+			devDependencies.set(`${dep.ecosystem}:${dep.name}@${dep.version}`, dep);
 		}
 		for (const dep of regDeps) {
 			registryDependencies.add(dep);
