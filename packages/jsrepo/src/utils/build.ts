@@ -2,6 +2,7 @@ import { log } from '@clack/prompts';
 import { err, ok, type Result } from 'nevereverthrow';
 import path from 'pathe';
 import pc from 'picocolors';
+import { z } from 'zod';
 import type {
 	Config,
 	RegistryConfig,
@@ -76,11 +77,22 @@ export type RegistryFile = {
 	devDependencies: RemoteDependency[] | undefined;
 };
 
+export const UnresolvedImportSchema = z.object({
+	import: z.string(),
+	item: z.string(),
+	file: z.object({
+		type: z.string(),
+		path: z.string().transform((v) => v as ItemRelativePath),
+	}),
+	meta: z.record(z.string(), z.unknown()),
+});
+
 /** All the information that a client would need about the registry to correct imports in a users project. */
 export type UnresolvedImport = {
 	/** The literal import string to be transformed on the client */
 	import: string;
 	item: string;
+	file: { type: RegistryItemType; path: ItemRelativePath };
 	/** Additional properties to help resolve the import on the client */
 	meta: Record<string, unknown>;
 };
@@ -416,7 +428,9 @@ function collectFolderFiles(
 			if (readdirResult.isErr())
 				return err(
 					new BuildError(
-						`Error reading directory: ${pc.bold(absolutePath)} referenced by ${pc.bold(parent.parentItem.name)}`,
+						`Error reading directory: ${pc.bold(absolutePath)} referenced by ${pc.bold(
+							parent.parentItem.name
+						)}`,
 						{
 							registryName: parent.parentItem.registryName,
 							suggestion: 'Please ensure the directory exists and is readable.',
@@ -727,12 +741,15 @@ async function resolveFileDependencies(
 				_imports_.push({
 					import: dependency.import,
 					item: localDependency.parent.name,
+					file: {
+						type: localDependency.type,
+						path: localDependency.path,
+					},
 					meta: await dependency.createTemplate(localDependency),
 				});
 			} else {
 				// only error if in strict mode
 				if (item.strict === false) continue;
-				console.dir(resolvedFiles.keys(), { depth: null });
 				return err(
 					new ImportedFileNotResolvedError({
 						referencedFile: dependency.fileName,

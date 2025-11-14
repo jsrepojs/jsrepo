@@ -560,13 +560,17 @@ export async function transformRemoteContent(
 	const transformations = await lang?.transformImports(file._imports_, {
 		cwd: options.cwd,
 		targetPath: file.path,
-		getItemPath: (item) => {
-			for (const key of Object.keys(itemPaths)) {
-				// this will only ever match one item since items cannot have duplicate names
-				if (key.endsWith(`/${item}`)) {
-					return itemPaths[key]!;
-				}
+		getItemPath: ({ item, file }) => {
+			// there are two types of paths
+			// <type> and <type>/<name>
+			for (const [key, value] of Object.entries(itemPaths)) {
+				// <type>/<name>
+				if (key === `${file.type}/${item}`) return value;
+
+				// <type>
+				if (key === file.type) return value;
 			}
+			// by now we should have already got all the necessary paths from the user
 			throw new Unreachable();
 		},
 	});

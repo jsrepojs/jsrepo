@@ -1,7 +1,7 @@
 import { defineConfig, defineDocs, frontmatterSchema, metaSchema } from "fumadocs-mdx/config";
 import { remarkMdxFiles } from "fumadocs-core/mdx-plugins";
 
-// You can customise Zod schemas for frontmatter and `meta.json` here
+// You can customize Zod schemas for frontmatter and `meta.json` here
 // see https://fumadocs.dev/docs/mdx/collections
 export const docs = defineDocs({
 	docs: {

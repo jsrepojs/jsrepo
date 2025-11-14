@@ -13,12 +13,7 @@ import type {
 	ResolveDependenciesOptions,
 	TransformImportsOptions,
 } from '@/langs/types';
-import type {
-	LocalDependency,
-	RemoteDependency,
-	ResolvedFile,
-	UnresolvedImport,
-} from '@/utils/build';
+import type { LocalDependency, RemoteDependency, UnresolvedImport } from '@/utils/build';
 import { existsSync, readdirSync, statSync } from '@/utils/fs';
 import { findNearestPackageJson, shouldInstall } from '@/utils/package';
 import { parsePackageName } from '@/utils/parse-package-name';
@@ -44,14 +39,11 @@ export function js(_options: JsOptions = {}): Language {
 		resolveDependencies: async (code, opts) =>
 			resolveImports(await getImports(code, opts), opts),
 		transformImports: async (imports, opts) =>
-			transformImports(imports as (UnresolvedImport & ImportTemplate)[], opts),
+			transformImports(imports as UnresolvedImport[], opts),
 		canInstallDependencies: (ecosystem) => ecosystem === 'js',
 		installDependencies: (deps, opts) => installDependencies(deps, opts),
 	};
 }
-
-/** The template that will be used to resolve the import on the client */
-export type ImportTemplate = { filePathRelativeToItem: string };
 
 /**
  * Resolves dependencies for javascript and typescript.
@@ -82,7 +74,7 @@ export async function resolveImports(
 			localDeps.push({
 				fileName: mod.path,
 				import: specifier,
-				createTemplate: createImportTemplate,
+				createTemplate: () => ({}),
 			});
 			continue;
 		}
@@ -140,12 +132,6 @@ export async function resolveImports(
 		localDependencies: localDeps,
 		dependencies,
 		devDependencies,
-	};
-}
-
-function createImportTemplate(resolvedFile: ResolvedFile): ImportTemplate {
-	return {
-		filePathRelativeToItem: resolvedFile.path,
 	};
 }
 
@@ -307,7 +293,7 @@ function tryResolveLocalAlias(
 			return ok({
 				fileName: foundMod.path,
 				import: mod,
-				createTemplate: createImportTemplate,
+				createTemplate: () => ({}),
 			});
 		}
 
@@ -381,13 +367,12 @@ export async function transformImports(
 	const transformedImports: ImportTransform[] = [];
 
 	for (const imp of imports) {
-		const itemPath = opts.getItemPath(imp.item);
+		const itemPath = opts.getItemPath({ item: imp.item, file: imp.file });
 		if (!itemPath) continue;
-		const filePathRelativeToItem = imp.meta.filePathRelativeToItem as string | undefined;
-		if (!filePathRelativeToItem) continue;
 
-		const { dir: filePathRelativeToItemDir, name: filePathRelativeToItemName } =
-			path.parse(filePathRelativeToItem);
+		const { dir: filePathRelativeToItemDir, name: filePathRelativeToItemName } = path.parse(
+			imp.file.path
+		);
 		// this handles the case where the import is referencing an index file but by the directory name instead of the index file itself
 		// for example: './utils/math' instead of './utils/math/index.ts'
 		const baseName =

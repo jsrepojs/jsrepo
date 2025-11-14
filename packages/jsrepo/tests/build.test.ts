@@ -3,7 +3,7 @@ import { assert, beforeAll, describe, expect, it } from 'vitest';
 import { loadConfigSearch } from '@/api';
 import { forEachRegistry } from '@/commands/utils';
 import { type BuildResult, buildRegistry, type ResolvedItem } from '@/utils/build';
-import type { AbsolutePath } from '@/utils/types';
+import type { AbsolutePath, ItemRelativePath } from '@/utils/types';
 
 const cwd = path.join(__dirname, './fixtures/build') as AbsolutePath;
 
@@ -91,7 +91,8 @@ describe('buildRegistry', () => {
 			expect(answerFormatFile!._imports_[0]).toMatchObject({
 				import: '../stdout',
 				item: 'stdout',
-				meta: { filePathRelativeToItem: 'stdout.ts' },
+				file: { type: 'utils', path: 'stdout.ts' as ItemRelativePath },
+				meta: {},
 			});
 		});
 
@@ -252,7 +253,8 @@ describe('buildRegistry', () => {
 			expect(counterFile._imports_[0]).toMatchObject({
 				import: '../../utils/math/add',
 				item: 'math',
-				meta: { filePathRelativeToItem: 'math/add.ts' },
+				file: { type: 'utils', path: 'math/add.ts' as ItemRelativePath },
+				meta: {},
 			});
 		});
 	});

@@ -12,6 +12,10 @@
 				{
 					"import": "@/registry/lib/utils",
 					"item": "utils",
+					"file": {
+						"type": "lib",
+						"path": "utils.ts"
+					},
 					"meta": {
 						"filePathRelativeToItem": "utils.ts"
 					}
@@ -30,6 +34,10 @@
 				{
 					"import": "@/registry/ui/button",
 					"item": "button",
+					"file": {
+						"type": "ui",
+						"path": "button.tsx"
+					},
 					"meta": {
 						"filePathRelativeToItem": "button.tsx"
 					}

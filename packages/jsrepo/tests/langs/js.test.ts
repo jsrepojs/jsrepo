@@ -7,8 +7,6 @@ import type { AbsolutePath, ItemRelativePath } from '@/utils/types';
 
 const CWD = path.join(__dirname, '../fixtures/langs/js') as AbsolutePath;
 
-const registryName = '@jsrepo/test';
-
 describe('js', () => {
 	it('should resolve dependencies', async () => {
 		const warn = vi.fn();
@@ -40,64 +38,6 @@ describe('js', () => {
 		expect(result.localDependencies[0]?.import).toBe('./math/add');
 		expect(result.localDependencies[1]?.import).toBe('./math/subtract');
 		expect(result.localDependencies[2]?.import).toBe('./stdout');
-
-		const addTemplate = await result.localDependencies[0]?.createTemplate({
-			absolutePath: joinAbsolute(CWD, 'math/add.ts'),
-			content: code,
-			path: 'math/add.ts' as ItemRelativePath,
-			target: undefined,
-			type: 'util',
-			role: 'file',
-			parent: { name: 'add', type: 'util', registryName },
-			dependencyResolution: 'auto',
-			localDependencies: [],
-			dependencies: [],
-			devDependencies: [],
-			manualDependencies: {
-				registryDependencies: [],
-				dependencies: [],
-				devDependencies: [],
-			},
-		});
-		expect(addTemplate).toEqual({ filePathRelativeToItem: 'math/add.ts' });
-		const subtractTemplate = await result.localDependencies[1]?.createTemplate({
-			absolutePath: joinAbsolute(CWD, 'math/subtract.ts'),
-			content: code,
-			path: 'math/subtract.ts' as ItemRelativePath,
-			target: undefined,
-			type: 'util',
-			role: 'file',
-			parent: { name: 'add', type: 'util', registryName },
-			dependencyResolution: 'auto',
-			localDependencies: [],
-			dependencies: [],
-			devDependencies: [],
-			manualDependencies: {
-				registryDependencies: [],
-				dependencies: [],
-				devDependencies: [],
-			},
-		});
-		expect(subtractTemplate).toEqual({ filePathRelativeToItem: 'math/subtract.ts' });
-		const stdoutTemplate = await result.localDependencies[2]?.createTemplate({
-			absolutePath: joinAbsolute(CWD, 'stdout.ts'),
-			type: 'util',
-			target: undefined,
-			content: code,
-			path: 'stdout.ts' as ItemRelativePath,
-			role: 'file',
-			parent: { name: 'print-answer', type: 'util', registryName },
-			dependencyResolution: 'auto',
-			localDependencies: [],
-			dependencies: [],
-			devDependencies: [],
-			manualDependencies: {
-				registryDependencies: [],
-				dependencies: [],
-				devDependencies: [],
-			},
-		});
-		expect(stdoutTemplate).toEqual({ filePathRelativeToItem: 'stdout.ts' });
 	});
 
 	it('should exclude excluded dependencies', async () => {
@@ -122,28 +62,32 @@ describe('js', () => {
 				{
 					import: '$lib/components/ui/button',
 					item: 'button',
-					meta: { filePathRelativeToItem: 'button/index.ts' },
+					file: { type: 'util', path: 'button/index.ts' as ItemRelativePath },
+					meta: {},
 				},
 				{
 					import: '$lib/hooks/use-clipboard.svelte',
 					item: 'use-clipboard',
-					meta: { filePathRelativeToItem: 'use-clipboard.svelte.ts' },
+					file: { type: 'util', path: 'use-clipboard.svelte.ts' as ItemRelativePath },
+					meta: {},
 				},
 				{
 					import: '$lib/utils.js',
 					item: 'utils',
-					meta: { filePathRelativeToItem: 'utils.ts' },
+					file: { type: 'util', path: 'utils.ts' as ItemRelativePath },
+					meta: {},
 				},
 				{
 					import: '../../utils/math/add.js',
 					item: 'math',
-					meta: { filePathRelativeToItem: 'math/add.ts' },
+					file: { type: 'util', path: 'math/add.ts' as ItemRelativePath },
+					meta: {},
 				},
 			],
 			{
 				cwd: CWD,
 				getItemPath: (item) => {
-					switch (item) {
+					switch (item.item) {
 						case 'button':
 							return {
 								path: 'src/lib/components/shadcn-svelte-extras/ui',
