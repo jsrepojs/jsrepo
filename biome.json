@@ -10,7 +10,15 @@
 		"attributePosition": "auto"
 	},
 	"files": {
-		"includes": ["**", "!**/dist", "!**/node_modules", "!**/docs", "!**/temp-test", "!**/tests/fixtures/**/*"]
+		"includes": [
+			"**",
+			"!**/dist",
+			"!**/node_modules",
+			"!**/docs",
+			"!**/temp-test",
+			"!**/tests/fixtures/**/*",
+			"!*.svelte"
+		]
 	},
 	"assist": { "actions": { "source": { "organizeImports": "on" } } },
 	"linter": {
@@ -114,6 +122,12 @@
 	"css": {
 		"parser": {
 			"tailwindDirectives": true
+		}
+	},
+	"html": {
+		"experimentalFullSupportEnabled": true,
+		"formatter": {
+			"indentScriptAndStyle": true
 		}
 	}
 }

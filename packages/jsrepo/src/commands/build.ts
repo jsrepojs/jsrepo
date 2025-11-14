@@ -23,6 +23,8 @@ import {
 	NoOutputsError,
 	NoRegistriesError,
 } from '@/utils/errors';
+import { existsSync } from '@/utils/fs';
+import { joinAbsolute } from '@/utils/path';
 import { intro, isTTY, outro } from '@/utils/prompts';
 import type { AbsolutePath } from '@/utils/types';
 import { debounced } from '@/utils/utils';
@@ -222,10 +224,11 @@ async function runWatch(
 			configResult.config,
 			async (registry) => {
 				const files = registry.items.flatMap((item) =>
-					item.files.map((file) => path.join(options.cwd, file.path))
+					item.files.map((file) => joinAbsolute(options.cwd, file.path))
 				);
 				for (const file of files) {
 					if (watchers.has(file)) continue;
+					if (!existsSync(file)) continue;
 					watchers.set(
 						file,
 						createWatcher(file, {
