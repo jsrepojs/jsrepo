@@ -3,6 +3,8 @@ title: jsrepo.com
 description: A registry for your registries.
 ---
 
+import { BadgesTable } from "@/components/badges-table";
+
 <BadgeGroup>
 	<OfficialBadge />
 </BadgeGroup>
@@ -135,3 +137,31 @@ If you already have a registry that can be built with **jsrepo** then there are 
 </Step>
 
 </Steps>
+
+## Badges
+
+<BadgesTable
+	badges={[
+		{
+			alt: 'jsrepo latest version',
+			hrefTemplate: 'https://jsrepo.com/badges/{{registry}}'
+		},
+		{
+			alt: 'jsrepo downloads weekly',
+			hrefTemplate: 'https://jsrepo.com/badges/{{registry}}/dm'
+		},
+		{
+			alt: 'jsrepo downloads monthly',
+			hrefTemplate: 'https://jsrepo.com/badges/{{registry}}/dw'
+		},
+		{
+			alt: 'jsrepo downloads yearly',
+			hrefTemplate: 'https://jsrepo.com/badges/{{registry}}/dy'
+		},
+		{
+			alt: 'jsrepo registry rating',
+			hrefTemplate: 'https://jsrepo.com/badges/{{registry}}/rating'
+		}
+	]}
+	defaultRegistry="@ieedan/std"
+/>
