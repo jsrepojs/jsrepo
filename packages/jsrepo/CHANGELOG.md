@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.0-beta.20
+### Patch Changes
+
+
+- fix: false positive for unresolvable syntax when dynamic imports are backquoted but the template is unused ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
 ## 3.0.0-beta.19
 ### Patch Changes
 
