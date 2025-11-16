@@ -166,4 +166,22 @@ const thing2 = import(\`foos/\${foo}\`);`;
 		expect(result).toStrictEqual(['./math/add', './thing', './math/subtract']);
 		expect(warn).toHaveBeenCalledOnce();
 	});
+
+	it('should treat backticks as resolvable so long as they are literals', async () => {
+		const code = `import { add } from './math/add';
+export { subtract } from './math/subtract';
+
+const thing = import('./thing');
+
+const foo = 'bar';
+const thing2 = import(\`./foo\`);`;
+		const warn = vi.fn();
+		const result = await getImports(code, {
+			fileName: joinAbsolute(CWD, 'logger.ts'),
+			warn,
+		});
+
+		expect(result).toStrictEqual(['./math/add', './thing', './foo', './math/subtract']);
+		expect(warn).toHaveBeenCalledTimes(0);
+	});
 });

@@ -159,20 +159,25 @@ export async function getImports(
 		const fullImport = code.slice(imp.moduleRequest.start, imp.moduleRequest.end);
 		const parsedImport = await parseAsync(fileName, fullImport);
 
+		// an literal expression or a template literal with a single quasi
+		const isLiteral =
+			parsedImport.program.body[0]?.type === 'ExpressionStatement' &&
+			(parsedImport.program.body[0].expression.type === 'Literal' ||
+				(parsedImport.program.body[0].expression.type === 'TemplateLiteral' &&
+					parsedImport.program.body[0].expression.quasis.length === 1));
+
 		// we can't resolve dynamic imports that are not literals so we just skip them and warn the user
-		if (parsedImport.program.body[0]?.type === 'ExpressionStatement') {
-			if (parsedImport.program.body[0].expression.type === 'Literal') {
-				// trim quotes from the start and end
-				modules.push(code.slice(imp.moduleRequest.start + 1, imp.moduleRequest.end - 1));
-				continue;
-			}
+		if (!isLiteral) {
+			warn(
+				`Skipping ${pc.cyan(fullImport)} from ${pc.bold(
+					fileName
+				)}. Reason: Unresolvable syntax. 💡 consider manually including the modules expected to be resolved by this import in your registry dependencies.`
+			);
+			continue;
 		}
 
-		warn(
-			`Skipping ${pc.cyan(fullImport)} from ${pc.bold(
-				fileName
-			)}. Reason: Unresolvable syntax. 💡 consider manually including the modules expected to be resolved by this import in your registry dependencies.`
-		);
+		// trim quotes from the start and end
+		modules.push(code.slice(imp.moduleRequest.start + 1, imp.moduleRequest.end - 1));
 	}
 
 	// handle `export x from y` syntax
