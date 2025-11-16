@@ -609,3 +609,19 @@ This will automatically strip the types from TypeScript files and rename them to
 <Callout type="warning">
     This only works for [erasable syntax](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-8.html#the---erasablesyntaxonly-option) if you are expecting for your users to use TypeScript ensure you are using the `--erasableSyntaxOnly` option when writing your TypeScript code.
 </Callout>
+
+### Depending on items from other registries
+
+Often times you may want to depend on items from other registries. In `shadcn/ui` you would add the registry URL to the item you are dependent on.
+
+**jsrepo** doesn't support this for a few reasons:
+
+1. You may have made changes to the component in your project that are not tracked by the upstream registry. This can break the users code or cause it to function incorrectly.
+2. It's possible that the author of the upstream registry may make changes to the component that break your code in users projects.
+
+For this reason **jsrepo** doesn't support depending on items from other registries. The alternative is to simply copy the components from the upstream registry into your own registry and serve them from your own registry.
+
+We recommend when you do this to follow a few best practices:
+
+1. Credit the upstream registry in some way so users know where those items came from.
+2. Ensure to set `add: "when-needed"` on items from external registries to prevent them from being listed by the `add` command.
