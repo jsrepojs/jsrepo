@@ -1,5 +1,11 @@
 # @jsrepo/mcp
 
+## 0.0.1-beta.22
+### Patch Changes
+
+
+- fix: add banner to ensure mcp works with `npx` ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
 ## 0.0.1-beta.21
 ### Patch Changes
 
