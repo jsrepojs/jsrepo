@@ -229,7 +229,7 @@ export const Terminal = ({
       data-slot="terminal"
       ref={containerRef}
       className={cn(
-        "border-border bg-fd-card z-0 h-full max-h-[400px] w-full max-w-lg rounded-xl border",
+        "border-border bg-card z-0 h-full max-h-[400px] w-full max-w-lg rounded-xl border",
         className
       )}
     >

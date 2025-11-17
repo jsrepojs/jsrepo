@@ -17,6 +17,7 @@ import { Biomejs } from "./biome";
 import { Prettier } from "./prettier";
 import { NPM } from "./npm";
 import { TypeScript } from "./typescript";
+import { RegistryKit } from "./registry-kit";
 
 export {
 	GitHub as GitHubLogo,
@@ -38,4 +39,5 @@ export {
 	Prettier as PrettierLogo,
 	NPM as NpmLogo,
 	TypeScript as TypeScriptLogo,
+	RegistryKit as RegistryKitLogo,
 };
