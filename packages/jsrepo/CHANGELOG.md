@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.0-beta.21
+### Patch Changes
+
+
+- feat: allow for searching components in list when running `add` command without a specific item ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
 ## 3.0.0-beta.20
 ### Patch Changes
 
