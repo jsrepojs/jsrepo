@@ -3,7 +3,7 @@
 import { GitHubLogo, GitLabLogo, JsrepoLogo, RegistryKitLogo } from "@/components/logos";
 import { AnimatedBeam } from "@/components/ui/animated-beam";
 import { cn } from "@/lib/utils";
-import { FolderGit2 } from "lucide-react";
+import { Folder } from "lucide-react";
 import { useRef } from "react";
 
 function Circle({ className, ...props }: React.ComponentProps<"div">) {
@@ -69,7 +69,7 @@ export function ProvidersSection() {
 
 					<div>
 						<Circle ref={projectRef}>
-							<FolderGit2 className="text-muted-foreground" />
+							<Folder className="text-muted-foreground" />
 						</Circle>
 					</div>
 

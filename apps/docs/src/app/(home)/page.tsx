@@ -5,6 +5,7 @@ import { FeatureTabs, FeatureTabsList, FeatureTabsTrigger, FeatureTabsContent } 
 import { AnimatedSpan, Terminal, TypingAnimation } from "@/components/ui/terminal";
 import { CodeBlock } from "./code-block";
 import { ProvidersSection } from "./providers-section";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
 	title: "jsrepo.dev - The modern component registry toolchain",
@@ -39,24 +40,53 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
 	return (
-		<main className="flex flex-1 flex-col gap-12 justify-center text-center">
-			<HeroSection />
-			<div className="flex flex-col w-full">
-				<FeatureAccordionSection />
-				<div className="flex flex-col items-center justify-center border-b border-border px-6">
-					<div className="max-w-6xl w-full border-x text-start p-6"></div>
+		<>
+			<main className="flex flex-1 flex-col gap-12 justify-center text-center">
+				<HeroSection />
+				<div className="flex flex-col w-full">
+					<FeatureAccordionSection />
+					<div className="flex flex-col items-center justify-center border-b border-border px-6">
+						<div className="max-w-6xl w-full border-x text-start p-6"></div>
+					</div>
+					<ProvidersSection />
+					<div className="flex flex-col items-center justify-center border-b border-border px-6">
+						<div className="max-w-6xl w-full border-x text-start p-6"></div>
+					</div>
+					<PluginsSection />
+					<div className="flex flex-col items-center justify-center border-b border-border px-6">
+						<div className="max-w-6xl w-full border-x text-start p-6"></div>
+					</div>
+					<LLMsSection />
+					<div className="flex flex-col items-center justify-center border-b border-border px-6">
+						<div className="max-w-6xl w-full border-x text-start p-6"></div>
+					</div>
+					<div className="flex flex-col items-center justify-center border-b border-border px-6">
+						<div className="max-w-6xl w-full border-x text-start p-6 flex items-center justify-center flex-col gap-3">
+							<h2 className="text-2xl font-bold text-center">Ready to level up your registry?</h2>
+							<Button asChild>
+								<Link href="/docs/create-a-registry">Start Building</Link>
+							</Button>
+						</div>
+					</div>
 				</div>
-				<ProvidersSection />
-				<div className="flex flex-col items-center justify-center border-b border-border px-6">
-					<div className="max-w-6xl w-full border-x text-start p-6"></div>
-				</div>
-				<PluginsSection />
-				<div className="flex flex-col items-center justify-center border-b border-border px-6">
-					<div className="max-w-6xl w-full border-x text-start p-6"></div>
-				</div>
-				<LLMsSection />
+			</main>
+			<div className="flex flex-col items-center px-6">
+				<footer className="flex items-center justify-between py-8 w-full max-w-6xl px-6 gap-6">
+					<span className="text-sm text-muted-foreground">
+						© {new Date().getFullYear()} jsrepo, All rights reserved.
+					</span>
+					<div
+						className={cn(
+							"flex items-center gap-4 flex-wrap",
+							"[&_a]:text-sm [&_a]:text-muted-foreground [&_a]:hover:text-primary [&_a]:hover:transition-colors"
+						)}
+					>
+						<Link href="https://github.com/jsrepojs/jsrepo" target="_blank">GitHub</Link>
+						<Link href="https://jsrepo.com">jsrepo.com</Link>
+					</div>
+				</footer>
 			</div>
-		</main>
+		</>
 	);
 }
 
@@ -148,7 +178,7 @@ export default defineConfig({
 
 function FeatureAccordionSection() {
 	return (
-		<div>
+		<div className="md:h-[368px]">
 			<FeatureTabs defaultValue="config">
 				<FeatureTabsList>
 					<FeatureTabsTrigger

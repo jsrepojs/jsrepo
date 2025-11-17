@@ -71,7 +71,12 @@ function FeatureTabs({
 				className={cn("flex items-center justify-center w-full border-y border-border px-6", className)}
 				{...props}
 			>
-				<div className={cn("max-w-6xl flex flex-col md:grid md:grid-cols-2 w-full", subClassName)}>
+				<div
+					className={cn(
+						"max-w-6xl flex flex-col border-x border-border md:grid md:grid-cols-2 w-full",
+						subClassName
+					)}
+				>
 					{children}
 				</div>
 			</div>
@@ -83,7 +88,7 @@ function FeatureTabsList({ className, children, ...props }: React.HTMLAttributes
 	return (
 		<div
 			className={cn(
-				"flex flex-col md:h-[368px] border-l border-r border-border md:border-r-none w-full",
+				"flex flex-col md:h-[368px] border-border border-b md:border-b-0 md:border-r w-full",
 				className
 			)}
 			{...props}
@@ -109,13 +114,15 @@ function FeatureTabsTrigger({
 	}, []);
 
 	return (
-		<>
+		<div
+			className="group border-border border-b last:border-b-0"
+			data-value={value}
+			data-state={activeTab === value ? "active" : "inactive"}
+		>
 			<button
 				type="button"
-				data-value={value}
-				data-state={activeTab === value ? "active" : "inactive"}
 				className={cn(
-					"py-4 px-6 first:border-t-0 transition-all duration-700 border-b md:border-b-transparent border-border md:data-[state=active]:border-b-border md:border-t group w-full flex items-center gap-4",
+					"border-border py-4 px-6 transition-all duration-700 group w-full flex items-center gap-4",
 					className
 				)}
 				onClick={() => setActiveTab(value, true)}
@@ -127,15 +134,15 @@ function FeatureTabsTrigger({
 				{children}
 			</button>
 			<div
-				data-state={activeTab === value ? "active" : "inactive"}
 				className={cn(
-					"hidden md:block border-border group bg-fd-card px-6 [--radix-accordion-content-height:137px] duration-300",
-					"h-0 data-[state=inactive]:py-0 data-[state=active]:py-4 data-[state=inactive]:h-0 data-[state=active]:h-[137px] data-[state=inactive]:animate-accordion-up data-[state=active]:animate-accordion-down"
+					"hidden md:block px-6 [--radix-accordion-content-height:144px] duration-300 h-0",
+					"group-data-[state=inactive]:py-0 group-data-[state=active]:py-4 group-data-[state=inactive]:h-0",
+					"group-data-[state=active]:h-[144px] group-data-[state=inactive]:animate-accordion-up group-data-[state=active]:animate-accordion-down",
 				)}
 			>
 				<p className="text-start text-muted-foreground group-data-[state=inactive]:hidden">{description}</p>
 			</div>
-		</>
+		</div>
 	);
 }
 
@@ -149,13 +156,7 @@ function FeatureTabsContent({
 	return activeTab !== value ? (
 		<></>
 	) : (
-		<div
-			className={cn(
-				"border border-border border-t-0 md:border-l-0 md:border-y-0 w-full bg-card",
-				className
-			)}
-			{...props}
-		>
+		<div className={cn("w-full bg-card", className)} {...props}>
 			{children}
 		</div>
 	);
