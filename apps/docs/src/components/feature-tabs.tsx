@@ -67,7 +67,10 @@ function FeatureTabs({
 	}, [activeTab, mode, tabs]);
 	return (
 		<FeatureTabsContext value={ctx}>
-			<div className={cn("flex items-center justify-center w-full border-y", className)} {...props}>
+			<div
+				className={cn("flex items-center justify-center w-full border-y border-border px-6", className)}
+				{...props}
+			>
 				<div className={cn("max-w-6xl flex flex-col md:grid md:grid-cols-2 w-full", subClassName)}>
 					{children}
 				</div>
@@ -78,7 +81,13 @@ function FeatureTabs({
 
 function FeatureTabsList({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
 	return (
-		<div className={cn("flex flex-col h-[368px] border-l border-r md:border-r-none w-full", className)} {...props}>
+		<div
+			className={cn(
+				"flex flex-col md:h-[368px] border-l border-r border-border md:border-r-none w-full",
+				className
+			)}
+			{...props}
+		>
 			{children}
 		</div>
 	);
@@ -106,7 +115,7 @@ function FeatureTabsTrigger({
 				data-value={value}
 				data-state={activeTab === value ? "active" : "inactive"}
 				className={cn(
-					"py-4 px-6 first:border-t-0 transition-all duration-700 border-b md:border-b-transparent md:data-[state=active]:border-b-border md:border-t group w-full flex items-center gap-4",
+					"py-4 px-6 first:border-t-0 transition-all duration-700 border-b md:border-b-transparent border-border md:data-[state=active]:border-b-border md:border-t group w-full flex items-center gap-4",
 					className
 				)}
 				onClick={() => setActiveTab(value, true)}
@@ -140,7 +149,13 @@ function FeatureTabsContent({
 	return activeTab !== value ? (
 		<></>
 	) : (
-		<div className={cn("border border-t-0 md:border-l-0 md:border-y-0 w-full bg-fd-card", className)} {...props}>
+		<div
+			className={cn(
+				"border border-border border-t-0 md:border-l-0 md:border-y-0 w-full bg-card",
+				className
+			)}
+			{...props}
+		>
 			{children}
 		</div>
 	);

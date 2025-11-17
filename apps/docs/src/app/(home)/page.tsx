@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { FeatureTabs, FeatureTabsList, FeatureTabsTrigger, FeatureTabsContent } from "@/components/feature-tabs";
 import { AnimatedSpan, Terminal, TypingAnimation } from "@/components/ui/terminal";
+import { CodeBlock } from "./code-block";
+import { ProvidersSection } from "./providers-section";
 
 export const metadata: Metadata = {
 	title: "jsrepo.dev - The modern component registry toolchain",
@@ -32,27 +34,41 @@ export const metadata: Metadata = {
 			},
 		],
 	},
+	metadataBase: new URL("https://v3.jsrepo.dev"),
 };
 
 export default function HomePage() {
 	return (
 		<main className="flex flex-1 flex-col gap-12 justify-center text-center">
 			<HeroSection />
-			<FeatureAccordionSection />
+			<div className="flex flex-col w-full">
+				<FeatureAccordionSection />
+				<div className="flex flex-col items-center justify-center border-b border-border px-6">
+					<div className="max-w-6xl w-full border-x text-start p-6"></div>
+				</div>
+				<ProvidersSection />
+				<div className="flex flex-col items-center justify-center border-b border-border px-6">
+					<div className="max-w-6xl w-full border-x text-start p-6"></div>
+				</div>
+				<PluginsSection />
+				<div className="flex flex-col items-center justify-center border-b border-border px-6">
+					<div className="max-w-6xl w-full border-x text-start p-6"></div>
+				</div>
+				<LLMsSection />
+			</div>
 		</main>
 	);
 }
 
 function HeroSection() {
 	return (
-		<div className="flex flex-col items-center justify-center">
+		<div className="flex flex-col items-center justify-center mt-[25svh]">
 			<div className="flex flex-col gap-6 items-center justify-center max-w-3/4">
 				<h1 className="text-balance text-4xl font-medium sm:text-5xl md:text-6xl">
 					The modern component registry toolchain
 				</h1>
-				<p className="mx-auto max-w-3xl text-pretty text-lg">
-					Whatever project you're working on you need only remember one command:{" "}
-					<span className="font-mono font-medium">jsrepo</span>.
+				<p className="mx-auto max-w-3xl text-pretty text-lg text-muted-foreground">
+					Let jsrepo handle the hard parts of source registries so you can focus on building.
 				</p>
 				<div className="flex items-center justify-center">
 					<Button variant="default" asChild>
@@ -64,10 +80,76 @@ function HeroSection() {
 	);
 }
 
+function PluginsSection() {
+	return (
+		<div className="flex flex-col items-center justify-center border-b border-border px-6">
+			<div className="max-w-6xl w-full border-x text-start p-6">
+				<div className="flex flex-col items-center justify-center gap-1">
+					<h2 className="text-2xl font-bold text-center">Customize your experience with plugins</h2>
+					<p className="text-sm text-muted-foreground text-center">
+						With a js based config the sky is the limit.
+					</p>
+				</div>
+				<CodeBlock
+					lang="ts"
+					code={`import { defineConfig } from "jsrepo";
+import javascript from "@jsrepo/transform-javascript";
+import prettier from "@jsrepo/transform-prettier";
+
+export default defineConfig({
+	transforms: [javascript(), prettier()], // [!code highlight]
+});`}
+				/>
+			</div>
+		</div>
+	);
+}
+
+function LLMsSection() {
+	return (
+		<div className="flex flex-col items-center justify-center border-b border-border px-6">
+			<div className="max-w-6xl w-full border-x text-start p-6">
+				<div className="flex flex-col items-center justify-center gap-1">
+					<h2 className="text-2xl font-bold text-center">Built for LLMs</h2>
+					<p className="text-sm text-muted-foreground text-center">
+						jsrepo is optimized for LLMs by giving them demos and documentation alongside registry items.
+					</p>
+				</div>
+				<CodeBlock
+					lang="ts"
+					code={`import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+		name: '@registry/kit',
+		description: 'Components for your registry.',
+		items: [
+			{
+				name: 'button',
+				type: 'component',
+				files: [
+					{
+						path: 'src/components/button.tsx',
+					},
+					{ // [!code highlight]
+						path: 'src/demos/button.tsx', // [!code highlight]
+						role: 'demo', // [!code highlight]
+					}, // [!code highlight]
+				]
+			}
+		]
+	}
+});`}
+				/>
+			</div>
+		</div>
+	);
+}
+
 function FeatureAccordionSection() {
 	return (
-		<div className="px-6 md:px-0">
-			<FeatureTabs defaultValue="config" subClassName="h-[368px]">
+		<div>
+			<FeatureTabs defaultValue="config">
 				<FeatureTabsList>
 					<FeatureTabsTrigger
 						value="config"
@@ -99,7 +181,7 @@ function FeatureAccordionSection() {
 					</FeatureTabsTrigger>
 				</FeatureTabsList>
 				<FeatureTabsContent value="config">
-					<Terminal className="border-none text-start h-[368px] [&>pre]:w-full *:data-[slot='terminal-header']:hidden w-full">
+					<Terminal className="border-none rounded-none w-full text-start h-[368px] [&>pre]:w-full *:data-[slot='terminal-header']:hidden">
 						<TypingAnimation>&gt; jsrepo init</TypingAnimation>
 
 						<AnimatedSpan className="text-green-500">✔ Wrote config to jsrepo.config.ts</AnimatedSpan>
@@ -110,7 +192,7 @@ function FeatureAccordionSection() {
 					</Terminal>
 				</FeatureTabsContent>
 				<FeatureTabsContent value="build">
-					<Terminal className="border-none h-[368px] max-w-none text-start [&>pre]:w-full *:data-[slot='terminal-header']:hidden w-full">
+					<Terminal className="border-none rounded-none h-[368px] max-w-none text-start [&>pre]:w-full *:data-[slot='terminal-header']:hidden w-full">
 						<TypingAnimation>&gt; jsrepo build --watch</TypingAnimation>
 
 						<AnimatedSpan className="text-green-500" delay={10}>
@@ -124,7 +206,7 @@ function FeatureAccordionSection() {
 					</Terminal>
 				</FeatureTabsContent>
 				<FeatureTabsContent value="add">
-					<Terminal className="border-none text-start h-[368px] [&>pre]:w-full *:data-[slot='terminal-header']:hidden w-full">
+					<Terminal className="border-none rounded-none text-start h-[368px] [&>pre]:w-full *:data-[slot='terminal-header']:hidden w-full">
 						<TypingAnimation>&gt; jsrepo add button</TypingAnimation>
 
 						<AnimatedSpan className="text-green-500">
@@ -140,7 +222,7 @@ function FeatureAccordionSection() {
 					</Terminal>
 				</FeatureTabsContent>
 				<FeatureTabsContent value="update">
-					<Terminal className="border-none h-[368px] max-w-none text-start [&>pre]:w-full *:data-[slot='terminal-header']:hidden w-full">
+					<Terminal className="border-none rounded-none h-[368px] max-w-none text-start [&>pre]:w-full *:data-[slot='terminal-header']:hidden w-full">
 						<TypingAnimation>&gt; jsrepo update button</TypingAnimation>
 
 						<AnimatedSpan className="text-green-500">
