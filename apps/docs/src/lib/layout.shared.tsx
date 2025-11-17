@@ -13,7 +13,7 @@ export function baseOptions(): BaseLayoutProps {
 		nav: {
 			title: (
 				<>
-					<JsrepoWordmark className="h-6"/>
+					<JsrepoWordmark className="h-6" aria-label="jsrepo"/>
 				</>
 			),
 		},
