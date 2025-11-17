@@ -264,7 +264,7 @@ function FeatureAccordionSection() {
 						<AnimatedSpan>
 							<div className="space-y-1 text-sm font-mono">
 								<div className="text-muted-foreground">
-									@ieedan/shadcn-svelte-extras/button {"->"} src/components/ui/button.tsx
+									@ieedan/shadcn-svelte-extras/button {"->"} src/components/button.svelte
 								</div>
 								<div className="space-y-0.5 pl-4">
 									<div className="text-muted-foreground">+ 20 more unchanged (-E to expand)</div>
