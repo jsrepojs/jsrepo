@@ -236,7 +236,6 @@ export async function runInit(
 		`Retrieved manifest${registries.length > 1 ? 's' : ''} from ${pc.cyan(registries.join(', '))}`
 	);
 	const resolvedRegistries = resolvedRegistriesResult.value;
-	verbose(`Successfully resolved ${resolvedRegistries.size} registry/registries`);
 
 	const pluginChoices = new Map<string, { install: boolean; plugin: Plugin }>();
 	for (const [_, resolved] of resolvedRegistries) {
@@ -367,7 +366,6 @@ export async function runInit(
 		}
 		spinner.stop(`Fetched ${pc.cyan(itemsToAdd.map((item) => item.item.name).join(', '))}`);
 		const items = itemsResult.value;
-		verbose(`Fetched ${items.length} item(s) successfully`);
 
 		const itemPathsResult = await getPathsForItems({ items, config, options });
 		if (itemPathsResult.isErr()) return err(itemPathsResult.error);

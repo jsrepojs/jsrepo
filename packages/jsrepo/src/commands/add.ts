@@ -161,7 +161,6 @@ export async function runAdd(
 			`Retrieved manifest${registries.length > 1 ? 's' : ''} from ${pc.cyan(registries.join(', '))}`
 		);
 		const resolvedRegistries = resolvedRegistriesResult.value;
-		verbose(`Successfully resolved ${resolvedRegistries.size} registry/registries`);
 
 		const possibleItems = Array.from(resolvedRegistries.entries()).flatMap(([_, registry]) => {
 			return registry.manifest.items
@@ -270,7 +269,6 @@ export async function runAdd(
 		});
 		if (resolvedWantedItemsResult.isErr()) return err(resolvedWantedItemsResult.error);
 		resolvedWantedItems = resolvedWantedItemsResult.value;
-		verbose(`Resolved ${resolvedWantedItems.length} wanted item(s)`);
 	}
 
 	spinner.start(
@@ -286,7 +284,6 @@ export async function runAdd(
 		`Fetched ${pc.cyan(resolvedWantedItems.map((item) => item.item.name).join(', '))}`
 	);
 	const items = itemsResult.value;
-	verbose(`Fetched ${items.length} item(s) successfully`);
 
 	const itemPathsResult = await getPathsForItems({ items, config, options });
 	if (itemPathsResult.isErr()) return err(itemPathsResult.error);

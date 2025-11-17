@@ -157,7 +157,6 @@ export async function runUpdate(
 		});
 		if (resolvedWantedItemsResult.isErr()) return err(resolvedWantedItemsResult.error);
 		resolvedWantedItems = resolvedWantedItemsResult.value;
-		verbose(`Resolved ${resolvedWantedItems.length} wanted item(s)`);
 	} else {
 		verbose(`Mode: ${options.all ? 'updating all items' : 'interactive selection'}`);
 		spinner.start(
@@ -176,7 +175,6 @@ export async function runUpdate(
 			`Retrieved manifest${registries.length > 1 ? 's' : ''} from ${pc.cyan(registries.join(', '))}`
 		);
 		const resolvedRegistries = resolvedRegistriesResult.value;
-		verbose(`Successfully resolved ${resolvedRegistries.size} registry/registries`);
 
 		const allItems: ResolvedWantedItem[] = Array.from(resolvedRegistries.entries()).flatMap(
 			([_, registry]) => {
@@ -275,7 +273,6 @@ export async function runUpdate(
 		`Fetched ${pc.cyan(resolvedWantedItems.map((item) => item.item.name).join(', '))}`
 	);
 	const items = itemsResult.value;
-	verbose(`Fetched ${items.length} item(s) successfully`);
 
 	const itemPathsResult = await getPathsForItems({ items, config, options });
 	if (itemPathsResult.isErr()) return err(itemPathsResult.error);
