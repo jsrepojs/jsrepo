@@ -179,7 +179,7 @@ export const DistributedOutputFileSchema = z.object({
 	content: z.string(),
 	type: z.string(),
 	role: z.union([z.union(RegistryFileRoles.map((role) => z.literal(role))), z.undefined()]),
-	_imports_: z.array(UnresolvedImportSchema),
+	_imports_: z.union([z.array(UnresolvedImportSchema), z.undefined()]),
 	target: z.union([z.string(), z.undefined()]),
 	registryDependencies: z.union([z.array(z.string()), z.undefined()]),
 	dependencies: z.union([z.array(RemoteDependencySchema), z.undefined()]),

@@ -557,7 +557,7 @@ export async function transformRemoteContent(
 	}
 ): Promise<FileWithContents> {
 	const lang = languages.find((lang) => lang.canResolveDependencies(file.path));
-	const transformations = await lang?.transformImports(file._imports_, {
+	const transformations = await lang?.transformImports(file._imports_ ?? [], {
 		cwd: options.cwd,
 		targetPath: file.path,
 		getItemPath: ({ item, file }) => {

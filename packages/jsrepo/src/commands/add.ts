@@ -1,4 +1,9 @@
-import { cancel, groupMultiselect, isCancel, multiselect } from '@clack/prompts';
+import {
+	type AutocompleteMultiSelectOptions,
+	autocompleteMultiselect,
+	cancel,
+	isCancel,
+} from '@clack/prompts';
 import { Command } from 'commander';
 import { err, ok, type Result } from 'nevereverthrow';
 import path from 'pathe';
@@ -162,50 +167,34 @@ export async function runAdd(
 		});
 
 		if (!options.all) {
-			let userSelections: string[] | symbol;
-			if (resolvedRegistries.size > 1) {
-				userSelections = await groupMultiselect({
-					message: 'Which items would you like to add?',
-					options: possibleItems
-						.filter((item) => (item.item.add ?? 'when-added') === 'when-added')
-						.reduce(
-							(acc, item) => {
-								if (!acc[item.registry.url]) {
-									acc[item.registry.url] = [];
-								}
-								acc[item.registry.url]?.push({
-									value: `${item.registry.url}/${item.item.name}`,
-									label: item.item.name,
-									hint: item.item.description,
-								});
-								return acc;
-							},
-							{} as Record<
-								string,
-								{
-									value: string;
-									label: string;
-									hint?: string | undefined;
-									disabled?: boolean | undefined;
-								}[]
-							>
-						),
-				});
-			} else {
-				userSelections = await multiselect({
-					message: 'Which items would you like to add?',
-					options: possibleItems
-						.filter((item) => (item.item.add ?? 'when-added') === 'when-added')
-						.map((item) => ({
-							label:
-								resolvedRegistries.size > 1
-									? `${item.registry.url}/${item.item.name}`
-									: item.item.name,
-							value: `${item.registry.url}/${item.item.name}`,
-							hint: item.item.description,
-						})),
-				});
-			}
+			const multiSelectOptions: AutocompleteMultiSelectOptions<`${string}/${string}`>['options'] =
+				possibleItems
+					.filter((item) => (item.item.add ?? 'when-added') === 'when-added')
+					.map((item) => {
+						const value = `${item.registry.url}/${item.item.name}` as const;
+						const label =
+							resolvedRegistries.size > 1
+								? `${pc.cyan(item.registry.url)}/${item.item.name}`
+								: item.item.name;
+
+						return {
+							label: label,
+							value: value,
+							hint:
+								(item.item.description?.length ??
+								0 >= process.stdout.columns - label.length - 12)
+									? `${item.item.description
+											?.slice(0, process.stdout.columns - label.length - 12)
+											.trim()}...`
+									: item.item.description,
+						};
+					});
+
+			const userSelections = await autocompleteMultiselect({
+				message: 'Which items would you like to add?',
+				options: multiSelectOptions,
+				maxItems: process.stdout.rows - 10,
+			});
 
 			if (isCancel(userSelections)) {
 				cancel('Canceled!');
