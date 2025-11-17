@@ -16,6 +16,7 @@ import {
 	parseOptions,
 	tryCommand,
 } from '@/commands/utils';
+
 import { DEFAULT_PROVIDERS } from '@/providers';
 import {
 	getPathsForItems,
