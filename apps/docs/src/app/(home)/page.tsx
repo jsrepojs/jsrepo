@@ -6,6 +6,7 @@ import { AnimatedSpan, Terminal, TypingAnimation } from "@/components/ui/termina
 import { CodeBlock } from "./code-block";
 import { ProvidersSection } from "./providers-section";
 import { cn } from "@/lib/utils";
+import PrismaticBurst from "@/components/PrismaticBurst";
 
 export const metadata: Metadata = {
 	title: "jsrepo.dev - The modern component registry toolchain",
@@ -60,12 +61,32 @@ export default function HomePage() {
 					<div className="flex flex-col items-center justify-center border-b border-border px-6">
 						<div className="max-w-6xl w-full border-x text-start p-6"></div>
 					</div>
+					<RestEasySection />
 					<div className="flex flex-col items-center justify-center border-b border-border px-6">
-						<div className="max-w-6xl w-full border-x text-start p-6 flex items-center justify-center flex-col gap-3">
-							<h2 className="text-2xl font-bold text-center">Ready to level up your registry?</h2>
-							<Button asChild>
-								<Link href="/docs/create-a-registry">Start Building</Link>
-							</Button>
+						<div className="max-w-6xl w-full border-x text-start p-6"></div>
+					</div>
+					<div className="flex flex-col items-center justify-center border-b border-border px-6">
+						<div className="max-w-6xl relative w-full border-x text-start p-10 flex items-center justify-center flex-col gap-3">
+							<div className="relative z-10 flex items-center justify-center flex-col gap-3">
+								<h2 className="text-2xl font-bold text-center">Ready to level up your registry?</h2>
+								<Button asChild>
+									<Link href="/docs/create-a-registry">Start Building</Link>
+								</Button>
+							</div>
+							<div className="size-full absolute">
+								<PrismaticBurst
+									animationType="rotate3d"
+									intensity={2}
+									speed={0.5}
+									distort={1.0}
+									paused={false}
+									offset={{ x: 0, y: 0 }}
+									hoverDampness={0.25}
+									rayCount={24}
+									mixBlendMode="lighten"
+									colors={["#ff007a", "#4d3dff", "#ffffff"]}
+								/>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -81,7 +102,9 @@ export default function HomePage() {
 							"[&_a]:text-sm [&_a]:text-muted-foreground [&_a]:hover:text-primary [&_a]:hover:transition-colors"
 						)}
 					>
-						<Link href="https://github.com/jsrepojs/jsrepo" target="_blank">GitHub</Link>
+						<Link href="https://github.com/jsrepojs/jsrepo" target="_blank">
+							GitHub
+						</Link>
 						<Link href="https://jsrepo.com">jsrepo.com</Link>
 					</div>
 				</footer>
@@ -92,13 +115,13 @@ export default function HomePage() {
 
 function HeroSection() {
 	return (
-		<div className="flex flex-col items-center justify-center mt-[25svh]">
+		<div className="flex flex-col items-center justify-center mt-[15svh]">
 			<div className="flex flex-col gap-6 items-center justify-center max-w-3/4">
 				<h1 className="text-balance text-4xl font-medium sm:text-5xl md:text-6xl">
 					The modern component registry toolchain
 				</h1>
 				<p className="mx-auto max-w-3xl text-pretty text-lg text-muted-foreground">
-					Let jsrepo handle the hard parts of source registries so you can focus on building.
+					jsrepo handles the hard parts of registries so you can focus on building.
 				</p>
 				<div className="flex items-center justify-center">
 					<Button variant="default" asChild>
@@ -113,7 +136,7 @@ function HeroSection() {
 function PluginsSection() {
 	return (
 		<div className="flex flex-col items-center justify-center border-b border-border px-6">
-			<div className="max-w-6xl w-full border-x text-start p-6">
+			<div className="max-w-6xl w-full border-x flex flex-col text-start p-6 gap-6">
 				<div className="flex flex-col items-center justify-center gap-1">
 					<h2 className="text-2xl font-bold text-center">Customize your experience with plugins</h2>
 					<p className="text-sm text-muted-foreground text-center">
@@ -135,10 +158,69 @@ export default defineConfig({
 	);
 }
 
+function RestEasySection() {
+	return (
+		<div className="flex flex-col items-center justify-center border-b border-border px-6">
+			<div className="max-w-6xl w-full border-x flex flex-col text-start p-6 gap-6">
+				<div className="flex flex-col items-center justify-center gap-1">
+					<h2 className="text-2xl font-bold text-center">Rest easy</h2>
+					<p className="text-sm text-muted-foreground text-center">
+						If your registry builds with jsrepo, it will work for your users.
+					</p>
+				</div>
+				<div className="grid grid-cols-2 gap-6">
+					<CodeBlock
+						className="h-full"
+						lang="ts"
+						code={`import { createHighlighterCore } from 'shiki/core';
+import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
+import { customLang } from './langs/custom.ts';
+
+export const highlighter = await createHighlighterCore({
+  themes: [
+    import('@shikijs/themes/nord'),
+    import('@shikijs/themes/dark-plus'),
+  ],
+  langs: [
+    import('@shikijs/langs/typescript'),
+    import('@shikijs/langs/javascript'),
+	customLang(),
+  ],
+  engine: createJavaScriptRegexEngine()
+});`}
+					/>
+					<CodeBlock
+						className="h-full"
+						lang="jsonc"
+						code={`{
+	name: "shiki",
+	files: [
+		{
+			path: "shiki.ts",
+			content: //...,
+		}
+	],
+	// auto detect dependencies within your registry
+	registryDependencies: ['custom'],
+	// automatically detect remote dependencies
+	dependencies: [
+		'shiki', 
+		// including dynamic imports
+		'@shikijs/themes', 
+		'@shikijs/langs'
+	]
+}`}
+					/>
+				</div>
+			</div>
+		</div>
+	);
+}
+
 function LLMsSection() {
 	return (
 		<div className="flex flex-col items-center justify-center border-b border-border px-6">
-			<div className="max-w-6xl w-full border-x text-start p-6">
+			<div className="max-w-6xl w-full border-x text-start p-6 flex flex-col gap-6">
 				<div className="flex flex-col items-center justify-center gap-1">
 					<h2 className="text-2xl font-bold text-center">Built for LLMs</h2>
 					<p className="text-sm text-muted-foreground text-center">

@@ -1,6 +1,6 @@
 "use client";
 
-import { GitHubLogo, GitLabLogo, JsrepoLogo, RegistryKitLogo } from "@/components/logos";
+import { GitHubLogo, JsrepoLogo, RegistryKitLogo } from "@/components/logos";
 import { AnimatedBeam } from "@/components/ui/animated-beam";
 import { cn } from "@/lib/utils";
 import { Folder } from "lucide-react";
@@ -22,7 +22,7 @@ export function ProvidersSection() {
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	const githubRef = useRef<HTMLDivElement>(null);
-	const gitlabRef = useRef<HTMLDivElement>(null);
+	const httpRef = useRef<HTMLDivElement>(null);
 	const jsrepoRef = useRef<HTMLDivElement>(null);
 
 	const cliRef = useRef<HTMLDivElement>(null);
@@ -55,7 +55,7 @@ export function ProvidersSection() {
 							<span className="text-sm text-muted-foreground">@jsrepo/registry-kit</span>
 						</div>
 						<div
-							ref={jsrepoRef}
+							ref={httpRef}
 							className="rounded-full z-10 bg-accent px-3 py-2 flex items-center justify-center gap-2"
 						>
 							<RegistryKitLogo className="size-4" />
@@ -74,7 +74,7 @@ export function ProvidersSection() {
 					</div>
 
 					<AnimatedBeam containerRef={containerRef} fromRef={githubRef} toRef={cliRef} />
-					<AnimatedBeam containerRef={containerRef} fromRef={gitlabRef} toRef={cliRef} />
+					<AnimatedBeam containerRef={containerRef} fromRef={httpRef} toRef={cliRef} />
 					<AnimatedBeam containerRef={containerRef} fromRef={jsrepoRef} toRef={cliRef} />
 					<AnimatedBeam containerRef={containerRef} fromRef={projectRef} toRef={cliRef} />
 				</div>
