@@ -3,7 +3,7 @@ name: Bundle Analyze
 on:
     pull_request:
         branches:
-            - next
+            - [next, main]
 
 jobs:
     bundle-analyze:
