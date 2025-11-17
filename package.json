@@ -23,19 +23,20 @@
 		"build:example-registries": "pnpm -r --filter './examples/**' registry:build"
 	},
 	"devDependencies": {
-		"concurrently": "catalog:",
 		"@biomejs/biome": "2.3.0",
 		"@changesets/cli": "^2.29.7",
 		"@svitejs/changesets-changelog-github-compact": "^1.2.0",
+		"concurrently": "catalog:",
 		"pkg-pr-new": "^0.0.60",
 		"wait-on": "^9.0.1"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [
+			"@tailwindcss/oxide",
+			"core-js",
 			"esbuild",
 			"msw",
-			"sharp",
-			"@tailwindcss/oxide"
+			"sharp"
 		]
 	}
 }
