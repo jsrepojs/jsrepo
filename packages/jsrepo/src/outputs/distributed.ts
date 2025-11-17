@@ -189,6 +189,7 @@ export const DistributedOutputFileSchema = z.object({
 export type DistributedOutputFile = z.infer<typeof DistributedOutputFileSchema>;
 
 export const DistributedOutputItemSchema = z.object({
+	$schema: z.string().optional(),
 	name: z.string(),
 	title: z.union([z.string(), z.undefined()]),
 	description: z.union([z.string(), z.undefined()]),

@@ -431,6 +431,15 @@ async function fetchItemDistributedMode(
 	if (result.isErr()) return err(result.error);
 	return ok({
 		...result.value,
+		files: result.value.files.map((file) => ({
+			...file,
+			path:
+				// this is a weird compat thing.
+				// shadcn/ui has the full path to the file even though the client only needs the basename
+				result.value.$schema === 'https://ui.shadcn.com/schema/registry-item.json'
+					? (path.basename(file.path) as ItemRelativePath)
+					: file.path,
+		})),
 		registry: item.registry,
 	});
 }
@@ -677,7 +686,10 @@ export async function getPathsForItems({
 		for (const type of uniqueTypes) {
 			// the item name can be used to override the target
 			const itemPath = resolvedPaths[`${type}/${item.name}`] ?? resolvedPaths[type];
-			if (itemPath !== undefined) continue;
+			if (itemPath !== undefined) {
+				resolvedPaths[`${type}/${item.name}`] = itemPath;
+				continue;
+			}
 			const result = await getItemLocation(item, {
 				paths: resolvedPaths,
 				nonInteractive: options.yes,
@@ -691,9 +703,9 @@ export async function getPathsForItems({
 				return err(result.error);
 			}
 			const { path: originalPath, resolvedPath } = result.value;
-			resolvedPaths[type] = resolvedPath;
+			resolvedPaths[`${type}/${item.name}`] = resolvedPath;
 			if (config) {
-				config.paths[type] = originalPath;
+				config.paths[`${type}/${item.name}`] = originalPath;
 			}
 		}
 	}
@@ -762,12 +774,13 @@ export async function prepareUpdates({
 	let neededEnvVars: Record<string, string> | undefined;
 
 	for (const item of items) {
-		const type = normalizeItemTypeForPath(item.type);
-		const itemPath = itemPaths[`${type}/${item.name}`]!;
 		for (let file of item.files) {
 			if (file.role === 'example' && !options.withExamples) continue;
 			if (file.role === 'doc' && !options.withDocs) continue;
 			if (file.role === 'test' && !options.withTests) continue;
+
+			const type = normalizeItemTypeForPath(file.type);
+			const expectedPath = itemPaths[`${type}/${item.name}`]!;
 
 			file = await transformRemoteContent(file, {
 				item,
@@ -790,7 +803,7 @@ export async function prepareUpdates({
 				);
 			}
 
-			const filePath = getTargetPath(file, { itemPath, options });
+			const filePath = getTargetPath(file, { itemPath: expectedPath, options });
 
 			// check if the file needs to be updated
 			if (existsSync(filePath)) {
@@ -970,7 +983,11 @@ export async function updateFiles({
 }
 
 export function getItemPaths(
-	items: { name: string; type: RegistryItemType }[],
+	items: {
+		name: string;
+		type: RegistryItemType;
+		files: { path: ItemRelativePath; type: RegistryItemType; target?: string }[];
+	}[],
 	resolvedPaths: Config['paths'],
 	{
 		config,
@@ -986,21 +1003,24 @@ export function getItemPaths(
 > {
 	return items.reduce(
 		(acc, item) => {
-			const type = normalizeItemTypeForPath(item.type);
-			const path = resolvedPaths[`${type}/${item.name}`] ?? resolvedPaths[type]!;
-			// we know that if the resolved path is not the same that the user is using an alias
-			const alias =
-				(config?.paths[`${type}/${item.name}`] &&
-				config?.paths[`${type}/${item.name}`] !== resolvedPaths[`${type}/${item.name}`]
-					? config.paths[`${type}/${item.name}`]
-					: undefined) ??
-				(config?.paths[type] && config?.paths[type] !== resolvedPaths[type]
-					? config.paths[type]
-					: undefined);
-			acc[`${type}/${item.name}`] = {
-				path,
-				alias,
-			};
+			for (const file of item.files) {
+				const type = normalizeItemTypeForPath(file.type);
+				const path = resolvedPaths[`${type}/${item.name}`] ?? resolvedPaths[type]!;
+				// we know that if the resolved path is not the same that the user is using an alias
+				const alias =
+					(config?.paths[`${type}/${item.name}`] &&
+					config?.paths[`${type}/${item.name}`] !== resolvedPaths[`${type}/${item.name}`]
+						? config.paths[`${type}/${item.name}`]
+						: undefined) ??
+					(config?.paths[type] && config?.paths[type] !== resolvedPaths[type]
+						? config.paths[type]
+						: undefined);
+				acc[`${type}/${item.name}`] = {
+					path,
+					alias,
+				};
+			}
+
 			return acc;
 		},
 		{} as Record<
