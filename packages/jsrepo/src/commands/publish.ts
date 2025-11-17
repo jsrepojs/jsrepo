@@ -115,9 +115,13 @@ export async function runPublish(
 	registries: string[],
 	{ options, config }: { options: PublishOptions; config: Config }
 ): Promise<Result<PublishCommandResult, CLIError>> {
-	const { verbose: _, spinner } = initLogging({ options });
+	const { verbose, spinner } = initLogging({ options });
 
 	const publishStart = performance.now();
+
+	verbose(`Starting publish command for ${registries.length} registry/registries: ${registries.join(', ') || '(all)'}`);
+	verbose(`Working directory: ${options.cwd}`);
+	verbose(`Dry run: ${options.dryRun}`);
 
 	if (options.dryRun) {
 		log.warn(
@@ -128,11 +132,13 @@ export async function runPublish(
 	if (!hasRegistries(config)) return err(new NoRegistriesError());
 
 	const providers = config.providers ?? DEFAULT_PROVIDERS;
+	verbose(`Using ${providers.length} provider(s): ${providers.map(p => p.name).join(', ')}`);
 	const jsrepoProvider = providers.find((p) => p.name === 'jsrepo') as JsrepoProvider | undefined;
 	if (!jsrepoProvider) return err(new NoProviderFoundError('jsrepo'));
 
 	const tokenManager = new TokenManager();
 	const token = tokenManager.get(jsrepoProvider, undefined);
+	verbose(`Token found: ${token ? 'yes' : 'no'}`);
 	if (!token) {
 		return err(
 			new JsrepoError('You need to be authenticated to publish your registry.', {
@@ -145,6 +151,8 @@ export async function runPublish(
 
 	const pkg = findNearestPackageJson(options.cwd);
 	if (!pkg) return err(new NoPackageJsonFoundError());
+	verbose(`Found package.json: ${pkg.path}`);
+	verbose(`Package version: ${pkg.package.version || '(not set)'}`);
 
 	const buildStart = performance.now();
 
@@ -160,11 +168,18 @@ export async function runPublish(
 	>(
 		config,
 		async (registry) => {
-			if (registries.length > 0 && !registries.includes(registry.name))
+			if (registries.length > 0 && !registries.includes(registry.name)) {
+				verbose(`Skipping registry ${registry.name}: not in publish list`);
 				return ok({ skipped: true, name: registry.name });
+			}
 
+			verbose(`Building registry: ${registry.name}`);
 			const buildResult = await buildRegistry(registry, { options, config });
-			if (buildResult.isErr()) return err(buildResult.error);
+			if (buildResult.isErr()) {
+				verbose(`Failed to build registry ${registry.name}: ${buildResult.error.message}`);
+				return err(buildResult.error);
+			}
+			verbose(`Successfully built registry ${registry.name} with ${buildResult.value.items.length} item(s)`);
 			return ok({ skipped: false, buildResult: buildResult.value });
 		},
 		{ cwd: options.cwd }
@@ -188,15 +203,21 @@ export async function runPublish(
 			continue;
 		}
 
+		verbose(`Validating registry ${buildResult.value.buildResult.name} for publish`);
 		const result = validateRegistryPrepublish(buildResult.value.buildResult, {
 			pkg: pkg.package,
 		});
-		if (result.isErr()) return err(result.error);
+		if (result.isErr()) {
+			verbose(`Validation failed for ${buildResult.value.buildResult.name}: ${result.error.message}`);
+			return err(result.error);
+		}
+		verbose(`Validation passed for ${buildResult.value.buildResult.name}, version: ${result.value.version}`);
 		preparedRegistries.push({
 			...buildResult.value.buildResult,
 			version: result.value.version,
 		});
 	}
+	verbose(`Prepared ${preparedRegistries.length} registry/registries for publishing, skipped ${skippedRegistries.length}`);
 
 	spinner.start(
 		`Publishing ${pc.green(preparedRegistries.length)} ${preparedRegistries.length > 1 ? 'registries' : 'registry'}...`
@@ -209,11 +230,18 @@ export async function runPublish(
 		result: Result<{ version: string; tag?: string }, CLIError>;
 	}[] = [];
 	for (const registry of preparedRegistries) {
+		verbose(`Publishing registry ${registry.name} version ${registry.version}${options.dryRun ? ' (dry run)' : ''}`);
 		const publishResult = await publishRegistry(registry, {
 			token,
 			provider: jsrepoProvider,
 			options,
+			verbose,
 		});
+		if (publishResult.isErr()) {
+			verbose(`Failed to publish ${registry.name}: ${publishResult.error.message}`);
+		} else {
+			verbose(`Successfully published ${registry.name} version ${publishResult.value.version}${publishResult.value.tag ? ` (tag: ${publishResult.value.tag})` : ''}`);
+		}
 		publishedRegistries.push({
 			skipped: false,
 			name: registry.name,
@@ -228,6 +256,8 @@ export async function runPublish(
 	);
 
 	const publishEnd = performance.now();
+	const duration = publishEnd - publishStart;
+	verbose(`Publish command completed in ${duration.toFixed(2)}ms`);
 
 	return ok({
 		duration: publishEnd - publishStart,
@@ -288,11 +318,13 @@ async function publishRegistry(
 		token,
 		provider,
 		options,
-	}: { token: string; provider: JsrepoProvider; options: PublishOptions }
+		verbose,
+	}: { token: string; provider: JsrepoProvider; options: PublishOptions; verbose: (msg: string) => void }
 ): Promise<Result<{ version: string; tag?: string }, CLIError>> {
 	const collectResult = collectRegistryFiles(registry, options.cwd);
 	if (collectResult.isErr()) return err(collectResult.error);
 	const files = collectResult.value;
+	verbose(`Collected ${files.length} file(s) for registry ${registry.name}`);
 
 	const pack = tar.pack();
 	for (const file of files) {
@@ -301,9 +333,12 @@ async function publishRegistry(
 	pack.finalize();
 
 	const tarBuffer = await buffer(pack.pipe(createGzip()));
+	verbose(`Created tarball: ${(tarBuffer.length / 1024).toFixed(2)} KB`);
 
 	try {
-		const response = await fetch(`${provider.baseUrl}/api/publish/v3`, {
+		const publishUrl = `${provider.baseUrl}/api/publish/v3`;
+		verbose(`Publishing to: ${publishUrl}`);
+		const response = await fetch(publishUrl, {
 			body: tarBuffer,
 			headers: {
 				'content-type': 'application/gzip',

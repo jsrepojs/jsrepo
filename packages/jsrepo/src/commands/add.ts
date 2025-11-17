@@ -109,19 +109,28 @@ export async function runAdd(
 	options: AddOptions,
 	configResult: { path: AbsolutePath; config: Config } | null
 ): Promise<Result<AddCommandResult, CLIError>> {
-	const { verbose: _, spinner } = initLogging({ options });
+	const { verbose, spinner } = initLogging({ options });
 
 	const config = configResult?.config;
+
+	verbose(`Starting add command with ${itemsArg.length} item(s): ${itemsArg.join(', ') || '(none)'}`);
+	verbose(`Working directory: ${options.cwd}`);
+	verbose(`Config found: ${configResult ? `yes (${configResult.path})` : 'no'}`);
+	verbose(`Options: overwrite=${options.overwrite}, withExamples=${options.withExamples}, withDocs=${options.withDocs}, withTests=${options.withTests}, expand=${options.expand}, maxUnchanged=${options.maxUnchanged}`);
 
 	// this is to support zero config adds
 	const providers = config?.providers ?? DEFAULT_PROVIDERS;
 	const registries = options.registry ? [options.registry] : (config?.registries ?? []);
+	verbose(`Using ${providers.length} provider(s): ${providers.map(p => p.name).join(', ')}`);
+	verbose(`Using ${registries.length} registry/registries: ${registries.join(', ') || '(none)'}`);
 
 	let resolvedWantedItems: ResolvedWantedItem[];
 
 	if (itemsArg.length === 0 || options.all) {
+		verbose(`Mode: ${options.all ? '--all (adding all items)' : 'interactive selection'}`);
 		// in the case that --all was provided we treat items as registry urls
 		if (options.all && itemsArg.length > 0) {
+			verbose(`Validating ${itemsArg.length} registry URL(s) as items`);
 			// we ensure that all registries are valid
 			for (const item of itemsArg) {
 				const foundProvider = providers.some((p) => p.matches(item));
@@ -131,6 +140,7 @@ export async function runAdd(
 			}
 		}
 		const availableRegistries = itemsArg.length > 0 ? itemsArg : registries;
+		verbose(`Available registries: ${availableRegistries.join(', ')}`);
 		// we can't add from 0 registries
 		if (availableRegistries.length === 0) return err(new RegistryNotProvidedError());
 
@@ -151,6 +161,7 @@ export async function runAdd(
 			`Retrieved manifest${registries.length > 1 ? 's' : ''} from ${pc.cyan(registries.join(', '))}`
 		);
 		const resolvedRegistries = resolvedRegistriesResult.value;
+		verbose(`Successfully resolved ${resolvedRegistries.size} registry/registries`);
 
 		const possibleItems = Array.from(resolvedRegistries.entries()).flatMap(([_, registry]) => {
 			return registry.manifest.items
@@ -160,6 +171,7 @@ export async function runAdd(
 					registry,
 				}));
 		});
+		verbose(`Found ${possibleItems.length} possible item(s) across all registries`);
 
 		if (!options.all) {
 			let userSelections: string[] | symbol;
@@ -218,17 +230,21 @@ export async function runAdd(
 					registry: item.registry,
 					item: item.item,
 				}));
+			verbose(`User selected ${resolvedWantedItems.length} item(s)`);
 		} else {
 			// select all items
 			resolvedWantedItems = possibleItems;
+			verbose(`--all flag: selecting all ${resolvedWantedItems.length} item(s)`);
 		}
 	} else {
+		verbose(`Mode: parsing ${itemsArg.length} specific item(s)`);
 		const parsedWantedItemsResult = parseWantedItems(itemsArg, {
 			providers,
 			registries: registries,
 		});
 		if (parsedWantedItemsResult.isErr()) return err(parsedWantedItemsResult.error);
 		const { wantedItems, neededRegistries } = parsedWantedItemsResult.value;
+		verbose(`Parsed ${wantedItems.length} wanted item(s), need ${neededRegistries.length} registry/registries: ${neededRegistries.join(', ')}`);
 
 		spinner.start(
 			`Retrieving manifest${neededRegistries.length > 1 ? 's' : ''} from ${pc.cyan(neededRegistries.join(', '))}`
@@ -254,6 +270,7 @@ export async function runAdd(
 		});
 		if (resolvedWantedItemsResult.isErr()) return err(resolvedWantedItemsResult.error);
 		resolvedWantedItems = resolvedWantedItemsResult.value;
+		verbose(`Resolved ${resolvedWantedItems.length} wanted item(s)`);
 	}
 
 	spinner.start(
@@ -269,10 +286,15 @@ export async function runAdd(
 		`Fetched ${pc.cyan(resolvedWantedItems.map((item) => item.item.name).join(', '))}`
 	);
 	const items = itemsResult.value;
+	verbose(`Fetched ${items.length} item(s) successfully`);
 
 	const itemPathsResult = await getPathsForItems({ items, config, options });
 	if (itemPathsResult.isErr()) return err(itemPathsResult.error);
 	const { itemPaths, resolvedPaths } = itemPathsResult.value;
+	verbose(`Resolved paths for ${Object.keys(itemPaths).length} item(s)`);
+	if (resolvedPaths) {
+		verbose(`Resolved ${Object.keys(resolvedPaths).length} path configuration(s)`);
+	}
 
 	const prepareUpdatesResult = await prepareUpdates({
 		configResult,
@@ -284,18 +306,31 @@ export async function runAdd(
 	if (prepareUpdatesResult.isErr()) return err(prepareUpdatesResult.error);
 	const { neededDependencies, neededEnvVars, neededFiles, updatedPaths } =
 		prepareUpdatesResult.value;
+	verbose(`Prepared updates: ${neededFiles.length} file(s), ${neededDependencies.dependencies.length + neededDependencies.devDependencies.length} dependency/dependencies, ${neededEnvVars ? Object.keys(neededEnvVars).length : 0} env var(s)`);
+	if (neededDependencies.dependencies.length > 0) {
+		verbose(`Dependencies: ${neededDependencies.dependencies.map(d => `${d.name}@${d.version || 'latest'}`).join(', ')}`);
+	}
+	if (neededDependencies.devDependencies.length > 0) {
+		verbose(`Dev dependencies: ${neededDependencies.devDependencies.map(d => `${d.name}@${d.version || 'latest'}`).join(', ')}`);
+	}
+	if (neededEnvVars) {
+		verbose(`Environment variables: ${Object.keys(neededEnvVars).join(', ')}`);
+	}
 
 	const updatedFilesResult = await updateFiles({ files: neededFiles, options });
 	if (updatedFilesResult.isErr()) return err(updatedFilesResult.error);
 	const updatedFiles = updatedFilesResult.value;
+	verbose(`Updated ${updatedFiles.length} file(s): ${updatedFiles.join(', ')}`);
 
 	if (configResult && updatedPaths) {
+		verbose(`Updating config paths: ${Object.keys(updatedPaths).join(', ')}`);
 		const configCodeResult = readFileSync(configResult.path);
 		if (configCodeResult.isErr()) return err(configCodeResult.error);
 		const configCode = configCodeResult.value;
 		await updateConfigPaths(updatedPaths, {
 			config: { path: configResult.path, code: configCode },
 		});
+		verbose(`Config paths updated successfully`);
 	}
 
 	let updatedEnvVars: Record<string, string> | undefined;
@@ -309,7 +344,9 @@ export async function runAdd(
 		options,
 		config,
 	});
+	verbose(`Installed ${updatedDependencies.length} dependency/dependencies`);
 
+	verbose(`Add command completed successfully`);
 	return ok({
 		items,
 		updatedDependencies,

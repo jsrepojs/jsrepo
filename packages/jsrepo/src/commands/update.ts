@@ -110,20 +110,29 @@ export async function runUpdate(
 	options: UpdateOptions,
 	configResult: { path: AbsolutePath; config: Config } | null
 ): Promise<Result<UpdateCommandResult, CLIError>> {
-	const { verbose: _, spinner } = initLogging({ options });
+	const { verbose, spinner } = initLogging({ options });
 
 	const config = configResult?.config;
+	verbose(`Starting update command with ${itemsArg.length} item(s): ${itemsArg.join(', ') || '(none)'}`);
+	verbose(`Working directory: ${options.cwd}`);
+	verbose(`Config found: ${configResult ? `yes (${configResult.path})` : 'no'}`);
+	verbose(`Options: overwrite=${options.overwrite}, withExamples=${options.withExamples}, withDocs=${options.withDocs}, withTests=${options.withTests}, expand=${options.expand}, maxUnchanged=${options.maxUnchanged}, all=${options.all}`);
+
 	const providers = config?.providers ?? DEFAULT_PROVIDERS;
 	const registries = options.registry ? [options.registry] : (config?.registries ?? []);
+	verbose(`Using ${providers.length} provider(s): ${providers.map(p => p.name).join(', ')}`);
+	verbose(`Using ${registries.length} registry/registries: ${registries.join(', ') || '(none)'}`);
 
 	let resolvedWantedItems: ResolvedWantedItem[];
 	if (itemsArg.length > 0) {
+		verbose(`Mode: updating specific ${itemsArg.length} item(s)`);
 		const parsedWantedItemsResult = parseWantedItems(itemsArg, {
 			providers,
 			registries,
 		});
 		if (parsedWantedItemsResult.isErr()) return err(parsedWantedItemsResult.error);
 		const { wantedItems, neededRegistries } = parsedWantedItemsResult.value;
+		verbose(`Parsed ${wantedItems.length} wanted item(s), need ${neededRegistries.length} registry/registries: ${neededRegistries.join(', ')}`);
 
 		spinner.start(
 			`Retrieving manifest${neededRegistries.length > 1 ? 's' : ''} from ${pc.cyan(neededRegistries.join(', '))}`
@@ -148,7 +157,9 @@ export async function runUpdate(
 		});
 		if (resolvedWantedItemsResult.isErr()) return err(resolvedWantedItemsResult.error);
 		resolvedWantedItems = resolvedWantedItemsResult.value;
+		verbose(`Resolved ${resolvedWantedItems.length} wanted item(s)`);
 	} else {
+		verbose(`Mode: ${options.all ? 'updating all items' : 'interactive selection'}`);
 		spinner.start(
 			`Retrieving manifest${registries.length > 1 ? 's' : ''} from ${pc.cyan(registries.join(', '))}`
 		);
@@ -165,6 +176,7 @@ export async function runUpdate(
 			`Retrieved manifest${registries.length > 1 ? 's' : ''} from ${pc.cyan(registries.join(', '))}`
 		);
 		const resolvedRegistries = resolvedRegistriesResult.value;
+		verbose(`Successfully resolved ${resolvedRegistries.size} registry/registries`);
 
 		const allItems: ResolvedWantedItem[] = Array.from(resolvedRegistries.entries()).flatMap(
 			([_, registry]) => {
@@ -173,6 +185,7 @@ export async function runUpdate(
 					.map((item) => ({ item, registry }));
 			}
 		);
+		verbose(`Found ${allItems.length} item(s) marked for 'when-added' across all registries`);
 
 		const itemPathsResult = await getPathsForItems({
 			items: allItems.map((item) => ({
@@ -197,16 +210,21 @@ export async function runUpdate(
 		}[] = [];
 		for (const { item, registry } of allItems) {
 			const itemPath = itemPaths[`${item.type}/${item.name}`]?.path;
-			if (!itemPath) continue; // don't know where it is so we can't update it
+			if (!itemPath) {
+				verbose(`Skipping ${item.name}: no path found in config`);
+				continue; // don't know where it is so we can't update it
+			}
 
 			for (const file of item.files) {
 				const filePath = getTargetPath(file, { itemPath: { path: itemPath }, options });
 				if (!existsSync(filePath)) continue;
 				updateCandidates.push({ item: { ...item, registry }, registry });
+				verbose(`Found update candidate: ${item.name} at ${itemPath}`);
 				break;
 			}
 		}
 
+		verbose(`Found ${updateCandidates.length} update candidate(s)`);
 		if (updateCandidates.length === 0) return err(new NoItemsToUpdateError());
 
 		if (options.all) {
@@ -214,6 +232,7 @@ export async function runUpdate(
 				item,
 				registry,
 			}));
+			verbose(`--all flag: updating all ${resolvedWantedItems.length} candidate(s)`);
 		} else {
 			const registryUrls = new Set<string>();
 			for (const { registry } of updateCandidates) {
@@ -239,6 +258,7 @@ export async function runUpdate(
 			resolvedWantedItems = updateCandidates.filter(({ item }) =>
 				selectedItems.includes(`${item.registry.url}/${item.name}`)
 			);
+			verbose(`User selected ${resolvedWantedItems.length} item(s) to update`);
 		}
 	}
 
@@ -255,10 +275,15 @@ export async function runUpdate(
 		`Fetched ${pc.cyan(resolvedWantedItems.map((item) => item.item.name).join(', '))}`
 	);
 	const items = itemsResult.value;
+	verbose(`Fetched ${items.length} item(s) successfully`);
 
 	const itemPathsResult = await getPathsForItems({ items, config, options });
 	if (itemPathsResult.isErr()) return err(itemPathsResult.error);
 	const { itemPaths, resolvedPaths } = itemPathsResult.value;
+	verbose(`Resolved paths for ${Object.keys(itemPaths).length} item(s)`);
+	if (resolvedPaths) {
+		verbose(`Resolved ${Object.keys(resolvedPaths).length} path configuration(s)`);
+	}
 
 	const prepareUpdatesResult = await prepareUpdates({
 		configResult,
@@ -270,18 +295,31 @@ export async function runUpdate(
 	if (prepareUpdatesResult.isErr()) return err(prepareUpdatesResult.error);
 	const { neededDependencies, neededEnvVars, neededFiles, updatedPaths } =
 		prepareUpdatesResult.value;
+	verbose(`Prepared updates: ${neededFiles.length} file(s), ${neededDependencies.dependencies.length + neededDependencies.devDependencies.length} dependency/dependencies, ${neededEnvVars ? Object.keys(neededEnvVars).length : 0} env var(s)`);
+	if (neededDependencies.dependencies.length > 0) {
+		verbose(`Dependencies: ${neededDependencies.dependencies.map(d => `${d.name}@${d.version || 'latest'}`).join(', ')}`);
+	}
+	if (neededDependencies.devDependencies.length > 0) {
+		verbose(`Dev dependencies: ${neededDependencies.devDependencies.map(d => `${d.name}@${d.version || 'latest'}`).join(', ')}`);
+	}
+	if (neededEnvVars) {
+		verbose(`Environment variables: ${Object.keys(neededEnvVars).join(', ')}`);
+	}
 
 	const updatedFilesResult = await updateFiles({ files: neededFiles, options });
 	if (updatedFilesResult.isErr()) return err(updatedFilesResult.error);
 	const updatedFiles = updatedFilesResult.value;
+	verbose(`Updated ${updatedFiles.length} file(s): ${updatedFiles.join(', ')}`);
 
 	if (configResult && updatedPaths) {
+		verbose(`Updating config paths: ${Object.keys(updatedPaths).join(', ')}`);
 		const configCodeResult = readFileSync(configResult.path);
 		if (configCodeResult.isErr()) return err(configCodeResult.error);
 		const configCode = configCodeResult.value;
 		await updateConfigPaths(updatedPaths, {
 			config: { path: configResult.path, code: configCode },
 		});
+		verbose(`Config paths updated successfully`);
 	}
 
 	let updatedEnvVars: Record<string, string> | undefined;
@@ -295,7 +333,9 @@ export async function runUpdate(
 		options,
 		config,
 	});
+	verbose(`Installed ${updatedDependencies.length} dependency/dependencies`);
 
+	verbose(`Update command completed successfully`);
 	return ok({
 		items,
 		updatedDependencies,

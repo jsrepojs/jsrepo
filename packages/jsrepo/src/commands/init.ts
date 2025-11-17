@@ -111,13 +111,20 @@ export async function runInit(
 	options: InitOptions,
 	configResult: { config: Config; path: AbsolutePath } | null
 ): Promise<Result<void, CLIError>> {
-	const { verbose: _, spinner } = initLogging({ options });
+	const { verbose, spinner } = initLogging({ options });
+
+	verbose(`Starting init command with ${registriesArg.length} registry/registries: ${registriesArg.join(', ') || '(none)'}`);
+	verbose(`Working directory: ${options.cwd}`);
+	verbose(`Config found: ${configResult ? `yes (${configResult.path})` : 'no'}`);
+	verbose(`Options: overwrite=${options.overwrite}, expand=${options.expand}, maxUnchanged=${options.maxUnchanged}, js=${options.js}`);
 
 	const packagePath = joinAbsolute(options.cwd, 'package.json');
 
 	const packageJsonResult = tryGetPackage(packagePath);
 	if (packageJsonResult.isErr()) return err(new NoPackageJsonFoundError());
 	const packageJson = packageJsonResult.value;
+	verbose(`Found package.json: ${packagePath}`);
+	verbose(`Package type: ${packageJson.type || 'commonjs'}`);
 
 	let { config, path: configPath } = configResult ?? {
 		config: null,
@@ -126,12 +133,16 @@ export async function runInit(
 			packageJson.type === 'module' ? 'jsrepo.config.ts' : 'jsrepo.config.mts'
 		),
 	};
+	verbose(`Config path: ${configPath}`);
 	const providers = config?.providers ?? DEFAULT_PROVIDERS;
+	verbose(`Using ${providers.length} provider(s): ${providers.map(p => p.name).join(', ')}`);
 
 	let configCode: string;
 	if (config === null) {
+		verbose(`No existing config found, creating blank config`);
 		configCode = initBlankConfig();
 	} else {
+		verbose(`Reading existing config from ${configPath}`);
 		const configCodeResult = readFileSync(configPath);
 		if (configCodeResult.isErr()) return err(configCodeResult.error);
 		configCode = configCodeResult.value;
@@ -142,6 +153,7 @@ export async function runInit(
 		packageJson.dependencies?.jsrepo === undefined &&
 		packageJson.devDependencies?.jsrepo === undefined
 	) {
+		verbose(`jsrepo not found in dependencies, adding to devDependencies`);
 		if (!packageJson.devDependencies) {
 			packageJson.devDependencies = {};
 		}
@@ -153,9 +165,12 @@ export async function runInit(
 		);
 		if (writePackageJsonResult.isErr()) return err(writePackageJsonResult.error);
 		hasJsrepo = false;
+	} else {
+		verbose(`jsrepo already in dependencies`);
 	}
 
 	if (options.js) {
+		verbose(`--js flag: adding @jsrepo/transform-javascript transform plugin`);
 		const addPluginsToConfigResult = await addPluginsToConfig({
 			plugins: [
 				{
@@ -174,10 +189,12 @@ export async function runInit(
 	if (registriesArg.length === 0) {
 		if (config !== null) return err(new AlreadyInitializedError());
 
+		verbose(`No registries specified, writing config and exiting`);
 		const writeConfigResult = writeFileSync(configPath, configCode);
 		if (writeConfigResult.isErr()) return err(writeConfigResult.error);
 
 		log.success(`Wrote config to ${pc.cyan(path.relative(options.cwd, configPath))}`);
+		verbose(`Config written successfully`);
 
 		if (!hasJsrepo) {
 			await promptInstallDependencies(
@@ -200,6 +217,7 @@ export async function runInit(
 	}
 
 	const registries = registriesArg.length > 0 ? registriesArg : (config?.registries ?? []);
+	verbose(`Initializing with ${registries.length} registry/registries: ${registries.join(', ')}`);
 
 	spinner.start(
 		`Retrieving manifest${registries.length > 1 ? 's' : ''} from ${pc.cyan(registries.join(', '))}`
@@ -218,20 +236,25 @@ export async function runInit(
 		`Retrieved manifest${registries.length > 1 ? 's' : ''} from ${pc.cyan(registries.join(', '))}`
 	);
 	const resolvedRegistries = resolvedRegistriesResult.value;
+	verbose(`Successfully resolved ${resolvedRegistries.size} registry/registries`);
 
 	const pluginChoices = new Map<string, { install: boolean; plugin: Plugin }>();
 	for (const [_, resolved] of resolvedRegistries) {
+		verbose(`Initializing registry: ${resolved.url}`);
 		const initRegistryResult = await initRegistry(resolved, {
 			configCode,
 			configPath,
 			options,
 			pluginChoices,
 			config,
+			verbose,
 		});
 		if (initRegistryResult.isErr()) return err(initRegistryResult.error);
 		configCode = initRegistryResult.value;
+		verbose(`Registry ${resolved.url} initialized successfully`);
 	}
 
+	verbose(`Adding registries to config`);
 	const addRegistriesToConfigResult = await addRegistriesToConfig(registriesArg, {
 		config: { path: configPath, code: configCode },
 	});
@@ -242,6 +265,7 @@ export async function runInit(
 	if (writeConfigResult.isErr()) return err(writeConfigResult.error);
 
 	log.success(`Wrote config to ${pc.cyan(path.relative(options.cwd, configPath))}`);
+	verbose(`Config written successfully`);
 
 	const neededDeps = new Map<DependencyKey, RemoteDependency>(
 		Array.from(pluginChoices.values())
@@ -259,6 +283,7 @@ export async function runInit(
 			)
 	);
 
+	verbose(`Found ${neededDeps.size} plugin dependency/dependencies to install`);
 	if (neededDeps.size > 0) {
 		await promptInstallDependencies(
 			{
@@ -284,6 +309,7 @@ export async function runInit(
 	neededDeps.clear();
 
 	const parsedPath = path.parse(configPath);
+	verbose(`Reloading config to get updated state`);
 	const loadConfigResult = await loadConfig({ cwd: parsedPath.dir });
 	if (loadConfigResult.isErr()) return err(loadConfigResult.error);
 	config = loadConfigResult.value;
@@ -292,13 +318,15 @@ export async function runInit(
 		registry.manifest.items
 			.filter((item) => item.add === 'on-init')
 			.map((item) => ({ registry, item }))
-	);
+		);
+	verbose(`Found ${itemsToAdd.length} item(s) marked for 'on-init'`);
 
 	const optionallyOnInitItems = Array.from(resolvedRegistries.values()).flatMap((registry) =>
 		registry.manifest.items
 			.filter((item) => item.add === 'optionally-on-init')
 			.map((item) => ({ registry, item }))
-	);
+		);
+	verbose(`Found ${optionallyOnInitItems.length} item(s) marked for 'optionally-on-init'`);
 
 	if (optionallyOnInitItems.length > 0) {
 		const response = await multiselect({
@@ -317,6 +345,7 @@ export async function runInit(
 		itemsToAdd.push(
 			...optionallyOnInitItems.filter((item) => response.includes(item.item.name))
 		);
+		verbose(`User selected ${response.length} optional item(s), total items to add: ${itemsToAdd.length}`);
 	}
 
 	const neededDependencies: {
@@ -324,6 +353,7 @@ export async function runInit(
 		devDependencies: RemoteDependency[];
 	} = { dependencies: [], devDependencies: [] };
 	if (itemsToAdd.length > 0) {
+		verbose(`Adding ${itemsToAdd.length} item(s) marked for initialization`);
 		spinner.start(
 			`Fetching ${pc.cyan(itemsToAdd.map((item) => item.item.name).join(', '))}...`
 		);
@@ -337,10 +367,12 @@ export async function runInit(
 		}
 		spinner.stop(`Fetched ${pc.cyan(itemsToAdd.map((item) => item.item.name).join(', '))}`);
 		const items = itemsResult.value;
+		verbose(`Fetched ${items.length} item(s) successfully`);
 
 		const itemPathsResult = await getPathsForItems({ items, config, options });
 		if (itemPathsResult.isErr()) return err(itemPathsResult.error);
 		const { itemPaths, resolvedPaths } = itemPathsResult.value;
+		verbose(`Resolved paths for ${Object.keys(itemPaths).length} item(s)`);
 
 		const prepareUpdatesResult = await prepareUpdates({
 			configResult: { path: configPath, config },
@@ -362,10 +394,12 @@ export async function runInit(
 			neededFiles,
 			updatedPaths,
 		} = prepareUpdatesResult.value;
+		verbose(`Prepared updates: ${neededFiles.length} file(s), ${neededDeps.dependencies.length + neededDeps.devDependencies.length} dependency/dependencies, ${neededEnvVars ? Object.keys(neededEnvVars).length : 0} env var(s)`);
 
 		const updatedFilesResult = await updateFiles({ files: neededFiles, options });
 		if (updatedFilesResult.isErr()) return err(updatedFilesResult.error);
 		const updatedFiles = updatedFilesResult.value;
+		verbose(`Updated ${updatedFiles.length} file(s): ${updatedFiles.join(', ')}`);
 
 		log.success(`Updated ${pc.green(updatedFiles.length)} files`);
 
@@ -385,6 +419,7 @@ export async function runInit(
 	}
 
 	if (config.paths !== undefined) {
+		verbose(`Updating config paths: ${Object.keys(config.paths).join(', ')}`);
 		const updateConfigPathsResult = await updateConfigPaths(config.paths, {
 			config: { path: configPath, code: configCode },
 		});
@@ -395,10 +430,13 @@ export async function runInit(
 		if (writeConfigResult.isErr()) return err(writeConfigResult.error);
 
 		log.success(`Updated paths`);
+		verbose(`Config paths updated successfully`);
 	}
 
+	verbose(`Installing dependencies: ${neededDependencies.dependencies.length} dependency/dependencies, ${neededDependencies.devDependencies.length} dev dependency/dependencies`);
 	await promptInstallDependenciesByEcosystem(neededDependencies, { options, config });
 
+	verbose(`Init command completed successfully`);
 	return ok();
 }
 
@@ -410,25 +448,30 @@ async function initRegistry(
 		options,
 		pluginChoices,
 		config,
+		verbose,
 	}: {
 		configCode: string;
 		configPath: AbsolutePath;
 		options: InitOptions;
 		pluginChoices: Map<string, { install: boolean; plugin: Plugin }>;
 		config: Config | null;
+		verbose: (msg: string) => void;
 	}
 ): Promise<
 	Result<string, InvalidKeyTypeError | ConfigObjectNotFoundError | CouldNotFindJsrepoImportError>
 > {
+	verbose(`Initializing plugins for registry ${registry.url}`);
 	const initPluginsResult = await initPlugins(registry, {
 		configCode,
 		configPath,
 		options,
 		pluginChoices,
+		verbose,
 	});
 	if (initPluginsResult.isErr()) return err(initPluginsResult.error);
 	configCode = initPluginsResult.value;
 
+	verbose(`Initializing default paths for registry ${registry.url}`);
 	const initDefaultPathsResult = await initDefaultPaths(registry, {
 		configCode,
 		configPath,
@@ -448,18 +491,25 @@ async function initPlugins(
 		configPath,
 		options,
 		pluginChoices,
+		verbose,
 	}: {
 		configCode: string;
 		configPath: AbsolutePath;
 		options: InitOptions;
 		pluginChoices: Map<string, { install: boolean; plugin: Plugin }>;
+		verbose: (msg: string) => void;
 	}
 ): Promise<
 	Result<string, InvalidKeyTypeError | ConfigObjectNotFoundError | CouldNotFindJsrepoImportError>
 > {
-	if (!registry.manifest.plugins) return ok(configCode);
+	if (!registry.manifest.plugins) {
+		verbose(`No plugins required for registry ${registry.url}`);
+		return ok(configCode);
+	}
+	verbose(`Processing ${Object.keys(registry.manifest.plugins).length} plugin type(s) for registry ${registry.url}`);
 
 	for (const [key, plugins] of Object.entries(registry.manifest.plugins)) {
+		verbose(`Processing ${plugins.length} plugin(s) for type: ${key}`);
 		const getWantedPluginsResult = await getWantedPlugins(plugins, {
 			pluginChoices,
 			options,
@@ -468,6 +518,7 @@ async function initPlugins(
 		});
 		if (getWantedPluginsResult.isErr()) return err(getWantedPluginsResult.error);
 		const wantedPlugins = getWantedPluginsResult.value;
+		verbose(`Selected ${wantedPlugins.length} plugin(s) to add for type ${key}`);
 		const addPluginsToConfigResult = await addPluginsToConfig({
 			plugins: wantedPlugins,
 			key: key as keyof typeof registry.manifest.plugins,

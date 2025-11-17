@@ -68,10 +68,16 @@ export async function runAuth(
 	options: AuthOptions,
 	config: Config | undefined
 ): Promise<Result<AuthCommandResult, CLIError>> {
-	const { verbose: _verbose, spinner: _spinner } = initLogging({ options });
+	const { verbose, spinner: _spinner } = initLogging({ options });
+
+	verbose(`Starting auth command${providerArg ? ` for provider: ${providerArg}` : ''}`);
+	verbose(`Logout: ${options.logout}`);
+	verbose(`Token provided: ${options.token ? 'yes' : 'no'}`);
 
 	const providers = (config?.providers ?? DEFAULT_PROVIDERS).filter((p) => p.auth !== undefined);
 	const registries = config?.registries ?? [];
+	verbose(`Found ${providers.length} provider(s) with auth support: ${providers.map(p => p.name).join(', ')}`);
+	verbose(`Found ${registries.length} registry/registries in config`);
 
 	const registriesByProvider = new Map<string, string[]>();
 	for (const registry of registries) {
@@ -82,9 +88,11 @@ export async function runAuth(
 			registry,
 		]);
 	}
+	verbose(`Mapped registries to providers: ${Array.from(registriesByProvider.entries()).map(([p, r]) => `${p}: ${r.length}`).join(', ')}`);
 
 	let provider: ProviderFactory | undefined;
 	if (!providerArg) {
+		verbose(`No provider specified, prompting user to select`);
 		const providerSelection = await select({
 			message: 'Select a provider to authenticate to.',
 			options: providers.map((p) => ({
@@ -100,21 +108,30 @@ export async function runAuth(
 
 		// we know it's valid because we checked for cancel
 		provider = providers.find((p) => p.name === providerSelection)!;
+		verbose(`User selected provider: ${provider.name}`);
 	} else {
 		provider = providers.find((p) => p.name === providerArg);
 		if (!provider) return err(new NoProviderFoundError(providerArg));
+		verbose(`Using provider: ${provider.name}`);
 	}
 
-	if (options.logout) return await logout(provider);
+	if (options.logout) {
+		verbose(`Executing logout flow for provider: ${provider.name}`);
+		return await logout(provider, verbose);
+	}
 
-	return await login(provider, { config, options });
+	verbose(`Executing login flow for provider: ${provider.name}`);
+	return await login(provider, { config, options, verbose });
 }
 
-async function logout(provider: ProviderFactory): Promise<Result<AuthCommandResult, CLIError>> {
+async function logout(provider: ProviderFactory, verbose: (msg: string) => void): Promise<Result<AuthCommandResult, CLIError>> {
 	const tokenManager = new TokenManager();
+	verbose(`Checking token storage type: ${provider.auth!.tokenStoredFor}`);
 	if (provider.auth!.tokenStoredFor === 'registry') {
 		const registryTokens = tokenManager.getProviderRegistryTokens(provider);
+		verbose(`Found ${Object.keys(registryTokens).length} registry token(s)`);
 		if (Object.keys(registryTokens).length === 0) {
+			verbose(`No tokens found, logout complete`);
 			return ok({ type: 'logout', provider: provider.name, registry: undefined });
 		}
 
@@ -131,9 +148,11 @@ async function logout(provider: ProviderFactory): Promise<Result<AuthCommandResu
 			process.exit(0);
 		}
 
+		verbose(`Deleting token for registry: ${registrySelection}`);
 		tokenManager.delete(provider, registrySelection);
 		return ok({ type: 'logout', provider: provider.name, registry: registrySelection });
 	} else {
+		verbose(`Deleting provider-level token`);
 		tokenManager.delete(provider, undefined);
 		return ok({ type: 'logout', provider: provider.name, registry: undefined });
 	}
@@ -141,13 +160,16 @@ async function logout(provider: ProviderFactory): Promise<Result<AuthCommandResu
 
 async function login(
 	provider: ProviderFactory,
-	{ config, options }: { config: Config | undefined; options: AuthOptions }
+	{ config, options, verbose }: { config: Config | undefined; options: AuthOptions; verbose: (msg: string) => void }
 ): Promise<Result<AuthCommandResult, CLIError>> {
 	const tokenManager = new TokenManager();
+	verbose(`Checking token storage type: ${provider.auth!.tokenStoredFor}`);
 	if (provider.auth!.tokenStoredFor === 'registry') {
 		const registries = config?.registries ?? [];
+		verbose(`Found ${registries.length} registry/registries in config`);
 		let registry: string;
 		if (registries.length === 0) {
+			verbose(`No registries in config, prompting user for registry name`);
 			const registrySelection = await text({
 				message: 'Enter the name of the registry to authenticate to.',
 				validate(value) {
@@ -163,7 +185,9 @@ async function login(
 			}
 
 			registry = registrySelection;
+			verbose(`User entered registry: ${registry}`);
 		} else {
+			verbose(`Prompting user to select from ${registries.length} registry/registries`);
 			const registrySelection = await select({
 				message: 'Select a registry to authenticate to.',
 				options: [
@@ -199,13 +223,16 @@ async function login(
 				}
 
 				registry = registrySelection;
+				verbose(`User entered custom registry: ${registry}`);
 			} else {
 				registry = registrySelection;
+				verbose(`User selected registry: ${registry}`);
 			}
 		}
 
 		let token = options.token;
 		if (!token) {
+			verbose(`No token provided via option, prompting user`);
 			if (provider.auth!.getToken) {
 				token = await provider.auth!.getToken({
 					registry,
@@ -240,11 +267,14 @@ async function login(
 			}
 		}
 
+		verbose(`Storing token for registry: ${registry}`);
 		tokenManager.set(provider, registry, token);
 		return ok({ type: 'login', provider: provider.name, registry });
 	} else {
+		verbose(`Provider-level authentication (no registry)`);
 		let token = options.token;
 		if (!token) {
+			verbose(`No token provided via option, prompting user`);
 			if (provider.auth!.getToken) {
 				token = await provider.auth!.getToken({
 					p: {
@@ -278,6 +308,7 @@ async function login(
 			}
 		}
 
+		verbose(`Storing provider-level token`);
 		tokenManager.set(provider, undefined, token);
 		return ok({ type: 'login', provider: provider.name });
 	}
