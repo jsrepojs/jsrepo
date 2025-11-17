@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { StdioTransport } from '@tmcp/transport-stdio';
 import pc from 'picocolors';
 import { server } from './server';
