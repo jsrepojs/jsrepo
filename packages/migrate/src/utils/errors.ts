@@ -4,11 +4,9 @@ import type { z } from 'zod';
 export type CLIError =
 	| JsrepoError
 	| NoPackageJsonFoundError
-	| InvalidRegistryError
-	| AlreadyInitializedError
 	| InvalidOptionsError
 	| InvalidJSONError
-	| Unreachable;
+	| ManifestNotFoundError;
 
 export class JsrepoError extends Error {
 	private readonly suggestion: string;
@@ -41,40 +39,11 @@ export class NoPackageJsonFoundError extends JsrepoError {
 	}
 }
 
-export class OldConfigNotFoundError extends JsrepoError {
-	constructor({ path }: { path: string }) {
-		super(`Old config not found at ${pc.bold(path)}.`, {
-			suggestion:
-				'Please ensure you are running this command in the root of your jsrepo project.',
-		});
-	}
-}
-
 export class ManifestNotFoundError extends JsrepoError {
 	constructor({ path }: { path: string }) {
 		super(`Manifest not found at ${pc.bold(path)}.`, {
 			suggestion:
 				'This is a bug, please report it here: https://github.com/jsrepojs/jsrepo/issues',
-		});
-	}
-}
-
-export class InvalidRegistryError extends JsrepoError {
-	constructor(registry: string) {
-		super(
-			`Invalid registry: ${pc.bold(registry)} A provider for this registry was not found.`,
-			{
-				suggestion: 'Maybe you need to add a provider for this registry?',
-				docsLink: 'See: https://v3.jsrepo.dev/docs/providers',
-			}
-		);
-	}
-}
-
-export class AlreadyInitializedError extends JsrepoError {
-	constructor() {
-		super('Config already initialized.', {
-			suggestion: '@jsrepo/migrate only works for brand new configs.',
 		});
 	}
 }
@@ -108,16 +77,5 @@ export class InvalidJSONError extends JsrepoError {
 				suggestion: 'Check the input JSON and try again.',
 			}
 		);
-	}
-}
-
-/**
- * This error is thrown when a code path should be unreachable.
- */
-export class Unreachable extends JsrepoError {
-	constructor() {
-		super('This code path should be unreachable.', {
-			suggestion: 'This is a bug, please report it.',
-		});
 	}
 }

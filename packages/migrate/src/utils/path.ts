@@ -1,5 +1,5 @@
 import path from 'pathe';
-import type { AbsolutePath, Branded } from './types';
+import type { AbsolutePath } from './types';
 
 /**
  * Join all arguments together and normalize the resulting path.
@@ -10,12 +10,6 @@ import type { AbsolutePath, Branded } from './types';
  */
 export function joinAbsolute(p: AbsolutePath, ...paths: string[]): AbsolutePath {
 	return path.join(p, ...paths) as AbsolutePath;
-}
-
-export type NormalizedAbsolutePath = Branded<AbsolutePath, 'normalizedAbsolutePath'>;
-
-export function normalizeAbsolute(p: AbsolutePath): NormalizedAbsolutePath {
-	return path.normalize(p) as NormalizedAbsolutePath;
 }
 
 /**

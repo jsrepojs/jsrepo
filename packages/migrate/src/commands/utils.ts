@@ -15,18 +15,8 @@ export const defaultCommandOptionsSchema = z.object({
 
 export const commonOptions = {
 	yes: new Option('--yes', 'Skip the confirmation prompt.').default(false),
-	noCache: new Option('--no-cache', 'Disable caching of resolved git urls.').default(false),
 	verbose: new Option('--verbose', 'Include debug logs.').default(false),
 	overwrite: new Option('--overwrite', 'Overwrite files without prompting.').default(false),
-	expand: new Option('-E, --expand', 'Expands the diff so you see the entire file.').default(
-		false
-	),
-	maxUnchanged: new Option(
-		'--max-unchanged <lines>',
-		'Maximum unchanged lines that will show without being collapsed.'
-	)
-		.argParser((value) => Number.parseInt(value, 10))
-		.default(5),
 	cwd: new Option('--cwd <path>', 'The current working directory.').default(process.cwd()),
 };
 

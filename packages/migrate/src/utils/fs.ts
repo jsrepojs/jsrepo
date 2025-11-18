@@ -44,21 +44,6 @@ export function writeFileSync(p: AbsolutePath, data: string): Result<void, Jsrep
 	}
 }
 
-export function readdirSync(p: AbsolutePath): Result<string[], JsrepoError> {
-	try {
-		return ok(fs.readdirSync(p));
-	} catch (e) {
-		return err(
-			new JsrepoError(
-				`Failed to read directory ${p}: ${e instanceof Error ? e.message : String(e)}`,
-				{
-					suggestion: 'Please try again.',
-				}
-			)
-		);
-	}
-}
-
 export function mkdirSync(p: AbsolutePath): Result<void, JsrepoError> {
 	try {
 		fs.mkdirSync(p, { recursive: true });
@@ -100,19 +85,4 @@ export function rmSync(p: AbsolutePath): Result<void, JsrepoError> {
 
 export function existsSync(p: AbsolutePath): boolean {
 	return fs.existsSync(p);
-}
-
-export function statSync(p: AbsolutePath): Result<fs.Stats, JsrepoError> {
-	try {
-		return ok(fs.statSync(p));
-	} catch (e) {
-		return err(
-			new JsrepoError(
-				`Failed to stat file ${p}: ${e instanceof Error ? e.message : String(e)}`,
-				{
-					suggestion: 'Please try again.',
-				}
-			)
-		);
-	}
 }
