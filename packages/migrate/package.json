@@ -1,0 +1,61 @@
+{
+	"name": "@jsrepo/migrate",
+	"description": "Automatically migrate your jsrepo project to the newest version of jsrepo.",
+	"version": "0.0.0",
+	"license": "MIT",
+	"homepage": "https://v3.jsrepo.dev",
+	"author": {
+		"name": "Aidan Bleser",
+		"url": "https://github.com/ieedan"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/jsrepojs/jsrepo"
+	},
+	"bugs": {
+		"url": "https://github.com/jsrepojs/jsrepo/issues"
+	},
+	"keywords": [
+		"migrate",
+		"jsrepo",
+		"cli",
+		"v3"
+	],
+	"type": "module",
+	"bin": "./dist/bin.js",
+	"main": "./dist/bin.js",
+	"files": [
+		"dist/**/*",
+		"!dist/**/*.map"
+	],
+	"scripts": {
+		"start": "node ./dist/bin.js",
+		"build": "tsdown",
+		"dev": "tsdown --watch",
+		"check": "tsc --noEmit",
+		"bundle-analyze": "FORCE_COLOR=1 node ../../bundle-analyzer/dist/index.js analyze ."
+	},
+	"packageManager": "pnpm@10.20.0",
+	"dependencies": {
+		"commander": "^14.0.2",
+		"jsrepo": "workspace:*"
+	},
+	"devDependencies": {
+		"@clack/prompts": "1.0.0-alpha.6",
+		"@types/node": "catalog:",
+		"@types/semver": "^7.7.1",
+		"escape-string-regexp": "^5.0.0",
+		"ignore": "^7.0.5",
+		"is-unicode-supported": "^2.1.0",
+		"magic-string": "^0.30.21",
+		"nevereverthrow": "^0.3.0",
+		"package-manager-detector": "^1.5.0",
+		"pathe": "^2.0.3",
+		"picocolors": "catalog:",
+		"semver": "^7.7.3",
+		"tinyexec": "^1.0.2",
+		"tsdown": "catalog:",
+		"typescript": "catalog:",
+		"zod": "catalog:"
+	}
+}
