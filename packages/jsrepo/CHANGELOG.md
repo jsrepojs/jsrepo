@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.0-beta.22
+### Patch Changes
+
+
+- fix: Ensure items are added to the correct paths in the users project ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
 ## 3.0.0-beta.21
 ### Patch Changes
 
