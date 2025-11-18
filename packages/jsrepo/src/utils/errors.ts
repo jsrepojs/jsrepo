@@ -58,8 +58,7 @@ export class JsrepoError extends Error {
 	}
 
 	toString() {
-		// TODO: look into formatting this better
-		return `${this.message} ${this.suggestion}${this.docsLink ? `\n\nSee: ${this.docsLink}` : ''}`;
+		return `${this.message} ${this.suggestion}${pc.gray(this.docsLink ? `\n   See: ${this.docsLink}` : '')}`;
 	}
 }
 
