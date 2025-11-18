@@ -14,6 +14,6 @@ pnpm dlx @jsrepo/migrate v3
 pnpm dlx @jsrepo/migrate v3
 ```
 
-Migrates your jsrepo project to jsrepo v3.
-
-It will migrate both your `jsrepo.json` and `jsrepo-build-config.json` to the new `jsrepo.config.ts` config file.
+- Migrates your `jsrepo-build-config.json` and `jsrepo.json` files into the new `jsrepo.config.ts` file.
+- Installs `jsrepo@beta` and the correct formatting transform (if you were using one)
+- Builds your registry using both v2 and v3 to ensure compatibility
