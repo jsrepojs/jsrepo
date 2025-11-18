@@ -1,5 +1,14 @@
 # jsrepo
 
+## 3.0.0-beta.23
+### Patch Changes
+
+
+- feat: add `meta` prop to registry items ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- feat: add `categories` prop to registry items ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
 ## 3.0.0-beta.22
 ### Patch Changes
 
