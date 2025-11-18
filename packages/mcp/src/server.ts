@@ -151,7 +151,7 @@ server.tool(
 				],
 			};
 		}
-		const { itemPaths, resolvedPaths } = getPathsForItemsResult.value;
+		const { itemPaths } = getPathsForItemsResult.value;
 
 		const { neededDependencies, neededEnvVars, neededFiles } = (
 			await prepareUpdates({
@@ -164,7 +164,6 @@ server.tool(
 					withTests: options.withTests ?? false,
 				},
 				itemPaths,
-				resolvedPaths,
 				items,
 			})
 		).match(

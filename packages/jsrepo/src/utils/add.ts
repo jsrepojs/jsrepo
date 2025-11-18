@@ -14,7 +14,7 @@ import type { RepositoryOutputFile } from '@/outputs/repository';
 import { fetchManifest, type Provider, type ProviderFactory } from '@/providers';
 import type { DependencyKey, RemoteDependency } from '@/utils/build';
 import type { Config, RegistryItemAdd, RegistryItemType } from '@/utils/config';
-import { arePathsEqual, getPathsMatcher, resolvePath, resolvePaths } from '@/utils/config/utils';
+import { getPathsMatcher, resolvePath, resolvePaths } from '@/utils/config/utils';
 import { formatDiff } from '@/utils/diff';
 import type { PathsMatcher } from '@/utils/tsconfig';
 import { safeParseFromJSON } from '@/utils/zod';
@@ -498,16 +498,17 @@ export async function getItemLocation(
 		matcher: PathsMatcher;
 	}
 ): Promise<Result<{ resolvedPath: string; path: string }, NoPathProvidedError>> {
+	// if all the files are just target files we don't need to prompt the user for a path
 	if (item.files.filter((file) => file.target !== undefined).length === item.files.length) {
-		// if all the files are just target files we don't need to prompt the user for a path
 		return ok({
 			path: '',
 			resolvedPath: '',
 		});
 	}
+
 	const defaultPath = paths['*'];
 	const type = normalizeItemTypeForPath(item.type);
-	const path = paths[item.name] ?? paths[type];
+	const path = paths[type];
 	if (!path) {
 		if (defaultPath) {
 			return ok({
@@ -670,6 +671,7 @@ export async function getPathsForItems({
 		{
 			itemPaths: Record<string, { path: string; alias?: string }>;
 			resolvedPaths: Config['paths'];
+			updatedPaths: Record<string, string>;
 		},
 		NoPathProvidedError
 	>
@@ -680,13 +682,13 @@ export async function getPathsForItems({
 		cwd: options.cwd,
 		matcher: pathsMatcher,
 	});
+	const updatedPaths: Record<string, string> = {};
 	// get any paths that are not already set
 	for (const item of items) {
 		const uniqueTypes = Array.from(
 			new Set(Array.from(item.files, (file) => normalizeItemTypeForPath(file.type)))
 		);
 		for (const type of uniqueTypes) {
-			// the item name can be used to override the target
 			const itemPath = resolvedPaths[`${type}/${item.name}`] ?? resolvedPaths[type];
 			if (itemPath !== undefined) {
 				resolvedPaths[`${type}/${item.name}`] = itemPath;
@@ -705,16 +707,17 @@ export async function getPathsForItems({
 				return err(result.error);
 			}
 			const { path: originalPath, resolvedPath } = result.value;
-			resolvedPaths[`${type}/${item.name}`] = resolvedPath;
+			resolvedPaths[type] = resolvedPath;
+			updatedPaths[type] = originalPath;
 			if (config) {
-				config.paths[`${type}/${item.name}`] = originalPath;
+				config.paths[type] = originalPath;
 			}
 		}
 	}
 
 	const itemPaths = getItemPaths(items, resolvedPaths, { config });
 
-	return ok({ itemPaths, resolvedPaths });
+	return ok({ itemPaths, resolvedPaths, updatedPaths });
 }
 
 export type UpdatedFile = {
@@ -741,7 +744,6 @@ export type UpdatedFile = {
 export async function prepareUpdates({
 	items,
 	itemPaths,
-	resolvedPaths,
 	configResult,
 	options,
 }: {
@@ -754,7 +756,6 @@ export async function prepareUpdates({
 		withTests: boolean;
 	};
 	itemPaths: Record<string, { path: string; alias?: string }>;
-	resolvedPaths: Config['paths'];
 	items: (ItemRepository | ItemDistributed)[];
 }): Promise<
 	Result<
@@ -765,7 +766,6 @@ export async function prepareUpdates({
 			};
 			neededEnvVars: Record<string, string> | undefined;
 			neededFiles: UpdatedFile[];
-			updatedPaths: Config['paths'] | undefined;
 		},
 		InvalidDependencyError
 	>
@@ -896,16 +896,6 @@ export async function prepareUpdates({
 		}
 	}
 
-	// we spread here so that aliases are maintained
-	let updatedPaths: Config['paths'] | undefined = {
-		...resolvedPaths,
-		...configResult?.config.paths,
-	};
-	if (!configResult || arePathsEqual(configResult.config.paths, updatedPaths)) {
-		// if there are no changes or no config is provided we don't need to update the paths
-		updatedPaths = undefined;
-	}
-
 	return ok({
 		neededDependencies: {
 			dependencies: Array.from(neededDependencies.values()),
@@ -913,7 +903,6 @@ export async function prepareUpdates({
 		},
 		neededEnvVars,
 		neededFiles,
-		updatedPaths,
 	});
 }
 

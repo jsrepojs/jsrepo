@@ -290,7 +290,7 @@ export async function runInit(
 
 	const itemsToAdd = Array.from(resolvedRegistries.values()).flatMap((registry) =>
 		registry.manifest.items
-			.filter((item) => item.add === 'on-init')
+			.filter((item) => item.add === 'on-init' || item.name === 'index')
 			.map((item) => ({ registry, item }))
 	);
 
@@ -323,6 +323,7 @@ export async function runInit(
 		dependencies: RemoteDependency[];
 		devDependencies: RemoteDependency[];
 	} = { dependencies: [], devDependencies: [] };
+
 	if (itemsToAdd.length > 0) {
 		spinner.start(
 			`Fetching ${pc.cyan(itemsToAdd.map((item) => item.item.name).join(', '))}...`
@@ -340,7 +341,7 @@ export async function runInit(
 
 		const itemPathsResult = await getPathsForItems({ items, config, options });
 		if (itemPathsResult.isErr()) return err(itemPathsResult.error);
-		const { itemPaths, resolvedPaths } = itemPathsResult.value;
+		const { itemPaths } = itemPathsResult.value;
 
 		const prepareUpdatesResult = await prepareUpdates({
 			configResult: { path: configPath, config },
@@ -352,7 +353,6 @@ export async function runInit(
 				withTests: false,
 			},
 			itemPaths,
-			resolvedPaths,
 			items,
 		});
 		if (prepareUpdatesResult.isErr()) return err(prepareUpdatesResult.error);
@@ -360,7 +360,6 @@ export async function runInit(
 			neededDependencies: neededDeps,
 			neededEnvVars,
 			neededFiles,
-			updatedPaths,
 		} = prepareUpdatesResult.value;
 
 		const updatedFilesResult = await updateFiles({ files: neededFiles, options });
@@ -379,7 +378,6 @@ export async function runInit(
 			}
 		}
 
-		if (updatedPaths) config.paths = updatedPaths;
 		neededDeps.dependencies.push(...neededDependencies.dependencies);
 		neededDeps.devDependencies.push(...neededDependencies.devDependencies);
 	}

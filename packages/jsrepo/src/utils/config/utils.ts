@@ -142,11 +142,3 @@ export function resolvePath(
 
 	return resolved;
 }
-
-export function arePathsEqual(paths1: Config['paths'], paths2: Config['paths']): boolean {
-	if (Object.keys(paths1).length !== Object.keys(paths2).length) return false;
-	for (const [key, value] of Object.entries(paths1)) {
-		if (paths2[key] !== value) return false;
-	}
-	return true;
-}

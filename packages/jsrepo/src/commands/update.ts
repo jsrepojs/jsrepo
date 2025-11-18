@@ -169,7 +169,10 @@ export async function runUpdate(
 		const allItems: ResolvedWantedItem[] = Array.from(resolvedRegistries.entries()).flatMap(
 			([_, registry]) => {
 				return registry.manifest.items
-					.filter((item) => (item.add ?? 'when-added') === 'when-added')
+					.filter(
+						(item) =>
+							(item.add ?? 'when-added') === 'when-added' && item.name !== 'index'
+					)
 					.map((item) => ({ item, registry }));
 			}
 		);
@@ -258,18 +261,16 @@ export async function runUpdate(
 
 	const itemPathsResult = await getPathsForItems({ items, config, options });
 	if (itemPathsResult.isErr()) return err(itemPathsResult.error);
-	const { itemPaths, resolvedPaths } = itemPathsResult.value;
+	const { itemPaths, updatedPaths } = itemPathsResult.value;
 
 	const prepareUpdatesResult = await prepareUpdates({
 		configResult,
 		options,
 		itemPaths,
-		resolvedPaths,
 		items,
 	});
 	if (prepareUpdatesResult.isErr()) return err(prepareUpdatesResult.error);
-	const { neededDependencies, neededEnvVars, neededFiles, updatedPaths } =
-		prepareUpdatesResult.value;
+	const { neededDependencies, neededEnvVars, neededFiles } = prepareUpdatesResult.value;
 
 	const updatedFilesResult = await updateFiles({ files: neededFiles, options });
 	if (updatedFilesResult.isErr()) return err(updatedFilesResult.error);
@@ -279,7 +280,7 @@ export async function runUpdate(
 		const configCodeResult = readFileSync(configResult.path);
 		if (configCodeResult.isErr()) return err(configCodeResult.error);
 		const configCode = configCodeResult.value;
-		await updateConfigPaths(updatedPaths, {
+		await updateConfigPaths(config?.paths ?? updatedPaths, {
 			config: { path: configResult.path, code: configCode },
 		});
 	}

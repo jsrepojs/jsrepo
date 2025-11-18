@@ -16,7 +16,6 @@ import {
 	parseOptions,
 	tryCommand,
 } from '@/commands/utils';
-
 import { DEFAULT_PROVIDERS } from '@/providers';
 import {
 	getPathsForItems,
@@ -170,7 +169,11 @@ export async function runAdd(
 		if (!options.all) {
 			const multiSelectOptions: AutocompleteMultiSelectOptions<`${string}/${string}`>['options'] =
 				possibleItems
-					.filter((item) => (item.item.add ?? 'when-added') === 'when-added')
+					.filter(
+						(item) =>
+							(item.item.add ?? 'when-added') === 'when-added' &&
+							item.item.name !== 'index'
+					)
 					.map((item) => {
 						const value = `${item.registry.url}/${item.item.name}` as const;
 						const label =
@@ -262,18 +265,16 @@ export async function runAdd(
 
 	const itemPathsResult = await getPathsForItems({ items, config, options });
 	if (itemPathsResult.isErr()) return err(itemPathsResult.error);
-	const { itemPaths, resolvedPaths } = itemPathsResult.value;
+	const { itemPaths, updatedPaths } = itemPathsResult.value;
 
 	const prepareUpdatesResult = await prepareUpdates({
 		configResult,
 		options,
 		itemPaths,
-		resolvedPaths,
 		items,
 	});
 	if (prepareUpdatesResult.isErr()) return err(prepareUpdatesResult.error);
-	const { neededDependencies, neededEnvVars, neededFiles, updatedPaths } =
-		prepareUpdatesResult.value;
+	const { neededDependencies, neededEnvVars, neededFiles } = prepareUpdatesResult.value;
 
 	const updatedFilesResult = await updateFiles({ files: neededFiles, options });
 	if (updatedFilesResult.isErr()) return err(updatedFilesResult.error);
@@ -283,7 +284,7 @@ export async function runAdd(
 		const configCodeResult = readFileSync(configResult.path);
 		if (configCodeResult.isErr()) return err(configCodeResult.error);
 		const configCode = configCodeResult.value;
-		await updateConfigPaths(updatedPaths, {
+		await updateConfigPaths(config?.paths ?? updatedPaths, {
 			config: { path: configResult.path, code: configCode },
 		});
 	}
