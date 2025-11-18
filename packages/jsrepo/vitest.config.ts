@@ -1,5 +1,5 @@
 /// <reference types="vitest/config" />
-import path from 'node:path';
+import path from 'pathe';
 import { defineConfig } from 'vite';
 
 export default defineConfig({

@@ -1,4 +1,4 @@
-import path from 'node:path';
+import path from 'pathe';
 import { describe, expect, it } from 'vitest';
 import { loadConfigSearch } from '@/utils/config/utils';
 import type { AbsolutePath } from '@/utils/types';
