@@ -367,10 +367,15 @@ export function parsePluginName(
 	let name = parsedPackage.value.name;
 	if (parsedPackage.value.name.startsWith('@')) {
 		if (parsedPackage.value.name.startsWith('@jsrepo/')) {
-			// add jsrepo- prefix back to official plugins
-			// instead of @jsrepo/transform-prettier
-			// we want jsrepo-transform-prettier
-			name = `jsrepo-${parsedPackage.value.name.split('/')[1]!}`;
+			if (!parsedPackage.value.name.split('/')[1]?.includes(key)) {
+				// hack around names like @jsrepo/shadcn
+				name = `jsrepo-${key}-${parsedPackage.value.name.split('/')[1]!}`;
+			} else {
+				// add jsrepo- prefix back to official plugins
+				// instead of @jsrepo/transform-prettier
+				// we want jsrepo-transform-prettier
+				name = `jsrepo-${parsedPackage.value.name.split('/')[1]!}`;
+			}
 		} else {
 			// use the second portion of the name
 			// instead of @example/jsrepo-transform-prettier

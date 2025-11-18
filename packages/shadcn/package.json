@@ -31,6 +31,10 @@
 		"./output": {
 			"types": "./dist/output.d.ts",
 			"default": "./dist/output.js"
+		},
+		"./provider": {
+			"types": "./dist/provider.d.ts",
+			"default": "./dist/provider.js"
 		}
 	},
 	"main": "./dist/index.js",
