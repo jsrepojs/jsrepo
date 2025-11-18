@@ -9,6 +9,7 @@
 		"@jsrepo/transform-javascript": "0.0.0",
 		"@jsrepo/shadcn": "0.0.0",
 		"@jsrepo/docs": "0.0.0",
+		"@jsrepo/migrate": "0.0.0",
 		"@example/react": "0.1.0",
 		"@example/svelte": "0.0.1"
 	},
