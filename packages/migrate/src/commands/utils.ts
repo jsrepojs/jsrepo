@@ -15,8 +15,6 @@ export const defaultCommandOptionsSchema = z.object({
 
 export const commonOptions = {
 	yes: new Option('--yes', 'Skip the confirmation prompt.').default(false),
-	verbose: new Option('--verbose', 'Include debug logs.').default(false),
-	overwrite: new Option('--overwrite', 'Overwrite files without prompting.').default(false),
 	cwd: new Option('--cwd <path>', 'The current working directory.').default(process.cwd()),
 };
 

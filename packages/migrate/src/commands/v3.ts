@@ -44,8 +44,6 @@ import { safeParseFromJSON } from '@/utils/zod';
 
 export const schema = defaultCommandOptionsSchema.extend({
 	yes: z.boolean(),
-	verbose: z.boolean(),
-	overwrite: z.boolean(),
 });
 
 export type V3Options = z.infer<typeof schema>;
@@ -54,8 +52,6 @@ export const v3 = new Command('v3')
 	.description('Migrate your jsrepo config to v3.')
 	.addOption(commonOptions.cwd)
 	.addOption(commonOptions.yes)
-	.addOption(commonOptions.verbose)
-	.addOption(commonOptions.overwrite)
 	.action(async (rawOptions) => {
 		const options = parseOptions(schema, rawOptions);
 
