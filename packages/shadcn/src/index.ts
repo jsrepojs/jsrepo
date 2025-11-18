@@ -52,6 +52,14 @@ export type ShadcnRegistryItem = {
 	 * Environment variables that are required for the item to work. These will be added to the users `.env` or `.env.local` file. NEVER ADD SECRETS HERE.
 	 */
 	envVars?: Record<string, string>;
+	/**
+	 * Organize your registry item.
+	 */
+	categories?: string[];
+	/**
+	 * Add additional metadata to your registry item.
+	 */
+	meta?: Record<string, string>;
 };
 
 export function defineShadcnRegistry(registry: ShadcnRegistry): RegistryConfig {

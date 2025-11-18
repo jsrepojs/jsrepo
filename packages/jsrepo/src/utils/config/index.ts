@@ -180,6 +180,8 @@ export type RegistryItem = {
 	 * Environment variables that are required for the item to work. These will be added to the users `.env` or `.env.local` file. NEVER ADD SECRETS HERE.
 	 */
 	envVars?: Record<string, string>;
+	categories?: string[];
+	meta?: Record<string, string>;
 };
 
 export const RegistryFileRoles = ['example', 'doc', 'test', 'file'] as const;
@@ -240,6 +242,10 @@ export type RegistryItemFile = {
 	 * Only valid as children of a folder. Allows you to individually configure each file in the folder.
 	 */
 	files?: RegistryItemFolderFile[];
+	/**
+	 * Include additional metadata on the item. (Available to LLMs when using the `@jsrepo/mcp` server)
+	 */
+	meta?: Record<string, string>;
 };
 
 export type RegistryItemFolderFile = Prettify<

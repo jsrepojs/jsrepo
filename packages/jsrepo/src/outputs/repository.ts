@@ -72,6 +72,8 @@ export function repository({ format }: RepositoryOutputOptions = {}): Output {
 							}) satisfies RepositoryOutputFile
 					),
 					envVars: item.envVars,
+					categories: item.categories,
+					meta: item.meta,
 				})),
 			};
 
@@ -111,6 +113,8 @@ export const RepositoryOutputManifestItemSchema = z.object({
 		z.undefined(),
 	]),
 	envVars: z.union([z.record(z.string(), z.string()), z.undefined()]),
+	categories: z.union([z.array(z.string()), z.undefined()]),
+	meta: z.union([z.record(z.string(), z.string()), z.undefined()]),
 });
 
 export type RepositoryOutputManifestItem = z.infer<typeof RepositoryOutputManifestItemSchema>;

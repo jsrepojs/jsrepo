@@ -198,6 +198,8 @@ export const RESOLVED_REGISTRY = {
 				envVars: {},
 				title: undefined,
 				description: undefined,
+				categories: undefined,
+				meta: undefined,
 			},
 			{
 				name: 'types',
@@ -220,6 +222,8 @@ export const RESOLVED_REGISTRY = {
 				envVars: {},
 				title: undefined,
 				description: undefined,
+				categories: undefined,
+				meta: undefined,
 			},
 			{
 				name: 'add',
@@ -242,6 +246,8 @@ export const RESOLVED_REGISTRY = {
 				envVars: {},
 				title: undefined,
 				description: undefined,
+				categories: undefined,
+				meta: undefined,
 			},
 		],
 	} satisfies DistributedOutputManifest,

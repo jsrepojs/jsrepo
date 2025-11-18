@@ -66,6 +66,13 @@ describe('buildRegistry', () => {
 			expect(mathItem.add).toBe('when-added');
 		});
 
+		it('should have correct metadata', () => {
+			expect(mathItem.meta).toStrictEqual({
+				extendedDescription: 'Use this for basic math operations',
+			});
+			expect(mathItem.categories).toStrictEqual(['math', 'utils']);
+		});
+
 		it('should have correct dependencies', () => {
 			expect(mathItem.registryDependencies).toStrictEqual(['stdout']);
 			expect(mathItem.dependencies).toStrictEqual([

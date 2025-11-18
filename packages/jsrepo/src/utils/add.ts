@@ -257,6 +257,8 @@ export type ItemRepository = {
 	registry: ResolvedRegistry;
 	files: Array<RepositoryOutputFile & { content: string }>;
 	envVars?: Record<string, string>;
+	categories?: string[];
+	meta?: Record<string, string>;
 };
 
 export type ItemDistributed = DistributedOutputItem & { registry: ResolvedRegistry };

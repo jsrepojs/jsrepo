@@ -43,6 +43,10 @@ export default defineConfig({
 						]
 					}
 				],
+				categories: ['math', 'utils'],
+				meta: {
+					extendedDescription: 'Use this for basic math operations'
+				}
 			},
 			{
 				name: "stdout",

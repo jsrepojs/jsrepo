@@ -76,6 +76,8 @@ export function distributed({ dir, format }: DistributedOutputOptions): Output {
 								devDependencies: file.devDependencies,
 							}) satisfies DistributedOutputManifestFile
 					),
+					categories: item.categories,
+					meta: item.meta,
 				})),
 			};
 			files.push({
@@ -108,6 +110,8 @@ export function distributed({ dir, format }: DistributedOutputOptions): Output {
 					dependencies: item.dependencies,
 					devDependencies: item.devDependencies,
 					envVars: item.envVars,
+					categories: item.categories,
+					meta: item.meta,
 				};
 				files.push({
 					path: joinAbsolute(cwd, dir, `${item.name}.json`),
@@ -163,6 +167,8 @@ export const DistributedOutputManifestItemSchema = z.object({
 	]),
 	envVars: z.union([z.record(z.string(), z.string()), z.undefined()]),
 	files: z.union([z.array(DistributedOutputManifestFileSchema), z.undefined()]).default([]),
+	categories: z.union([z.array(z.string()), z.undefined()]),
+	meta: z.union([z.record(z.string(), z.string()), z.undefined()]),
 });
 
 export const DistributedOutputManifestSchema = RegistryMetaSchema.extend({
@@ -203,6 +209,8 @@ export const DistributedOutputItemSchema = z.object({
 	]),
 	envVars: z.union([z.record(z.string(), z.string()), z.undefined()]),
 	files: z.union([z.array(DistributedOutputFileSchema), z.undefined()]).default([]),
+	categories: z.union([z.array(z.string()), z.undefined()]),
+	meta: z.union([z.record(z.string(), z.string()), z.undefined()]),
 });
 
 export type DistributedOutputItem = z.infer<typeof DistributedOutputItemSchema>;

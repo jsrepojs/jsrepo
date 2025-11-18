@@ -338,7 +338,7 @@ server.tool(
 		let results: typeof candidateItems;
 		if (query) {
 			const sortedResults = fuzzysort.go(query, candidateItems, {
-				keys: ['item.name', 'item.description', 'item.type'],
+				keys: ['item.name', 'item.description', 'item.type', 'item.categories'],
 			});
 
 			if (sortedResults.length === 0) {
@@ -390,7 +390,7 @@ server.tool(
 
 function displayItemDetails(item: RegistryItemWithContent): string {
 	return dedent`
-	# ${item.name} - ${item.type}
+	# ${item.name} - ${item.type}${item.categories ? ` (Categories: ${item.categories.join(', ')})` : ''}
 	${item.description ?? ''}
 
 	## Files
@@ -427,6 +427,11 @@ function displayItemDetails(item: RegistryItemWithContent): string {
 		.map(([name, value]) => `${name}="${value}"`)
 		.join('\n')}
 	\`\`\`
+
+	Additional info:
+	${Object.entries(item.meta ?? {})
+		.map(([key, value]) => `- ${key}: ${value}`)
+		.join('\n')}
 	`;
 }
 

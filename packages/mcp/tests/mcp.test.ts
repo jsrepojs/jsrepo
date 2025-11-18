@@ -1,5 +1,5 @@
 import { InMemoryTransport } from '@tmcp/transport-in-memory';
-import { describe, expect, it } from 'vitest';
+import { assert, describe, expect, it } from 'vitest';
 import { server } from '../src/server';
 
 const transport = new InMemoryTransport(server);
@@ -21,5 +21,26 @@ describe('server', () => {
 		for (const tool of expectedTools) {
 			expect(toolNames).toContain(tool);
 		}
+	});
+
+	it('should list items for a registry', async () => {
+		const result = await session.callTool('list_items_in_registry', {
+			cwd: process.cwd(),
+			registries: ['@ieedan/shadcn-svelte-extras@beta'],
+			query: 'math',
+		});
+
+		assert(result.content?.[0].type === 'text');
+		expect(result.content[0].text).toContain('# Search results\nFound');
+	});
+
+	it('should show a specific registry item', async () => {
+		const result = await session.callTool('view_registry_item', {
+			cwd: process.cwd(),
+			item: '@ieedan/shadcn-svelte-extras@beta/button',
+		});
+
+		assert(result.content?.[0].type === 'text');
+		expect(result.content[0].text).toContain('buttonVariants');
 	});
 });

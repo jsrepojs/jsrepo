@@ -387,6 +387,8 @@ function collectRegistryFiles(
 				dependencies: file.dependencies,
 				devDependencies: file.devDependencies,
 			})),
+			categories: item.categories,
+			meta: item.meta,
 		})),
 	};
 	files.push({
@@ -416,6 +418,8 @@ function collectRegistryFiles(
 			dependencies: item.dependencies,
 			devDependencies: item.devDependencies,
 			envVars: item.envVars,
+			categories: item.categories,
+			meta: item.meta,
 		};
 		files.push({
 			name: `${item.name}.json`,

@@ -59,6 +59,8 @@ export type ResolvedItem = {
 	devDependencies: RemoteDependency[] | undefined;
 	add: RegistryItemAdd;
 	envVars: Record<string, string> | undefined;
+	categories: string[] | undefined;
+	meta: Record<string, string> | undefined;
 };
 
 export type RegistryFile = {
@@ -693,6 +695,8 @@ export async function resolveRegistryItem(
 		devDependencies: Array.from(devDependencies.values()),
 		add: item.add ?? 'when-added',
 		envVars: item.envVars,
+		categories: item.categories,
+		meta: item.meta,
 	});
 }
 
