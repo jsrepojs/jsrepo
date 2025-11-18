@@ -1,5 +1,17 @@
 # jsrepo
 
+## 3.0.0-beta.24
+### Patch Changes
+
+
+- fix: Fixed an issue where when initializing a registry paths would be unnecessarily added to the config ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: improve error formatting ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- feat: add support for `index` items ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
 ## 3.0.0-beta.23
 ### Patch Changes
 
