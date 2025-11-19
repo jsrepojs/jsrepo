@@ -1,5 +1,11 @@
 # @jsrepo/transform-prettier
 
+## 0.0.1-beta.26
+### Patch Changes
+
+- Updated dependencies [[`2d20f97`](https://github.com/jsrepojs/jsrepo/commit/2d20f97614e90bdc2b99e0347e13612687830466)]:
+  - jsrepo@3.0.0-beta.26
+
 ## 0.0.1-beta.25
 ### Patch Changes
 
