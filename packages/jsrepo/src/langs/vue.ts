@@ -61,8 +61,8 @@ export function vue(_options: VueOptions = {}): Language {
 				devDependencies: imports.flatMap((imp) => imp.devDependencies),
 			};
 		},
-		transformImports: async (imports, opts) => transformImports(imports, opts),
+		transformImports,
 		canInstallDependencies: (ecosystem) => ecosystem === 'js',
-		installDependencies: async (deps, opts) => installDependencies(deps, opts),
+		installDependencies,
 	};
 }

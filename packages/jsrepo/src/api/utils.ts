@@ -11,5 +11,6 @@ export {
 	resolveWantedItems,
 	updateFiles,
 } from '@/utils/add';
+export { joinAbsolute } from '@/utils/path';
 export { promptAddEnvVars, promptInstallDependenciesByEcosystem } from '@/utils/prompts';
 export type { AbsolutePath, ItemRelativePath } from '@/utils/types';

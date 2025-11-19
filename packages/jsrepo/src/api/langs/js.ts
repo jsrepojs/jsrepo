@@ -1,1 +1,1 @@
-export { installDependencies, js, resolveImports, transformImports } from '@/langs/js';
+export { getImports, installDependencies, js, resolveImports, transformImports } from '@/langs/js';
