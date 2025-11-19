@@ -88,6 +88,9 @@ class GitLab implements Provider {
 
 			return await response.text();
 		} catch (error) {
+			if (error instanceof ProviderFetchError) {
+				throw new ProviderFetchError(error.originalMessage, url.toString());
+			}
 			throw new ProviderFetchError(
 				`${error instanceof Error ? error.message : String(error)}`,
 				url.toString()
