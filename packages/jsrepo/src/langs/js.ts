@@ -1,6 +1,6 @@
 import { builtinModules } from 'node:module';
 import escapeStringRegexp from 'escape-string-regexp';
-import { err, ok, type Result } from 'nevereverthrow';
+import { err, ok, Result } from 'nevereverthrow';
 import { parseAsync } from 'oxc-parser';
 import { detect, resolveCommand } from 'package-manager-detector';
 import path from 'pathe';
@@ -14,6 +14,7 @@ import type {
 	TransformImportsOptions,
 } from '@/langs/types';
 import type { LocalDependency, RemoteDependency, UnresolvedImport } from '@/utils/build';
+import { transformShadcnImports } from '@/utils/compat/shadcn';
 import { existsSync, readdirSync, statSync } from '@/utils/fs';
 import { findNearestPackageJson, shouldInstall } from '@/utils/package';
 import { parsePackageName } from '@/utils/parse-package-name';
@@ -21,6 +22,7 @@ import { dirname, joinAbsolute } from '@/utils/path';
 import { runCommands } from '@/utils/prompts';
 import { createPathsMatcher, tryGetTsconfig } from '@/utils/tsconfig';
 import type { AbsolutePath } from '@/utils/types';
+import { noop } from '@/utils/utils';
 import { validateNpmPackageName } from '@/utils/validate-npm-package-name';
 
 const SUPPORTED_EXTENSIONS = ['.js', '.ts', '.jsx', '.tsx', '.mjs', '.mts'] as const;
@@ -38,10 +40,9 @@ export function js(_options: JsOptions = {}): Language {
 			SUPPORTED_EXTENSIONS.some((ext) => fileName.endsWith(ext)),
 		resolveDependencies: async (code, opts) =>
 			resolveImports(await getImports(code, opts), opts),
-		transformImports: async (imports, opts) =>
-			transformImports(imports as UnresolvedImport[], opts),
+		transformImports,
 		canInstallDependencies: (ecosystem) => ecosystem === 'js',
-		installDependencies: (deps, opts) => installDependencies(deps, opts),
+		installDependencies,
 	};
 }
 
@@ -364,14 +365,24 @@ function resolveRemoteDeps(
 }
 
 export async function transformImports(
-	imports: UnresolvedImport[],
+	code: string,
+	_imports_: UnresolvedImport[],
 	opts: TransformImportsOptions
-): Promise<ImportTransform[]> {
+): Promise<string> {
+	const fileImports = await getImports(code, {
+		fileName: joinAbsolute(opts.cwd, opts.targetPath),
+		warn: noop,
+	});
+
 	const destDir = path.join(opts.targetPath);
 
 	const transformedImports: ImportTransform[] = [];
 
-	for (const imp of imports) {
+	for (const imp of _imports_) {
+		const importIndex = fileImports.indexOf(imp.import);
+		if (importIndex !== -1) {
+			fileImports.splice(importIndex, 1);
+		}
 		const itemPath = opts.getItemPath({ item: imp.item, file: imp.file });
 		if (!itemPath) continue;
 
@@ -409,15 +420,56 @@ export async function transformImports(
 		});
 	}
 
-	return transformedImports;
+	const componentsPaths = Result.fromThrowable(
+		() => opts.getItemPath({ item: '', file: { type: 'component' } }),
+		() => null
+	)().unwrapOr(null);
+	const utilsPaths = Result.fromThrowable(
+		() => opts.getItemPath({ item: '', file: { type: 'util' } }),
+		() => null
+	)().unwrapOr(null);
+	const uiPaths = Result.fromThrowable(
+		() => opts.getItemPath({ item: '', file: { type: 'ui' } }),
+		() => null
+	)().unwrapOr(null);
+	const libPaths = Result.fromThrowable(
+		() => opts.getItemPath({ item: '', file: { type: 'lib' } }),
+		() => null
+	)().unwrapOr(null);
+	const hooksPaths = Result.fromThrowable(
+		() => opts.getItemPath({ item: '', file: { type: 'hook' } }),
+		() => null
+	)().unwrapOr(null);
+
+	// any unresolved imports we can attempt to resolve with the shadcn compat transform
+	code = await transformShadcnImports({
+		code,
+		imports: fileImports,
+		config: {
+			aliases: {
+				components: componentsPaths?.alias ?? componentsPaths?.path,
+				utils: utilsPaths?.alias ?? utilsPaths?.path,
+				ui: uiPaths?.alias ?? uiPaths?.path,
+				lib: libPaths?.alias ?? libPaths?.path,
+				hooks: hooksPaths?.alias ?? hooksPaths?.path,
+			},
+		},
+		fileName: joinAbsolute(opts.cwd, opts.targetPath),
+	});
+
+	for (const transformation of transformedImports) {
+		code = code.replace(transformation.pattern, transformation.replacement);
+	}
+
+	return code;
 }
 
-function createImportPattern(literal: string): RegExp {
+export function createImportPattern(literal: string): RegExp {
 	// eventually we can use RegExp.escape I assume as soon as polyfills are available
 	return new RegExp(`(['"])${escapeStringRegexp(literal)}\\1`, 'g');
 }
 
-function createReplacement(replacement: string): string {
+export function createReplacement(replacement: string): string {
 	return `$1${replacement}$1`;
 }
 

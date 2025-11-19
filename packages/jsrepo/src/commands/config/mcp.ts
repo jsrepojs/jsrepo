@@ -17,8 +17,9 @@ import { existsSync, readFileSync, writeFileSync } from '@/utils/fs';
 import { stringify } from '@/utils/json';
 import { joinAbsolute } from '@/utils/path';
 import { intro, outro } from '@/utils/prompts';
+import { safeParseFromJSON } from '@/utils/zod';
 
-const supportedClients = ['cursor', 'claude', 'vscode', 'codex'] as const;
+const supportedClients = ['cursor', 'claude', 'vscode', 'codex', 'antigravity'] as const;
 
 export const schema = defaultCommandOptionsSchema.extend({
 	client: z.array(z.enum(supportedClients)).optional(),
@@ -66,8 +67,6 @@ export type ConfigMcpCommandResult = {
 export async function runMcp(
 	options: ConfigMcpOptions
 ): Promise<Result<ConfigMcpCommandResult, CLIError>> {
-	const start = performance.now();
-
 	let clientsToConfigure: McpClient[];
 
 	if (options.all) {
@@ -92,6 +91,8 @@ export async function runMcp(
 
 		clientsToConfigure = selected;
 	}
+
+	const start = performance.now();
 
 	const results: ClientResult[] = [];
 
@@ -176,24 +177,79 @@ export function updateTomlConfig(existingContent: string): string {
 	return `${existingContent}${MCP_SERVER_CONFIG_TOML}`;
 }
 
+export const McpServerConfigSchema = z.object({
+	mcpServers: z.record(
+		z.string(),
+		z.object({
+			command: z.string(),
+			args: z.array(z.string()),
+			env: z.record(z.string(), z.string()).optional(),
+		})
+	),
+});
+
+export type McpServerConfig = z.infer<typeof McpServerConfigSchema>;
+
+export function updateJsonConfig(
+	existingContent: string,
+	key: string,
+	value: McpServerConfig['mcpServers'][string]
+): Result<string, CLIError> {
+	if (existingContent.trim().length === 0) {
+		return ok(
+			stringify({ mcpServers: { [key]: value } } satisfies McpServerConfig, { format: true })
+		);
+	}
+
+	const parsedContentResult = safeParseFromJSON(McpServerConfigSchema, existingContent);
+	if (parsedContentResult.isErr()) {
+		return err(
+			new JsrepoError(
+				`Failed to parse MCP server config: ${parsedContentResult.error.message}`,
+				{
+					suggestion: 'Please try again.',
+				}
+			)
+		);
+	}
+	const parsedContent = parsedContentResult.value;
+
+	const newContent = {
+		mcpServers: {
+			...parsedContent.mcpServers,
+			[key]: value,
+		},
+	} satisfies McpServerConfig;
+
+	return ok(stringify(newContent, { format: true }));
+}
+
+function updateJsonFile(filePath: AbsolutePath): Result<void, CLIError> {
+	const existingContent = existsSync(filePath) ? readFileSync(filePath)._unsafeUnwrap() : '';
+	const newContent = updateJsonConfig(
+		existingContent,
+		'jsrepo',
+		MCP_SERVER_CONFIG_JSON.mcpServers.jsrepo
+	);
+	if (newContent.isErr()) return err(newContent.error);
+	return writeConfig(filePath, newContent.value);
+}
+
 const CLIENTS: Record<McpClient, ClientConfig> = {
 	cursor: {
 		name: 'Cursor',
 		filePath: (cwd: AbsolutePath) => joinAbsolute(cwd, '.cursor/mcp.json'),
-		writeConfig: (filePath: AbsolutePath) =>
-			writeConfig(filePath, stringify(MCP_SERVER_CONFIG_JSON, { format: true })),
+		writeConfig: updateJsonFile,
 	},
 	claude: {
 		name: 'Claude Code',
 		filePath: (cwd: AbsolutePath) => joinAbsolute(cwd, '.mcp.json'),
-		writeConfig: (filePath: AbsolutePath) =>
-			writeConfig(filePath, stringify(MCP_SERVER_CONFIG_JSON, { format: true })),
+		writeConfig: updateJsonFile,
 	},
 	vscode: {
 		name: 'VS Code',
 		filePath: (cwd: AbsolutePath) => joinAbsolute(cwd, '.vscode/mcp.json'),
-		writeConfig: (filePath: AbsolutePath) =>
-			writeConfig(filePath, stringify(MCP_SERVER_CONFIG_JSON, { format: true })),
+		writeConfig: updateJsonFile,
 	},
 	codex: {
 		name: 'Codex',
@@ -205,5 +261,11 @@ const CLIENTS: Record<McpClient, ClientConfig> = {
 			const newContent = updateTomlConfig(existingContent);
 			return writeConfig(filePath, newContent);
 		},
+	},
+	antigravity: {
+		name: 'Antigravity',
+		filePath: () =>
+			joinAbsolute(os.homedir() as AbsolutePath, '.gemini/antigravity/mcp_config.json'),
+		writeConfig: updateJsonFile,
 	},
 };

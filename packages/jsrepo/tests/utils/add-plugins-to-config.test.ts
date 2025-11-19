@@ -559,4 +559,13 @@ describe('parsePluginName', () => {
 			version: '3.2.1',
 		});
 	});
+
+	it('should parse shadcn plugin', () => {
+		const result = parsePluginName('@jsrepo/shadcn', 'provider');
+		expect(result._unsafeUnwrap()).toEqual({
+			name: 'shadcn',
+			packageName: '@jsrepo/shadcn',
+			version: undefined,
+		});
+	});
 });

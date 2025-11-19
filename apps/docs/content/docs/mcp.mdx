@@ -25,6 +25,7 @@ All **jsrepo** registries are supported out of the box by the MCP server, includ
 		<UnderlineTabsTrigger value="claude"><ClaudeLogo /> Claude Code </UnderlineTabsTrigger>
 		<UnderlineTabsTrigger value="vs-code"><VSCodeLogo /> VS Code</UnderlineTabsTrigger>
 		<UnderlineTabsTrigger value="codex"><OpenAILogo /> Codex</UnderlineTabsTrigger>
+		<UnderlineTabsTrigger value="antigravity"><AntigravityLogo /> Antigravity</UnderlineTabsTrigger>
 	</UnderlineTabsList>
 	<UnderlineTabsContent value="cursor">
         You can quickly configure the MCP server for Cursor by running the following command:
@@ -99,6 +100,26 @@ All **jsrepo** registries are supported out of the box by the MCP server, includ
         [mcp_servers.jsrepo]
         command = "npx"
         args = ["@jsrepo/mcp"]
+        ```
+    </UnderlineTabsContent>
+    <UnderlineTabsContent value="antigravity">
+        You can quickly configure the MCP server for Antigravity by running the following command:
+
+		```sh
+        jsrepo config mcp --client antigravity
+        ```
+
+        This will automatically configure the MCP server for Antigravity in the correct file:
+
+        ```json title="~/.gemini/antigravity/mcp_config.json"
+        {
+            "mcpServers": {
+                "jsrepo": {
+                    "command": "npx",
+                    "args": ["@jsrepo/mcp"]
+                }
+            }
+        }
         ```
     </UnderlineTabsContent>
 </UnderlineTabs>

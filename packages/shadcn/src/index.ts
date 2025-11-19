@@ -6,9 +6,12 @@ import {
 	type RemoteDependency,
 } from 'jsrepo';
 import type { registryItemTypeSchema } from 'shadcn/schema';
+import { provider } from './provider';
 import { parsePackageName } from './utils';
 
 export * from './output';
+
+export default provider;
 
 export type ShadcnRegistryItemType = (typeof registryItemTypeSchema.options)[number];
 

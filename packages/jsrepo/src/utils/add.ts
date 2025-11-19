@@ -569,26 +569,27 @@ export async function transformRemoteContent(
 	}
 ): Promise<FileWithContents> {
 	const lang = languages.find((lang) => lang.canResolveDependencies(file.path));
-	const transformations = await lang?.transformImports(file._imports_ ?? [], {
-		cwd: options.cwd,
-		targetPath: file.path,
-		getItemPath: ({ item, file }) => {
-			// there are two types of paths
-			// <type> and <type>/<name>
-			for (const [key, value] of Object.entries(itemPaths)) {
-				// <type>/<name>
-				if (key === `${file.type}/${item}`) return value;
+	file.content =
+		(await lang?.transformImports(file.content, file._imports_ ?? [], {
+			cwd: options.cwd,
+			targetPath: file.path,
+			item: item.name,
+			file: { type: file.type, path: file.path },
+			getItemPath: ({ item, file }) => {
+				// there are two types of paths
+				// <type> and <type>/<name>
+				for (const [key, value] of Object.entries(itemPaths)) {
+					// <type>/<name>
+					if (key === `${file.type}/${item}`) return value;
 
-				// <type>
-				if (key === file.type) return value;
-			}
-			// by now we should have already got all the necessary paths from the user
-			throw new Unreachable();
-		},
-	});
-	for (const transformation of transformations ?? []) {
-		file.content = file.content.replace(transformation.pattern, transformation.replacement);
-	}
+					// <type>
+					if (key === file.type) return value;
+				}
+				// by now we should have already got all the necessary paths from the user
+				throw new Unreachable();
+			},
+		})) ?? file.content;
+
 	for (const transform of config?.transforms ?? []) {
 		const result = await transform.transform({
 			code: file.content,
@@ -992,24 +993,28 @@ export function getItemPaths(
 		alias?: string;
 	}
 > {
-	return items.reduce(
+	const itemPaths = items.reduce(
 		(acc, item) => {
 			for (const file of item.files) {
 				const type = normalizeItemTypeForPath(file.type);
-				const path = resolvedPaths[`${type}/${item.name}`] ?? resolvedPaths[type]!;
-				// we know that if the resolved path is not the same that the user is using an alias
-				const alias =
-					(config?.paths[`${type}/${item.name}`] &&
-					config?.paths[`${type}/${item.name}`] !== resolvedPaths[`${type}/${item.name}`]
+
+				const itemPath = resolvedPaths[`${type}/${item.name}`];
+				const itemAlias =
+					config?.paths[`${type}/${item.name}`] &&
+					config.paths[`${type}/${item.name}`] !== itemPath
 						? config.paths[`${type}/${item.name}`]
-						: undefined) ??
-					(config?.paths[type] && config?.paths[type] !== resolvedPaths[type]
+						: undefined;
+
+				const typePath = resolvedPaths[type];
+				const typeAlias =
+					config?.paths[type] && config.paths[type] !== typePath
 						? config.paths[type]
-						: undefined);
-				acc[`${type}/${item.name}`] = {
-					path,
-					alias,
-				};
+						: undefined;
+
+				acc[`${type}/${item.name}`] = itemPath
+					? { path: itemPath, alias: itemAlias }
+					: // at this point we know that the type must be defined
+						{ path: typePath!, alias: typeAlias! };
 			}
 
 			return acc;
@@ -1022,6 +1027,24 @@ export function getItemPaths(
 			}
 		>
 	);
+
+	for (const [key, value] of Object.entries(resolvedPaths)) {
+		// we only care about type only paths
+		if (key.includes('/')) continue;
+		// just rename for readability
+		const type = key;
+
+		const typePath = value;
+		const typeAlias =
+			config?.paths[type] && config.paths[type] !== typePath ? config.paths[type] : undefined;
+
+		// let's also make sure we just add the straight type path if it's defined
+		if (typePath) {
+			itemPaths[type] = { path: typePath, alias: typeAlias };
+		}
+	}
+
+	return itemPaths;
 }
 
 /**

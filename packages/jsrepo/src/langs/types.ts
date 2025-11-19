@@ -17,7 +17,9 @@ export type TransformImportsOptions = {
 	cwd: AbsolutePath;
 	/** The path of the file that the imports will be transformed for. */
 	targetPath: string;
-	getItemPath(opts: { item: string; file: { type: RegistryItemType; path: ItemRelativePath } }): {
+	item: string;
+	file: { type: RegistryItemType; path: ItemRelativePath };
+	getItemPath(opts: { item: string; file: { type: RegistryItemType } }): {
 		/** The resolved path of the dependency. */
 		path: string;
 		/** The alias of the dependency. */
@@ -49,9 +51,10 @@ export interface Language {
 	): Promise<ResolveDependenciesResult> | ResolveDependenciesResult;
 	/** Returns an object where the key is the import to be transformed and the value is the transformed import. */
 	transformImports(
+		code: string,
 		_imports_: UnresolvedImport[],
 		opts: TransformImportsOptions
-	): Promise<ImportTransform[]> | ImportTransform[];
+	): Promise<string>;
 
 	/** Determines whether or not the language can install dependencies for the given ecosystem. */
 	canInstallDependencies(ecosystem: Ecosystem): boolean;

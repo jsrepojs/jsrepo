@@ -46,8 +46,8 @@ export function css({ allowTailwindDirectives = true }: Partial<CssOptions> = {}
 				opts
 			);
 		},
-		transformImports: async (imports, opts) => transformImports(imports, opts),
+		transformImports,
 		canInstallDependencies: (ecosystem) => ecosystem === 'js',
-		installDependencies: async (deps, opts) => installDependencies(deps, opts),
+		installDependencies,
 	};
 }

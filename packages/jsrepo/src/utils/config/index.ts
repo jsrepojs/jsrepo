@@ -3,7 +3,7 @@ import { DEFAULT_LANGS, type Language } from '@/langs';
 import type { Output } from '@/outputs/types';
 import { DEFAULT_PROVIDERS, type ProviderFactory } from '@/providers';
 import type { RemoteDependency } from '@/utils/build';
-import type { ItemRelativePath, LooseAutocomplete, Prettify } from '@/utils/types';
+import type { AbsolutePath, ItemRelativePath, LooseAutocomplete, Prettify } from '@/utils/types';
 import { extract, type MaybeGetterAsync } from '@/utils/utils';
 
 export type RegistryConfigArgs = [{ cwd: string }];
@@ -258,7 +258,7 @@ export type RegistryItemFolderFile = Prettify<
 >;
 
 export type TransformOptions = {
-	cwd: string;
+	cwd: AbsolutePath;
 	registryUrl: string;
 	item: {
 		name: string;

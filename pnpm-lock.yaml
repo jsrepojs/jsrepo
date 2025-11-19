@@ -126,6 +126,9 @@ importers:
         specifier: ^3.3.1
         version: 3.3.1
     devDependencies:
+      '@jsrepo/shadcn':
+        specifier: workspace:*
+        version: link:../../packages/shadcn
       '@shikijs/transformers':
         specifier: ^3.15.0
         version: 3.15.0
@@ -144,6 +147,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.0
         version: 19.2.2(@types/react@19.2.2)
+      fuzzysort:
+        specifier: ^3.1.0
+        version: 3.1.0
       jsrepo:
         specifier: workspace:*
         version: link:../../packages/jsrepo
@@ -165,6 +171,9 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
+      zod:
+        specifier: 'catalog:'
+        version: 4.1.12
 
   bundle-analyzer:
     dependencies:

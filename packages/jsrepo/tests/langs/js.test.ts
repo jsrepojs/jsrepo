@@ -58,6 +58,11 @@ describe('js', () => {
 
 	it('should transform imports correctly', async () => {
 		const result = await js().transformImports(
+			`import { button } from '$lib/components/ui/button';
+import { useClipboard } from '$lib/hooks/use-clipboard.svelte';
+import { utils } from '$lib/utils.js';
+import { add } from '../../utils/math/add.js';
+import { Separator } from '@/registry/new-york-v4/ui/separator';`,
 			[
 				{
 					import: '$lib/components/ui/button',
@@ -86,6 +91,8 @@ describe('js', () => {
 			],
 			{
 				cwd: CWD,
+				item: 'button',
+				file: { type: 'util', path: 'button/index.ts' as ItemRelativePath },
 				getItemPath: (item) => {
 					switch (item.item) {
 						case 'button':
@@ -103,34 +110,24 @@ describe('js', () => {
 								alias: '$lib/utils',
 							};
 						default: {
+							if (item.file.type === 'ui')
+								return { path: 'src/components/ui', alias: '@/components/ui' };
+							if (item.file.type === 'component')
+								return { path: 'src/components', alias: '@/components' };
 							throw new Error(`Unknown item: ${item}`);
 						}
 					}
 				},
-				targetPath: joinAbsolute(
-					CWD,
-					'src/lib/components/ui/copy-button/copy-button.svelte'
-				),
+				targetPath: joinAbsolute(CWD, 'src/lib/components/ui/copy-button/copy-button.tsx'),
 			}
 		);
-		expect(result).toStrictEqual([
-			{
-				pattern: /(['"])\$lib\/components\/ui\/button\1/g,
-				replacement: '$1$lib/components/shadcn-svelte-extras/ui/button$1',
-			},
-			{
-				pattern: /(['"])\$lib\/hooks\/use\x2dclipboard\.svelte\1/g,
-				replacement: '$1$lib/hooks/use-clipboard.svelte$1',
-			},
-			{
-				pattern: /(['"])\$lib\/utils\.js\1/g,
-				replacement: '$1$lib/utils.js$1',
-			},
-			{
-				pattern: /(['"])\.\.\/\.\.\/utils\/math\/add\.js\1/g,
-				replacement: '$1$lib/utils/math/add.js$1',
-			},
-		]);
+		expect(
+			result
+		).toStrictEqual(`import { button } from '$lib/components/shadcn-svelte-extras/ui/button';
+import { useClipboard } from '$lib/hooks/use-clipboard.svelte';
+import { utils } from '$lib/utils.js';
+import { add } from '$lib/utils/math/add.js';
+import { Separator } from '@/components/ui/separator';`);
 	});
 });
 
