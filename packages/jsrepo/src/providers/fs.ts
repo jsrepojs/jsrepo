@@ -61,6 +61,9 @@ class Fs implements Provider {
 			const resourcePathStr = path.isAbsolute(filePath)
 				? filePath
 				: path.join(process.cwd(), filePath);
+			if (error instanceof ProviderFetchError) {
+				throw new ProviderFetchError(error.originalMessage, resourcePathStr);
+			}
 			throw new ProviderFetchError(
 				`${error instanceof Error ? error.message : String(error)}`,
 				resourcePathStr
