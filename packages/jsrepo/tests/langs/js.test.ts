@@ -110,16 +110,15 @@ import { Separator } from '@/registry/new-york-v4/ui/separator';`,
 								alias: '$lib/utils',
 							};
 						default: {
-							if (item.file.type === 'ui') return { path: 'src/components/ui', alias: '@/components/ui' };
-							if (item.file.type === 'component') return { path: 'src/components', alias: '@/components' };
+							if (item.file.type === 'ui')
+								return { path: 'src/components/ui', alias: '@/components/ui' };
+							if (item.file.type === 'component')
+								return { path: 'src/components', alias: '@/components' };
 							throw new Error(`Unknown item: ${item}`);
 						}
 					}
 				},
-				targetPath: joinAbsolute(
-					CWD,
-					'src/lib/components/ui/copy-button/copy-button.tsx'
-				),
+				targetPath: joinAbsolute(CWD, 'src/lib/components/ui/copy-button/copy-button.tsx'),
 			}
 		);
 		expect(
