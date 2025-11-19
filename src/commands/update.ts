@@ -4,6 +4,7 @@ import color from 'chalk';
 import { Command, program } from 'commander';
 import { resolveCommand } from 'package-manager-detector/commands';
 import { detect } from 'package-manager-detector/detect';
+import path from 'pathe';
 import * as v from 'valibot';
 import * as ascii from '../utils/ascii';
 import { getBlockFilePath, getInstalled, preloadBlocks, resolveTree } from '../utils/blocks';
@@ -294,6 +295,7 @@ async function _update(blockNames: string[], options: Options) {
 			if (updateResult.applyChanges) {
 				loading.start(`Writing changes to ${color.cyan(destPath)}`);
 
+				fs.mkdirSync(path.dirname(destPath), { recursive: true });
 				fs.writeFileSync(destPath, updateResult.updatedContent);
 
 				loading.stop(`Wrote changes to ${color.cyan(destPath)}.`);
