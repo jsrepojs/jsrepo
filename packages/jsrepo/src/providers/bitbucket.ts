@@ -79,6 +79,13 @@ class BitBucket implements Provider {
 			const response = await f(url.toString(), { headers });
 
 			if (!response.ok) {
+				const isJson = response.headers.get('content-type')?.includes('application/json');
+				if (isJson) {
+					throw new ProviderFetchError(
+						`${response.status} ${(await response.json()).message ?? response.statusText}`,
+						url.toString()
+					);
+				}
 				throw new ProviderFetchError(
 					`${response.status} ${response.statusText}`,
 					url.toString()
