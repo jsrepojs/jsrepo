@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.0-beta.26
+### Patch Changes
+
+
+- Fix error message stacking in manifest fetch errors. Removes redundant "Error fetching" prefixes to improve readability of error messages. ([#686](https://github.com/jsrepojs/jsrepo/pull/686))
+
 ## 3.0.0-beta.25
 ### Patch Changes
 
