@@ -57,6 +57,10 @@ export default function HomePage() {
 					<div className="flex flex-col items-center justify-center border-b border-border px-6">
 						<div className="max-w-6xl w-full border-x text-start p-6"></div>
 					</div>
+					<ShadcnCompatibilitySection />
+					<div className="flex flex-col items-center justify-center border-b border-border px-6">
+						<div className="max-w-6xl w-full border-x text-start p-6"></div>
+					</div>
 					<LLMsSection />
 					<div className="flex flex-col items-center justify-center border-b border-border px-6">
 						<div className="max-w-6xl w-full border-x text-start p-6"></div>
@@ -253,6 +257,35 @@ export default defineConfig({
 	}
 });`}
 				/>
+			</div>
+		</div>
+	);
+}
+
+function ShadcnCompatibilitySection() {
+	return (
+		<div className="flex flex-col items-center justify-center border-b border-border px-6">
+			<div className="max-w-6xl w-full border-x place-items-center text-start p-6 flex flex-col gap-6">
+				<div className="flex flex-col items-center justify-center gap-1">
+					<h2 className="text-2xl font-bold text-center">Shadcn compatible</h2>
+					<p className="text-sm text-muted-foreground text-center">
+						Add and update items seamlessly from shadcn registries.
+					</p>
+				</div>
+				<Terminal startOnView={true} className="w-full max-w-2xl">
+					<TypingAnimation>&gt; jsrepo add shadcn:@react-bits/AnimatedContent-TS-TW</TypingAnimation>
+
+					<AnimatedSpan className="text-green-500">
+						✔ Fetched manifest from shadcn:@react-bits/AnimatedContent-TS-TW
+					</AnimatedSpan>
+
+					<AnimatedSpan className="text-green-500">✔ Fetched AnimatedContent-TS-TW.</AnimatedSpan>
+
+					<AnimatedSpan className="text-green-500">
+						<span>Added AnimatedContent-TS-TW to your project.</span>
+						<span className="pl-2">Updated 1 file.</span>
+					</AnimatedSpan>
+				</Terminal>
 			</div>
 		</div>
 	);

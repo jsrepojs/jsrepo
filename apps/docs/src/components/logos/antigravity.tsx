@@ -99,7 +99,7 @@ function Antigravity(props: SVGProps<SVGSVGElement>) {
 					filterUnits="userSpaceOnUse"
 					color-interpolation-filters="sRGB"
 				>
-					<feFlood flood-opacity="0" result="BackgroundImageFix" />
+					<feFlood floodOpacity="0" result="BackgroundImageFix" />
 					<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
 					<feGaussianBlur stdDeviation="1.0328" result="effect1_foregroundBlur_442_52" />
 				</filter>
@@ -112,7 +112,7 @@ function Antigravity(props: SVGProps<SVGSVGElement>) {
 					filterUnits="userSpaceOnUse"
 					color-interpolation-filters="sRGB"
 				>
-					<feFlood flood-opacity="0" result="BackgroundImageFix" />
+					<feFlood floodOpacity="0" result="BackgroundImageFix" />
 					<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
 					<feGaussianBlur stdDeviation="4.99305" result="effect1_foregroundBlur_442_52" />
 				</filter>
@@ -125,7 +125,7 @@ function Antigravity(props: SVGProps<SVGSVGElement>) {
 					filterUnits="userSpaceOnUse"
 					color-interpolation-filters="sRGB"
 				>
-					<feFlood flood-opacity="0" result="BackgroundImageFix" />
+					<feFlood floodOpacity="0" result="BackgroundImageFix" />
 					<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
 					<feGaussianBlur stdDeviation="4.24456" result="effect1_foregroundBlur_442_52" />
 				</filter>
@@ -138,7 +138,7 @@ function Antigravity(props: SVGProps<SVGSVGElement>) {
 					filterUnits="userSpaceOnUse"
 					color-interpolation-filters="sRGB"
 				>
-					<feFlood flood-opacity="0" result="BackgroundImageFix" />
+					<feFlood floodOpacity="0" result="BackgroundImageFix" />
 					<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
 					<feGaussianBlur stdDeviation="4.24456" result="effect1_foregroundBlur_442_52" />
 				</filter>
@@ -151,7 +151,7 @@ function Antigravity(props: SVGProps<SVGSVGElement>) {
 					filterUnits="userSpaceOnUse"
 					color-interpolation-filters="sRGB"
 				>
-					<feFlood flood-opacity="0" result="BackgroundImageFix" />
+					<feFlood floodOpacity="0" result="BackgroundImageFix" />
 					<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
 					<feGaussianBlur stdDeviation="4.24456" result="effect1_foregroundBlur_442_52" />
 				</filter>
@@ -164,7 +164,7 @@ function Antigravity(props: SVGProps<SVGSVGElement>) {
 					filterUnits="userSpaceOnUse"
 					color-interpolation-filters="sRGB"
 				>
-					<feFlood flood-opacity="0" result="BackgroundImageFix" />
+					<feFlood floodOpacity="0" result="BackgroundImageFix" />
 					<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
 					<feGaussianBlur stdDeviation="4.03359" result="effect1_foregroundBlur_442_52" />
 				</filter>
@@ -177,7 +177,7 @@ function Antigravity(props: SVGProps<SVGSVGElement>) {
 					filterUnits="userSpaceOnUse"
 					color-interpolation-filters="sRGB"
 				>
-					<feFlood flood-opacity="0" result="BackgroundImageFix" />
+					<feFlood floodOpacity="0" result="BackgroundImageFix" />
 					<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
 					<feGaussianBlur stdDeviation="3.65557" result="effect1_foregroundBlur_442_52" />
 				</filter>
@@ -190,7 +190,7 @@ function Antigravity(props: SVGProps<SVGSVGElement>) {
 					filterUnits="userSpaceOnUse"
 					color-interpolation-filters="sRGB"
 				>
-					<feFlood flood-opacity="0" result="BackgroundImageFix" />
+					<feFlood floodOpacity="0" result="BackgroundImageFix" />
 					<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
 					<feGaussianBlur stdDeviation="3.26458" result="effect1_foregroundBlur_442_52" />
 				</filter>
@@ -203,7 +203,7 @@ function Antigravity(props: SVGProps<SVGSVGElement>) {
 					filterUnits="userSpaceOnUse"
 					color-interpolation-filters="sRGB"
 				>
-					<feFlood flood-opacity="0" result="BackgroundImageFix" />
+					<feFlood floodOpacity="0" result="BackgroundImageFix" />
 					<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
 					<feGaussianBlur stdDeviation="2.92121" result="effect1_foregroundBlur_442_52" />
 				</filter>
@@ -216,7 +216,7 @@ function Antigravity(props: SVGProps<SVGSVGElement>) {
 					filterUnits="userSpaceOnUse"
 					color-interpolation-filters="sRGB"
 				>
-					<feFlood flood-opacity="0" result="BackgroundImageFix" />
+					<feFlood floodOpacity="0" result="BackgroundImageFix" />
 					<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
 					<feGaussianBlur stdDeviation="2.46731" result="effect1_foregroundBlur_442_52" />
 				</filter>
@@ -229,7 +229,7 @@ function Antigravity(props: SVGProps<SVGSVGElement>) {
 					filterUnits="userSpaceOnUse"
 					color-interpolation-filters="sRGB"
 				>
-					<feFlood flood-opacity="0" result="BackgroundImageFix" />
+					<feFlood floodOpacity="0" result="BackgroundImageFix" />
 					<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
 					<feGaussianBlur stdDeviation="3.05371" result="effect1_foregroundBlur_442_52" />
 				</filter>

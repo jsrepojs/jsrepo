@@ -5,7 +5,6 @@ description: Why we built jsrepo.
 
 import Link from "next/link";
 
-
 [shadcn/ui](https://ui.shadcn.com) proved that distributing code in a way that allows consumers to own the source is an extremely powerful pattern. Since then registries have become a common way to distribute reusable components.
 
 As more and more registries start to emerge it became clear that there was a need for a more powerful toolchain to help manage and distribute these registries. That's where **jsrepo** comes in...
@@ -42,7 +41,7 @@ As more and more registries start to emerge it became clear that there was a nee
 	<AccordionItem value="q-2">
 		<AccordionTrigger>Is this shadcn compatible?</AccordionTrigger>
 		<AccordionContent className="flex flex-col gap-4 text-balance">
-			**jsrepo** is partially **shadcn** compatible. You can add and update items from **shadcn** with zero configuration needed, however imports are not currently resolved so you will have to update them manually. If you want to make your **jsrepo** registry **shadcn** compatible you can take a look at the <Link href="/docs/outputs/shadcn" className='text-(--tw-prose-links) font-medium underline underline-offset-[3.5px] decoration-[1.5px]'>@shadcn/jsrepo</Link> package.
+			Yes **jsrepo** is not shadcn compatible. You can add and update items from **shadcn** with zero configuration needed.
 		</AccordionContent>
 	</AccordionItem>
 </Accordion>
