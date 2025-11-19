@@ -53,6 +53,17 @@ export async function fetchRaw(
 		verbose?.(`Got a response from ${url} ${response.status} ${response.statusText}`);
 
 		if (!response.ok) {
+			const isJson = response.headers.get('content-type')?.includes('application/json');
+			if (isJson) {
+				const jsonError = await response.json();
+				return Err(
+					state.provider.formatFetchError(
+						state,
+						resourcePath,
+						`${response.status} ${jsonError.message ?? response.statusText}`
+					)
+				);
+			}
 			return Err(
 				state.provider.formatFetchError(
 					state,
