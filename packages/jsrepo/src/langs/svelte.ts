@@ -57,8 +57,8 @@ export function svelte(_options: SvelteOptions = {}): Language {
 				devDependencies: imports.flatMap((imp) => imp.devDependencies),
 			};
 		},
-		transformImports,
+		transformImports: (code, imports, opts) => transformImports(code, imports, opts),
 		canInstallDependencies: (ecosystem) => ecosystem === 'js',
-		installDependencies,
+		installDependencies: (deps, opts) => installDependencies(deps, opts),
 	};
 }
