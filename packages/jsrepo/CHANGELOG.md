@@ -1,5 +1,14 @@
 # jsrepo
 
+## 3.0.0-beta.25
+### Patch Changes
+
+
+- feat: transform imports from shadcn registries ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- feat: `config mcp` support for google antigravity ([#682](https://github.com/jsrepojs/jsrepo/pull/682))
+
 ## 3.0.0-beta.24
 ### Patch Changes
 
