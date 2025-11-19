@@ -1,5 +1,11 @@
 # @jsrepo/shadcn
 
+## 0.0.1-beta.27
+### Patch Changes
+
+
+- fix provider export ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
 ## 0.0.1-beta.26
 ### Patch Changes
 
