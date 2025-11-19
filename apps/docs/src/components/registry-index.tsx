@@ -70,7 +70,7 @@ export function RegistryDirectory() {
 			</InputGroup>
 			<div className="flex flex-col gap-2 not-prose">
 				{filteredItems.map((registry) => (
-					<Registry registry={registry} />
+					<Registry key={registry.name} registry={registry} />
 				))}
 			</div>
 		</div>

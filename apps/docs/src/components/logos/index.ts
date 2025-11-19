@@ -18,6 +18,7 @@ import { Prettier } from "./prettier";
 import { NPM } from "./npm";
 import { TypeScript } from "./typescript";
 import { RegistryKit } from "./registry-kit";
+import { Antigravity } from "./antigravity";
 
 export {
 	GitHub as GitHubLogo,
@@ -40,4 +41,5 @@ export {
 	NPM as NpmLogo,
 	TypeScript as TypeScriptLogo,
 	RegistryKit as RegistryKitLogo,
+	Antigravity as AntigravityLogo,
 };

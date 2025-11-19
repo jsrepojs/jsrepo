@@ -15,7 +15,10 @@ function UnderlineTabsList({ className, ...props }: React.ComponentProps<typeof 
 	return (
 		<TabsPrimitive.List
 			data-slot="underline-tabs-list"
-			className={cn("flex items-end relative border-b h-9 w-fit", className)}
+			className={cn(
+				"flex items-end relative border-b h-9 w-fit overflow-x-auto max-w-full scrollbar-hide",
+				className
+			)}
 			{...props}
 		/>
 	);
