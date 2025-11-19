@@ -1,5 +1,10 @@
 # jsrepo
 
+## 2.5.2
+### Patch Changes
+
+- 44225bd: fix: Improve error handling by displaying the response.message when it's available
+
 ## 2.5.1
 ### Patch Changes
 
