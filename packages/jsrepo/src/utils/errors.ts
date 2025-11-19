@@ -98,11 +98,13 @@ export class RegistryItemNotFoundError extends JsrepoError {
 
 export class ProviderFetchError extends JsrepoError {
 	readonly resourcePath: string;
+	readonly originalMessage: string;
 	constructor(message: string, resourcePath: string) {
 		super(`Error fetching ${resourcePath}: ${message}`, {
 			suggestion: 'Please try again.',
 		});
 		this.resourcePath = resourcePath;
+		this.originalMessage = message;
 	}
 }
 
@@ -110,8 +112,10 @@ export class ManifestFetchError extends JsrepoError {
 	constructor(error: unknown) {
 		super(
 			error instanceof ProviderFetchError
-				? `Error fetching manifest file from ${pc.bold(error.resourcePath)}: ${error.message}`
-				: `Error fetching manifest file: ${error instanceof Error ? error.message : String(error)}`,
+				? `Error fetching manifest file from ${pc.bold(error.resourcePath)}: ${error.originalMessage}`
+				: error instanceof ManifestFetchError
+					? error.message
+					: `Error fetching manifest file: ${error instanceof Error ? error.message : String(error)}`,
 			{
 				suggestion: 'Please try again.',
 			}
@@ -125,7 +129,7 @@ export class RegistryItemFetchError extends JsrepoError {
 			error instanceof ProviderFetchError
 				? `Error fetching ${pc.bold(`${options.registry}/${options.item}`)} from ${pc.bold(
 						error.resourcePath
-					)}: ${error.message}`
+					)}: ${error.originalMessage}`
 				: `Error fetching ${options.registry}/${options.item}: ${
 						error instanceof Error ? error.message : String(error)
 					}`,

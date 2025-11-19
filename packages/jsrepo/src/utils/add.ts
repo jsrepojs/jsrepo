@@ -365,7 +365,7 @@ export async function fetchFile(fileName: string, block: ResolvedItem) {
 	} catch (error) {
 		if (error instanceof ProviderFetchError)
 			return err(
-				new RegistryFileFetchError(error.message, {
+				new RegistryFileFetchError(error.originalMessage, {
 					registry: block.registry.url,
 					item: block.name,
 					resourcePath: error.resourcePath,
