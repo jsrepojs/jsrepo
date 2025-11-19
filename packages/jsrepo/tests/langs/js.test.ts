@@ -61,7 +61,8 @@ describe('js', () => {
 			`import { button } from '$lib/components/ui/button';
 import { useClipboard } from '$lib/hooks/use-clipboard.svelte';
 import { utils } from '$lib/utils.js';
-import { add } from '../../utils/math/add.js';`,
+import { add } from '../../utils/math/add.js';
+import { Separator } from '@/registry/new-york-v4/ui/separator';`,
 			[
 				{
 					import: '$lib/components/ui/button',
@@ -109,13 +110,15 @@ import { add } from '../../utils/math/add.js';`,
 								alias: '$lib/utils',
 							};
 						default: {
+							if (item.file.type === 'ui') return { path: 'src/components/ui', alias: '@/components/ui' };
+							if (item.file.type === 'component') return { path: 'src/components', alias: '@/components' };
 							throw new Error(`Unknown item: ${item}`);
 						}
 					}
 				},
 				targetPath: joinAbsolute(
 					CWD,
-					'src/lib/components/ui/copy-button/copy-button.svelte'
+					'src/lib/components/ui/copy-button/copy-button.tsx'
 				),
 			}
 		);
@@ -124,7 +127,8 @@ import { add } from '../../utils/math/add.js';`,
 		).toStrictEqual(`import { button } from '$lib/components/shadcn-svelte-extras/ui/button';
 import { useClipboard } from '$lib/hooks/use-clipboard.svelte';
 import { utils } from '$lib/utils.js';
-import { add } from '$lib/utils/math/add.js';`);
+import { add } from '$lib/utils/math/add.js';
+import { Separator } from '@/components/ui/separator';`);
 	});
 });
 
