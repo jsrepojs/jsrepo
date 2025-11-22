@@ -1,5 +1,11 @@
 # @jsrepo/migrate
 
+## 0.0.1-beta.5
+### Patch Changes
+
+
+- fix: only build the registry when a registry config was migrated ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
 ## 0.0.1-beta.4
 ### Patch Changes
 
