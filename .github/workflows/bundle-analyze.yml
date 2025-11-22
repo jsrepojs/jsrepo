@@ -1,0 +1,32 @@
+name: Bundle Analyze
+
+on:
+    pull_request:
+        branches: [next, main]
+
+jobs:
+    bundle-analyze:
+        runs-on: ubuntu-latest
+        permissions:
+            pull-requests: write
+
+        steps:
+            - uses: actions/checkout@v4
+            - uses: pnpm/action-setup@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Build bundle analyzer
+              run: pnpm build:bundle-analyzer
+
+            - name: Build packages
+              run: pnpm build:packages
+
+            - name: Bundle Analyze
+              run: |
+                  pnpm bundle-analyze

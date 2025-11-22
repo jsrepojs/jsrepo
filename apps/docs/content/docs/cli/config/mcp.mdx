@@ -1,0 +1,78 @@
+---
+title: mcp
+description: Configure the jsrepo MCP server for your environment.
+---
+
+```sh
+jsrepo config mcp
+```
+
+## Usage
+
+Configure the jsrepo MCP server. You will be prompted to select which clients to configure:
+
+```sh
+jsrepo config mcp
+```
+
+You will be prompted to select which clients you want to configure:
+
+```
+◆  Which clients would you like to configure?
+│  ■ Cursor
+│  □ Claude Code
+│  □ VS Code
+│  □ Codex
+└
+```
+
+Configure a specific client:
+
+```sh
+jsrepo config mcp --client cursor
+```
+
+Configure multiple clients:
+
+```sh
+jsrepo config mcp --client cursor vscode
+```
+
+Configure all supported MCP clients:
+
+```sh
+jsrepo config mcp --all
+```
+
+## Options
+
+### `--all`
+
+Configure all supported MCP clients:
+
+```sh
+jsrepo config mcp --all
+```
+
+### `--client`
+
+The MCP client(s) to configure. Supported clients: `cursor`, `claude`, `vscode`, `codex`:
+
+```sh
+jsrepo config mcp --client cursor
+```
+
+Configure multiple clients:
+
+```sh
+jsrepo config mcp --client cursor vscode
+```
+
+### `--cwd`
+
+The current working directory:
+
+```sh
+jsrepo config mcp --cwd ./my-project
+```
+

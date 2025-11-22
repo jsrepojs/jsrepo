@@ -1,0 +1,31 @@
+{
+	"name": "utils",
+	"type": "lib",
+	"add": "when-added",
+	"files": [
+		{
+			"type": "lib",
+			"role": "file",
+			"content": "import { type ClassValue, clsx } from 'clsx';\nimport { twMerge } from 'tailwind-merge';\n\nexport function cn(...inputs: ClassValue[]) {\n\treturn twMerge(clsx(inputs));\n}\n",
+			"path": "utils.ts",
+			"_imports_": [],
+			"registryDependencies": [],
+			"dependencies": [],
+			"devDependencies": []
+		}
+	],
+	"registryDependencies": [],
+	"dependencies": [],
+	"devDependencies": [
+		{
+			"ecosystem": "js",
+			"name": "clsx",
+			"version": "^2.1.1"
+		},
+		{
+			"ecosystem": "js",
+			"name": "tailwind-merge",
+			"version": "^3.3.1"
+		}
+	]
+}

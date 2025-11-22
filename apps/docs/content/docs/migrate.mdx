@@ -1,0 +1,173 @@
+---
+title: Migration
+description: Migrate from jsrepo v2 to jsrepo v3.
+---
+
+**jsrepo** v3 is a complete rewrite of the **jsrepo** CLI and we haven't been shy about making breaking changes. 
+
+If you're coming from **jsrepo** v2 and want to quickly get started with **jsrepo** v3 you can run the following command in your existing **jsrepo** project:
+
+```sh
+pnpm dlx @jsrepo/migrate v3
+```
+
+The migration tool will:
+- Migrate your `jsrepo-build-config.json` and `jsrepo.json` files into the new `jsrepo.config.ts` file.
+- Install `jsrepo@beta` and the correct formatting transform (if you were using one)
+- Build your registry using both v2 and v3 to ensure compatibility
+
+<Callout type="info">
+    You can put this in your upgrade guide for your users.
+</Callout>
+
+## Breaking changes
+
+### 1. A new js based config
+
+In **jsrepo** v2 you used a `jsrepo-build-config.json` file to configure your registry and a `jsrepo.json` file to configure your project. This wasn't great for obvious reasons.
+
+In **jsrepo** v3 we use a `jsrepo.config.ts` file to configure your registry and project: 
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	// ...
+});
+```
+
+This affords us more flexibility and allows us to support plugins.
+
+<Callout type="info">
+    If you're like me you may be worried about having to automatically make modifications to a js based config. Not to worry! The blood, sweat, and (mostly) tears have been shed to make it as seamless as possible.
+</Callout>
+
+### 2. No more categories
+
+In **jsrepo** v2 we had item categories. This allowed you to group items together and add them by running `jsrepo add <category>/<item>`.
+
+In **jsrepo** v3 you can add items by running `jsrepo add <item>`.
+
+"categories" are now the `type` of the item. The type of an item is used to determine the path that the item will be added to in the user's project:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+		items: [
+			{
+				name: "button",
+				type: "component", // instead of category now it's type // [!code highlight]
+				files: [
+					{
+						path: "src/components/button.tsx",
+					},
+				],
+			},
+		],
+	},
+});
+```
+
+### 3. No backwards compatibility with v2 registries
+
+You probably could've guessed this by some of the changes we have already mentioned but unfortunately we don't support adding items from v2 registries from the v3 CLI.
+
+If you still want to use a v2 registry you can of course continue to use the v2 CLI to add items to your project:
+
+```sh
+pnpm dlx jsrepo@2 add ui/button
+```
+
+### 4. Deprecated commands
+
+The following commands have been deprecated in **jsrepo** v3:
+
+- `jsrepo test`
+- `jsrepo execute`
+- `jsrepo tokens` - Now all auth functions are handled by the `jsrepo auth` command.
+- `jsrepo mcp` - The MCP server has been moved to the `@jsrepo/mcp` package.
+
+### 5. No more `Update with AI`
+
+While we were excited by the `Update with AI` feature it didn't feel worth the added bundle cost. We'll likely explore ways to improve the workflow of updating items with AI without the added bundle cost.
+
+### 6. Formatting functionality has been externalized
+
+In **jsrepo** v2 you could format code before it was added to your project by configuring the formatter in your `jsrepo.json` file.
+
+With **jsrepo** v3 we introduced the concept of "transforms" and in so doing we realized that the formatting functionality should be externalized to reduce the bundle size of the CLI and allow for more flexibility for users.
+
+You can now configure formatting for your project by adding one of the officially supported transforms to your config:
+
+```sh
+# prettier
+jsrepo config transform prettier
+# biome
+jsrepo config transform biome
+```
+
+### 7. Output configuration changes
+
+In **jsrepo** v2, registries could specify an `outputDir` in their build config. In **jsrepo** v3, this has been replaced with output plugins:
+
+- Registries that had an `outputDir` are migrated to use the [distributed](/docs/outputs/distributed) output
+- Registries without an `outputDir` use the [repository](/docs/outputs/repository) output by default
+
+### 8. Removed peer dependencies
+
+Right now this is just a choice to reduce API surface for language plugins. If this becomes something the community wants we can add it back in the future.
+
+## The wins
+
+Now let's talk about the reasons we are so excited to break everyone's code for **jsrepo** v3.
+
+### Plugins
+
+In **jsrepo** v3 we have introduced plugins. There are currently three types of plugins:
+
+- [Languages](/docs/languages) - Extend jsrepo dependency resolution support to include additional languages.
+- [Outputs](/docs/outputs) - Customize the way your registry is distributed.
+- [Providers](/docs/providers) - Allow users to install items from a custom source.
+- [Transforms](/docs/transforms) - Modify code before it's added to your project.
+
+### Shadcn compatibility
+
+**jsrepo** v3 is now **shadcn** compatible. You can now add and update items from **shadcn** meaning **jsrepo** now has access to an entire ecosystem of **shadcn** registries.
+
+Try it out by running:
+
+```sh
+pnpm jsrepo add --registry https://ui.shadcn.com/r/styles/new-york-v4
+```
+
+### Greatly improved MCP responses
+
+Thanks to adopting the more manual approach for defining a registry it's now possible to add metadata to your registry items greatly improving the responses you will get when using the **jsrepo** MCP server.
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+		items: [
+			{
+				name: "button",
+                title: "Button", // [!code ++]
+                description: "A button component", // [!code ++]
+                files: [
+                    {
+                        path: "src/components/button.tsx",
+                    },
+                    // add examples for LLMs to use
+                    { // [!code ++]
+                        path: 'src/demos/button-demo.tsx', // [!code ++]
+                        role: 'example', // [!code ++]
+                    } // [!code ++]
+                ]
+			},
+		],
+	},
+});
+```

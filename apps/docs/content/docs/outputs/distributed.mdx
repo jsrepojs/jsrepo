@@ -1,0 +1,42 @@
+---
+title: Distributed
+description: Output your registry as json files in a directory.
+---
+
+import { Files, Folder, File } from "@/components/files";
+
+<BadgeGroup>
+	<SourceBadge path="packages/jsrepo/src/outputs/distributed.ts" />
+	<OfficialBadge />
+</BadgeGroup>
+
+The `distributed` output is used for maximizing performance when serving your registry as a static asset.
+
+## Usage
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { distributed } from "jsrepo/outputs"; // [!code ++]
+
+export default defineConfig({
+	registry: {
+		outputs: [distributed({ dir: "./public/r" })], // [!code ++]
+	},
+});
+```
+
+Now running `jsrepo build` will output your registry to the `./public/r` directory.
+
+Unlike the `repository` output, the `distributed` output will output each item as a separate json file. For example:
+
+<Files>
+	<Folder name="public" defaultOpen>
+		<Folder name="r" defaultOpen>
+			<File name="registry.json" />
+			<File name="button.json" />
+			<File name="utils.json" />
+		</Folder>
+	</Folder>
+</Files>
+
+Since each item file contains all the code for all the files required for that item this is much more performant, and portable than the `repository` output.

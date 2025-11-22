@@ -1,0 +1,201 @@
+---
+title: jsrepo.config
+description: The configuration file for jsrepo.
+---
+
+The `jsrepo.config.(ts|js|mts|mjs)` file is used to configure **jsrepo** projects and registries.
+
+Having a js based config allows you far more flexibility when configuring your project or registry allowing you to abstract out the reusable parts of your config.
+
+## Creating a config
+
+To create a new config in your project you can run the following command or copy the code below:
+
+```sh
+jsrepo init
+```
+
+This will initialize a blank config in your project.
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	// configure where stuff comes from here
+	registries: [],
+	// configure were stuff goes here
+	paths: {},
+});
+```
+
+<Callout type="info">
+	We default to `.mts` to prevent errors when you don't have `"type": "module"` in your `package.json`. But you can
+	rename this to `.ts` if you prefer.
+</Callout>
+
+### Create with a registry
+
+To create your config with a registry you can run the following command:
+
+```sh
+jsrepo init [registry]
+```
+
+Let's look at an example...
+
+You might run:
+
+```sh
+jsrepo init https://example.com/registry
+```
+
+First you will be prompted to install any plugins specified by the registry author:
+
+```plaintext
+┌   jsrepo
+│
+◆  Would you like to add the @jsrepo/transform-prettier transform plugin?
+│  ● Yes / ○ No
+```
+
+Next you can configure the paths for the items you want to add. (These are the types of the items you can add from the registry)
+
+```plaintext
+◆  Which paths would you like to configure?
+│  ◻ block (Default: src/components)
+│  ◻ component
+│  ◻ lib
+└
+```
+
+Once you have configured the paths any items that were specified by the registry author to add upon initialization will be added to your project. And the resulting config should look like this:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import prettier from "@jsrepo/transform-prettier";
+
+export default defineConfig({
+	registries: ["https://example.com/registry"],
+	transforms: [prettier()],
+	paths: {
+		block: "src/components",
+		component: "src/components/ui",
+		lib: "src/lib",
+	},
+});
+```
+
+## Adding plugins
+
+Plugins are a big part of what makes jsrepo so powerful but having to manually add them to your config kinda sucks. So we've added a way to automatically install and add plugins to your config.
+
+To add a plugin run the following command:
+
+```sh
+# add a transform plugin
+jsrepo config transform @jsrepo/transform-prettier
+# add a provider plugin
+jsrepo config provider jsrepo-provider-<provider>
+# add a language plugin
+jsrepo config language jsrepo-language-<language>
+```
+
+This will automatically install the plugin and add it to your config:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import prettier from "@jsrepo/transform-prettier"; // [!code ++]
+
+export default defineConfig({
+	registries: ["https://example.com/registry"],
+	transforms: [prettier()], // [!code ++]
+	paths: {
+		block: "src/components",
+		component: "src/components/ui",
+		lib: "src/lib",
+	},
+});
+```
+
+As your config grows this will continue to work (so long as you don't use some really contrived syntax for your config).
+
+## Options
+
+### languages
+
+Languages are how **jsrepo** knows how to parse and transform code. You can read more about the supported languages [here](/docs/languages).
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { js } from "jsrepo/languages";
+
+export default defineConfig({
+	languages: [js()], // [!code highlight]
+});
+```
+
+### paths
+
+Paths are how **jsrepo** knows where to put items in your project. Paths can either reference a type of item or a specific item.
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	paths: { // [!code highlight]
+		block: "src/components", // [!code highlight]
+		// control where a specific item goes by referencing it by `<type>/<name>` // [!code highlight]
+		"ui/button": "src/components/ui/button", // [!code highlight]
+	}, // [!code highlight]
+});
+```
+
+### providers
+
+Providers are how **jsrepo** knows where to fetch items from. You can read more about providers [here](/docs/providers).
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { fs } from "jsrepo/providers";
+
+export default defineConfig({
+	providers: [fs()], // [!code highlight]
+});
+```
+
+### registries
+
+Registries are the default locations that items will be fetched from when you run **jsrepo** commands.
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registries: ["https://example.com/registry"], // [!code highlight]
+});
+```
+
+### registry
+
+The `registry` option allows you to define your own registry or registries. You can learn more about creating your own registry [here](/docs/create-a-registry).
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: ..., // [!code highlight]
+});
+```
+
+### transforms
+
+Transforms allow you to make modifications to code before it is added to your project this is where you might add formatting, and other code modifications. You can read more about transforms [here](/docs/transforms).
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import prettier from "@jsrepo/transform-prettier";
+
+export default defineConfig({
+	transforms: [prettier()], // [!code highlight]
+});
+```

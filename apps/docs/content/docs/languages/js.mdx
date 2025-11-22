@@ -1,0 +1,54 @@
+---
+title: js
+description: JavaScript language support for jsrepo.
+---
+
+<BadgeGroup>
+	<SourceBadge path="packages/jsrepo/src/langs/js.ts" />
+	<OfficialBadge />
+	<DefaultBadge />
+</BadgeGroup>
+
+The `js` language plugin supports dependency resolution for both JavaScript and TypeScript files as well as installing dependencies with `ecosystem: "js"`.
+
+## Supported syntax
+
+The JavaScript plugin will detect dependencies from the following syntax:
+
+- Static imports
+- Dynamic imports
+- Export from statements
+
+For example the following code:
+
+```ts
+import 'dotenv/config';
+import { print } from "@/utils/stdout";
+
+async function printDynamic() {
+	const data = await import("./data.json", { with: { type: "json" } });
+	print(data.message);
+}
+
+export { logger } from "@/utils/logger";
+```
+
+Will result in the following dependencies:
+
+-   `dotenv` - From side effect import
+-   `@/utils/stdout` - From static import
+-   `./data.json` - From dynamic import
+-   `@/utils/logger` - From export from statement
+
+## Supported File Extensions
+
+The JavaScript language plugin supports the following file extensions:
+
+| Extension |
+| --------- |
+| `.js`     |
+| `.ts`     |
+| `.jsx`    |
+| `.tsx`    |
+| `.mjs`    |
+| `.mts`    |

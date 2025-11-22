@@ -1,0 +1,41 @@
+---
+title: provider
+description: Add a provider to your config.
+---
+
+```sh
+jsrepo config provider
+```
+
+## Usage
+
+Add a provider to your config. You will be prompted to install dependencies after adding:
+
+```sh
+jsrepo config provider jsrepo-provider-jsr
+```
+
+Add multiple providers at once:
+
+```sh
+jsrepo config provider jsrepo-provider-jsr jsrepo-provider-npm
+```
+
+## Options
+
+### `--cwd`
+
+The current working directory:
+
+```sh
+jsrepo config provider jsrepo-provider-jsr --cwd ./my-project
+```
+
+### `--yes`
+
+Skip the confirmation prompt:
+
+```sh
+jsrepo config provider jsrepo-provider-jsr --yes
+```
+

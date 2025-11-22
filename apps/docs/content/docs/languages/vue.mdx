@@ -1,0 +1,28 @@
+---
+title: vue
+description: Vue language support for jsrepo.
+---
+
+<BadgeGroup>
+	<SourceBadge path="packages/jsrepo/src/langs/vue.ts" />
+	<OfficialBadge />
+	<DefaultBadge />
+</BadgeGroup>
+
+The `vue` language plugin supports dependency resolution for Vue files as well as installing dependencies with `ecosystem: "js"`.
+
+<Callout type="warning">
+	This language plugin requires `vue` to be installed in your project.
+</Callout>
+
+## Supported syntax
+
+The Vue plugin parses all script tags and passes the code to the [JavaScript plugin](/docs/languages/js) to resolve dependencies so all the same syntax is supported.
+
+## Supported File Extensions
+
+The Vue language plugin supports the following file extensions:
+
+| Extension |
+| --------- |
+| `.vue`    |

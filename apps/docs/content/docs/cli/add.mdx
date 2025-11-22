@@ -1,0 +1,133 @@
+---
+title: add
+description: Add items from registries to your project.
+---
+
+```sh
+jsrepo add
+```
+
+## Usage
+
+Add an item from the registries in your `jsrepo.config` file:
+
+```sh
+jsrepo add button
+```
+
+If the item exists in multiple registries you will be prompted to select which one you want to add:
+
+```
+◆  Multiple registries contain button. Please select one:
+│  ● button (@ieedan/shadcn-svelte-extras)
+│  ○ button (@ai/elements)
+└
+```
+
+Add an item from a specific registry:
+
+```sh
+jsrepo add @ieedan/shadcn-svelte-extras/button
+```
+
+Add all items from a specific registry:
+
+```sh
+jsrepo add @ieedan/shadcn-svelte-extras --all
+```
+
+Add all items from every registry in your `jsrepo.config` file:
+
+```sh
+jsrepo add --all
+```
+
+## Options
+
+### `--all`
+
+Add all items from every registry:
+
+```sh
+jsrepo add --all
+```
+
+### `--cwd`
+
+The current working directory:
+
+```sh
+jsrepo add button --cwd ./my-project
+```
+
+### `--expand`
+
+Expands the diff so you see the entire file:
+
+```sh
+jsrepo add button --expand
+```
+
+### `--max-unchanged`
+
+Maximum unchanged lines that will show without being collapsed:
+
+```sh
+jsrepo add button --max-unchanged 20
+```
+
+### `--overwrite`
+
+Overwrite files without prompting:
+
+```sh
+jsrepo add button --overwrite
+```
+
+### `--registry`
+
+The registry to add items from:
+
+```sh
+jsrepo add button --registry @ieedan/shadcn-svelte-extras
+```
+
+### `--verbose`
+
+Include debug logs:
+
+```sh
+jsrepo add button --verbose
+```
+
+### `--with-docs`
+
+Add items with docs:
+
+```sh
+jsrepo add --with-docs
+```
+
+### `--with-examples`
+
+Add items with examples:
+
+```sh
+jsrepo add --with-examples
+```
+
+### `--with-tests`
+
+Add items with tests:
+
+```sh
+jsrepo add --with-tests
+```
+
+### `--yes`
+
+Skip the confirmation prompt:
+
+```sh
+jsrepo add button --yes
+```

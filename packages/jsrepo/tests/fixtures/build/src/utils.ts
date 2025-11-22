@@ -1,0 +1,1 @@
+export const STDOUT_PREFIX = 'stdout: ';

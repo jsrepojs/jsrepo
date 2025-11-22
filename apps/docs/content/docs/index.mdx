@@ -1,0 +1,47 @@
+---
+title: Introduction
+description: Why we built jsrepo.
+---
+
+import Link from "next/link";
+
+[shadcn/ui](https://ui.shadcn.com) proved that distributing code in a way that allows consumers to own the source is an extremely powerful pattern. Since then registries have become a common way to distribute reusable components.
+
+As more and more registries start to emerge it became clear that there was a need for a more powerful toolchain to help manage and distribute these registries. That's where **jsrepo** comes in...
+
+**jsrepo** is a toolchain for distributing your code. It gives powerful tools to both registry owners and consumers. 
+
+**Registry owners...**
+- Don't want to have to write their own CLI and build system to distribute their code
+- Want to be able to test and verify that their registry will work for their users before they publish it
+- Want to be able to host their registries privately without having to write their own hosting solution
+
+**Registry consumers...**
+- Want to quickly add items from a registry to their project and start using them without having to even look at the code
+- Want to be able to easily update their items with visibility to what as changed
+- Want to be able to install and manage code from multiple registries in a single project
+- Want an easy way to authenticate to private registries
+
+**jsrepo...**
+- Provides a powerful CLI for building and distributing your registry
+- Prevents you from publishing broken or unusable registries
+- Provides provider adapters to allow you to host your registry publicly or privately anywhere you want
+- Automatically resolves dependencies to other items so your items always come ready to use
+- Provides an interactive update command to easily update your items with visibility to what as changed
+- Allows you to authenticate to private registries with `jsrepo auth`
+
+<Accordion type="single" collapsible>
+	<AccordionItem value="q-1">
+		<AccordionTrigger>Is this trying to replace npm?</AccordionTrigger>
+		<AccordionContent className="flex flex-col gap-4 text-balance">
+			No, **jsrepo** won't replace npm, but it's perfect for distributing code like leftPad that probably shouldn't
+			be a package but also shouldn't have to be rewritten every time.
+		</AccordionContent>
+	</AccordionItem>
+	<AccordionItem value="q-2">
+		<AccordionTrigger>Is this shadcn compatible?</AccordionTrigger>
+		<AccordionContent className="flex flex-col gap-4 text-balance">
+			Yes **jsrepo** is not shadcn compatible. You can add and update items from **shadcn** with zero configuration needed.
+		</AccordionContent>
+	</AccordionItem>
+</Accordion>

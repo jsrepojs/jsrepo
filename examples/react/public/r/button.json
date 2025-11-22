@@ -1,0 +1,67 @@
+{
+	"name": "button",
+	"type": "ui",
+	"add": "when-added",
+	"files": [
+		{
+			"type": "ui",
+			"role": "file",
+			"content": "import type React from 'react';\nimport { tv, type VariantProps } from 'tailwind-variants';\nimport { cn } from '@/registry/lib/utils';\n\nexport const buttonVariants = tv({\n\tbase: 'flex items-center rounded-md active:scale-98 transition-all',\n\tvariants: {\n\t\tvariant: {\n\t\t\tdefault: 'bg-primary text-primary-foreground',\n\t\t\tdestructive: 'bg-destructive text-destructive-foreground',\n\t\t\toutline: 'border border-border hover:bg-accent',\n\t\t},\n\t\tsize: {\n\t\t\tdefault: 'h-8 px-2.5',\n\t\t\tsm: 'h-7 px-2',\n\t\t},\n\t},\n});\n\nexport type Variant = VariantProps<typeof buttonVariants>['variant'];\nexport type Size = VariantProps<typeof buttonVariants>['size'];\n\nexport function Button({\n\tvariant = 'default',\n\tsize = 'default',\n\tclassName,\n\t...props\n}: React.ComponentProps<'button'> & { variant?: Variant; size?: Size }) {\n\treturn <button {...props} className={cn(buttonVariants({ variant, size }), className)} />;\n}\n",
+			"path": "button.tsx",
+			"_imports_": [
+				{
+					"import": "@/registry/lib/utils",
+					"item": "utils",
+					"file": {
+						"type": "lib",
+						"path": "utils.ts"
+					},
+					"meta": {
+						"filePathRelativeToItem": "utils.ts"
+					}
+				}
+			],
+			"registryDependencies": [],
+			"dependencies": [],
+			"devDependencies": []
+		},
+		{
+			"type": "page",
+			"role": "example",
+			"content": "import { Button } from '@/registry/ui/button';\n\nexport function ButtonDemoPage() {\n\treturn (\n\t\t<>\n\t\t\t<div className=\"flex place-items-center gap-2\">\n\t\t\t\t<Button variant=\"default\">Click me</Button>\n\t\t\t\t<Button variant=\"destructive\">Click me</Button>\n\t\t\t\t<Button variant=\"outline\">Click me</Button>\n\t\t\t</div>\n\t\t\t<div className=\"flex place-items-end gap-2\">\n\t\t\t\t<Button variant=\"default\" size=\"sm\">\n\t\t\t\t\tSm\n\t\t\t\t</Button>\n\t\t\t\t<Button variant=\"default\" size=\"default\">\n\t\t\t\t\tMd\n\t\t\t\t</Button>\n\t\t\t</div>\n\t\t</>\n\t);\n}\n",
+			"path": "page.tsx",
+			"_imports_": [
+				{
+					"import": "@/registry/ui/button",
+					"item": "button",
+					"file": {
+						"type": "ui",
+						"path": "button.tsx"
+					},
+					"meta": {
+						"filePathRelativeToItem": "button.tsx"
+					}
+				}
+			],
+			"target": "src/app/demos/button-demo/page.tsx",
+			"registryDependencies": [],
+			"dependencies": [],
+			"devDependencies": []
+		}
+	],
+	"registryDependencies": ["utils"],
+	"dependencies": [
+		{
+			"ecosystem": "js",
+			"name": "react",
+			"version": "19.2.0"
+		}
+	],
+	"devDependencies": [
+		{
+			"ecosystem": "js",
+			"name": "tailwind-variants",
+			"version": "^3.1.1"
+		}
+	]
+}

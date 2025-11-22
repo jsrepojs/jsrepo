@@ -1,0 +1,35 @@
+---
+title: Biome
+description: Format code before it's added to your project using Biome.
+---
+
+<BadgeGroup>
+	<SourceBadge path="packages/transform-biome/src/index.ts" />
+	<OfficialBadge />
+	<NpmBadge packageName="@jsrepo/transform-biome" />
+</BadgeGroup>
+
+The [@jsrepo/transform-biome](https://npmjs.com/package/@jsrepo/transform-biome) package is a transform plugin for **jsrepo** that formats code using your local biome configuration before it's added to your project using [Biome](https://biomejs.dev).
+
+<Callout type="info">
+    This is especially useful when you are making use of the `jsrepo update` command as it will format the code the same way as it is in your project preventing any formatting changes from being shown in the diff.
+</Callout>
+
+## Installation
+
+To add the **@jsrepo/transform-biome** transform to your config run the following command:
+
+```sh
+jsrepo config transform biome
+```
+
+This will automatically install the transform and add it to your config:
+
+```ts
+import { defineConfig } from "jsrepo";
+import biome from "@jsrepo/transform-biome"; // [!code ++]
+
+export default defineConfig({
+	transforms: [biome()], // [!code ++]
+});
+```

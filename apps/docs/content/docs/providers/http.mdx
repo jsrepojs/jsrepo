@@ -1,0 +1,92 @@
+---
+title: http
+description: Download and add registry items from an arbitrary HTTP endpoint.
+---
+
+import { Files, Folder, File } from "@/components/files";
+
+<BadgeGroup>
+	<SourceBadge path="packages/jsrepo/src/providers/http.ts" />
+	<OfficialBadge />
+	<DefaultBadge />
+</BadgeGroup>
+
+The http provider is the simplest provider by far. To add registry items simply provide the base url of the `registry.json` file:
+
+```sh
+jsrepo add https://example.com/registry
+```
+
+**jsrepo** will then find the `registry.json` file from `https://example.com/registry/registry.json`.
+
+## Deploying a registry to your own website
+
+When deploying a registry to your own website you will want to use the `distributed` output type:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { distributed } from "jsrepo/outputs"; // [!code ++]
+
+export default defineConfig({
+	// `dir` is the directory to output the files to
+	outputs: [distributed({ dir: "./public/r" })], // [!code ++]
+});
+```
+
+This will output your registry to the `public/r` directory which might look something like this:
+
+<Files>
+	<Folder name="public" defaultOpen>
+		<Folder name="r" defaultOpen>
+			<File name="registry.json" />
+			<File name="button.json" />
+			<File name="utils.json" />
+		</Folder>
+	</Folder>
+</Files>
+
+Users will then be able to add registry items to their project by running:
+
+```sh
+jsrepo add https://your-website.com/r
+```
+
+## Authentication
+
+To authenticate with the http provider you can run the following command:
+
+```sh
+jsrepo auth http
+```
+
+You will then be prompted to select or enter the name of a registry to authenticate to.
+
+Once authenticated that token will continue to be used for that registry until you logout.
+
+You can logout of your account by running:
+
+```sh
+jsrepo auth http --logout
+```
+
+## Options
+
+When using the http provider you can provide a custom base url to override the authorization header for a specific site. This can be useful if a website is using an authorization method different than the default `Bearer` token.
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { http } from "jsrepo/providers";
+
+export default defineConfig({
+	providers: [
+		http({
+			// url to your registry
+			baseUrl: "https://your-website.com/r",
+			// custom auth header
+			authHeader: (token) => ({ token: `${token}` }),
+		}),
+	],
+});
+```
+
+Now when you use `https://your-website.com/r` it will use the custom auth header you provided.

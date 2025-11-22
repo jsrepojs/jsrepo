@@ -1,0 +1,54 @@
+---
+title: publish
+description: Publish your registry to jsrepo.com.
+---
+
+```sh
+jsrepo publish
+```
+
+## Usage
+
+Publish all registries in your `jsrepo.config` file:
+
+```sh
+jsrepo publish
+```
+
+Publish a specific registry:
+
+```sh
+jsrepo publish @jsrepo/playground
+```
+
+Publish in dry run mode:
+
+```sh
+jsrepo publish --dry-run
+```
+
+## Options
+
+### `--cwd`
+
+The current working directory:
+
+```sh
+jsrepo build --cwd ./my-project
+```
+
+### `--dry-run`
+
+Publish in dry run mode. This will check with jsrepo.com to see if the registry can be published in it's current state:
+
+```sh
+jsrepo publish --dry-run
+```
+
+### `--verbose`
+
+Include debug logs:
+
+```sh
+jsrepo publish --verbose
+```

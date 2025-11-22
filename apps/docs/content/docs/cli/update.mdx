@@ -1,0 +1,133 @@
+---
+title: update
+description: Update items in your project.
+---
+
+```sh
+jsrepo update
+```
+
+## Usage
+
+Update an item in your project:
+
+```sh
+jsrepo update button
+```
+
+Select which items from your project that you want to update:
+
+```sh
+jsrepo update
+```
+
+```
+◆  Which items would you like to update?
+│  ■ button
+│  □ math
+│  □ logger
+└
+```
+
+Update an item from a specific registry:
+
+```sh
+jsrepo update @ieedan/shadcn-svelte-extras/button
+```
+
+Update all items in your project:
+
+```sh
+jsrepo update --all
+```
+
+## Options
+
+### `--all`
+
+Update all items in your project:
+
+```sh
+jsrepo update --all
+```
+
+### `--cwd`
+
+The current working directory:
+
+```sh
+jsrepo update button --cwd ./my-project
+```
+
+### `--expand`
+
+Expands the diff so you see the entire file:
+
+```sh
+jsrepo update button --expand
+```
+
+### `--max-unchanged`
+
+Maximum unchanged lines that will show without being collapsed:
+
+```sh
+jsrepo update button --max-unchanged 20
+```
+
+### `--overwrite`
+
+Overwrite files without prompting:
+
+```sh
+jsrepo update button --overwrite
+```
+
+### `--registry`
+
+The registry to update items from:
+
+```sh
+jsrepo update button --registry @ieedan/shadcn-svelte-extras
+```
+
+### `--verbose`
+
+Include debug logs:
+
+```sh
+jsrepo update button --verbose
+```
+
+### `--with-docs`
+
+Include docs in the update:
+
+```sh
+jsrepo update --with-docs
+```
+
+### `--with-examples`
+
+Include examples in the update:
+
+```sh
+jsrepo update --with-examples
+```
+
+### `--with-tests`
+
+Include tests in the update:
+
+```sh
+jsrepo update --with-tests
+```
+
+### `--yes`
+
+Skip the confirmation prompt:
+
+```sh
+jsrepo update button --yes
+```
+
