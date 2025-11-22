@@ -213,33 +213,36 @@ export default defineConfig({${
 	const writeNewConfigResult = writeFileSync(newConfigPath, newConfigCode);
 	if (writeNewConfigResult.isErr()) return err(writeNewConfigResult.error);
 
-	const newBuildCommand = resolveCommand(
-		(await detect({ cwd: options.cwd }))?.agent ?? 'npm',
-		'execute',
-		['jsrepo@beta', 'build']
-	);
-	if (newBuildCommand === null)
-		return err(
-			new JsrepoError('Failed to resolve `jsrepo build` command', {
-				suggestion:
-					'Please ensure you can build your registry with the `jsrepo build` command.',
-			})
+	// build if we migrated a registry config
+	if (oldRegistryConfig !== null) {
+		const newBuildCommand = resolveCommand(
+			(await detect({ cwd: options.cwd }))?.agent ?? 'npm',
+			'execute',
+			['jsrepo@beta', 'build']
 		);
-
-	await runCommands({
-		title: 'Running `jsrepo build`',
-		cwd: options.cwd,
-		commands: [newBuildCommand],
-		messages: {
-			success: () => 'v3 Build completed successfully',
-			error: () => {
-				throw new JsrepoError('Failed to build registry', {
+		if (newBuildCommand === null)
+			return err(
+				new JsrepoError('Failed to resolve `jsrepo build` command', {
 					suggestion:
-						'The migration was successful, but the build failed. Please try again.',
-				});
+						'Please ensure you can build your registry with the `jsrepo build` command.',
+				})
+			);
+
+		await runCommands({
+			title: 'Running `jsrepo build`',
+			cwd: options.cwd,
+			commands: [newBuildCommand],
+			messages: {
+				success: () => 'v3 Build completed successfully',
+				error: () => {
+					throw new JsrepoError('Failed to build registry', {
+						suggestion:
+							'The migration was successful, but the build failed. Please try again.',
+					});
+				},
 			},
-		},
-	});
+		});
+	}
 
 	await installDependencies(
 		{
