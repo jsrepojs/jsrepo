@@ -1,5 +1,6 @@
 import { JsrepoWordmark } from "@/components/logos/jsrepo-com";
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
+import Link from "next/link";
 
 /**
  * Shared layout configurations
@@ -13,7 +14,7 @@ export function baseOptions(): BaseLayoutProps {
 		nav: {
 			title: (
 				<>
-					<JsrepoWordmark className="h-6" aria-label="jsrepo"/>
+					<JsrepoWordmark className="h-6" aria-label="jsrepo" />
 				</>
 			),
 		},
