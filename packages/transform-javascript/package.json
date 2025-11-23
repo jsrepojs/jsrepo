@@ -3,7 +3,7 @@
 	"description": "A transform plugin for jsrepo to strip types from TypeScript code.",
 	"version": "0.0.1-beta.19",
 	"license": "MIT",
-	"homepage": "https://v3.jsrepo.dev",
+	"homepage": "https://jsrepo.dev",
 	"author": {
 		"name": "Aidan Bleser",
 		"url": "https://github.com/ieedan"

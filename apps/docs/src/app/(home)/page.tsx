@@ -9,11 +9,11 @@ import { cn } from "@/lib/utils";
 import PrismaticBurst from "@/components/PrismaticBurst";
 
 export const metadata: Metadata = {
-	title: "jsrepo.dev - The modern component registry toolchain",
-	description: "jsrepo - The modern component registry toolchain",
+	title: "jsrepo.dev - The modern registry toolchain",
+	description: "jsrepo - The modern registry toolchain",
 	openGraph: {
 		title: "jsrepo.dev",
-		description: "jsrepo - The modern component registry toolchain",
+		description: "jsrepo - The modern registry toolchain",
 		type: "website",
 		siteName: "jsrepo.dev",
 		images: [
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 	twitter: {
 		card: "summary_large_image",
 		title: "jsrepo.dev",
-		description: "jsrepo - The modern component registry toolchain",
+		description: "jsrepo - The modern registry toolchain",
 		images: [
 			{
 				url: "/og",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 			},
 		],
 	},
-	metadataBase: new URL("https://v3.jsrepo.dev"),
+	metadataBase: new URL("https://jsrepo.dev"),
 };
 
 export default function HomePage() {
@@ -122,7 +122,7 @@ function HeroSection() {
 		<div className="flex flex-col items-center justify-center mt-[15svh]">
 			<div className="flex flex-col gap-6 items-center justify-center max-w-3/4">
 				<h1 className="text-balance text-4xl font-medium sm:text-5xl md:text-6xl">
-					The modern component registry toolchain
+					The modern registry toolchain
 				</h1>
 				<p className="mx-auto max-w-3xl text-pretty text-lg text-muted-foreground">
 					jsrepo handles the hard parts of registries so you can focus on building.

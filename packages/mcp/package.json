@@ -3,7 +3,7 @@
 	"description": "An MCP server for jsrepo.",
 	"version": "0.0.1-beta.28",
 	"license": "MIT",
-	"homepage": "https://v3.jsrepo.dev/docs/mcp",
+	"homepage": "https://jsrepo.dev/docs/mcp",
 	"author": {
 		"name": "Aidan Bleser",
 		"url": "https://github.com/ieedan"

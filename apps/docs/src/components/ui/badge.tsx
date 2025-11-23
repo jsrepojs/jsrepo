@@ -50,7 +50,7 @@ function SourceBadge({
 }) {
 	return (
 		<a
-			href={new URL(path, "https://github.com/jsrepojs/jsrepo/blob/next/").toString()}
+			href={new URL(path, "https://github.com/jsrepojs/jsrepo/blob/main/").toString()}
 			className="flex place-items-center justify-center not-prose"
 		>
 			<Badge variant="secondary" className={cn("text-muted-foreground", className)} {...props}>

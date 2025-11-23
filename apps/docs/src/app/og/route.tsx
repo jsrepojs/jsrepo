@@ -5,7 +5,7 @@ export const revalidate = false;
 
 export async function GET() {
 	const title = "jsrepo";
-	const description = "The modern component registry toolchain.";
+	const description = "The modern registry toolchain.";
 
 	return new ImageResponse(
 		(
