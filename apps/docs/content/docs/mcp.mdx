@@ -68,17 +68,17 @@ All **jsrepo** registries are supported out of the box by the MCP server, includ
         ```
     </UnderlineTabsContent>
 	<UnderlineTabsContent value="vs-code">
-        You can quickly configure the MCP server for Claude Code by running the following command:
+        You can quickly configure the MCP server for VSCode by running the following command:
 
 		```sh
         jsrepo config mcp --client vscode
         ```
 
-        This will automatically configure the MCP server for Claude Code in the correct file:
+        This will automatically configure the MCP server for VSCode in the correct file:
 
         ```json title=".vscode/mcp.json"
         {
-            "mcpServers": {
+            "servers": {
                 "jsrepo": {
                     "command": "npx",
                     "args": ["@jsrepo/mcp"]

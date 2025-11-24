@@ -153,14 +153,10 @@ function writeConfig(filePath: AbsolutePath, content: string): Result<void, CLIE
 	}
 }
 
-const MCP_SERVER_CONFIG_JSON = {
-	mcpServers: {
-		jsrepo: {
-			command: 'npx',
-			args: ['@jsrepo/mcp'],
-		},
-	},
-};
+const MCP_SERVER_CONFIG_JSON: ServerConfig = {
+	command: 'npx',
+	args: ['@jsrepo/mcp'],
+} as const;
 
 const MCP_SERVER_CONFIG_TOML = `[mcp_servers.jsrepo]
 command = "npx"
@@ -177,27 +173,39 @@ export function updateTomlConfig(existingContent: string): string {
 	return `${existingContent}${MCP_SERVER_CONFIG_TOML}`;
 }
 
+const ServerConfigSchema = z.object({
+	command: z.string(),
+	args: z.array(z.string()),
+	env: z.record(z.string(), z.string()).optional(),
+});
+
+export type ServerConfig = z.infer<typeof ServerConfigSchema>;
+
 export const McpServerConfigSchema = z.object({
-	mcpServers: z.record(
-		z.string(),
-		z.object({
-			command: z.string(),
-			args: z.array(z.string()),
-			env: z.record(z.string(), z.string()).optional(),
-		})
-	),
+	mcpServers: z.record(z.string(), ServerConfigSchema),
+});
+
+export const VSCodeServerConfigSchema = z.object({
+	servers: z.record(z.string(), ServerConfigSchema),
 });
 
 export type McpServerConfig = z.infer<typeof McpServerConfigSchema>;
+export type VSCodeServerConfig = z.infer<typeof VSCodeServerConfigSchema>;
 
-export function updateJsonConfig(
-	existingContent: string,
-	key: string,
-	value: McpServerConfig['mcpServers'][string]
-): Result<string, CLIError> {
+export function updateJsonConfig({
+	existingContent,
+	serverName,
+	serverConfig,
+}: {
+	existingContent: string;
+	serverName: string;
+	serverConfig: ServerConfig;
+}): Result<string, CLIError> {
 	if (existingContent.trim().length === 0) {
 		return ok(
-			stringify({ mcpServers: { [key]: value } } satisfies McpServerConfig, { format: true })
+			stringify({ mcpServers: { [serverName]: serverConfig } } satisfies McpServerConfig, {
+				format: true,
+			})
 		);
 	}
 
@@ -217,20 +225,60 @@ export function updateJsonConfig(
 	const newContent = {
 		mcpServers: {
 			...parsedContent.mcpServers,
-			[key]: value,
+			[serverName]: serverConfig,
 		},
 	} satisfies McpServerConfig;
 
 	return ok(stringify(newContent, { format: true }));
 }
 
-function updateJsonFile(filePath: AbsolutePath): Result<void, CLIError> {
+export function updateVSCodeJsonConfig({
+	existingContent,
+	serverName,
+	serverConfig,
+}: {
+	existingContent: string;
+	serverName: string;
+	serverConfig: ServerConfig;
+}): Result<string, CLIError> {
+	if (existingContent.trim().length === 0) {
+		return ok(
+			stringify({ servers: { [serverName]: serverConfig } } satisfies VSCodeServerConfig, {
+				format: true,
+			})
+		);
+	}
+
+	const parsedContentResult = safeParseFromJSON(VSCodeServerConfigSchema, existingContent);
+	if (parsedContentResult.isErr()) {
+		return err(
+			new JsrepoError(
+				`Failed to parse MCP server config: ${parsedContentResult.error.message}`,
+				{
+					suggestion: 'Please try again.',
+				}
+			)
+		);
+	}
+	const parsedContent = parsedContentResult.value;
+
+	const newContent = {
+		servers: {
+			...parsedContent.servers,
+			[serverName]: serverConfig,
+		},
+	} satisfies VSCodeServerConfig;
+
+	return ok(stringify(newContent, { format: true }));
+}
+
+function updateJsonFile(filePath: AbsolutePath, config: ServerConfig): Result<void, CLIError> {
 	const existingContent = existsSync(filePath) ? readFileSync(filePath)._unsafeUnwrap() : '';
-	const newContent = updateJsonConfig(
+	const newContent = updateVSCodeJsonConfig({
 		existingContent,
-		'jsrepo',
-		MCP_SERVER_CONFIG_JSON.mcpServers.jsrepo
-	);
+		serverName: 'jsrepo',
+		serverConfig: config,
+	});
 	if (newContent.isErr()) return err(newContent.error);
 	return writeConfig(filePath, newContent.value);
 }
@@ -239,17 +287,17 @@ const CLIENTS: Record<McpClient, ClientConfig> = {
 	cursor: {
 		name: 'Cursor',
 		filePath: (cwd: AbsolutePath) => joinAbsolute(cwd, '.cursor/mcp.json'),
-		writeConfig: updateJsonFile,
+		writeConfig: (filePath: AbsolutePath) => updateJsonFile(filePath, MCP_SERVER_CONFIG_JSON),
 	},
 	claude: {
 		name: 'Claude Code',
 		filePath: (cwd: AbsolutePath) => joinAbsolute(cwd, '.mcp.json'),
-		writeConfig: updateJsonFile,
+		writeConfig: (filePath: AbsolutePath) => updateJsonFile(filePath, MCP_SERVER_CONFIG_JSON),
 	},
 	vscode: {
 		name: 'VS Code',
 		filePath: (cwd: AbsolutePath) => joinAbsolute(cwd, '.vscode/mcp.json'),
-		writeConfig: updateJsonFile,
+		writeConfig: (filePath: AbsolutePath) => updateJsonFile(filePath, MCP_SERVER_CONFIG_JSON),
 	},
 	codex: {
 		name: 'Codex',
@@ -266,6 +314,6 @@ const CLIENTS: Record<McpClient, ClientConfig> = {
 		name: 'Antigravity',
 		filePath: () =>
 			joinAbsolute(os.homedir() as AbsolutePath, '.gemini/antigravity/mcp_config.json'),
-		writeConfig: updateJsonFile,
+		writeConfig: (filePath: AbsolutePath) => updateJsonFile(filePath, MCP_SERVER_CONFIG_JSON),
 	},
 };

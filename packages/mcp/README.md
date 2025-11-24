@@ -15,7 +15,7 @@ npx jsrepo config mcp
 
 ### Manual Configuration
 
-json config:
+JSON config (for Cursor, Claude Code, Antigravity):
 
 ```json
 {
@@ -28,7 +28,20 @@ json config:
 }
 ```
 
-toml config:
+JSON config (for VS Code):
+
+```json
+{
+	"servers": {
+		"jsrepo": {
+			"command": "npx",
+			"args": ["@jsrepo/mcp"]
+		}
+	}
+}
+```
+
+TOML config (for Codex):
 
 ```toml
 [mcp_servers.jsrepo]

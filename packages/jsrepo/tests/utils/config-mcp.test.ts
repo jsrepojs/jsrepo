@@ -16,9 +16,13 @@ describe('updateJsonConfig', () => {
 			},
 		};
 
-		const result = updateJsonConfig(JSON.stringify(config), 'jsrepo', {
-			command: 'npx',
-			args: ['@jsrepo/mcp'],
+		const result = updateJsonConfig({
+			existingContent: JSON.stringify(config),
+			serverName: 'jsrepo',
+			serverConfig: {
+				command: 'npx',
+				args: ['@jsrepo/mcp'],
+			},
 		});
 		assert(result.isOk());
 		expect(result.value).toBe(
@@ -37,7 +41,11 @@ describe('updateJsonConfig', () => {
 	});
 
 	it('should create a new file when empty', () => {
-		const result = updateJsonConfig('', 'jsrepo', { command: 'npx', args: ['@jsrepo/mcp'] });
+		const result = updateJsonConfig({
+			existingContent: '',
+			serverName: 'jsrepo',
+			serverConfig: { command: 'npx', args: ['@jsrepo/mcp'] },
+		});
 		assert(result.isOk());
 		expect(result.value).toBe(
 			stringify(
@@ -64,9 +72,13 @@ describe('updateJsonConfig', () => {
 			},
 		};
 
-		const result = updateJsonConfig(JSON.stringify(config), 'jsrepo', {
-			command: 'npx',
-			args: ['@jsrepo/mcp'],
+		const result = updateJsonConfig({
+			existingContent: JSON.stringify(config),
+			serverName: 'jsrepo',
+			serverConfig: {
+				command: 'npx',
+				args: ['@jsrepo/mcp'],
+			},
 		});
 		assert(result.isOk());
 		expect(result.value).toBe(
