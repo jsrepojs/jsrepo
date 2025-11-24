@@ -1,5 +1,26 @@
 # @jsrepo/mcp
 
+## 0.0.1
+### Patch Changes
+
+
+- fix: add banner to ensure mcp works with `npx` ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- chore: update docs links ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- rename `search` tool to `list` and make searching optional ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- chore: bump deps ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- initial beta release ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+- Updated dependencies [[`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843), [`183a68e`](https://github.com/jsrepojs/jsrepo/commit/183a68e2f162d1e867a6db5d79fbfea8b6be2843)]:
+  - jsrepo@3.0.0
+
 ## 0.0.1-beta.31
 ### Patch Changes
 
