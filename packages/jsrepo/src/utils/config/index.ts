@@ -119,14 +119,14 @@ export type RegistryItemType = LooseAutocomplete<
 	'block' | 'component' | 'lib' | 'hook' | 'ui' | 'page'
 >;
 
-export const RegistryItemAddSchema = z.enum([
+export const RegistryItemAddOptions = [
 	'optionally-on-init',
 	'on-init',
 	'when-needed',
 	'when-added',
-]);
-
-export type RegistryItemAdd = z.infer<typeof RegistryItemAddSchema>;
+] as const;
+export const RegistryItemAddSchema = z.enum(RegistryItemAddOptions);
+export type RegistryItemAdd = (typeof RegistryItemAddOptions)[number];
 
 export type RegistryItem = {
 	/** The name of the item. MUST be unique. Spaces are NOT allowed. */
