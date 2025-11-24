@@ -159,7 +159,7 @@ export async function runV3(options: V3Options): Promise<Result<V3CommandResult,
 	}
 
 	const neededDependencies: string[] = [
-		'jsrepo@beta',
+		'jsrepo@latest',
 		...(oldProjectConfig?.formatter ? [`@jsrepo/transform-${oldProjectConfig.formatter}`] : []),
 	];
 
@@ -218,7 +218,7 @@ export default defineConfig({${
 		const newBuildCommand = resolveCommand(
 			(await detect({ cwd: options.cwd }))?.agent ?? 'npm',
 			'execute',
-			['jsrepo@beta', 'build']
+			['jsrepo@latest', 'build']
 		);
 		if (newBuildCommand === null)
 			return err(
