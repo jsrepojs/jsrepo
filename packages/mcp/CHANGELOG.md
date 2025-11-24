@@ -1,5 +1,11 @@
 # @jsrepo/mcp
 
+## 0.0.1-beta.30
+### Patch Changes
+
+- Updated dependencies [[`db08900`](https://github.com/jsrepojs/jsrepo/commit/db08900353eac423d359b437362802c3f4b5b331)]:
+  - jsrepo@3.0.0-beta.28
+
 ## 0.0.1-beta.29
 ### Patch Changes
 
