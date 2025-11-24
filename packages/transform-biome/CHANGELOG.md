@@ -1,5 +1,11 @@
 # @jsrepo/transform-biome
 
+## 0.0.3
+### Patch Changes
+
+- Updated dependencies [[`ca63e1b`](https://github.com/jsrepojs/jsrepo/commit/ca63e1b07bab114b9ad9c998bd3d97403e12bc59), [`ca63e1b`](https://github.com/jsrepojs/jsrepo/commit/ca63e1b07bab114b9ad9c998bd3d97403e12bc59)]:
+  - jsrepo@3.0.2
+
 ## 0.0.2
 ### Patch Changes
 

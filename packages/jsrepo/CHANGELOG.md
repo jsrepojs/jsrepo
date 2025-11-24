@@ -1,5 +1,14 @@
 # jsrepo
 
+## 3.0.2
+### Patch Changes
+
+
+- fix: ensure paths are resolved correctly ([#697](https://github.com/jsrepojs/jsrepo/pull/697))
+
+
+- fix: Ensure the user selects at least one option in the add command multiselect ([#697](https://github.com/jsrepojs/jsrepo/pull/697))
+
 ## 3.0.1
 ### Patch Changes
 
