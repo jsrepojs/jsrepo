@@ -1,5 +1,143 @@
 # jsrepo
 
+## 3.0.0
+### Patch Changes
+
+
+- v3 initial beta release ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- feat: remove `registry:` prefix from item types ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- feat: add `meta` prop to registry items ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: ensure token is provided to fetch methods ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: Remove zod reliance for exported types ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- feat: allow for searching components in list when running `add` command without a specific item ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: Improve robustness of builds with value optional instead of key optional and better tests ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: peer deps ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: Ensure that paths are updated when running add/update commands ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: Fix add type ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: make `svelte` and `vue` optional peer dependencies ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: Skip and warn the user for dynamic imports with unresolvable syntax ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- feat: `publish` command ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: Add `docsLink` to `NoOutputsError` ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: ensure dependencies are properly installed ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: Fixed an issue where when initializing a registry paths would be unnecessarily added to the config ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: improve error formatting ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- Fix error message stacking in manifest fetch errors. Removes redundant "Error fetching" prefixes to improve readability of error messages. ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- chore: bump deps ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- feat: add `categories` prop to registry items ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: ensure vscode configuration is correct ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: Create config at `.mts` only if `type: "module"` is not set in package.json ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- feat: add `optionally-on-init` add option ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: ensure dependencies are still installed even if file content is the same ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- update `transform` api to allow for renaming files ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- breaking: rename `contents` -> `content` for shadcn compatibility ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- feat: transform imports from shadcn registries ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: make peer deps less agressive ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: Fixed an issue where files with multiple dots i.e. foo.bar.ts were not resolved correctly ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- breaking: Rename `remoteDependencies` -> `dependencies` and `devDependencies` for improved shadcn compatibility ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: ensure dev dependencies are added ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- feat: `config mcp` support for google antigravity ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- Fix bundling issues ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: Improve error message when registry item cannot be found ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- shadcn-compat: add `title` to registry items config ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: Improve errors for invalid imports. ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: Ensure items are added to the correct paths in the users project ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: Exit with the correct code for `publish` and `build` commands ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- feat: `publish` command ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: Ensure registry dependencies exist ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: false positive for unresolvable syntax when dynamic imports are backquoted but the template is unused ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- fix: Prevent duplicate dependencies in build result ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- feat: add support for `index` items ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- refactor the way that files are added to users projects ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
+
+- breaking: Rename manifest file from `jsrepo.json` -> `registry.json` ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
 ## 3.0.0-beta.29
 ### Patch Changes
 
