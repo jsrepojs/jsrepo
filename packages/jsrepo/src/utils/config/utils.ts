@@ -129,6 +129,9 @@ export function resolvePath(
 	p: string,
 	{ cwd, matcher }: { cwd: string; matcher: PathsMatcher }
 ): string {
+	// don't resolve relative paths
+	if (p.startsWith('./')) return p;
+
 	if (matcher === null) {
 		return path.relative(cwd, path.join(path.resolve(cwd), p));
 	}

@@ -690,9 +690,14 @@ export async function getPathsForItems({
 			new Set(Array.from(item.files, (file) => normalizeItemTypeForPath(file.type)))
 		);
 		for (const type of uniqueTypes) {
-			const itemPath = resolvedPaths[`${type}/${item.name}`] ?? resolvedPaths[type];
+			const itemPath = resolvedPaths[`${type}/${item.name}`] 
+			const typePath = resolvedPaths[type];
 			if (itemPath !== undefined) {
 				resolvedPaths[`${type}/${item.name}`] = itemPath;
+				continue;
+			}
+			if (typePath !== undefined) {
+				resolvedPaths[type] = typePath;
 				continue;
 			}
 			const result = await getItemLocation(item, {
@@ -719,6 +724,79 @@ export async function getPathsForItems({
 	const itemPaths = getItemPaths(items, resolvedPaths, { config });
 
 	return ok({ itemPaths, resolvedPaths, updatedPaths });
+}
+
+export function getItemPaths(
+	items: {
+		name: string;
+		type: RegistryItemType;
+		files: { path: ItemRelativePath; type: RegistryItemType; target?: string }[];
+	}[],
+	resolvedPaths: Config['paths'],
+	{
+		config,
+	}: {
+		config: Config | undefined;
+	}
+): Record<
+	string,
+	{
+		path: string;
+		alias?: string;
+	}
+> {
+	const itemPaths = items.reduce(
+		(acc, item) => {
+			for (const file of item.files) {
+				const type = normalizeItemTypeForPath(file.type);
+
+				const itemPath = resolvedPaths[`${type}/${item.name}`];
+				const itemAlias =
+					config?.paths[`${type}/${item.name}`] &&
+					config.paths[`${type}/${item.name}`] !== itemPath
+						? config.paths[`${type}/${item.name}`]
+						: undefined;
+
+				const typePath = resolvedPaths[type];
+				const typeAlias =
+					config?.paths[type] && config.paths[type] !== typePath
+						? config.paths[type]
+						: undefined;
+
+				acc[`${type}/${item.name}`] = itemPath
+					? { path: itemPath, alias: itemAlias }
+					: // at this point we know that the type must be defined
+						{ path: typePath!, alias: typeAlias! };
+			}
+
+			return acc;
+		},
+		{} as Record<
+			string,
+			{
+				path: string;
+				alias?: string;
+			}
+		>
+	);
+
+	for (const [key, value] of Object.entries(resolvedPaths)) {
+		// we only care about type only paths
+		if (key.includes('/')) continue;
+		// just rename for readability
+		const type = key;
+
+		const typePath = value;
+		const typeAlias =
+			config?.paths[type] && config.paths[type] !== typePath ? config.paths[type] : undefined;
+
+		// let's also make sure we just add the straight type path if it's defined
+		if (typePath) {
+			itemPaths[type] = { path: typePath, alias: typeAlias };
+		}
+	}
+
+	return itemPaths;
 }
 
 export type UpdatedFile = {
@@ -972,79 +1050,6 @@ export async function updateFiles({
 		}
 	}
 	return ok(updatedFiles);
-}
-
-export function getItemPaths(
-	items: {
-		name: string;
-		type: RegistryItemType;
-		files: { path: ItemRelativePath; type: RegistryItemType; target?: string }[];
-	}[],
-	resolvedPaths: Config['paths'],
-	{
-		config,
-	}: {
-		config: Config | undefined;
-	}
-): Record<
-	string,
-	{
-		path: string;
-		alias?: string;
-	}
-> {
-	const itemPaths = items.reduce(
-		(acc, item) => {
-			for (const file of item.files) {
-				const type = normalizeItemTypeForPath(file.type);
-
-				const itemPath = resolvedPaths[`${type}/${item.name}`];
-				const itemAlias =
-					config?.paths[`${type}/${item.name}`] &&
-					config.paths[`${type}/${item.name}`] !== itemPath
-						? config.paths[`${type}/${item.name}`]
-						: undefined;
-
-				const typePath = resolvedPaths[type];
-				const typeAlias =
-					config?.paths[type] && config.paths[type] !== typePath
-						? config.paths[type]
-						: undefined;
-
-				acc[`${type}/${item.name}`] = itemPath
-					? { path: itemPath, alias: itemAlias }
-					: // at this point we know that the type must be defined
-						{ path: typePath!, alias: typeAlias! };
-			}
-
-			return acc;
-		},
-		{} as Record<
-			string,
-			{
-				path: string;
-				alias?: string;
-			}
-		>
-	);
-
-	for (const [key, value] of Object.entries(resolvedPaths)) {
-		// we only care about type only paths
-		if (key.includes('/')) continue;
-		// just rename for readability
-		const type = key;
-
-		const typePath = value;
-		const typeAlias =
-			config?.paths[type] && config.paths[type] !== typePath ? config.paths[type] : undefined;
-
-		// let's also make sure we just add the straight type path if it's defined
-		if (typePath) {
-			itemPaths[type] = { path: typePath, alias: typeAlias };
-		}
-	}
-
-	return itemPaths;
 }
 
 /**
