@@ -1,0 +1,50 @@
+---
+title: html
+description: HTML language support for jsrepo.
+---
+
+<BadgeGroup>
+	<SourceBadge path="packages/jsrepo/src/langs/html.ts" />
+	<OfficialBadge />
+	<DefaultBadge />
+</BadgeGroup>
+
+The `html` language plugin supports dependency resolution for HTML files as well as installing dependencies with `ecosystem: "js"`.
+
+## Supported syntax
+
+The HTML plugin will detect dependencies from the following syntax:
+
+-   `script` tags with `src` attributes
+-   `script` tags with inline code
+-   `link` tags with `href` attributes
+
+For example the following code:
+
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="./app.css">
+	</head>
+	<!-- Doesn't resolve remote deps -->
+	<script src="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19"></script>
+	<script>
+		import { print } from "@/utils/stdout";
+		print("Hello, world!");
+	</script>
+</html>
+```
+
+Will result in the following dependencies:
+
+-   `./app.css` - From `link` tag
+-   `@/utils/stdout` - From `script` tag with inline code
+
+## Supported File Extensions
+
+The HTML language plugin supports the following file extensions:
+
+| Extension |
+| --------- |
+| `.html`   |

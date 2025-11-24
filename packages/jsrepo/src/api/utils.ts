@@ -1,0 +1,16 @@
+export {
+	fetchAllResolvedItems,
+	getPathsForItems,
+	normalizeItemTypeForPath,
+	parseWantedItems,
+	prepareUpdates,
+	type RegistryItemWithContent,
+	resolveAndFetchAllItems,
+	resolveRegistries,
+	resolveTree,
+	resolveWantedItems,
+	updateFiles,
+} from '@/utils/add';
+export { joinAbsolute } from '@/utils/path';
+export { promptAddEnvVars, promptInstallDependenciesByEcosystem } from '@/utils/prompts';
+export type { AbsolutePath, ItemRelativePath } from '@/utils/types';

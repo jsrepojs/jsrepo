@@ -1,0 +1,123 @@
+{
+	"name": "jsrepo",
+	"description": "A CLI to add shared code from remote repositories.",
+	"version": "3.0.0-beta.29",
+	"license": "MIT",
+	"homepage": "https://jsrepo.dev",
+	"author": {
+		"name": "Aidan Bleser",
+		"url": "https://github.com/ieedan"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/jsrepojs/jsrepo"
+	},
+	"bugs": {
+		"url": "https://github.com/jsrepojs/jsrepo/issues"
+	},
+	"keywords": [
+		"repo",
+		"cli",
+		"svelte",
+		"vue",
+		"typescript",
+		"javascript",
+		"shadcn",
+		"registry"
+	],
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/api/index.d.ts",
+			"default": "./dist/api/index.js"
+		},
+		"./providers": {
+			"types": "./dist/api/providers.d.ts",
+			"default": "./dist/api/providers.js"
+		},
+		"./langs": {
+			"types": "./dist/api/langs/index.d.ts",
+			"default": "./dist/api/langs/index.js"
+		},
+		"./langs/*": {
+			"types": "./dist/api/langs/*.d.ts",
+			"default": "./dist/api/langs/*.js"
+		},
+		"./outputs": {
+			"types": "./dist/api/outputs.d.ts",
+			"default": "./dist/api/outputs.js"
+		},
+		"./config": {
+			"types": "./dist/api/config.d.ts",
+			"default": "./dist/api/config.js"
+		},
+		"./errors": {
+			"types": "./dist/api/errors.d.ts",
+			"default": "./dist/api/errors.js"
+		},
+		"./utils": {
+			"types": "./dist/api/utils.d.ts",
+			"default": "./dist/api/utils.js"
+		}
+	},
+	"bin": "./dist/bin.js",
+	"main": "./dist/index.js",
+	"files": [
+		"dist/**/*",
+		"!dist/**/*.map"
+	],
+	"scripts": {
+		"start": "node ./dist/bin.js",
+		"build": "tsdown",
+		"dev": "tsdown --watch",
+		"check": "tsc --noEmit",
+		"test": "vitest",
+		"bundle-analyze": "FORCE_COLOR=1 node ../../bundle-analyzer/dist/index.js analyze ."
+	},
+	"packageManager": "pnpm@10.20.0",
+	"dependencies": {
+		"commander": "^14.0.2",
+		"oxc-parser": "^0.96.0",
+		"unconfig": "^7.3.3"
+	},
+	"peerDependencies": {
+		"svelte": "^5.0.0",
+		"vue": "^3.0.0"
+	},
+	"peerDependenciesMeta": {
+		"vue": {
+			"optional": true
+		},
+		"svelte": {
+			"optional": true
+		}
+	},
+	"devDependencies": {
+		"@clack/prompts": "1.0.0-alpha.6",
+		"@types/node": "catalog:",
+		"@types/semver": "^7.7.1",
+		"@types/tar-stream": "^3.1.4",
+		"conf": "^15.0.2",
+		"css-dependency": "^0.0.3",
+		"dedent": "^1.7.0",
+		"diff": "^8.0.2",
+		"escape-string-regexp": "^5.0.0",
+		"get-tsconfig": "^4.13.0",
+		"is-unicode-supported": "^2.1.0",
+		"magic-string": "^0.30.21",
+		"nevereverthrow": "^0.3.0",
+		"node-machine-id": "^1.1.12",
+		"package-manager-detector": "^1.5.0",
+		"parse5": "^8.0.0",
+		"pathe": "^2.0.3",
+		"picocolors": "catalog:",
+		"semver": "^7.7.3",
+		"tar-stream": "^3.1.7",
+		"tinyexec": "^1.0.2",
+		"tsdown": "catalog:",
+		"typescript": "catalog:",
+		"vite": "^7.2.0",
+		"vitest": "catalog:",
+		"zod": "catalog:"
+	}
+}

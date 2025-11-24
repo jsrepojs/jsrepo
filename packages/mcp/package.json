@@ -1,0 +1,58 @@
+{
+	"name": "@jsrepo/mcp",
+	"description": "An MCP server for jsrepo.",
+	"version": "0.0.1-beta.31",
+	"license": "MIT",
+	"homepage": "https://jsrepo.dev/docs/mcp",
+	"author": {
+		"name": "Aidan Bleser",
+		"url": "https://github.com/ieedan"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/jsrepojs/jsrepo"
+	},
+	"bugs": {
+		"url": "https://github.com/jsrepojs/jsrepo/issues"
+	},
+	"keywords": [
+		"jsrepo",
+		"mcp",
+		"server",
+		"ai"
+	],
+	"type": "module",
+	"bin": "./dist/index.js",
+	"main": "./dist/index.js",
+	"files": [
+		"dist/**/*",
+		"!dist/**/*.map"
+	],
+	"scripts": {
+		"build": "tsdown",
+		"dev": "tsdown --watch",
+		"start": "node ./dist/index.js mcp",
+		"check": "tsc --noEmit",
+		"mcp:inspector": "pnpm dlx @modelcontextprotocol/inspector node ./dist/index.js mcp",
+		"test": "vitest",
+		"bundle-analyze": "FORCE_COLOR=1 node ../../bundle-analyzer/dist/index.js analyze ."
+	},
+	"packageManager": "pnpm@10.17.1",
+	"dependencies": {
+		"jsrepo": "workspace:*"
+	},
+	"devDependencies": {
+		"@tmcp/adapter-zod": "^0.1.7",
+		"@tmcp/transport-in-memory": "^0.0.2",
+		"@tmcp/transport-stdio": "^0.4.0",
+		"@types/node": "catalog:",
+		"dedent": "^1.7.0",
+		"fuzzysort": "^3.1.0",
+		"picocolors": "catalog:",
+		"tmcp": "^1.16.2",
+		"tsdown": "catalog:",
+		"typescript": "catalog:",
+		"vitest": "catalog:",
+		"zod": "catalog:"
+	}
+}

@@ -1,105 +1,42 @@
 {
-	"name": "jsrepo",
-	"description": "A CLI to add shared code from remote repositories.",
-	"version": "2.5.2",
+	"name": "@jsrepo/monorepo",
+	"version": "0.0.0",
+	"description": "The monorepo for jsrepo",
 	"license": "MIT",
-	"homepage": "https://jsrepo.dev",
-	"author": {
-		"name": "Aidan Bleser",
-		"url": "https://github.com/ieedan"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/jsrepojs/jsrepo"
-	},
-	"bugs": {
-		"url": "https://github.com/jsrepojs/jsrepo/issues"
-	},
-	"keywords": [
-		"repo",
-		"cli",
-		"svelte",
-		"vue",
-		"typescript",
-		"javascript",
-		"shadcn",
-		"registry"
-	],
+	"packageManager": "pnpm@10.4.1",
 	"type": "module",
-	"packageManager": "pnpm@10.8.1",
-	"exports": {
-		".": {
-			"types": "./dist/api/index.d.ts",
-			"default": "./dist/api/index.js"
-		}
-	},
-	"bin": "./dist/index.js",
-	"main": "./dist/index.js",
-	"files": [
-		"./schemas/**/*",
-		"dist/**/*"
-	],
 	"scripts": {
-		"start": "tsup --silent && node ./dist/index.js",
-		"build": "tsup",
-		"generate:reference": "pnpm dlx tsx ./scripts/generate-reference.ts ",
-		"run:dev": "node ./dist/index.js",
-		"format": "biome format --write",
+		"build": "pnpm --r --filter '!./examples/**' build",
+		"dev": "concurrently -n packages,apps --kill-others=false -c \"blue,green\" \"pnpm --r --parallel --filter '!./examples/**' --filter '!./apps/**' dev\" \"wait-on packages/jsrepo/dist/api/index.js && pnpm -r --parallel --filter './apps/**' dev\"",
 		"lint": "biome lint --write",
-		"check": "biome check && pnpm check:types",
-		"test": "vitest",
-		"check:types": "tsc",
-		"changeset:version": "changeset version && pnpm generate:reference && pnpm format",
-		"ci:release": "pnpm build && changeset publish",
-		"mcp:inspector": "pnpm build && pnpm dlx @modelcontextprotocol/inspector node ./dist/index.js mcp"
+		"format": "biome format --write",
+		"check": "biome check --fix && pnpm type:check",
+		"type:check": "pnpm -r check",
+		"test": "pnpm -r test",
+		"changeset:version": "changeset version && pnpm format",
+		"ci:release": "pnpm build:packages && changeset publish",
+		"postinstall": "pnpm build:packages",
+		"build:packages": "pnpm -parallel --filter './packages/*' build",
+		"bundle-analyze": "pnpm build:bundle-analyzer && pnpm -r --filter './packages/*' --color=always bundle-analyze",
+		"build:bundle-analyzer": "pnpm -F @jsrepo/bundle-analyzer build",
+		"build:examples": "pnpm -r --filter './examples/**' build",
+		"build:example-registries": "pnpm -r --filter './examples/**' registry:build"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.2.4",
+		"@biomejs/biome": "2.3.0",
 		"@changesets/cli": "^2.29.7",
-		"@types/make-fetch-happen": "^10.0.4",
-		"@types/node": "^24.4.0",
-		"@types/semver": "^7.7.1",
-		"@types/validate-npm-package-name": "^4.0.2",
+		"@svitejs/changesets-changelog-github-compact": "^1.2.0",
+		"concurrently": "catalog:",
 		"pkg-pr-new": "^0.0.60",
-		"tsup": "^8.5.0",
-		"typescript": "^5.9.2",
-		"vitest": "^3.2.4"
+		"wait-on": "^9.0.1"
 	},
-	"dependencies": {
-		"@anthropic-ai/sdk": "^0.62.0",
-		"@biomejs/js-api": "^3.0.0",
-		"@biomejs/wasm-nodejs": "^2.2.4",
-		"@clack/prompts": "^0.11.0",
-		"@tmcp/adapter-valibot": "^0.1.3",
-		"@tmcp/transport-stdio": "^0.4.0",
-		"boxen": "^8.0.1",
-		"chalk": "^5.6.2",
-		"commander": "^14.0.1",
-		"conf": "^14.0.0",
-		"css-dependency": "^0.0.3",
-		"diff": "^8.0.2",
-		"escape-string-regexp": "^5.0.0",
-		"estree-walker": "^3.0.3",
-		"get-tsconfig": "^4.10.1",
-		"ignore": "^7.0.5",
-		"is-unicode-supported": "^2.1.0",
-		"make-fetch-happen": "^15.0.1",
-		"node-machine-id": "^1.1.12",
-		"ollama": "^0.5.17",
-		"openai": "^5.20.2",
-		"oxc-parser": "^0.72.3",
-		"package-manager-detector": "^1.3.0",
-		"parse5": "^8.0.0",
-		"pathe": "^2.0.3",
-		"prettier": "^3.6.2",
-		"semver": "^7.7.2",
-		"sisteransi": "^1.0.5",
-		"svelte": "^5.38.10",
-		"tar": "^7.4.3",
-		"tinyexec": "^1.0.1",
-		"tmcp": "^1.16.0",
-		"valibot": "1.1.0",
-		"validate-npm-package-name": "^6.0.2",
-		"vue": "^3.5.21"
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"@tailwindcss/oxide",
+			"core-js",
+			"esbuild",
+			"msw",
+			"sharp"
+		]
 	}
 }

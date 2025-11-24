@@ -1,0 +1,124 @@
+---
+title: Outputs
+description: Output your registry however you want.
+---
+
+Outputs allow you to customize the way your registry is distributed, or (more generally) what to do with the registry after it's built.
+
+This isn't limited into building your registry into a format that **jsrepo** can understand you could use it to output documentation or a manifest for your own CLI application.
+
+By default **jsrepo** ships with two output types:
+
+- [Distributed](/docs/outputs/distributed) - Output your registry as json files in a directory.
+- [Repository](/docs/outputs/repository) - Output your registry as a single json file in the root of your repository.
+
+Here are all the officially available outputs:
+
+<Cards>
+	<Card href="/docs/outputs/distributed" icon={<SplitIcon />} title="Distributed">
+		Output your registry as json files in a directory.
+	</Card>
+	<Card href="/docs/outputs/repository" icon={<FolderIcon />} title="Repository">
+		Output your registry as a single json file in the root of your repository.
+	</Card>
+    <Card href="/docs/outputs/shadcn" icon={<ShadcnLogo />} title="shadcn">
+		Output your registry as a shadcn registry.
+	</Card>
+</Cards>
+
+## Creating a custom output
+
+You can create your own output either inline in your config file or as a standalone package.
+
+For this example we will create a standalone package that outputs your registry as a markdown file called `REGISTRY.md`.
+
+Let's create our `output.ts` file and import the `Output` type from `jsrepo/outputs`:
+
+```ts
+import type { Output } from "jsrepo/outputs";
+
+export function output(): Output {
+    return {
+        
+    }
+}
+```
+
+Next let's define the `output` key to define how the registry should be output:
+
+```ts title="src/output.ts"
+import type { Output } from "jsrepo/outputs";
+
+export const OUTPUT_FILE = "REGISTRY.md";
+
+export function output(): Output {
+    return {
+        output: async (buildResult, { cwd }) => { // [!code ++]
+            let content = `# ${buildResult.name}\n\n`; // [!code ++]
+            // [!code ++]
+            for (const item of buildResult.items) { // [!code ++]
+                content += `## ${item.name}\n\n${item.description}\n\n`; // [!code ++]
+            } // [!code ++]
+            // [!code ++]
+            fs.writeFileSync(path.join(cwd, OUTPUT_FILE), content); // [!code ++]
+        }, // [!code ++]
+    }
+}
+```
+
+<Callout type="info">
+    The `buildResult` object contains a bunch of useful information about the registry. You can find the full type [here](https://github.com/jsrepojs/jsrepo/blob/next/packages/jsrepo/src/utils/build.ts#L31).
+</Callout>
+
+Finally we can define the `clean` key to define how to remove the output file before the next build:
+
+```ts title="src/output.ts"
+import type { Output } from "jsrepo/outputs";
+
+export const OUTPUT_FILE = "REGISTRY.md";
+
+export function output(): Output {
+    return {
+        output: async (buildResult, { cwd }) => {
+            let content = `# ${buildResult.name}\n\n`;
+
+            for (const item of buildResult.items) {
+                content += `## ${item.name}\n\n${item.description}\n\n`;
+            }
+
+            fs.writeFileSync(path.join(cwd, OUTPUT_FILE), content);
+        },
+        clean: async ({ cwd }) => { // [!code ++]
+            const manifestPath = path.join(cwd, OUTPUT_FILE); // [!code ++]
+            if (!fs.existsSync(manifestPath)) return; // [!code ++]
+            fs.rmSync(manifestPath); // [!code ++]
+        }, // [!code ++]
+    }
+}
+```
+
+Now we can use the output in our config file:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { output } from "./src/output";
+
+export default defineConfig({
+    registry: {
+        name: "my-registry",
+        outputs: [output()],
+        // ...
+    }
+});
+```
+
+And the result should look like this:
+
+```markdown title="REGISTRY.md"
+# my-registry
+
+## button
+
+A button component.
+
+```

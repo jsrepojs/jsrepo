@@ -1,0 +1,41 @@
+---
+title: language
+description: Add a language to your config.
+---
+
+```sh
+jsrepo config language
+```
+
+## Usage
+
+Add a language to your config. You will be prompted to install dependencies after adding:
+
+```sh
+jsrepo config language jsrepo-language-go
+```
+
+Add multiple languages at once:
+
+```sh
+jsrepo config language jsrepo-language-go jsrepo-language-rust
+```
+
+## Options
+
+### `--cwd`
+
+The current working directory:
+
+```sh
+jsrepo config language jsrepo-language-go --cwd ./my-project
+```
+
+### `--yes`
+
+Skip the confirmation prompt:
+
+```sh
+jsrepo config language jsrepo-language-go --yes
+```
+

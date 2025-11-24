@@ -1,0 +1,54 @@
+---
+title: shadcn
+description: Download and add items from the shadcn registry index.
+---
+
+import { RegistryDirectory } from "@/components/registry-index";
+
+<BadgeGroup>
+	<SourceBadge path="packages/shadcn/src/provider.ts" />
+	<OfficialBadge />
+</BadgeGroup>
+
+## Usage
+
+The **shadcn** registry index is a nice way to shorten shadcn registry urls. If you are making use of shadcn registries in your project you can use this provider to use registries by their shortened name.
+
+Since this doesn't come by default you will need to add it to your `jsrepo.config.ts` file. You can do this with a command:
+
+```sh
+jsrepo config provider @jsrepo/shadcn
+```
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import shadcn from "@jsrepo/shadcn"; // [!code ++]
+
+export default defineConfig({
+	providers: [shadcn()], // [!code ++]
+});
+```
+
+Now you can simply use the `shadcn:` prefix followed by the registry namespace:
+
+```sh
+jsrepo add --registry shadcn:@react-bits
+```
+
+## Options
+
+<TypeTable
+	type={{
+		registryIndexUrl: {
+			description: "The base url of the registry index.",
+			type: "string",
+			default: "https://ui.shadcn.com/r/registries.json",
+		},
+	}}
+/>
+
+## Registry Directory
+
+All of these registries are available to use with the **shadcn** provider.
+
+<RegistryDirectory />

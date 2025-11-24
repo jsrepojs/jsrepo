@@ -1,3 +1,14 @@
-onlyBuiltDependencies:
-  - '@biomejs/biome'
-  - esbuild
+packages:
+  - "packages/*"
+  - "examples/*"
+  - "apps/*"
+  - "bundle-analyzer"
+
+catalog:
+  vitest: ^4.0.7
+  "@types/node": ^24.10.0
+  zod: ^4.1.12
+  tsdown: ^0.15.12
+  picocolors: ^1.1.1
+  typescript: ^5.9.3
+  concurrently: ^9.2.1

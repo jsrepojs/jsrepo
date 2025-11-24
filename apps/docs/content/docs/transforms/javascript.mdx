@@ -1,0 +1,69 @@
+---
+title: JavaScript
+description: Transform TypeScript registry items into JavaScript before adding them to your project.
+---
+
+<BadgeGroup>
+	<SourceBadge path="packages/transform-javascript/src/index.ts" />
+	<OfficialBadge />
+	<NpmBadge packageName="@jsrepo/transform-javascript" />
+</BadgeGroup>
+
+The [@jsrepo/transform-javascript](https://npmjs.com/package/@jsrepo/transform-javascript) package is a transform plugin for **jsrepo** that converts TypeScript registry items into JavaScript before adding them to your project.
+
+<Callout type="warning">
+    This only works for [erasable syntax](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-8.html#the---erasablesyntaxonly-option).
+</Callout>
+
+## Installation
+
+```sh
+jsrepo config transform javascript
+# or initialize any jsrepo project with the --js flag
+jsrepo init @ieedan/std --js
+```
+
+This will automatically install the transform and add it to your config:
+
+```ts
+import { defineConfig } from "jsrepo";
+import javascript from "@jsrepo/transform-javascript"; // [!code ++]
+
+export default defineConfig({
+	// ...
+	transforms: [javascript()], // [!code ++]
+});
+```
+
+This plugin will then transform any registry items written in TypeScript into JavaScript before adding them to your project.
+
+**Before:**
+
+```ts title="math/add.ts"
+export function add(a: number, b: number): number {
+	return a + b;
+}
+```
+
+**After:**
+
+```ts title="math/add.js"
+export function add(a: number, b: number): number { // [!code --]
+export function add(a, b) { // [!code ++]
+	return a + b;
+}
+```
+
+## Supported Languages
+
+If your language of choice is not supported here feel free to contribute it!
+
+- ✅ Full support
+- ⚠️ Partial support
+- ❌ No support
+
+
+| Language   | Support |
+|------------|---------|
+| TypeScript | ✅      |
+| Svelte     | ✅      |

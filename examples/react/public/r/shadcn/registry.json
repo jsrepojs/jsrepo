@@ -1,0 +1,36 @@
+{
+	"$schema": "https://ui.shadcn.com/schema/registry.json",
+	"name": "@example/react",
+	"homepage": "https://www.jsrepo.com/@example/react",
+	"items": [
+		{
+			"name": "button",
+			"type": "registry:ui",
+			"dependencies": ["react@19.2.0"],
+			"registryDependencies": ["utils"],
+			"files": [
+				{
+					"type": "registry:ui",
+					"path": "button.tsx"
+				},
+				{
+					"type": "registry:page",
+					"path": "page.tsx",
+					"target": "src/app/demos/button-demo/page.tsx"
+				}
+			]
+		},
+		{
+			"name": "utils",
+			"type": "registry:lib",
+			"dependencies": [],
+			"registryDependencies": [],
+			"files": [
+				{
+					"type": "registry:lib",
+					"path": "utils.ts"
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,49 @@
+---
+title: build
+description: Build your registry.
+---
+
+```sh
+jsrepo build
+```
+
+## Usage
+
+Build all blocks from the registries in your `jsrepo.config` file:
+
+```sh
+jsrepo build
+```
+
+Build blocks and watch for changes:
+
+```sh
+jsrepo build --watch
+```
+
+## Options
+
+### `--cwd`
+
+The current working directory:
+
+```sh
+jsrepo build --cwd ./my-project
+```
+
+### `--debounce`, `-d`
+
+How long to wait before building again after a change is detected (watch mode only):
+
+```sh
+jsrepo build --watch --debounce 200
+```
+
+### `--watch`, `-w`
+
+Watch for changes and rebuild automatically:
+
+```sh
+jsrepo build --watch
+```
+

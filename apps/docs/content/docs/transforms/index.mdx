@@ -1,0 +1,105 @@
+---
+title: Transforms
+description: Modify code before it is added to your project.
+---
+
+Transforms are a way to modify code before it's added to your project. You can use transforms to format code, add comments, or any other code modification you can think of.
+
+Transforms are also pluggable so you can create your own and share them with the community. Here are a few of the officially supported transforms:
+<Cards>
+	<Card href="/docs/transforms/prettier" icon={<PrettierLogo />} title="@jsrepo/transform-prettier">
+		Format code before it's added to your project using **Prettier**.
+	</Card>
+	<Card href="/docs/transforms/biome" icon={<BiomeLogo />} title="@jsrepo/transform-biome">
+		Format code before it's added to your project using **Biome**.
+	</Card>
+	<Card href="/docs/transforms/javascript" icon={<JavaScriptLogo />} title="@jsrepo/transform-javascript">
+		Transform TypeScript registry items into JavaScript before adding them to your project.
+	</Card>
+</Cards>
+
+## Adding transforms
+
+You can add transforms to your config by running the following command:
+
+```sh
+jsrepo config transform jsrepo-transform-my-transform
+```
+
+This will automatically install the transform and add it to your config:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import myTransform from "jsrepo-transform-my-transform"; // [!code ++]
+
+export default defineConfig({
+	transforms: [myTransform()], // [!code ++]
+});
+```
+
+## Transform authors
+
+When creating transforms we recommend you follow a few rules:
+
+1. Name your transform package with the following naming convention: `jsrepo-transform-<name>` or `@<org>/jsrepo-transform-<name>`
+2. Export the transform as the `default` export
+
+The name of your transform in the config will be the name of your package without the `jsrepo-transform-` prefix converted to camel case.
+
+For example:
+
+```plaintext
+jsrepo-transform-my-transform -> myTransform
+@my-org/jsrepo-transform-my-transform -> myTransform
+```
+
+Official plugins are an exception to this rule to prevent having to name packages like `@jsrepo/jsrepo-transform-prettier`. 
+
+For instance:
+
+```plaintext
+@jsrepo/transform-prettier -> prettier
+@jsrepo/transform-faster-prettier -> fasterPrettier
+```
+
+## Creating your own transform
+
+To demonstrate the power of transforms let's create a simple transform that adds a comment at the top of each file letting the user know what registry the item was added from.
+
+```ts title="src/transform.ts"
+import type { Transform } from "jsrepo";
+
+export default function(): Transform {
+	return {
+		transform: async (code, fileName, { registryUrl }) => {
+			if (fileName.endsWith('.ts') || fileName.endsWith('.js')) {
+				return { code: `// Added from ${registryUrl}\n\n${code}` };
+			}
+
+			// return nothing since no changes were made
+			return { };
+		},
+	};
+}
+```
+
+Now we can use the transform in our config:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import addComment from "./src/transform"; // [!code ++]
+
+export default defineConfig({
+	transforms: [addComment()], // [!code ++]
+});
+```
+
+Now when users add items from the registry they will include the comment at the top of the file letting them know what registry the item was added from:
+
+```ts title="src/math/add.ts"
+// Added from https://example.com/registry // [!code highlight]
+
+export function add(a: number, b: number): number {
+	return a + b;
+}
+```

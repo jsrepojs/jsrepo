@@ -2,6 +2,7 @@ name: CI
 
 on:
     pull_request:
+        branches: [main]
 
 jobs:
     CI:
@@ -23,6 +24,3 @@ jobs:
 
             - name: Test
               run: pnpm test
-
-            - name: Build
-              run: pnpm build

@@ -1,0 +1,88 @@
+---
+title: auth
+description: Authenticate to a provider or registry.
+---
+
+```sh
+jsrepo auth
+```
+
+## Usage
+
+Authenticate to a provider. You will be prompted to select a provider if multiple are available:
+
+```sh
+jsrepo auth
+```
+
+Authenticate to a specific provider:
+
+```sh
+jsrepo auth github
+```
+
+If the provider requires registry-specific authentication, you will be prompted to select a registry:
+
+```
+◆  Select a registry to authenticate to.
+│  ● @ieedan/shadcn-svelte-extras
+│  ○ @ai/elements
+│  ○ Other
+└
+```
+
+Logout from a provider:
+
+```sh
+jsrepo auth github --logout
+```
+
+If the provider uses registry-specific tokens, you will be prompted to select which registry to logout from:
+
+```
+◆  Select a registry to logout of.
+│  ● @ieedan/shadcn-svelte-extras
+│  ○ @ai/elements
+└
+```
+
+Authenticate using a token directly:
+
+```sh
+jsrepo auth github --token <your-token>
+```
+
+## Options
+
+### `--cwd`
+
+The current working directory:
+
+```sh
+jsrepo auth --cwd ./my-project
+```
+
+### `--logout`
+
+Execute the logout flow:
+
+```sh
+jsrepo auth github --logout
+```
+
+### `--token`
+
+The token to use for authenticating to this provider:
+
+```sh
+jsrepo auth github --token <your-token>
+```
+
+### `--verbose`
+
+Include debug logs:
+
+```sh
+jsrepo auth github --verbose
+```
+

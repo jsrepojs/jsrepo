@@ -1,0 +1,116 @@
+---
+title: bitbucket
+description: Download and add registry items from a Bitbucket repository.
+---
+
+<BadgeGroup>
+	<SourceBadge path="packages/jsrepo/src/providers/bitbucket.ts" />
+	<OfficialBadge />
+	<DefaultBadge />
+</BadgeGroup>
+
+## Usage
+
+To start adding registry items from a Bitbucket repository you can run the following command:
+
+```sh
+jsrepo add https://bitbucket.org/<owner>/<repo>/<item-name>
+```
+
+The Bitbucket provider can parse Bitbucket URLs so that you can just copy and paste a link to a Bitbucket repository and it will just work:
+
+```sh
+jsrepo add https://bitbucket.org/<owner>/<repo>/<item-name>
+jsrepo add https://bitbucket.org/<owner>/<repo>/src/<ref>
+```
+
+### The `bitbucket/` shorthand
+
+You can also just use the `bitbucket/` shorthand in place of `https://bitbucket.org/`.
+
+```sh
+jsrepo add bitbucket/<owner>/<repo>/<item-name>
+jsrepo add bitbucket/<owner>/<repo>/src/<ref>
+```
+
+<Callout type="info">
+	If you configured a custom `baseUrl` in your `jsrepo.config` file then using the `bitbucket/` shorthand will use your
+	custom base url instead of `https://bitbucket.org/`.
+</Callout>
+
+### Custom base urls
+
+By default the Bitbucket provider will use `https://bitbucket.org` as the base url for the `bitbucket/` shorthand. You can configure this behavior by configuring `bitbucket` in your `jsrepo.config` file:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { bitbucket } from "jsrepo/providers";
+
+export default defineConfig({
+	providers: [bitbucket()], // [!code ++]
+});
+```
+
+Alternatively you can use the `bitbucket:https://<url>` shorthand to use a custom base url without having to touch your config file:
+
+```sh
+jsrepo add bitbucket:https://bitbucket.org/<owner>/<repo>/src/<ref>
+```
+
+This syntax tells the Bitbucket provider that it can resolve this URL as a Bitbucket repository.
+
+## Deploying your registry to Bitbucket
+
+When deploying your registry to Bitbucket you will want to use the `repository` output type:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { repository } from "jsrepo/outputs"; // [!code ++]
+
+export default defineConfig({
+	registry: {
+		// ...
+		outputs: [repository()], // [!code ++]
+	},
+});
+```
+
+This will create a `registry.json` file that will contain everything users need to use your registry.
+
+<Callout type="warning">
+	The `registry.json` file must be at the **root** of your repository otherwise users won't be able to use your registry.
+</Callout>
+
+## Authentication
+
+To authenticate with Bitbucket you can run the following command:
+
+```sh
+jsrepo auth bitbucket
+```
+
+You can logout of your account by running:
+
+```sh
+jsrepo auth bitbucket --logout
+```
+
+### Environment Variable
+
+If you prefer to use an environment variable or are in an environment where you can't use the `jsrepo auth` command you can provide the token via the `BITBUCKET_TOKEN` environment variable.
+
+```sh
+BITBUCKET_TOKEN=... jsrepo add 
+```
+
+## Options
+
+<TypeTable
+	type={{
+		baseUrl: {
+			description: "The base url to use when using the bitbucket/ shorthand.",
+			type: "string",
+			default: "https://bitbucket.org",
+		},
+	}}
+/>

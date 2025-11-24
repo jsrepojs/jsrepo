@@ -1,0 +1,35 @@
+---
+title: Prettier
+description: Format code before it's added to your project using Prettier.
+---
+
+<BadgeGroup>
+	<SourceBadge path="packages/transform-prettier/src/index.ts" />
+	<OfficialBadge />
+	<NpmBadge packageName="@jsrepo/transform-prettier" />
+</BadgeGroup>
+
+The [@jsrepo/transform-prettier](https://npmjs.com/package/@jsrepo/transform-prettier) package is a transform plugin for **jsrepo** that formats code using your local Prettier configuration before it's added to your project using [Prettier](https://prettier.io).
+
+<Callout type="info">
+    This is especially useful when you are making use of the `jsrepo update` command as it will format the code the same way as it is in your project preventing any formatting changes from being shown in the diff.
+</Callout>
+
+## Installation
+
+To add the **@jsrepo/transform-prettier** transform to your config run the following command:
+
+```sh
+jsrepo config transform prettier
+```
+
+This will automatically install the transform and add it to your config:
+
+```ts
+import { defineConfig } from "jsrepo";
+import prettier from "@jsrepo/transform-prettier"; // [!code ++]
+
+export default defineConfig({
+	transforms: [prettier()], // [!code ++]
+});
+```
