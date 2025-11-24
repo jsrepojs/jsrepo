@@ -92,7 +92,13 @@ export async function runTransform(
 	if (writeResult.isErr()) return err(writeResult.error);
 
 	await promptInstallDependencies(
-		{ devDependencies: transforms, dependencies: [] },
+		{
+			devDependencies: transforms.map((transform) => ({
+				name: transform.packageName,
+				version: transform.version,
+			})),
+			dependencies: [],
+		},
 		{ options, configPath: config.path }
 	);
 

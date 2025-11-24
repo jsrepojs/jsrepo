@@ -93,7 +93,13 @@ export async function runProvider(
 	if (writeResult.isErr()) return err(writeResult.error);
 
 	await promptInstallDependencies(
-		{ devDependencies: providers, dependencies: [] },
+		{
+			devDependencies: providers.map((provider) => ({
+				name: provider.packageName,
+				version: provider.version,
+			})),
+			dependencies: [],
+		},
 		{ options, configPath: config.path }
 	);
 

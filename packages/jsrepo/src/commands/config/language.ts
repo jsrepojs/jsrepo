@@ -91,7 +91,13 @@ export async function runLanguage(
 	if (writeResult.isErr()) return err(writeResult.error);
 
 	await promptInstallDependencies(
-		{ devDependencies: languages, dependencies: [] },
+		{
+			devDependencies: languages.map((language) => ({
+				name: language.packageName,
+				version: language.version,
+			})),
+			dependencies: [],
+		},
 		{ options, configPath: config.path }
 	);
 
