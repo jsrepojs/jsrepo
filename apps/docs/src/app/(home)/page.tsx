@@ -249,7 +249,7 @@ export default defineConfig({
 					},
 					{ // [!code highlight]
 						path: 'src/demos/button.tsx', // [!code highlight]
-						role: 'demo', // [!code highlight]
+						role: 'example', // [!code highlight]
 					}, // [!code highlight]
 				]
 			}
