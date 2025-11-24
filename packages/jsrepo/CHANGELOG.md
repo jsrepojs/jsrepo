@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.0-beta.29
+### Patch Changes
+
+
+- fix: Ensure that paths are updated when running add/update commands ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
 ## 3.0.0-beta.28
 ### Patch Changes
 
