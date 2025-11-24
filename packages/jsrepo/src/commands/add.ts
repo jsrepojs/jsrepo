@@ -34,7 +34,7 @@ import type { Config } from '@/utils/config';
 import { updateConfigPaths } from '@/utils/config/mods/update-paths';
 import { loadConfigSearch } from '@/utils/config/utils';
 import { type CLIError, InvalidRegistryError, RegistryNotProvidedError } from '@/utils/errors';
-import { readFileSync } from '@/utils/fs';
+import { readFileSync, writeFileSync } from '@/utils/fs';
 import {
 	initLogging,
 	intro,
@@ -284,9 +284,12 @@ export async function runAdd(
 		const configCodeResult = readFileSync(configResult.path);
 		if (configCodeResult.isErr()) return err(configCodeResult.error);
 		const configCode = configCodeResult.value;
-		await updateConfigPaths(config?.paths ?? updatedPaths, {
+		const updatedConfigCode = await updateConfigPaths(config?.paths ?? updatedPaths, {
 			config: { path: configResult.path, code: configCode },
 		});
+		if (updatedConfigCode.isErr()) return err(updatedConfigCode.error);
+		const writeResult = writeFileSync(configResult.path, updatedConfigCode.value);
+		if (writeResult.isErr()) return err(writeResult.error);
 	}
 
 	let updatedEnvVars: Record<string, string> | undefined;
