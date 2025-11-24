@@ -374,7 +374,10 @@ export async function transformImports(
 		warn: noop,
 	});
 
-	const destDir = path.join(opts.targetPath);
+	const destDir = path.join(
+		opts.getItemPath({ item: opts.item, file: opts.file }).path,
+		opts.targetPath
+	);
 
 	const transformedImports: ImportTransform[] = [];
 
@@ -399,7 +402,7 @@ export async function transformImports(
 		// if relative make it relative
 		if (itemPath.alias === undefined) {
 			const relative = path.relative(
-				path.dirname(destDir),
+				path.join(opts.cwd, path.dirname(destDir)),
 				path.join(opts.cwd, itemPath.path, filePathRelativeToItemDir, baseName)
 			);
 
