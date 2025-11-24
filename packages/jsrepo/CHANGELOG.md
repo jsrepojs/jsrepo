@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.0-beta.28
+### Patch Changes
+
+
+- fix: Fix add type ([#634](https://github.com/jsrepojs/jsrepo/pull/634))
+
 ## 3.0.0-beta.27
 ### Patch Changes
 
