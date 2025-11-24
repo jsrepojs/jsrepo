@@ -374,7 +374,10 @@ export async function transformImports(
 		warn: noop,
 	});
 
-	const destDir = path.join(opts.getItemPath({ item: opts.item, file: opts.file }).path, opts.targetPath);
+	const destDir = path.join(
+		opts.getItemPath({ item: opts.item, file: opts.file }).path,
+		opts.targetPath
+	);
 
 	const transformedImports: ImportTransform[] = [];
 

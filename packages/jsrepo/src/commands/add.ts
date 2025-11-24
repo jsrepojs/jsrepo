@@ -198,7 +198,7 @@ export async function runAdd(
 				message: 'Which items would you like to add?',
 				options: multiSelectOptions,
 				maxItems: process.stdout.rows - 10,
-				required: true
+				required: true,
 			});
 
 			if (isCancel(userSelections)) {

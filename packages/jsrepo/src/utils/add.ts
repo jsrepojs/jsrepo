@@ -690,7 +690,7 @@ export async function getPathsForItems({
 			new Set(Array.from(item.files, (file) => normalizeItemTypeForPath(file.type)))
 		);
 		for (const type of uniqueTypes) {
-			const itemPath = resolvedPaths[`${type}/${item.name}`] 
+			const itemPath = resolvedPaths[`${type}/${item.name}`];
 			const typePath = resolvedPaths[type];
 			if (itemPath !== undefined) {
 				resolvedPaths[`${type}/${item.name}`] = itemPath;
