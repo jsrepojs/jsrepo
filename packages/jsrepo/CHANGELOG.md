@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.1
+### Patch Changes
+
+
+- fix: Ensure that the correct package is installed on config commands ([`218b395`](https://github.com/jsrepojs/jsrepo/commit/218b39550e8a338bb4b792b1384a018563da8dad))
+
 ## 3.0.0
 ### Patch Changes
 
