@@ -3,7 +3,7 @@
 	"description": "Automatically migrate your jsrepo project to the newest version of jsrepo.",
 	"version": "0.0.1-beta.8",
 	"license": "MIT",
-	"homepage": "https://v3.jsrepo.dev",
+	"homepage": "https://jsrepo.dev",
 	"author": {
 		"name": "Aidan Bleser",
 		"url": "https://github.com/ieedan"

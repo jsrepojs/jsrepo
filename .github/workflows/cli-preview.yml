@@ -1,7 +1,7 @@
 name: Package Previews
 on:
     pull_request:
-        branches: [next, main]
+        branches: [main]
         paths:
             - 'pnpm-lock.yaml'
             - 'packages/**'

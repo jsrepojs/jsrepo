@@ -72,7 +72,7 @@ export const v3 = new Command('v3')
 				`   ${pc.gray('2.')} Add descriptions to registry items (optional)\n`
 			);
 			process.stdout.write(
-				`   ${pc.gray('3.')} Checkout the new docs to learn more! ${pc.cyan(`https://v3.jsrepo.dev`)}\n`
+				`   ${pc.gray('3.')} Checkout the new docs to learn more! ${pc.cyan(`https://jsrepo.dev`)}\n`
 			);
 			process.stdout.write('\n');
 		}
