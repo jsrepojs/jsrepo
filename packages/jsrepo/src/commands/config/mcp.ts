@@ -272,13 +272,24 @@ export function updateVSCodeJsonConfig({
 	return ok(stringify(newContent, { format: true }));
 }
 
-function updateJsonFile(filePath: AbsolutePath, config: ServerConfig): Result<void, CLIError> {
+function updateJsonFile(
+	filePath: AbsolutePath,
+	config: ServerConfig,
+	type: 'generic' | 'vscode' = 'generic'
+): Result<void, CLIError> {
 	const existingContent = existsSync(filePath) ? readFileSync(filePath)._unsafeUnwrap() : '';
-	const newContent = updateVSCodeJsonConfig({
-		existingContent,
-		serverName: 'jsrepo',
-		serverConfig: config,
-	});
+	const newContent =
+		type === 'vscode'
+			? updateVSCodeJsonConfig({
+					existingContent,
+					serverName: 'jsrepo',
+					serverConfig: config,
+				})
+			: updateJsonConfig({
+					existingContent,
+					serverName: 'jsrepo',
+					serverConfig: config,
+				});
 	if (newContent.isErr()) return err(newContent.error);
 	return writeConfig(filePath, newContent.value);
 }
@@ -297,7 +308,8 @@ const CLIENTS: Record<McpClient, ClientConfig> = {
 	vscode: {
 		name: 'VS Code',
 		filePath: (cwd: AbsolutePath) => joinAbsolute(cwd, '.vscode/mcp.json'),
-		writeConfig: (filePath: AbsolutePath) => updateJsonFile(filePath, MCP_SERVER_CONFIG_JSON),
+		writeConfig: (filePath: AbsolutePath) =>
+			updateJsonFile(filePath, MCP_SERVER_CONFIG_JSON, 'vscode'),
 	},
 	codex: {
 		name: 'Codex',
