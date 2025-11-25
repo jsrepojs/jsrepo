@@ -1,7 +1,7 @@
 {
 	"name": "@jsrepo/mcp",
 	"description": "An MCP server for jsrepo.",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"license": "MIT",
 	"homepage": "https://jsrepo.dev/docs/mcp",
 	"author": {

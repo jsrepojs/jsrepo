@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.4
+### Patch Changes
+
+
+- fix: Ensure items in repository mode are fetched with the `relativePath` ([#701](https://github.com/jsrepojs/jsrepo/pull/701))
+
 ## 3.0.3
 ### Patch Changes
 
