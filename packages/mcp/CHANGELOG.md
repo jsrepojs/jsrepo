@@ -1,5 +1,11 @@
 # @jsrepo/mcp
 
+## 0.0.6
+### Patch Changes
+
+- Updated dependencies [[`211c93a`](https://github.com/jsrepojs/jsrepo/commit/211c93a0eea809002575be90229f6542f2696cb5), [`211c93a`](https://github.com/jsrepojs/jsrepo/commit/211c93a0eea809002575be90229f6542f2696cb5), [`211c93a`](https://github.com/jsrepojs/jsrepo/commit/211c93a0eea809002575be90229f6542f2696cb5)]:
+  - jsrepo@3.0.5
+
 ## 0.0.5
 ### Patch Changes
 

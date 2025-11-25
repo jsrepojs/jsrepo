@@ -1,5 +1,17 @@
 # jsrepo
 
+## 3.0.5
+### Patch Changes
+
+
+- fix: only show updates when there are updates ([#703](https://github.com/jsrepojs/jsrepo/pull/703))
+
+
+- fix: normalize file type when getting the path ([#703](https://github.com/jsrepojs/jsrepo/pull/703))
+
+
+- feat: show the names of skipped dependencies ([#703](https://github.com/jsrepojs/jsrepo/pull/703))
+
 ## 3.0.4
 ### Patch Changes
 
