@@ -393,7 +393,7 @@ async function fetchItemRepositoryMode(
 ): Promise<Result<ItemRepository, RegistryFileFetchError>> {
 	const files = await Promise.all(
 		(item.files as RepositoryOutputFile[]).map(async (file) => {
-			const result = await fetchFile(file.path, item);
+			const result = await fetchFile(file.relativePath, item);
 			if (result.isErr()) return err(result.error);
 			return ok({
 				...file,
