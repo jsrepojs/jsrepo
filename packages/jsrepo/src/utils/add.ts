@@ -576,14 +576,15 @@ export async function transformRemoteContent(
 			item: item.name,
 			file: { type: file.type, path: file.path },
 			getItemPath: ({ item, file }) => {
+				const fileType = normalizeItemTypeForPath(file.type);
 				// there are two types of paths
 				// <type> and <type>/<name>
 				for (const [key, value] of Object.entries(itemPaths)) {
 					// <type>/<name>
-					if (key === `${file.type}/${item}`) return value;
+					if (key === `${fileType}/${item}`) return value;
 
 					// <type>
-					if (key === file.type) return value;
+					if (key === fileType) return value;
 				}
 				// by now we should have already got all the necessary paths from the user
 				throw new Unreachable();

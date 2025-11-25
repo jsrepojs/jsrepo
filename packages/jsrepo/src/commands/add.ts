@@ -104,7 +104,10 @@ export const add = new Command('add')
 export type AddCommandResult = {
 	items: (ItemRepository | ItemDistributed)[];
 	updatedFiles: string[];
-	updatedDependencies: RemoteDependency[];
+	updatedDependencies: {
+		installed: boolean;
+		dependencies: RemoteDependency[];
+	};
 	updatedEnvVars: Record<string, string> | undefined;
 	updatedPaths: Config['paths'] | undefined;
 };
@@ -319,19 +322,49 @@ function formatResult(result: AddCommandResult): string {
 		`Added ${pc.cyan(result.items.map((item) => item.name).join(', '))} to your project.`,
 	];
 
-	parts.push(`    Updated ${pc.green(result.updatedFiles.length)} files.`);
-
-	if (result.updatedPaths) {
-		parts.push(`    Updated ${pc.green(Object.keys(result.updatedPaths).length)} paths.`);
-	}
-
-	if (result.updatedDependencies.length > 0) {
-		parts.push(`    Updated ${pc.green(result.updatedDependencies.length)} dependencies.`);
-	}
-
-	if (result.updatedEnvVars) {
+	if (result.updatedFiles.length > 0) {
 		parts.push(
-			`    Updated ${pc.green(Object.keys(result.updatedEnvVars).length)} environment variables.`
+			`    Updated ${pc.green(result.updatedFiles.length)} ${
+				result.updatedFiles.length === 1 ? 'file' : 'files'
+			}.`
+		);
+	}
+
+	if (result.updatedPaths && Object.keys(result.updatedPaths).length > 0) {
+		parts.push(
+			`    Updated ${pc.green(Object.keys(result.updatedPaths).length)} ${
+				Object.keys(result.updatedPaths).length === 1 ? 'path' : 'paths'
+			}.`
+		);
+	}
+
+	if (result.updatedDependencies.dependencies.length > 0) {
+		if (result.updatedDependencies.installed) {
+			parts.push(
+				`    Installed ${pc.green(result.updatedDependencies.dependencies.length)} ${
+					result.updatedDependencies.dependencies.length === 1
+						? 'dependency'
+						: 'dependencies'
+				}.`
+			);
+		} else {
+			parts.push(
+				`    Skipped installation of ${pc.cyan(
+					result.updatedDependencies.dependencies
+						.map((dep) => `${dep.name}${dep.version ? `@${dep.version}` : ''}`)
+						.join(', ')
+				)}.`
+			);
+		}
+	}
+
+	if (result.updatedEnvVars && Object.keys(result.updatedEnvVars).length > 0) {
+		parts.push(
+			`    Updated ${pc.green(Object.keys(result.updatedEnvVars).length)} ${
+				Object.keys(result.updatedEnvVars).length === 1
+					? 'environment variable'
+					: 'environment variables'
+			}.`
 		);
 	}
 

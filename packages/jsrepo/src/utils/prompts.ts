@@ -199,7 +199,10 @@ export async function promptInstallDependenciesByEcosystem(
 		options,
 		config,
 	}: { options: { cwd: AbsolutePath; yes: boolean }; config: Config | undefined }
-): Promise<RemoteDependency[]> {
+): Promise<{
+	installed: boolean;
+	dependencies: RemoteDependency[];
+}> {
 	// we can fast path the js dependencies since we support js out of the box
 	const deps = shouldInstall(
 		{
@@ -241,7 +244,7 @@ export async function promptInstallDependenciesByEcosystem(
 
 	const languages = config?.languages ?? DEFAULT_LANGS;
 
-	if (dependenciesByEcosystem.size === 0) return [];
+	if (dependenciesByEcosystem.size === 0) return { installed: false, dependencies: [] };
 
 	let install = options.yes;
 	if (!options.yes) {
@@ -258,20 +261,22 @@ export async function promptInstallDependenciesByEcosystem(
 		install = result;
 	}
 
-	if (install) {
-		for (const [ecosystem, dependencies] of dependenciesByEcosystem) {
-			await languages
-				.find((lang) => lang.canInstallDependencies(ecosystem))
-				?.installDependencies(dependencies, {
-					cwd: options.cwd,
-				});
-		}
-	}
-
-	return Array.from(dependenciesByEcosystem.values()).flatMap((v) => [
+	const allDeps = Array.from(dependenciesByEcosystem.values()).flatMap((v) => [
 		...v.dependencies,
 		...v.devDependencies,
 	]);
+
+	if (!install) return { installed: false, dependencies: allDeps };
+
+	for (const [ecosystem, dependencies] of dependenciesByEcosystem) {
+		await languages
+			.find((lang) => lang.canInstallDependencies(ecosystem))
+			?.installDependencies(dependencies, {
+				cwd: options.cwd,
+			});
+	}
+
+	return { installed: true, dependencies: allDeps };
 }
 
 export async function runCommands({
