@@ -1,7 +1,7 @@
 {
 	"name": "jsrepo",
 	"description": "A CLI to add shared code from remote repositories.",
-	"version": "3.0.2",
+	"version": "3.0.3",
 	"license": "MIT",
 	"homepage": "https://jsrepo.dev",
 	"author": {
