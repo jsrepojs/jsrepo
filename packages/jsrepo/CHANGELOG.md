@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.3
+### Patch Changes
+
+
+- fix: Ensure that `config mcp` writes the correct file ([`ccbab08`](https://github.com/jsrepojs/jsrepo/commit/ccbab0840fc4fdf103e1cbab0d7edd9a18c43cc0))
+
 ## 3.0.2
 ### Patch Changes
 
