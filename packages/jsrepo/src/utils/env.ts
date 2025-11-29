@@ -35,7 +35,8 @@ export function parseEnvVariables(contents: string): Record<string, string> {
 	let currentValue: string[] = [];
 
 	for (let i = 0; i < lines.length; i++) {
-		let line = lines[i];
+		const line = lines[i];
+		if (line === undefined) continue;
 		const trimmedLine = line.trim();
 
 		// If we're continuing a multiline value (previous line ended with backslash)
