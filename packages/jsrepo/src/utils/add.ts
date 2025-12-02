@@ -263,85 +263,6 @@ export type ItemRepository = {
 
 export type ItemDistributed = DistributedOutputItem & { registry: ResolvedRegistry };
 
-/**
- * Recursively resolves the tree of wanted items and their dependencies.
- *
- * @param wantedItems - The wanted items to resolve.
- * @param options
- * @returns
- */
-export function resolveTree(
-	wantedItems: ResolvedWantedItem[],
-	{
-		resolvedItems,
-		options,
-	}: {
-		resolvedItems: Map<string, ResolvedItem>;
-		options: { withExamples: boolean; withDocs: boolean; withTests: boolean };
-	}
-): Result<ResolvedItem[], RegistryItemNotFoundError> {
-	for (const wantedItem of wantedItems) {
-		if (resolvedItems.has(wantedItem.item.name)) continue;
-
-		const needsResolving: ResolvedWantedItem[] = [];
-		for (const registryDependency of wantedItem.item.registryDependencies ?? []) {
-			if (resolvedItems.has(registryDependency)) continue;
-			const item = wantedItem.registry.manifest.items.find(
-				(i) => i.name === registryDependency
-			);
-			if (!item)
-				return err(
-					new RegistryItemNotFoundError(registryDependency, wantedItem.registry.url)
-				);
-			needsResolving.push({
-				registry: wantedItem.registry,
-				item,
-			});
-		}
-
-		// ensure we also add any registry dependencies of added files
-		for (const file of wantedItem.item.files) {
-			if (file.role === 'example' && !options.withExamples) continue;
-			if (file.role === 'doc' && !options.withDocs) continue;
-			if (file.role === 'test' && !options.withTests) continue;
-
-			for (const registryDependency of file.registryDependencies ?? []) {
-				if (resolvedItems.has(registryDependency)) continue;
-				const item = wantedItem.registry.manifest.items.find(
-					(i) => i.name === registryDependency
-				);
-				if (!item)
-					return err(
-						new RegistryItemNotFoundError(registryDependency, wantedItem.registry.url)
-					);
-				needsResolving.push({
-					registry: wantedItem.registry,
-					item,
-				});
-			}
-		}
-
-		const resolvedRegistryDependencies = resolveTree(needsResolving, {
-			resolvedItems,
-			options,
-		});
-		if (resolvedRegistryDependencies.isErr()) return err(resolvedRegistryDependencies.error);
-		for (const resolvedItem of resolvedRegistryDependencies.value) {
-			resolvedItems.set(resolvedItem.name, resolvedItem);
-		}
-
-		resolvedItems.set(wantedItem.item.name, {
-			name: wantedItem.item.name,
-			type: wantedItem.item.type,
-			add: wantedItem.item.add,
-			dependencies: wantedItem.item.dependencies,
-			registry: wantedItem.registry,
-			files: wantedItem.item.files,
-		});
-	}
-	return ok(Array.from(resolvedItems.values()));
-}
-
 export async function fetchItem(block: ResolvedItem) {
 	try {
 		const contents = await block.registry.provider.fetch(`${block.name}.json`, {
@@ -652,6 +573,85 @@ export async function resolveAndFetchAllItems(
 	const items = itemsResult.value;
 
 	return ok(items);
+}
+
+/**
+ * Recursively resolves the tree of wanted items and their dependencies.
+ *
+ * @param wantedItems - The wanted items to resolve.
+ * @param options
+ * @returns
+ */
+export function resolveTree(
+	wantedItems: ResolvedWantedItem[],
+	{
+		resolvedItems,
+		options,
+	}: {
+		resolvedItems: Map<string, ResolvedItem>;
+		options: { withExamples: boolean; withDocs: boolean; withTests: boolean };
+	}
+): Result<ResolvedItem[], RegistryItemNotFoundError> {
+	for (const wantedItem of wantedItems) {
+		if (resolvedItems.has(wantedItem.item.name)) continue;
+
+		const needsResolving: ResolvedWantedItem[] = [];
+		for (const registryDependency of wantedItem.item.registryDependencies ?? []) {
+			if (resolvedItems.has(registryDependency)) continue;
+			const item = wantedItem.registry.manifest.items.find(
+				(i) => i.name === registryDependency
+			);
+			if (!item)
+				return err(
+					new RegistryItemNotFoundError(registryDependency, wantedItem.registry.url)
+				);
+			needsResolving.push({
+				registry: wantedItem.registry,
+				item,
+			});
+		}
+
+		// ensure we also add any registry dependencies of added files
+		for (const file of wantedItem.item.files) {
+			if (file.role === 'example' && !options.withExamples) continue;
+			if (file.role === 'doc' && !options.withDocs) continue;
+			if (file.role === 'test' && !options.withTests) continue;
+
+			for (const registryDependency of file.registryDependencies ?? []) {
+				if (resolvedItems.has(registryDependency)) continue;
+				const item = wantedItem.registry.manifest.items.find(
+					(i) => i.name === registryDependency
+				);
+				if (!item)
+					return err(
+						new RegistryItemNotFoundError(registryDependency, wantedItem.registry.url)
+					);
+				needsResolving.push({
+					registry: wantedItem.registry,
+					item,
+				});
+			}
+		}
+
+		resolvedItems.set(wantedItem.item.name, {
+			name: wantedItem.item.name,
+			type: wantedItem.item.type,
+			add: wantedItem.item.add,
+			dependencies: wantedItem.item.dependencies,
+			registry: wantedItem.registry,
+			files: wantedItem.item.files,
+		});
+
+		const resolvedRegistryDependencies = resolveTree(needsResolving, {
+			resolvedItems,
+			options,
+		});
+		if (resolvedRegistryDependencies.isErr()) return err(resolvedRegistryDependencies.error);
+		for (const resolvedItem of resolvedRegistryDependencies.value) {
+			resolvedItems.set(resolvedItem.name, resolvedItem);
+		}
+	}
+	return ok(Array.from(resolvedItems.values()));
 }
 
 export async function getPathsForItems({

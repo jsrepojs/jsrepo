@@ -274,8 +274,8 @@ describe('resolveTree', () => {
 
 		assert(result.isOk());
 
-		expect(result.value[0]!.name).toBe('types');
-		expect(result.value[1]!.name).toBe('result');
+		expect(result.value[0]!.name).toBe('result');
+		expect(result.value[1]!.name).toBe('types');
 	});
 
 	it('should resolve the items dependencies and the optional file dependencies', () => {
@@ -297,10 +297,10 @@ describe('resolveTree', () => {
 		);
 
 		assert(result.isOk());
-
-		expect(result.value[0]!.name).toBe('types');
-		expect(result.value[1]!.name).toBe('add');
-		expect(result.value[2]!.name).toBe('result');
+		
+		expect(result.value[0]!.name).toBe('result');
+		expect(result.value[1]!.name).toBe('types');
+		expect(result.value[2]!.name).toBe('add');
 	});
 });
 
