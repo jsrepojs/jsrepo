@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.6
+### Patch Changes
+
+
+- fix: Ensure circular dependencies are handled correctly when adding ([#708](https://github.com/jsrepojs/jsrepo/pull/708))
+
 ## 3.0.5
 ### Patch Changes
 
