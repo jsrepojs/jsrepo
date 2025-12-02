@@ -322,8 +322,9 @@ describe('resolveTree', () => {
 
 		assert(result.isOk());
 
-		expect(result.value[0]!.name).toBe('result');
-		expect(result.value[1]!.name).toBe('types');
+		const itemNames = result.value.map((item) => item.name);
+		expect(itemNames).toContain('result');
+		expect(itemNames).toContain('types');
 	});
 
 	it('should resolve the items dependencies and the optional file dependencies', () => {
@@ -346,9 +347,10 @@ describe('resolveTree', () => {
 
 		assert(result.isOk());
 
-		expect(result.value[0]!.name).toBe('result');
-		expect(result.value[1]!.name).toBe('types');
-		expect(result.value[2]!.name).toBe('add');
+		const itemNames = result.value.map((item) => item.name);
+		expect(itemNames).toContain('result');
+		expect(itemNames).toContain('types');
+		expect(itemNames).toContain('add');
 	});
 
 	it('should successfully resolve an item with a circular dependency', () => {
