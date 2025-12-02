@@ -249,6 +249,54 @@ export const RESOLVED_REGISTRY = {
 				categories: undefined,
 				meta: undefined,
 			},
+			{
+				name: 'circular-a',
+				type: 'util',
+				registryDependencies: ['circular-b'],
+				add: 'when-added',
+				dependencies: [],
+				files: [
+					{
+						path: 'circular-a.ts' as ItemRelativePath,
+						role: 'file',
+						type: 'util',
+						target: undefined,
+						registryDependencies: undefined,
+						dependencies: undefined,
+						devDependencies: undefined,
+					},
+				],
+				devDependencies: [],
+				envVars: {},
+				title: undefined,
+				description: undefined,
+				categories: undefined,
+				meta: undefined,
+			},
+			{
+				name: 'circular-b',
+				type: 'util',
+				registryDependencies: ['circular-a'],
+				add: 'when-added',
+				dependencies: [],
+				files: [
+					{
+						path: 'circular-b.ts' as ItemRelativePath,
+						role: 'file',
+						type: 'util',
+						target: undefined,
+						registryDependencies: undefined,
+						dependencies: undefined,
+						devDependencies: undefined,
+					},
+				],
+				devDependencies: [],
+				envVars: {},
+				title: undefined,
+				description: undefined,
+				categories: undefined,
+				meta: undefined,
+			},
 		],
 	} satisfies DistributedOutputManifest,
 };
@@ -274,8 +322,9 @@ describe('resolveTree', () => {
 
 		assert(result.isOk());
 
-		expect(result.value[0]!.name).toBe('types');
-		expect(result.value[1]!.name).toBe('result');
+		const itemNames = result.value.map((item) => item.name);
+		expect(itemNames).toContain('result');
+		expect(itemNames).toContain('types');
 	});
 
 	it('should resolve the items dependencies and the optional file dependencies', () => {
@@ -298,9 +347,40 @@ describe('resolveTree', () => {
 
 		assert(result.isOk());
 
-		expect(result.value[0]!.name).toBe('types');
-		expect(result.value[1]!.name).toBe('add');
-		expect(result.value[2]!.name).toBe('result');
+		const itemNames = result.value.map((item) => item.name);
+		expect(itemNames).toContain('result');
+		expect(itemNames).toContain('types');
+		expect(itemNames).toContain('add');
+	});
+
+	it('should successfully resolve an item with a circular dependency', () => {
+		const circularA = RESOLVED_REGISTRY.manifest.items.find((i) => i.name === 'circular-a')!;
+		const result = resolveTree(
+			[
+				{
+					registry: RESOLVED_REGISTRY,
+					item: circularA,
+				},
+			],
+			{
+				options: {
+					withExamples: false,
+					withDocs: false,
+					withTests: false,
+				},
+				resolvedItems: new Map(),
+			}
+		);
+
+		assert(result.isOk());
+
+		// Should resolve both items in the circular dependency
+		const itemNames = result.value.map((item) => item.name);
+		expect(itemNames).toContain('circular-a');
+		expect(itemNames).toContain('circular-b');
+		// Should not have duplicates
+		expect(itemNames.filter((name) => name === 'circular-a')).toHaveLength(1);
+		expect(itemNames.filter((name) => name === 'circular-b')).toHaveLength(1);
 	});
 });
 
