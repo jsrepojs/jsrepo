@@ -251,7 +251,7 @@ export type RegistryItemFile = {
 export type RegistryItemFolderFile = Prettify<
 	Omit<RegistryItemFile, 'target' | 'type' | 'path'> & {
 		/**
-		 * Path to the file relative to the parent folder.
+		 * Path to the file/folder relative to the parent folder.
 		 */
 		path: string;
 	}

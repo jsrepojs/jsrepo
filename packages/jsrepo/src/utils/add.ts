@@ -406,7 +406,12 @@ export async function fetchAllResolvedItems(
  * @returns
  */
 export async function getItemLocation(
-	item: { name: string; type: RegistryItemType; files: { path: string; target?: string }[] },
+	item: {
+		name: string;
+		type: RegistryItemType;
+		files: { path: string; target?: string }[];
+		registry: ResolvedRegistry;
+	},
 	{
 		paths,
 		nonInteractive,
@@ -427,26 +432,28 @@ export async function getItemLocation(
 		});
 	}
 
-	const defaultPath = paths['*'];
+	const catchAllPath = paths['*'];
 	const type = normalizeItemTypeForPath(item.type);
 	const path = paths[type];
 	if (!path) {
-		if (defaultPath) {
+		if (catchAllPath) {
 			return ok({
-				path: defaultPath,
+				path: catchAllPath,
 				// already resolved
-				resolvedPath: defaultPath,
+				resolvedPath: catchAllPath,
 			});
 		}
 
 		// we just error in non-interactive mode
 		if (nonInteractive) return err(new NoPathProvidedError({ item: item.name, type }));
 
+		const defaultPath = item.registry.manifest.defaultPaths?.[type] ?? `./src/${type}`;
+
 		const blocksPath = await text({
 			message: `Where would you like to add ${pc.cyan(type)}?`,
-			placeholder: `./src/${type}`,
-			initialValue: `./src/${type}`,
-			defaultValue: `./src/${type}`,
+			placeholder: defaultPath,
+			initialValue: defaultPath,
+			defaultValue: defaultPath,
 			validate(value) {
 				if (!value || value.trim() === '') return 'Please provide a value';
 			},
@@ -664,6 +671,7 @@ export async function getPathsForItems({
 		name: string;
 		type: RegistryItemType;
 		files: { path: ItemRelativePath; type: RegistryItemType; target?: string }[];
+		registry: ResolvedRegistry;
 	}[];
 	config: Config | undefined;
 	options: { cwd: AbsolutePath; yes: boolean };
