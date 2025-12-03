@@ -185,6 +185,7 @@ export async function runUpdate(
 				name: item.item.name,
 				type: item.item.type,
 				files: item.item.files,
+				registry: item.registry,
 			})),
 			config,
 			options: {

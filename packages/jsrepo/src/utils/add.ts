@@ -406,7 +406,12 @@ export async function fetchAllResolvedItems(
  * @returns
  */
 export async function getItemLocation(
-	item: { name: string; type: RegistryItemType; files: { path: string; target?: string }[]; registry: ResolvedRegistry },
+	item: {
+		name: string;
+		type: RegistryItemType;
+		files: { path: string; target?: string }[];
+		registry: ResolvedRegistry;
+	},
 	{
 		paths,
 		nonInteractive,
