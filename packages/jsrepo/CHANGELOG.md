@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.7
+### Patch Changes
+
+
+- feat: Present the user with the defaultPath provided by the registry when prompting for a path ([#713](https://github.com/jsrepojs/jsrepo/pull/713))
+
 ## 3.0.6
 ### Patch Changes
 
