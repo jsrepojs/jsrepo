@@ -140,12 +140,16 @@ export type ResolvedWantedItem = {
 	registry: ResolvedRegistry;
 	item: {
 		name: string;
-		description?: string;
-		add?: RegistryItemAdd;
+		description: string | undefined;
+		add: RegistryItemAdd | undefined;
 		type: RegistryItemType;
-		registryDependencies?: string[];
-		dependencies?: (RemoteDependency | string)[];
+		registryDependencies: string[] | undefined;
+		dependencies: (RemoteDependency | string)[] | undefined;
+		devDependencies: (RemoteDependency | string)[] | undefined;
 		files: Array<RepositoryOutputFile | DistributedOutputManifestFile>;
+		envVars: Record<string, string> | undefined;
+		categories: string[] | undefined;
+		meta: Record<string, string> | undefined;
 	};
 };
 
@@ -239,26 +243,31 @@ export async function resolveWantedItems(
 
 export type ResolvedItem = {
 	name: string;
-	description?: string;
-	add?: RegistryItemAdd;
+	description: string | undefined;
+	add: RegistryItemAdd | undefined;
 	type: RegistryItemType;
-	dependencies?: (RemoteDependency | string)[];
+	registryDependencies: string[] | undefined;
+	dependencies: (RemoteDependency | string)[] | undefined;
+	devDependencies: (RemoteDependency | string)[] | undefined;
 	registry: ResolvedRegistry;
 	files: Array<RepositoryOutputFile | DistributedOutputManifestFile>;
+	envVars: Record<string, string> | undefined;
+	categories: string[] | undefined;
+	meta: Record<string, string> | undefined;
 };
 
 export type ItemRepository = {
 	name: string;
 	type: RegistryItemType;
-	add?: RegistryItemAdd;
-	description?: string;
-	dependencies?: (RemoteDependency | string)[];
-	devDependencies?: (RemoteDependency | string)[];
+	add: RegistryItemAdd | undefined;
+	description: string | undefined;
+	dependencies: (RemoteDependency | string)[] | undefined;
+	devDependencies: (RemoteDependency | string)[] | undefined;
 	registry: ResolvedRegistry;
 	files: Array<RepositoryOutputFile & { content: string }>;
-	envVars?: Record<string, string>;
-	categories?: string[];
-	meta?: Record<string, string>;
+	envVars: Record<string, string> | undefined;
+	categories: string[] | undefined;
+	meta: Record<string, string> | undefined;
 };
 
 export type ItemDistributed = DistributedOutputItem & { registry: ResolvedRegistry };
@@ -335,8 +344,12 @@ async function fetchItemRepositoryMode(
 		add: item.add,
 		description: item.description,
 		dependencies: item.dependencies,
+		devDependencies: item.devDependencies,
 		registry: item.registry,
 		files: filesResult,
+		envVars: item.envVars,
+		categories: item.categories,
+		meta: item.meta,
 	});
 }
 
@@ -643,10 +656,16 @@ export function resolveTree(
 		resolvedItems.set(wantedItem.item.name, {
 			name: wantedItem.item.name,
 			type: wantedItem.item.type,
+			description: wantedItem.item.description,
 			add: wantedItem.item.add,
+			registryDependencies: wantedItem.item.registryDependencies,
 			dependencies: wantedItem.item.dependencies,
+			devDependencies: wantedItem.item.devDependencies,
 			registry: wantedItem.registry,
 			files: wantedItem.item.files,
+			envVars: wantedItem.item.envVars,
+			categories: wantedItem.item.categories,
+			meta: wantedItem.item.meta,
 		});
 
 		const resolvedRegistryDependencies = resolveTree(needsResolving, {
