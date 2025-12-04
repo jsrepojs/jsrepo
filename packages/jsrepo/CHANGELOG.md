@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.8
+### Patch Changes
+
+
+- fix: Fix an issue where dev dependencies weren't installed ([#717](https://github.com/jsrepojs/jsrepo/pull/717))
+
 ## 3.0.7
 ### Patch Changes
 

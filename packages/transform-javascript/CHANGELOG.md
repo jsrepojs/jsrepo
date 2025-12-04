@@ -1,5 +1,11 @@
 # @jsrepo/transform-javascript
 
+## 0.0.9
+### Patch Changes
+
+- Updated dependencies [[`a704bd0`](https://github.com/jsrepojs/jsrepo/commit/a704bd09d678ff608c5c2e61c8b91f8c09717012)]:
+  - jsrepo@3.0.8
+
 ## 0.0.8
 ### Patch Changes
 
