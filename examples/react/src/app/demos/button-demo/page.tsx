@@ -1,6 +1,6 @@
 import { Button } from '@/registry/ui/button';
 
-export function ButtonDemoPage() {
+export default function ButtonDemoPage() {
 	return (
 		<>
 			<div className="flex place-items-center gap-2">

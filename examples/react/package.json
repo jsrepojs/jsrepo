@@ -4,18 +4,17 @@
 	"private": true,
 	"scripts": {
 		"dev": "concurrently -n registry,app \"pnpm registry:dev\" \"next dev\"",
-		"build": "pnpm build:registry && next build",
+		"build": "pnpm registry:build && next build",
 		"start": "pnpm build:registry && next start",
 		"registry:build": "jsrepo build",
 		"registry:dev": "jsrepo build --watch"
 	},
 	"dependencies": {
-		"next": "16.0.3",
+		"next": "16.0.7",
 		"react": "19.2.0",
 		"react-dom": "19.2.0"
 	},
 	"devDependencies": {
-		"concurrently": "catalog:",
 		"@jsrepo/shadcn": "workspace:*",
 		"@tailwindcss/postcss": "^4",
 		"@types/node": "^20",
@@ -23,6 +22,7 @@
 		"@types/react-dom": "^19",
 		"babel-plugin-react-compiler": "1.0.0",
 		"clsx": "^2.1.1",
+		"concurrently": "catalog:",
 		"jsrepo": "workspace:*",
 		"tailwind-merge": "^3.3.1",
 		"tailwind-variants": "^3.1.1",
