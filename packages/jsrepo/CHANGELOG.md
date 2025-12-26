@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.0.9
+### Patch Changes
+
+
+- fix: Improve package manager detection to fallback on the detected user agent ([#725](https://github.com/jsrepojs/jsrepo/pull/725))
+
 ## 3.0.8
 ### Patch Changes
 
