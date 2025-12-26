@@ -1,5 +1,6 @@
 import { intro as _intro, taskLog } from '@clack/prompts';
-import { detect, type ResolvedCommand, resolveCommand } from 'package-manager-detector';
+import { detectPackageManager } from 'jsrepo/utils';
+import { type ResolvedCommand, resolveCommand } from 'package-manager-detector';
 import pc from 'picocolors';
 import { x } from 'tinyexec';
 import pkg from '@/../package.json';
@@ -61,7 +62,7 @@ export async function installDependencies(
 ): Promise<void> {
 	const packageResult = findNearestPackageJson(cwd);
 	if (!packageResult) return;
-	const pm = (await detect({ cwd }))?.agent ?? 'npm';
+	const pm = await detectPackageManager(cwd);
 
 	// this is only if no dependencies were provided
 	if (dependencies.dependencies.length === 0 && dependencies.devDependencies.length === 0) {

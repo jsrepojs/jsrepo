@@ -211,6 +211,9 @@ importers:
       tsdown:
         specifier: 'catalog:'
         version: 0.15.12(@arethetypeswrong/core@0.18.2)(typescript@5.9.3)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
       zod:
         specifier: 'catalog:'
         version: 4.1.12

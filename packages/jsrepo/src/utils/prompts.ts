@@ -10,7 +10,13 @@ import {
 } from '@clack/prompts';
 import isUnicodeSupported from 'is-unicode-supported';
 import { err, ok, type Result } from 'nevereverthrow';
-import type { ResolvedCommand } from 'package-manager-detector';
+import {
+	AGENTS,
+	type Agent,
+	detect,
+	getUserAgent,
+	type ResolvedCommand,
+} from 'package-manager-detector';
 import path from 'pathe';
 import pc from 'picocolors';
 import { x } from 'tinyexec';
@@ -318,6 +324,12 @@ export async function runCommands({
 		task.error(messages.error(err));
 		process.exit(1);
 	}
+}
+
+export async function detectPackageManager(cwd: AbsolutePath): Promise<Agent> {
+	const detected = (await detect({ cwd }))?.agent;
+	if (detected) return detected;
+	return AGENTS.find((agent) => agent === getUserAgent()) ?? 'npm';
 }
 
 const unicode = isUnicodeSupported();
