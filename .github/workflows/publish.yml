@@ -2,36 +2,43 @@ name: Publish
 
 on:
     push:
-        branches: [main] 
+        branches:
+            - main
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
     release:
+        permissions:
+            contents: write # to create release (changesets/action)
+            pull-requests: write # to create pull request (changesets/action)
+            id-token: write # Required for OIDC
         name: Build & Publish Release
-        if: github.repository == 'jsrepojs/jsrepo'
         runs-on: ubuntu-latest
 
         steps:
             - uses: actions/checkout@v4
+              with:
+                # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
+                fetch-depth: 0
             - uses: pnpm/action-setup@v4
             - uses: actions/setup-node@v4
               with:
-                  node-version: "22"
-                  cache: pnpm
+                node-version: 24
+                cache: 'pnpm'
+
+            - run: npm install -g npm@latest
 
             - name: Install dependencies
               run: pnpm install
 
-            - name: Create Release Pull Request or Publish
+            - name: Create Release Pull Request or Publish to npm
               id: changesets
               uses: changesets/action@v1
               with:
-                  commit: "chore(release): version package"
-                  title: "chore(release): version package"
-                  version: pnpm changeset:version
-                  publish: pnpm ci:release
+                commit: "chore(release): version package"
+                title: "chore(release): version package"
+                publish: pnpm ci:release
               env:
-                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  NODE_ENV: production
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                NPM_CONFIG_PROVENANCE: true
