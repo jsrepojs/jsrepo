@@ -1,7 +1,7 @@
 {
 	"name": "@jsrepo/transform-javascript",
 	"description": "A transform plugin for jsrepo to strip types from TypeScript code.",
-	"version": "0.0.9",
+	"version": "0.0.10",
 	"license": "MIT",
 	"homepage": "https://jsrepo.dev",
 	"author": {
