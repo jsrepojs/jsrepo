@@ -2,7 +2,7 @@ import { builtinModules } from 'node:module';
 import escapeStringRegexp from 'escape-string-regexp';
 import { err, ok, Result } from 'nevereverthrow';
 import { parseAsync } from 'oxc-parser';
-import { detect, resolveCommand } from 'package-manager-detector';
+import { resolveCommand } from 'package-manager-detector';
 import path from 'pathe';
 import pc from 'picocolors';
 import { ModuleNotFoundError } from '@/api';
@@ -19,7 +19,7 @@ import { existsSync, readdirSync, statSync } from '@/utils/fs';
 import { findNearestPackageJson, shouldInstall } from '@/utils/package';
 import { parsePackageName } from '@/utils/parse-package-name';
 import { dirname, joinAbsolute } from '@/utils/path';
-import { runCommands } from '@/utils/prompts';
+import { detectPackageManager, runCommands } from '@/utils/prompts';
 import { createPathsMatcher, tryGetTsconfig } from '@/utils/tsconfig';
 import type { AbsolutePath } from '@/utils/types';
 import { noop } from '@/utils/utils';
@@ -482,7 +482,7 @@ export async function installDependencies(
 ): Promise<void> {
 	const packageResult = findNearestPackageJson(cwd);
 	if (!packageResult) return;
-	const pm = (await detect({ cwd }))?.agent ?? 'npm';
+	const pm = await detectPackageManager(cwd);
 
 	// this is only if no dependencies were provided
 	if (dependencies.dependencies.length === 0 && dependencies.devDependencies.length === 0) {
