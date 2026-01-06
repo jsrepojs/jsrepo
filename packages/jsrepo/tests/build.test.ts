@@ -1,5 +1,6 @@
+import { log } from '@clack/prompts';
 import path from 'pathe';
-import { assert, beforeAll, describe, expect, it } from 'vitest';
+import { assert, beforeAll, describe, expect, it, type MockInstance, vi } from 'vitest';
 import { loadConfigSearch } from '@/api';
 import { forEachRegistry } from '@/commands/utils';
 import { type BuildResult, buildRegistry, type ResolvedItem } from '@/utils/build';
@@ -9,8 +10,11 @@ const cwd = path.join(__dirname, './fixtures/build') as AbsolutePath;
 
 describe('buildRegistry', () => {
 	let firstRegistry: BuildResult;
+	let warnSpy: MockInstance;
 
 	beforeAll(async () => {
+		warnSpy = vi.spyOn(log, 'warn').mockImplementation(() => undefined);
+
 		const config = await loadConfigSearch({ cwd, promptForContinueIfNull: false });
 		if (config === null) throw new Error('Config not found');
 
@@ -47,7 +51,7 @@ describe('buildRegistry', () => {
 	});
 
 	it('should have the correct number of items', () => {
-		expect(firstRegistry.items).toHaveLength(8);
+		expect(firstRegistry.items).toHaveLength(9);
 	});
 
 	describe('math item', () => {
@@ -336,6 +340,57 @@ describe('buildRegistry', () => {
 				},
 			]);
 			expect(emptyItem.devDependencies).toStrictEqual([]);
+		});
+	});
+
+	describe('lanyard item (with binary asset files)', () => {
+		let lanyardItem: ResolvedItem;
+
+		beforeAll(() => {
+			lanyardItem = firstRegistry.items.find((item) => item.name === 'lanyard')!;
+			assert(lanyardItem !== undefined);
+		});
+
+		it('should have correct basic properties', () => {
+			expect(lanyardItem.name).toBe('lanyard');
+			expect(lanyardItem.type).toBe('ui');
+			expect(lanyardItem.add).toBe('when-added');
+		});
+
+		it('should include binary asset files (.glb, .png) without errors', () => {
+			expect(lanyardItem.files).toHaveLength(3);
+			expect(lanyardItem.files.map((f) => f.path).sort()).toEqual([
+				'lanyard/Lanyard.tsx',
+				'lanyard/card.glb',
+				'lanyard/lanyard.png',
+			]);
+		});
+
+		it('should have content for all files including binary assets', () => {
+			for (const file of lanyardItem.files) {
+				expect(file.content).toBeDefined();
+				expect(file.content.length).toBeGreaterThan(0);
+			}
+		});
+
+		it('should not have dependencies from binary files', () => {
+			// Binary files don't have dependencies since they're skipped
+			// Only the .tsx file's dependencies should be detected
+			expect(lanyardItem.registryDependencies).toStrictEqual([]);
+			// react is excluded in the config
+			expect(lanyardItem.dependencies).toStrictEqual([]);
+			expect(lanyardItem.devDependencies).toStrictEqual([]);
+		});
+
+		it('should not warn about binary asset files (.glb, .png)', () => {
+			const calls = warnSpy.mock.calls;
+			const binaryFileWarnings = calls.filter(
+				(call) =>
+					typeof call[0] === 'string' &&
+					call[0].includes("Couldn't find a language to resolve dependencies") &&
+					(call[0].includes('.glb') || call[0].includes('.png'))
+			);
+			expect(binaryFileWarnings).toStrictEqual([]);
 		});
 	});
 });

@@ -118,6 +118,15 @@ export default defineConfig({
 						target: 'src/routes/demo'
 					}
 				]
+			},
+			{
+				name: 'lanyard',
+				type: 'ui',
+				files: [
+					{
+						path: 'src/components/ui/lanyard',
+					}
+				]
 			}
 		],
 	},

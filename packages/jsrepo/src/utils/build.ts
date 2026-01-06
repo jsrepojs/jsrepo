@@ -31,6 +31,52 @@ import {
 import { existsSync, readdirSync, readFileSync, statSync } from './fs';
 import { parsePackageName } from './parse-package-name';
 import { joinAbsolute, joinRelative, type NormalizedAbsolutePath, normalizeAbsolute } from './path';
+import { endsWithOneOf } from './strings';
+
+/**
+ * We won't warn about these file types when resolving dependencies.
+ */
+const DO_NOT_RESOLVE_EXTENSIONS = [
+	// Images
+	'.png',
+	'.jpg',
+	'.jpeg',
+	'.gif',
+	'.svg',
+	'.webp',
+	'.ico',
+	'.bmp',
+	'.tiff',
+	// 3D models
+	'.glb',
+	'.gltf',
+	'.obj',
+	'.fbx',
+	'.dae',
+	// Fonts
+	'.woff',
+	'.woff2',
+	'.ttf',
+	'.eot',
+	'.otf',
+	// Media
+	'.mp4',
+	'.webm',
+	'.mp3',
+	'.wav',
+	'.ogg',
+	'.avi',
+	// Archives
+	'.zip',
+	'.tar',
+	'.gz',
+	// Other binary
+	'.pdf',
+	'.exe',
+	'.dll',
+	'.so',
+	'.dylib',
+] as const;
 
 export const MANIFEST_FILE = 'registry.json';
 
@@ -558,7 +604,12 @@ async function resolveFile(
 			dependencies = deps;
 			devDependencies = devDeps;
 		} else {
-			log.warn(`Couldn't find a language to resolve dependencies for ${file.absolutePath}.`);
+			// only log a warning if the file is not a binary asset file
+			if (!endsWithOneOf(file.path, DO_NOT_RESOLVE_EXTENSIONS)) {
+				log.warn(
+					`Couldn't find a language to resolve dependencies for ${file.absolutePath}.`
+				);
+			}
 		}
 	}
 
