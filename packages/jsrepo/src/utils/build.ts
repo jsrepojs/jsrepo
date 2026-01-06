@@ -604,6 +604,7 @@ async function resolveFile(
 			dependencies = deps;
 			devDependencies = devDeps;
 		} else {
+			// only log a warning if the file is not a binary asset file
 			if (!endsWithOneOf(file.path, DO_NOT_RESOLVE_EXTENSIONS)) {
 				log.warn(
 					`Couldn't find a language to resolve dependencies for ${file.absolutePath}.`
