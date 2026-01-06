@@ -54,7 +54,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",
-		"shadcn": "^3.5.0",
+		"shadcn": "^3.6.3",
 		"tsdown": "catalog:",
 		"typescript": "catalog:",
 		"zod": "catalog:"

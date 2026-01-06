@@ -17,7 +17,7 @@
 	"packageManager": "pnpm@10.17.1",
 	"dependencies": {
 		"@npmcli/arborist": "^9.1.6",
-		"commander": "^14.0.1",
+		"commander": "catalog:",
 		"npm-packlist": "^10.0.3",
 		"picocolors": "catalog:"
 	},
