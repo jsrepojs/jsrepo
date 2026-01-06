@@ -5,7 +5,7 @@ import {
 	type BindingProperty,
 	type ObjectExpression,
 	type ObjectProperty,
-	parseAsync,
+	parse,
 	Visitor,
 } from 'oxc-parser';
 import type { Config } from '@/utils/config';
@@ -31,7 +31,7 @@ export async function updateConfigPaths(
 ): Promise<Result<string, InvalidKeyTypeError | ConfigObjectNotFoundError>> {
 	if (Object.keys(paths).length === 0) return ok(config.code);
 
-	const parsed = await parseAsync(config.path, config.code);
+	const parsed = await parse(config.path, config.code);
 
 	const s = new MagicString(config.code);
 

@@ -5,7 +5,7 @@ import {
 	type BindingProperty,
 	type ObjectExpression,
 	type ObjectProperty,
-	parseAsync,
+	parse,
 	Visitor,
 } from 'oxc-parser';
 import { ConfigObjectNotFoundError, InvalidKeyTypeError } from '@/utils/errors';
@@ -29,7 +29,7 @@ export async function addRegistriesToConfig(
 ): Promise<Result<string, InvalidKeyTypeError | ConfigObjectNotFoundError>> {
 	if (registries.length === 0) return ok(config.code);
 
-	const parsed = await parseAsync(config.path, config.code);
+	const parsed = await parse(config.path, config.code);
 
 	const s = new MagicString(config.code);
 

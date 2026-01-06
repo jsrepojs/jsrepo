@@ -22,8 +22,8 @@
 		"ai"
 	],
 	"type": "module",
-	"bin": "./dist/index.js",
-	"main": "./dist/index.js",
+	"bin": "./dist/index.mjs",
+	"main": "./dist/index.mjs",
 	"files": [
 		"dist/**/*",
 		"!dist/**/*.map"
@@ -31,11 +31,11 @@
 	"scripts": {
 		"build": "tsdown",
 		"dev": "tsdown --watch",
-		"start": "node ./dist/index.js mcp",
+		"start": "node ./dist/index.mjs mcp",
 		"check": "tsc --noEmit",
-		"mcp:inspector": "pnpm dlx @modelcontextprotocol/inspector node ./dist/index.js mcp",
+		"mcp:inspector": "pnpm dlx @modelcontextprotocol/inspector node ./dist/index.mjs mcp",
 		"test": "vitest",
-		"bundle-analyze": "FORCE_COLOR=1 node ../../bundle-analyzer/dist/index.js analyze ."
+		"bundle-analyze": "FORCE_COLOR=1 node ../../bundle-analyzer/dist/index.mjs analyze ."
 	},
 	"packageManager": "pnpm@10.17.1",
 	"dependencies": {
@@ -43,13 +43,13 @@
 	},
 	"devDependencies": {
 		"@tmcp/adapter-zod": "^0.1.7",
-		"@tmcp/transport-in-memory": "^0.0.2",
-		"@tmcp/transport-stdio": "^0.4.0",
+		"@tmcp/transport-in-memory": "^0.0.5",
+		"@tmcp/transport-stdio": "^0.4.1",
 		"@types/node": "catalog:",
-		"dedent": "^1.7.0",
+		"dedent": "catalog:",
 		"fuzzysort": "^3.1.0",
 		"picocolors": "catalog:",
-		"tmcp": "^1.16.2",
+		"tmcp": "^1.19.0",
 		"tsdown": "catalog:",
 		"typescript": "catalog:",
 		"vitest": "catalog:",

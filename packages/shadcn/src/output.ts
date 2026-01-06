@@ -26,10 +26,20 @@ export function output(options: OutputOptions): Output {
 
 			for (const item of buildResult.items) {
 				const type = getType(item.type);
+				if (type === 'registry:base' || type === 'registry:font') {
+					throw new JsrepoError(
+						`${item.name} is of type ${type} and cannot be added to the registry.`,
+						{
+							suggestion: 'Please remove the item from the registry.',
+						}
+					);
+				}
 				const parseResult = registryItemTypeSchema.safeParse(type);
 				if (!parseResult.success) {
 					throw new JsrepoError(
-						`Invalid item type: ${type} for ${item.name}. Expected one of: ${registryItemTypeSchema.options.join(', ')}`,
+						`Invalid item type: ${type} for ${
+							item.name
+						}. Expected one of: ${registryItemTypeSchema.options.join(', ')}`,
 						{
 							suggestion: 'Please use a valid item type.',
 						}
@@ -47,7 +57,10 @@ export function output(options: OutputOptions): Output {
 						title: item.title,
 						description: item.description,
 						// validated above
-						type: getType(item.type) as Registry['items'][number]['type'],
+						type: getType(item.type) as Exclude<
+							Registry['items'][number]['type'],
+							'registry:base' | 'registry:font'
+						>,
 						envVars: item.envVars,
 						dependencies: item.dependencies?.map(
 							(dependency) =>
@@ -83,7 +96,10 @@ export function output(options: OutputOptions): Output {
 					name: item.name,
 					title: item.title,
 					description: item.description,
-					type: getType(item.type) as RegistryItem['type'],
+					type: getType(item.type) as Exclude<
+						RegistryItem['type'],
+						'registry:base' | 'registry:font'
+					>,
 					files: item.files.map((file) => {
 						return {
 							// biome-ignore lint/suspicious/noExplicitAny: already checked it

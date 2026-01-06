@@ -3,8 +3,8 @@
 	"description": "A package to help you distribute your jsrepo registry as a shadcn registry.",
 	"private": true,
 	"type": "module",
-	"main": "./dist/index.js",
-	"bin": "./dist/index.js",
+	"main": "./dist/index.mjs",
+	"bin": "./dist/index.mjs",
 	"files": [
 		"dist/**/*"
 	],
@@ -12,12 +12,12 @@
 		"build": "tsdown",
 		"dev": "tsdown --watch",
 		"check": "tsc --noEmit",
-		"start": "node ./dist/index.js"
+		"start": "node ./dist/index.mjs"
 	},
 	"packageManager": "pnpm@10.17.1",
 	"dependencies": {
 		"@npmcli/arborist": "^9.1.6",
-		"commander": "^14.0.1",
+		"commander": "catalog:",
 		"npm-packlist": "^10.0.3",
 		"picocolors": "catalog:"
 	},

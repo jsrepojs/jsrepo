@@ -135,7 +135,7 @@ describe('resolveWantedItems', () => {
 	});
 });
 
-export const RESOLVED_REGISTRY = {
+const RESOLVED_REGISTRY = {
 	url: '@ieedan/std@beta',
 	provider: {
 		state: {
