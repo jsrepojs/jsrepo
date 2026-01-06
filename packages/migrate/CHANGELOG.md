@@ -1,5 +1,14 @@
 # @jsrepo/migrate
 
+## 0.0.11
+### Patch Changes
+
+
+- chore: bump deps ([#730](https://github.com/jsrepojs/jsrepo/pull/730))
+
+- Updated dependencies [[`07d0399`](https://github.com/jsrepojs/jsrepo/commit/07d039908e241f7bdcc084c5697a9534fd2e4788), [`2362f8e`](https://github.com/jsrepojs/jsrepo/commit/2362f8e90ad79ba6df0fe6cfa4ceb82362ee5b62)]:
+  - jsrepo@3.0.10
+
 ## 0.0.10
 ### Patch Changes
 
