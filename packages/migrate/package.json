@@ -22,18 +22,18 @@
 		"v3"
 	],
 	"type": "module",
-	"bin": "./dist/bin.js",
-	"main": "./dist/bin.js",
+	"bin": "./dist/bin.mjs",
+	"main": "./dist/bin.mjs",
 	"files": [
 		"dist/**/*",
 		"!dist/**/*.map"
 	],
 	"scripts": {
-		"start": "node ./dist/bin.js",
+		"start": "node ./dist/bin.mjs",
 		"build": "tsdown",
 		"dev": "tsdown --watch",
 		"check": "tsc --noEmit",
-		"bundle-analyze": "FORCE_COLOR=1 node ../../bundle-analyzer/dist/index.js analyze ."
+		"bundle-analyze": "FORCE_COLOR=1 node ../../bundle-analyzer/dist/index.mjs analyze ."
 	},
 	"packageManager": "pnpm@10.20.0",
 	"dependencies": {

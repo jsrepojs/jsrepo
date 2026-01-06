@@ -1,7 +1,7 @@
 import { builtinModules } from 'node:module';
 import escapeStringRegexp from 'escape-string-regexp';
 import { err, ok, Result } from 'nevereverthrow';
-import { parseAsync } from 'oxc-parser';
+import { parse } from 'oxc-parser';
 import { resolveCommand } from 'package-manager-detector';
 import path from 'pathe';
 import pc from 'picocolors';
@@ -146,7 +146,7 @@ export async function getImports(
 		warn: ResolveDependenciesOptions['warn'];
 	}
 ): Promise<string[]> {
-	const result = await parseAsync(fileName, code);
+	const result = await parse(fileName, code);
 
 	const modules: string[] = [];
 
@@ -158,7 +158,7 @@ export async function getImports(
 	// handle dynamic imports
 	for (const imp of result.module.dynamicImports) {
 		const fullImport = code.slice(imp.moduleRequest.start, imp.moduleRequest.end);
-		const parsedImport = await parseAsync(fileName, fullImport);
+		const parsedImport = await parse(fileName, fullImport);
 
 		// an literal expression or a template literal with a single quasi
 		const isLiteral =

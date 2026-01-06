@@ -6,7 +6,7 @@ import {
 	type ImportDeclaration,
 	type ObjectExpression,
 	type ObjectProperty,
-	parseAsync,
+	parse,
 	Visitor,
 } from 'oxc-parser';
 import { vi } from 'vitest';
@@ -61,7 +61,7 @@ export async function addPluginsToConfig({
 > {
 	if (plugins.length === 0) return ok(config.code);
 
-	const parsed = await parseAsync(config.path, config.code);
+	const parsed = await parse(config.path, config.code);
 
 	const s = new MagicString(config.code);
 
