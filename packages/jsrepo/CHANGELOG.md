@@ -1,5 +1,14 @@
 # jsrepo
 
+## 3.0.10
+### Patch Changes
+
+
+- chore: bump deps ([#730](https://github.com/jsrepojs/jsrepo/pull/730))
+
+
+- fix: Do not warn that depenedencies cannot be resolved for binary files ([#729](https://github.com/jsrepojs/jsrepo/pull/729))
+
 ## 3.0.9
 ### Patch Changes
 
