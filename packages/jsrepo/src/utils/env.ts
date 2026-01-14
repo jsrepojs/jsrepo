@@ -43,6 +43,12 @@ export function parseEnvVariables(contents: string): Record<string, string> {
 			continue;
 		}
 
+		// Skip comment lines (lines starting with #)
+		if (trimmedLine.startsWith('#')) {
+			i++;
+			continue;
+		}
+
 		const firstEqualIndex = trimmedLine.indexOf('=');
 		if (firstEqualIndex === -1) {
 			i++;
@@ -76,6 +82,28 @@ export function parseEnvVariables(contents: string): Record<string, string> {
 				value = `${joined.slice(1, -1)}\n`;
 			} else {
 				value = joined;
+			}
+		} else {
+			// Single-line value - handle comments
+			// If value is quoted, find the closing quote first, then strip comments after it
+			if (value.startsWith('"') && value.endsWith('"')) {
+				// Quoted single-line value - comments can appear after the closing quote
+				const closingQuoteIndex = value.lastIndexOf('"');
+				if (closingQuoteIndex !== -1 && closingQuoteIndex < value.length - 1) {
+					// There's content after the closing quote - check for comment
+					const afterQuote = value.slice(closingQuoteIndex + 1);
+					const commentIndex = afterQuote.indexOf('#');
+					if (commentIndex !== -1) {
+						// Strip comment and any whitespace before it
+						value = value.slice(0, closingQuoteIndex + 1 + commentIndex).trimEnd();
+					}
+				}
+			} else {
+				// Unquoted value - find first # and strip everything after it (and whitespace before it)
+				const commentIndex = value.indexOf('#');
+				if (commentIndex !== -1) {
+					value = value.slice(0, commentIndex).trimEnd();
+				}
 			}
 		}
 
