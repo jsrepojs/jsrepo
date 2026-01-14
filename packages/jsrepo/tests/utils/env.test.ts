@@ -48,6 +48,18 @@ describe('parseEnvVariables', () => {
 			SIMPLE: 'normal_value',
 		});
 	});
+
+	it('should parse multi-line environment variables', () => {
+		const contents = dedent`
+		MULTI_LINE="some
+multi-line
+variable"
+		`;
+		const envVars = parseEnvVariables(contents);
+		expect(envVars).toEqual({
+			MULTI_LINE: 'some\nmulti-line\nvariable\n',
+		});
+	});
 });
 
 describe('updateEnvFile', () => {
@@ -89,6 +101,21 @@ describe('updateEnvFile', () => {
 		});
 		expect(newContents).toEqual(dedent`
 		TEST=test
+		`);
+	});
+
+	it('should handle multi-line variables', () => {
+		const contents = dedent`
+		TEST="some
+multi-line
+variable
+"
+		`;
+		const newContents = updateEnvFile(contents, {
+			TEST: 'test4',
+		});
+		expect(newContents).toEqual(dedent`
+		TEST="test4"
 		`);
 	});
 });
