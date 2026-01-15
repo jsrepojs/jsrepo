@@ -2,7 +2,7 @@ import type { FetchOptions, Provider, ProviderFactory } from '@/providers/types'
 import { ProviderFetchError } from '@/utils/errors';
 import { addTrailingSlash } from '@/utils/url';
 
-export type HttpOptions =
+export type HttpOptions = (
 	| {
 			baseUrl?: never;
 			/**
@@ -20,7 +20,13 @@ export type HttpOptions =
 			baseUrl: string;
 			/** The auth header for your site. */
 			authHeader?: (token: string) => Record<string, string>;
-	  };
+	  }
+) & {
+	/**
+	 * Additional headers to add to the request. The authHeader function result will override these headers.
+	 */
+	headers?: Record<string, string>;
+};
 
 /**
  * The built in http provider. When using this provider you should place it at the end of the providers array otherwise it will match all urls.
@@ -93,6 +99,7 @@ class Http implements Provider {
 		const url = this.resolveRaw(resourcePath);
 		try {
 			const headers: Record<string, string> = {
+				...(this.opts.headers ?? {}),
 				...(this.authHeader(token) ?? {}),
 			};
 
