@@ -1,5 +1,14 @@
 # jsrepo
 
+## 3.0.11
+### Patch Changes
+
+
+- fix: environment variable parsing ([#733](https://github.com/jsrepojs/jsrepo/pull/733))
+
+
+- feat: add `headers` to `http` provider to allow for providing custom headers with every request ([#736](https://github.com/jsrepojs/jsrepo/pull/736))
+
 ## 3.0.10
 ### Patch Changes
 
