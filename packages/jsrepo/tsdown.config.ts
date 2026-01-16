@@ -11,6 +11,7 @@ export default defineConfig({
 		'src/api/config.ts',
 		'src/api/errors.ts',
 		'src/api/utils.ts',
+		'src/api/warnings.ts',
 	],
 	format: ['esm'],
 	alias: {

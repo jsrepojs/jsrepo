@@ -58,6 +58,10 @@
 		"./utils": {
 			"types": "./dist/api/utils.d.mts",
 			"default": "./dist/api/utils.mjs"
+		},
+		"./warnings": {
+			"types": "./dist/api/warnings.d.mts",
+			"default": "./dist/api/warnings.mjs"
 		}
 	},
 	"bin": "./dist/bin.mjs",

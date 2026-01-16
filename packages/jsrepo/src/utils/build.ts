@@ -1,4 +1,3 @@
-import { log } from '@clack/prompts';
 import { err, ok, type Result } from 'nevereverthrow';
 import path from 'pathe';
 import pc from 'picocolors';
@@ -15,6 +14,11 @@ import type {
 	RegistryPlugin,
 } from '@/utils/config';
 import type { AbsolutePath, ItemRelativePath, LooseAutocomplete } from '@/utils/types';
+import {
+	createWarningHandler,
+	LanguageNotFoundWarning,
+	type WarningHandler,
+} from '@/utils/warnings';
 import {
 	BuildError,
 	DuplicateFileReferenceError,
@@ -281,6 +285,8 @@ export async function buildRegistry(
 	const result = await validateRegistryConfig(registry);
 	if (result.isErr()) return err(result.error);
 
+	const warn = createWarningHandler(config.onwarn);
+
 	// flatten all the files that need to be resolved into a single array
 	const preparedFilesResult = await collectItemFiles(registry.items, {
 		cwd: options.cwd,
@@ -294,6 +300,7 @@ export async function buildRegistry(
 		cwd: options.cwd,
 		config,
 		registry,
+		warn,
 	});
 	if (resolvedFilesResult.isErr()) return err(resolvedFilesResult.error);
 	const resolvedFiles = resolvedFilesResult.value;
@@ -515,11 +522,13 @@ export async function resolveFiles(
 		resolvedFiles = new Map<NormalizedAbsolutePath, ResolvedFile>(),
 		config,
 		registry,
+		warn,
 	}: {
 		cwd: AbsolutePath;
 		config: Config;
 		registry: RegistryConfig;
 		resolvedFiles?: ResolvedFiles;
+		warn: WarningHandler;
 	}
 ): Promise<Result<ResolvedFiles, BuildError>> {
 	for (const file of files) {
@@ -546,7 +555,7 @@ export async function resolveFiles(
 			);
 		}
 
-		const resolveResult = await resolveFile(file, { cwd, config, registry });
+		const resolveResult = await resolveFile(file, { cwd, config, registry, warn });
 		if (resolveResult.isErr()) return err(resolveResult.error);
 		resolvedFiles.set(normalizedPath, resolveResult.value);
 	}
@@ -555,7 +564,12 @@ export async function resolveFiles(
 
 async function resolveFile(
 	file: UnresolvedFile,
-	{ cwd, config, registry }: { cwd: AbsolutePath; config: Config; registry: RegistryConfig }
+	{
+		cwd,
+		config,
+		registry,
+		warn,
+	}: { cwd: AbsolutePath; config: Config; registry: RegistryConfig; warn: WarningHandler }
 ): Promise<Result<ResolvedFile, BuildError>> {
 	const contentResult = readFileSync(file.absolutePath);
 	if (contentResult.isErr())
@@ -598,7 +612,7 @@ async function resolveFile(
 				cwd,
 				fileName: file.absolutePath,
 				excludeDeps: registry.excludeDeps ?? [],
-				warn: log.warn,
+				warn,
 			});
 			localDependencies = localDeps;
 			dependencies = deps;
@@ -606,8 +620,11 @@ async function resolveFile(
 		} else {
 			// only log a warning if the file is not a binary asset file
 			if (!endsWithOneOf(file.path, DO_NOT_RESOLVE_EXTENSIONS)) {
-				log.warn(
-					`Couldn't find a language to resolve dependencies for ${file.absolutePath}.`
+				warn(
+					new LanguageNotFoundWarning(
+						`Couldn't find a language to resolve dependencies for ${file.absolutePath}.`,
+						{ path: file.absolutePath }
+					)
 				);
 			}
 		}
