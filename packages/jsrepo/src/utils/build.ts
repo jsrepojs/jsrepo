@@ -1,5 +1,5 @@
 import { log } from '@clack/prompts';
-import fg, { isDynamicPattern } from 'fast-glob';
+import { isDynamicPattern } from 'fast-glob';
 import { err, ok, type Result } from 'nevereverthrow';
 import path from 'pathe';
 import pc from 'picocolors';
@@ -31,6 +31,7 @@ import {
 	SelfReferenceError,
 } from './errors';
 import { existsSync, readdirSync, readFileSync, statSync } from './fs';
+import { glob } from './glob';
 import { parsePackageName } from './parse-package-name';
 import { joinAbsolute, joinRelative, type NormalizedAbsolutePath, normalizeAbsolute } from './path';
 import { endsWithOneOf } from './strings';
@@ -293,11 +294,15 @@ export async function expandRegistryItems(
 	const expandedRegistryItems: ExpandedRegistryItem[] = [];
 
 	for (const item of registry.items) {
-		const unresolvedFiles = await expandItemFiles(item.files, { cwd, item, registry });
-		if (unresolvedFiles.isErr()) return err(unresolvedFiles.error);
+		const expandedFilesResult = await expandItemFiles(item.files, { cwd, item, registry });
+		if (expandedFilesResult.isErr()) return err(expandedFilesResult.error);
+		const expandedFiles = expandedFilesResult.value;
+		if (expandedFiles.length === 0) {
+			return err(new NoFilesError({ name: item.name, registryName: registry.name }));
+		}
 		expandedRegistryItems.push({
 			...item,
-			files: unresolvedFiles.value,
+			files: expandedFiles,
 		});
 	}
 
@@ -314,7 +319,21 @@ async function expandItemFiles(
 		const absolutePath = joinAbsolute(cwd, file.path);
 		if (isDynamicPattern(absolutePath)) {
 			if (!file.files) {
-				const entries = await fg.glob(absolutePath, { absolute: true, dot: true });
+				const entriesResult = await glob(absolutePath, {
+					absolute: true,
+					dot: true,
+					registryName: registry.name,
+				});
+				if (entriesResult.isErr()) return err(entriesResult.error);
+				const entries = entriesResult.value;
+				if (entries.length === 0) {
+					log.warn(
+						`The glob pattern defined in ${pc.bold(item.name)}: ${pc.bold(
+							file.path
+						)} didn't match any files.`
+					);
+					continue;
+				}
 				const files = entries.map((e) => ({
 					...file,
 					path: path.basename(e) as ItemRelativePath,
@@ -474,7 +493,19 @@ async function expandItemFolderFiles(
 		const absolutePath = joinAbsolute(parent.absolutePath, f.path);
 		if (isDynamicPattern(absolutePath)) {
 			if (!f.files) {
-				const entries = await fg.glob(absolutePath, { absolute: true, dot: true });
+				const entriesResult = await glob(absolutePath, {
+					absolute: true,
+					dot: true,
+					registryName: registry.name,
+				});
+				if (entriesResult.isErr()) return err(entriesResult.error);
+				const entries = entriesResult.value;
+				if (entries.length === 0) {
+					log.warn(
+						`The glob pattern defined in ${pc.bold(item.name)}: ${pc.bold(f.path)} didn't match any files.`
+					);
+					continue;
+				}
 				const files = entries.map((e) => ({
 					...f,
 					path: path.basename(e) as ItemRelativePath,

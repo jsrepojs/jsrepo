@@ -1,3 +1,4 @@
+import type { Pattern } from 'fast-glob';
 import pc from 'picocolors';
 import type { z } from 'zod';
 import type { RegistryItemType } from './config';
@@ -454,6 +455,18 @@ export class InvalidJSONError extends JsrepoError {
 			`Invalid JSON: ${error instanceof Error ? (error.stack ?? error.message) : `${error}`}`,
 			{
 				suggestion: 'Check the input JSON and try again.',
+			}
+		);
+	}
+}
+
+export class GlobError extends BuildError {
+	constructor(error: unknown, pattern: Pattern, registryName: string) {
+		super(
+			`Error while parsing glob pattern ${pc.bold(pattern)}: ${error instanceof Error ? error.message : String(error)}`,
+			{
+				registryName,
+				suggestion: 'Please check the glob pattern and try again.',
 			}
 		);
 	}
