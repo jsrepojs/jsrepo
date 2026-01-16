@@ -344,7 +344,7 @@ export async function buildRegistry(
 	// flatten all the files that need to be resolved into a single array
 	const preparedFilesResult = await collectItemFiles(expandedRegistry.items, {
 		cwd: options.cwd,
-		registryName: registry.name,
+		registryName: expandedRegistry.name,
 	});
 	if (preparedFilesResult.isErr()) return err(preparedFilesResult.error);
 	const preparedFiles = preparedFilesResult.value;
@@ -353,7 +353,7 @@ export async function buildRegistry(
 	const resolvedFilesResult = await resolveFiles(preparedFiles, {
 		cwd: options.cwd,
 		config,
-		registry,
+		registry: expandedRegistry,
 	});
 	if (resolvedFilesResult.isErr()) return err(resolvedFilesResult.error);
 	const resolvedFiles = resolvedFilesResult.value;
@@ -361,7 +361,7 @@ export async function buildRegistry(
 	const resolvedItemsResult = await resolveRegistryItems(expandedRegistry.items, {
 		cwd: options.cwd,
 		resolvedFiles,
-		registryName: registry.name,
+		registryName: expandedRegistry.name,
 	});
 	if (resolvedItemsResult.isErr()) return err(resolvedItemsResult.error);
 	const resolvedItems = resolvedItemsResult.value;
