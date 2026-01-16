@@ -351,6 +351,39 @@ export default defineConfig({
 });
 ```
 
+#### Glob patterns in file paths
+
+You can also use glob patterns in file paths to include all files that match the pattern.
+
+For example lets say I want to include all my demos for the button component as examples:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+		items: [
+			{
+                name: 'button',
+                type: 'ui',
+				files: [
+                    {
+                        path: 'src/lib/components/button',
+                    },
+					{
+						path: "src/lib/demos/button-*.svelte", // [!code ++]
+                        role: 'example',
+                        dependencyResolution: 'manual',
+					},
+				],
+			},
+		],
+	});
+});
+```
+
+Now any demos under the `src/lib/demos/` path that match `button-*.svelte` will be included with the button item as examples.
+
 ### Excluding dependencies
 
 Many times you may not want certain dependencies to be installed with your registry items. For instance if you import `useState` from `react` you probably don't want to force users to install `react` with your registry.

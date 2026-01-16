@@ -1,4 +1,5 @@
 import { log } from '@clack/prompts';
+import fg, { isDynamicPattern } from 'fast-glob';
 import { err, ok, type Result } from 'nevereverthrow';
 import path from 'pathe';
 import pc from 'picocolors';
@@ -9,6 +10,7 @@ import type {
 	RegistryFileRoles,
 	RegistryItem,
 	RegistryItemAdd,
+	RegistryItemFile,
 	RegistryItemFolderFile,
 	RegistryItemType,
 	RegistryMeta,
@@ -225,6 +227,53 @@ export type ResolvedFile = {
 export type ResolvedFiles = Map<NormalizedAbsolutePath, ResolvedFile>;
 
 /**
+ * Expands glob patterns in registry items by replacing glob pattern file entries
+ * with all matching files. The original item is kept, but glob patterns in its files
+ * array are replaced with the actual matching files.
+ */
+async function expandGlobPatterns(
+	items: RegistryItem[],
+	{ cwd, registryName: _registryName }: { cwd: AbsolutePath; registryName: string }
+): Promise<Result<RegistryItem[], BuildError>> {
+	const expandedItems: RegistryItem[] = [];
+
+	for (const item of items) {
+		const expandedFiles: RegistryItemFile[] = [];
+
+		for (const file of item.files) {
+			if (isDynamicPattern(file.path)) {
+				// Expand the glob pattern to find all matching files
+				const globPath = joinAbsolute(cwd, file.path);
+				const matches = await fg(globPath, {
+					absolute: true,
+					onlyFiles: true,
+				});
+
+				// Add any matching files to the expanded files array
+				for (const matchPath of matches) {
+					const relativePath = path.relative(cwd, matchPath) as ItemRelativePath;
+					expandedFiles.push({
+						...file,
+						path: relativePath,
+					});
+				}
+			} else {
+				expandedFiles.push(file);
+			}
+		}
+
+		const expandedItem: RegistryItem = {
+			...item,
+			files: expandedFiles,
+		};
+
+		expandedItems.push(expandedItem);
+	}
+
+	return ok(expandedItems);
+}
+
+/**
  * Validates the registry config
  * @param registry
  */
@@ -278,11 +327,22 @@ export async function buildRegistry(
 	registry: RegistryConfig,
 	{ options, config }: { options: { cwd: AbsolutePath }; config: Config }
 ): Promise<Result<BuildResult, BuildError>> {
-	const result = await validateRegistryConfig(registry);
+	const expandedItemsResult = await expandGlobPatterns(registry.items, {
+		cwd: options.cwd,
+		registryName: registry.name,
+	});
+	if (expandedItemsResult.isErr()) return err(expandedItemsResult.error);
+
+	const expandedRegistry: RegistryConfig = {
+		...registry,
+		items: expandedItemsResult.value,
+	};
+
+	const result = await validateRegistryConfig(expandedRegistry);
 	if (result.isErr()) return err(result.error);
 
 	// flatten all the files that need to be resolved into a single array
-	const preparedFilesResult = await collectItemFiles(registry.items, {
+	const preparedFilesResult = await collectItemFiles(expandedRegistry.items, {
 		cwd: options.cwd,
 		registryName: registry.name,
 	});
@@ -298,7 +358,7 @@ export async function buildRegistry(
 	if (resolvedFilesResult.isErr()) return err(resolvedFilesResult.error);
 	const resolvedFiles = resolvedFilesResult.value;
 
-	const resolvedItemsResult = await resolveRegistryItems(registry.items, {
+	const resolvedItemsResult = await resolveRegistryItems(expandedRegistry.items, {
 		cwd: options.cwd,
 		resolvedFiles,
 		registryName: registry.name,
@@ -307,9 +367,9 @@ export async function buildRegistry(
 	const resolvedItems = resolvedItemsResult.value;
 
 	return ok({
-		...registry,
+		...expandedRegistry,
 		items: Array.from(resolvedItems.values()),
-		defaultPaths: registry.defaultPaths as Record<string, string> | undefined,
+		defaultPaths: expandedRegistry.defaultPaths as Record<string, string> | undefined,
 	});
 }
 

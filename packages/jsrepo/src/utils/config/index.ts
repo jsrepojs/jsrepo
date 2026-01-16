@@ -189,7 +189,27 @@ export const RegistryFileRoles = ['example', 'doc', 'test', 'file'] as const;
 export type RegistryFileRoles = (typeof RegistryFileRoles)[number];
 
 export type RegistryItemFile = {
-	/** Path of the file/folder relative to registry config. */
+	/**
+	 * Path of the file/folder relative to registry config.
+	 *
+	 * Supports glob patterns (e.g., `demos/component-*.svelte`). When a glob pattern is used,
+	 * it will be expanded to include all matching files in the same registry item.
+	 *
+	 * @example
+	 * ```ts
+	 * {
+	 *   name: "component-demos",
+	 *   files: [
+	 *     {
+	 *       path: "demos/component-*.svelte",
+	 *       role: "example"
+	 *     }
+	 *   ]
+	 * }
+	 * ```
+	 * This will expand to include all files matching `demos/component-*.svelte` as separate
+	 * file entries in the same registry item.
+	 */
 	path: string;
 	/**
 	 * The type of the file. This will determine the path that the file will be added to in the users project.
