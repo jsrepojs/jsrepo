@@ -102,6 +102,7 @@
 		"dedent": "catalog:",
 		"diff": "^8.0.2",
 		"escape-string-regexp": "^5.0.0",
+		"fast-glob": "^3.3.3",
 		"get-tsconfig": "^4.13.0",
 		"is-unicode-supported": "^2.1.0",
 		"magic-string": "^0.30.21",

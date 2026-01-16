@@ -24,7 +24,7 @@ export type CLIError =
 	| DuplicateItemNameError
 	| SelfReferenceError
 	| NoFilesError
-	| IllegalBlockNameError
+	| IllegalItemNameError
 	| InvalidRegistryDependencyError
 	| DuplicateFileReferenceError
 	| FileNotFoundError
@@ -301,11 +301,11 @@ export class NoFilesError extends BuildError {
 	}
 }
 
-export class IllegalBlockNameError extends BuildError {
+export class IllegalItemNameError extends BuildError {
 	constructor({ name, registryName }: { name: string; registryName: string }) {
-		super(`Illegal block name: ${pc.bold(name)}.`, {
+		super(`Illegal item name: ${pc.bold(name)}.`, {
 			registryName,
-			suggestion: 'Please ensure the block name is not the same as the manifest file name.',
+			suggestion: 'Please update the name of your item.',
 		});
 	}
 }

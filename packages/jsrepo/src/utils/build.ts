@@ -1,4 +1,5 @@
 import { log } from '@clack/prompts';
+import fg, { isDynamicPattern } from 'fast-glob';
 import { err, ok, type Result } from 'nevereverthrow';
 import path from 'pathe';
 import pc from 'picocolors';
@@ -9,6 +10,7 @@ import type {
 	RegistryFileRoles,
 	RegistryItem,
 	RegistryItemAdd,
+	RegistryItemFile,
 	RegistryItemFolderFile,
 	RegistryItemType,
 	RegistryMeta,
@@ -20,7 +22,7 @@ import {
 	DuplicateFileReferenceError,
 	DuplicateItemNameError,
 	FileNotFoundError,
-	IllegalBlockNameError,
+	IllegalItemNameError,
 	ImportedFileNotResolvedError,
 	InvalidDependencyError,
 	InvalidRegistryDependencyError,
@@ -252,8 +254,8 @@ export async function validateRegistryConfig(
 		if (item.files.length === 0)
 			return err(new NoFilesError({ name: item.name, registryName: registry.name }));
 
-		if (item.name === 'jsrepo' || item.name === 'registry')
-			return err(new IllegalBlockNameError({ name: item.name, registryName: registry.name }));
+		if (item.name === 'registry')
+			return err(new IllegalItemNameError({ name: item.name, registryName: registry.name }));
 	}
 
 	// check to make sure that any registry dependencies are valid
@@ -274,61 +276,94 @@ export async function validateRegistryConfig(
 	return ok();
 }
 
-export async function buildRegistry(
-	registry: RegistryConfig,
-	{ options, config }: { options: { cwd: AbsolutePath }; config: Config }
-): Promise<Result<BuildResult, BuildError>> {
-	const result = await validateRegistryConfig(registry);
-	if (result.isErr()) return err(result.error);
-
-	// flatten all the files that need to be resolved into a single array
-	const preparedFilesResult = await collectItemFiles(registry.items, {
-		cwd: options.cwd,
-		registryName: registry.name,
-	});
-	if (preparedFilesResult.isErr()) return err(preparedFilesResult.error);
-	const preparedFiles = preparedFilesResult.value;
-
-	// resolve all the files
-	const resolvedFilesResult = await resolveFiles(preparedFiles, {
-		cwd: options.cwd,
-		config,
-		registry,
-	});
-	if (resolvedFilesResult.isErr()) return err(resolvedFilesResult.error);
-	const resolvedFiles = resolvedFilesResult.value;
-
-	const resolvedItemsResult = await resolveRegistryItems(registry.items, {
-		cwd: options.cwd,
-		resolvedFiles,
-		registryName: registry.name,
-	});
-	if (resolvedItemsResult.isErr()) return err(resolvedItemsResult.error);
-	const resolvedItems = resolvedItemsResult.value;
-
-	return ok({
-		...registry,
-		items: Array.from(resolvedItems.values()),
-		defaultPaths: registry.defaultPaths as Record<string, string> | undefined,
-	});
-}
+type ExpandedRegistryItem = Omit<RegistryItem, 'files'> & {
+	files: UnresolvedFile[];
+};
 
 /**
- * Collects all the files that need to be resolved into a single array.
+ * Resolve any glob patterns or nested files within registry items and return a list of registry items with a flattened array of files.
  *
- * @param items
+ * @param registry
  * @param param1
- * @returns
  */
-export async function collectItemFiles(
-	items: RegistryItem[],
-	{ cwd, registryName }: { cwd: AbsolutePath; registryName: string }
+export async function expandRegistryItems(
+	registry: RegistryConfig,
+	{ cwd }: { cwd: AbsolutePath }
+): Promise<Result<ExpandedRegistryItem[], BuildError>> {
+	const expandedRegistryItems: ExpandedRegistryItem[] = [];
+
+	for (const item of registry.items) {
+		const unresolvedFiles = await expandItemFiles(item.files, { cwd, item, registry });
+		if (unresolvedFiles.isErr()) return err(unresolvedFiles.error);
+		expandedRegistryItems.push({
+			...item,
+			files: unresolvedFiles.value,
+		});
+	}
+
+	return ok(expandedRegistryItems);
+}
+
+async function expandItemFiles(
+	files: RegistryItemFile[],
+	{ cwd, item, registry }: { cwd: AbsolutePath; item: RegistryItem; registry: RegistryConfig }
 ): Promise<Result<UnresolvedFile[], BuildError>> {
 	const unresolvedFiles: UnresolvedFile[] = [];
-	for (const item of items) {
-		// all these files are at the root of the item and therefore should have absolute paths
-		for (const file of item.files) {
-			const absolutePath = joinAbsolute(cwd, file.path);
+
+	for (const file of files) {
+		const absolutePath = joinAbsolute(cwd, file.path);
+		if (isDynamicPattern(absolutePath)) {
+			if (!file.files) {
+				const entries = await fg.glob(absolutePath, { absolute: true, dot: true });
+				const files = entries.map((e) => ({
+					...file,
+					path: path.basename(e) as ItemRelativePath,
+					absolutePath: e as AbsolutePath,
+				}));
+
+				unresolvedFiles.push(
+					...files.map((f) => ({
+						absolutePath: f.absolutePath,
+						path: f.path,
+						type: f.type ?? item.type,
+						role: f.role ?? 'file',
+						target: f.target,
+						dependencyResolution:
+							f.dependencyResolution ?? item.dependencyResolution ?? 'auto',
+						parent: {
+							name: item.name,
+							type: item.type,
+							registryName: registry.name,
+						},
+						registryDependencies: f.registryDependencies,
+						dependencies: f.dependencies,
+						devDependencies: f.devDependencies,
+					}))
+				);
+				continue;
+			}
+
+			const subFilesResult = await expandItemFolderFiles(file.files, {
+				parent: {
+					type: file.type ?? item.type,
+					role: file.role ?? 'file',
+					target: file.target,
+					dependencyResolution: item.dependencyResolution ?? 'auto',
+					parentItem: {
+						name: item.name,
+						type: item.type,
+						registryName: registry.name,
+					},
+					path: file.path as ItemRelativePath,
+					absolutePath: absolutePath,
+				},
+				cwd,
+				item,
+				registry,
+			});
+			if (subFilesResult.isErr()) return err(subFilesResult.error);
+			unresolvedFiles.push(...subFilesResult.value);
+		} else {
 			if (!existsSync(absolutePath)) {
 				return err(
 					new FileNotFoundError({
@@ -337,13 +372,13 @@ export async function collectItemFiles(
 							name: item.name,
 							type: item.type,
 						},
-						registryName,
+						registryName: registry.name,
 					})
 				);
 			}
 
-			const isFile = statSync(absolutePath)._unsafeUnwrap().isFile();
-			if (isFile) {
+			const statResult = statSync(absolutePath)._unsafeUnwrap();
+			if (statResult.isFile()) {
 				unresolvedFiles.push({
 					absolutePath,
 					path: path.basename(file.path) as ItemRelativePath,
@@ -355,7 +390,7 @@ export async function collectItemFiles(
 					parent: {
 						name: item.name,
 						type: item.type,
-						registryName,
+						registryName: registry.name,
 					},
 					registryDependencies: file.registryDependencies,
 					dependencies: file.dependencies,
@@ -375,7 +410,7 @@ export async function collectItemFiles(
 						new BuildError(
 							`Error reading directory: ${pc.bold(absolutePath)} referenced by ${pc.bold(item.name)}`,
 							{
-								registryName,
+								registryName: registry.name,
 								suggestion: 'Please ensure the directory exists and is readable.',
 							}
 						)
@@ -385,7 +420,7 @@ export async function collectItemFiles(
 				}));
 			}
 
-			const subFilesResult = collectFolderFiles(files ?? [], {
+			const subFilesResult = await expandItemFolderFiles(files ?? [], {
 				parent: {
 					type: file.type ?? item.type,
 					role: file.role ?? 'file',
@@ -394,33 +429,31 @@ export async function collectItemFiles(
 					parentItem: {
 						name: item.name,
 						type: item.type,
-						registryName,
+						registryName: registry.name,
 					},
 					// we use the basename of the folder
 					path: path.basename(file.path) as ItemRelativePath,
 					absolutePath: absolutePath,
 				},
 				cwd,
+				item,
+				registry,
 			});
 			if (subFilesResult.isErr()) return err(subFilesResult.error);
 			unresolvedFiles.push(...subFilesResult.value);
 		}
 	}
+
 	return ok(unresolvedFiles);
 }
 
-/**
- * Collects all the files in a folder into a single array.
- *
- * @param files
- * @param parent
- * @returns
- */
-function collectFolderFiles(
+async function expandItemFolderFiles(
 	files: RegistryItemFolderFile[],
 	{
-		parent,
 		cwd,
+		item,
+		registry,
+		parent,
 	}: {
 		parent: {
 			type: RegistryItemType;
@@ -432,80 +465,166 @@ function collectFolderFiles(
 			absolutePath: AbsolutePath;
 		};
 		cwd: AbsolutePath;
+		item: RegistryItem;
+		registry: RegistryConfig;
 	}
-): Result<UnresolvedFile[], BuildError> {
+): Promise<Result<UnresolvedFile[], BuildError>> {
 	const unresolvedFiles: UnresolvedFile[] = [];
 	for (const f of files) {
 		const absolutePath = joinAbsolute(parent.absolutePath, f.path);
-		if (!existsSync(absolutePath)) {
-			return err(
-				new FileNotFoundError({
-					path: absolutePath,
-					parent: {
-						name: parent.parentItem.name,
-						type: parent.parentItem.type,
-					},
-					registryName: parent.parentItem.registryName,
-				})
-			);
-		}
-
-		const isFile = statSync(absolutePath)._unsafeUnwrap().isFile();
-		if (isFile) {
-			unresolvedFiles.push({
-				absolutePath,
-				path: path.join(parent.path, f.path) as ItemRelativePath,
-				type: parent.type,
-				role: f.role ?? parent.role,
-				target: parent.target ? path.join(parent.target, f.path) : undefined,
-				dependencyResolution: f.dependencyResolution ?? parent.dependencyResolution,
-				parent: parent.parentItem,
-				registryDependencies: f.registryDependencies,
-				dependencies: f.dependencies,
-				devDependencies: f.devDependencies,
-			});
-			// only folders can have sub files
-			continue;
-		}
-
-		let files: RegistryItemFolderFile[];
-		if (f.files) {
-			files = f.files;
-		} else {
-			const readdirResult = readdirSync(absolutePath);
-			if (readdirResult.isErr())
-				return err(
-					new BuildError(
-						`Error reading directory: ${pc.bold(absolutePath)} referenced by ${pc.bold(
-							parent.parentItem.name
-						)}`,
-						{
-							registryName: parent.parentItem.registryName,
-							suggestion: 'Please ensure the directory exists and is readable.',
-						}
-					)
+		if (isDynamicPattern(absolutePath)) {
+			if (!f.files) {
+				const entries = await fg.glob(absolutePath, { absolute: true, dot: true });
+				const files = entries.map((e) => ({
+					...f,
+					path: path.basename(e) as ItemRelativePath,
+					absolutePath: e as AbsolutePath,
+				}));
+				unresolvedFiles.push(
+					...files.map((f) => ({
+						absolutePath: f.absolutePath,
+						path: path.join(parent.path, f.path) as ItemRelativePath,
+						type: parent.type,
+						role: f.role ?? parent.role,
+						target: parent.target ? path.join(parent.target, f.path) : undefined,
+						dependencyResolution: f.dependencyResolution ?? parent.dependencyResolution,
+						parent: parent.parentItem,
+						registryDependencies: f.registryDependencies,
+						dependencies: f.dependencies,
+						devDependencies: f.devDependencies,
+					}))
 				);
-			files = readdirResult.value.map((f) => ({
-				path: f,
-			}));
-		}
+				continue;
+			}
 
-		const subFilesResult = collectFolderFiles(files ?? [], {
-			parent: {
-				parentItem: parent.parentItem,
-				target: parent.target ? path.join(parent.target, f.path) : undefined,
-				type: parent.type,
-				role: f.role ?? parent.role,
-				dependencyResolution: parent.dependencyResolution,
-				path: joinRelative(parent.path, f.path),
-				absolutePath: joinAbsolute(parent.absolutePath, f.path),
-			},
-			cwd,
-		});
-		if (subFilesResult.isErr()) return err(subFilesResult.error);
-		unresolvedFiles.push(...subFilesResult.value);
+			const subFilesResult = await expandItemFolderFiles(f.files, {
+				parent: {
+					parentItem: parent.parentItem,
+					target: parent.target ? path.join(parent.target, f.path) : undefined,
+					type: parent.type,
+					role: f.role ?? parent.role,
+					dependencyResolution: parent.dependencyResolution,
+					path: joinRelative(parent.path, f.path),
+					absolutePath: joinAbsolute(parent.absolutePath, f.path),
+				},
+				cwd,
+				item,
+				registry,
+			});
+			if (subFilesResult.isErr()) return err(subFilesResult.error);
+			unresolvedFiles.push(...subFilesResult.value);
+		} else {
+			if (!existsSync(absolutePath)) {
+				return err(
+					new FileNotFoundError({
+						path: absolutePath,
+						parent: {
+							name: parent.parentItem.name,
+							type: parent.parentItem.type,
+						},
+						registryName: parent.parentItem.registryName,
+					})
+				);
+			}
+
+			const isFile = statSync(absolutePath)._unsafeUnwrap().isFile();
+			if (isFile) {
+				unresolvedFiles.push({
+					absolutePath,
+					path: path.join(parent.path, f.path) as ItemRelativePath,
+					type: parent.type,
+					role: f.role ?? parent.role,
+					target: parent.target ? path.join(parent.target, f.path) : undefined,
+					dependencyResolution: f.dependencyResolution ?? parent.dependencyResolution,
+					parent: parent.parentItem,
+					registryDependencies: f.registryDependencies,
+					dependencies: f.dependencies,
+					devDependencies: f.devDependencies,
+				});
+				// only folders can have sub files
+				continue;
+			}
+
+			let files: RegistryItemFolderFile[];
+			if (f.files) {
+				files = f.files;
+			} else {
+				const readdirResult = readdirSync(absolutePath);
+				if (readdirResult.isErr())
+					return err(
+						new BuildError(
+							`Error reading directory: ${pc.bold(absolutePath)} referenced by ${pc.bold(
+								parent.parentItem.name
+							)}`,
+							{
+								registryName: parent.parentItem.registryName,
+								suggestion: 'Please ensure the directory exists and is readable.',
+							}
+						)
+					);
+				files = readdirResult.value.map((f) => ({
+					path: f,
+				}));
+			}
+
+			const subFilesResult = await expandItemFolderFiles(files ?? [], {
+				parent: {
+					parentItem: parent.parentItem,
+					target: parent.target ? path.join(parent.target, f.path) : undefined,
+					type: parent.type,
+					role: f.role ?? parent.role,
+					dependencyResolution: parent.dependencyResolution,
+					path: joinRelative(parent.path, f.path),
+					absolutePath: joinAbsolute(parent.absolutePath, f.path),
+				},
+				cwd,
+				item,
+				registry,
+			});
+			if (subFilesResult.isErr()) return err(subFilesResult.error);
+			unresolvedFiles.push(...subFilesResult.value);
+		}
 	}
 	return ok(unresolvedFiles);
+}
+
+export async function buildRegistry(
+	registry: RegistryConfig,
+	{ options, config }: { options: { cwd: AbsolutePath }; config: Config }
+): Promise<Result<BuildResult, BuildError>> {
+	const result = await validateRegistryConfig(registry);
+	if (result.isErr()) return err(result.error);
+
+	const expandedRegistryItemsResult = await expandRegistryItems(registry, {
+		cwd: options.cwd,
+	});
+	if (expandedRegistryItemsResult.isErr()) return err(expandedRegistryItemsResult.error);
+	const expandedRegistryItems = expandedRegistryItemsResult.value;
+
+	const resolvedFilesResult = await resolveFiles(
+		expandedRegistryItems.flatMap((item) => item.files),
+		{
+			cwd: options.cwd,
+			config,
+			registry,
+		}
+	);
+	if (resolvedFilesResult.isErr()) return err(resolvedFilesResult.error);
+	const resolvedFiles = resolvedFilesResult.value;
+
+	const resolvedItemsResult = await resolveRegistryItems(expandedRegistryItems, {
+		cwd: options.cwd,
+		resolvedFiles,
+		registry,
+	});
+	if (resolvedItemsResult.isErr()) return err(resolvedItemsResult.error);
+	const resolvedItems = resolvedItemsResult.value;
+
+	return ok({
+		...registry,
+		items: Array.from(resolvedItems.values()),
+		defaultPaths: registry.defaultPaths as Record<string, string> | undefined,
+	});
 }
 
 export async function resolveFiles(
@@ -518,7 +637,7 @@ export async function resolveFiles(
 	}: {
 		cwd: AbsolutePath;
 		config: Config;
-		registry: RegistryConfig;
+		registry: { name: string; excludeDeps?: string[] };
 		resolvedFiles?: ResolvedFiles;
 	}
 ): Promise<Result<ResolvedFiles, BuildError>> {
@@ -555,7 +674,11 @@ export async function resolveFiles(
 
 async function resolveFile(
 	file: UnresolvedFile,
-	{ cwd, config, registry }: { cwd: AbsolutePath; config: Config; registry: RegistryConfig }
+	{
+		cwd,
+		config,
+		registry,
+	}: { cwd: AbsolutePath; config: Config; registry: { name: string; excludeDeps?: string[] } }
 ): Promise<Result<ResolvedFile, BuildError>> {
 	const contentResult = readFileSync(file.absolutePath);
 	if (contentResult.isErr())
@@ -635,17 +758,17 @@ async function resolveFile(
 }
 
 export async function resolveRegistryItems(
-	items: RegistryItem[],
+	items: ExpandedRegistryItem[],
 	{
 		cwd,
 		resolvedItems = new Map<string, ResolvedItem>(),
 		resolvedFiles,
-		registryName,
+		registry,
 	}: {
 		cwd: AbsolutePath;
 		resolvedItems?: Map<string, ResolvedItem>;
 		resolvedFiles: ResolvedFiles;
-		registryName: string;
+		registry: { name: string };
 	}
 ): Promise<Result<Map<string, ResolvedItem>, BuildError>> {
 	for (const item of items) {
@@ -653,7 +776,7 @@ export async function resolveRegistryItems(
 			cwd,
 			resolvedItems,
 			resolvedFiles,
-			registryName,
+			registry,
 		});
 		if (resolvedItem.isErr()) return err(resolvedItem.error);
 		resolvedItems.set(item.name, resolvedItem.value);
@@ -664,17 +787,17 @@ export async function resolveRegistryItems(
 export type DependencyKey = `${Ecosystem}:${string}@${string}`;
 
 export async function resolveRegistryItem(
-	item: RegistryItem,
+	item: ExpandedRegistryItem,
 	{
 		cwd,
 		resolvedItems,
 		resolvedFiles,
-		registryName,
+		registry,
 	}: {
 		cwd: AbsolutePath;
 		resolvedItems: Map<string, ResolvedItem>;
 		resolvedFiles: ResolvedFiles;
-		registryName: string;
+		registry: { name: string };
 	}
 ): Promise<Result<ResolvedItem, BuildError>> {
 	const preResolvedItem = resolvedItems.get(item.name);
@@ -684,7 +807,7 @@ export async function resolveRegistryItem(
 	const registryDependencies = new Set<string>(item.registryDependencies ?? []);
 
 	const dependenciesResult = toRemoteDependencies(item.dependencies ?? [], {
-		registryName,
+		registryName: registry.name,
 		itemName: item.name,
 	});
 	if (dependenciesResult.isErr()) return err(dependenciesResult.error);
@@ -693,7 +816,7 @@ export async function resolveRegistryItem(
 	);
 
 	const devDependenciesResult = toRemoteDependencies(item.devDependencies ?? [], {
-		registryName,
+		registryName: registry.name,
 		itemName: item.name,
 	});
 	if (devDependenciesResult.isErr()) return err(devDependenciesResult.error);
@@ -753,7 +876,10 @@ export async function resolveRegistryItem(
 
 async function resolveFileDependencies(
 	resolvedFile: ResolvedFile,
-	{ resolvedFiles, item }: { resolvedFiles: ResolvedFiles; item: RegistryItem; cwd: AbsolutePath }
+	{
+		resolvedFiles,
+		item,
+	}: { resolvedFiles: ResolvedFiles; item: ExpandedRegistryItem; cwd: AbsolutePath }
 ): Promise<
 	Result<
 		{
