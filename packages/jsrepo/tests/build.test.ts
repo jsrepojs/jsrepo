@@ -217,14 +217,16 @@ describe('buildRegistry', () => {
 		});
 
 		it('should have a single file', () => {
-			expect(buttonItem.files).toHaveLength(2);
+			expect(buttonItem.files).toHaveLength(3);
 			const buttonFile = buttonItem.files[0];
 			assert(buttonFile !== undefined);
 			expect(buttonFile.path).toBe('button.tsx');
-			const exampleFile = buttonItem.files.find((f) => f.path === 'page.tsx');
-			expect(exampleFile).toBeDefined();
-			expect(exampleFile!.role).toBe('example');
-			expect(exampleFile!.type).toBe('page');
+			const exampleFile1 = buttonItem.files.find((f) => f.path === 'button-default.tsx');
+			expect(exampleFile1).toBeDefined();
+			expect(exampleFile1!.role).toBe('example');
+			const exampleFile2 = buttonItem.files.find((f) => f.path === 'button-loading.tsx');
+			expect(exampleFile2).toBeDefined();
+			expect(exampleFile2!.role).toBe('example');
 		});
 	});
 
