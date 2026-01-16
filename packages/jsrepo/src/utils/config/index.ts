@@ -193,22 +193,26 @@ export type RegistryItemFile = {
 	 * Path of the file/folder relative to registry config.
 	 *
 	 * Supports glob patterns (e.g., `demos/component-*.svelte`). When a glob pattern is used,
-	 * it will be expanded to include all matching files in the same registry item.
+	 * it will be expanded to include all matching files in the same registry item. If the glob 
+	 * pattern doesn't match any files it will simply be ignored.
 	 *
 	 * @example
 	 * ```ts
 	 * {
-	 *   name: "component-demos",
+	 *   name: "component",
+	 *   type: 'ui',
 	 *   files: [
 	 *     {
-	 *       path: "demos/component-*.svelte",
+	 *       path: "src/components/ui/component.tsx",
+	 *     },
+	 *     {
+	 *       path: "demos/component-*.tsx",
 	 *       role: "example"
 	 *     }
 	 *   ]
 	 * }
 	 * ```
-	 * This will expand to include all files matching `demos/component-*.svelte` as separate
-	 * file entries in the same registry item.
+	 * This will expand to include all files matching `demos/component-*.tsx`.
 	 */
 	path: string;
 	/**
