@@ -8,3 +8,5 @@ temp-test
 **/tests/fixtures/**/node_modules
 **/tests/fixtures/**/package-lock.json
 **/tests/fixtures/**/pnpm-lock.yaml
+
+.DS_Store
