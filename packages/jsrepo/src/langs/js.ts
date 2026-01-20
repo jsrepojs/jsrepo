@@ -18,13 +18,13 @@ import { transformShadcnImports } from '@/utils/compat/shadcn';
 import { existsSync, readdirSync, statSync } from '@/utils/fs';
 import { findNearestPackageJson, shouldInstall } from '@/utils/package';
 import { parsePackageName } from '@/utils/parse-package-name';
-import { InvalidImportWarning, UnresolvableDynamicImportWarning } from '@/utils/warnings';
 import { dirname, joinAbsolute } from '@/utils/path';
 import { detectPackageManager, runCommands } from '@/utils/prompts';
 import { createPathsMatcher, tryGetTsconfig } from '@/utils/tsconfig';
 import type { AbsolutePath } from '@/utils/types';
 import { noop } from '@/utils/utils';
 import { validateNpmPackageName } from '@/utils/validate-npm-package-name';
+import { InvalidImportWarning, UnresolvableDynamicImportWarning } from '@/utils/warnings';
 
 const SUPPORTED_EXTENSIONS = ['.js', '.ts', '.jsx', '.tsx', '.mjs', '.mts'] as const;
 
@@ -118,14 +118,7 @@ export async function resolveImports(
 			}
 		}
 
-		opts.warn(
-			new InvalidImportWarning(
-				`Skipped adding import \`${pc.cyan(specifier)}\` from ${
-					opts.fileName
-				}. Reason: Not a valid package name or path alias.`,
-				{ specifier, fileName: opts.fileName }
-			)
-		);
+		opts.warn(new InvalidImportWarning({ specifier, fileName: opts.fileName }));
 	}
 
 	const { dependencies, devDependencies } = resolveRemoteDeps(
@@ -173,14 +166,7 @@ export async function getImports(
 
 		// we can't resolve dynamic imports that are not literals so we just skip them and warn the user
 		if (!isLiteral) {
-			warn(
-				new UnresolvableDynamicImportWarning(
-					`Skipping ${pc.cyan(fullImport)} from ${pc.bold(
-						fileName
-					)}. Reason: Unresolvable syntax. 💡 consider manually including the modules expected to be resolved by this import in your registry dependencies.`,
-					{ fullImport, fileName }
-				)
-			);
+			warn(new UnresolvableDynamicImportWarning({ fullImport, fileName }));
 			continue;
 		}
 

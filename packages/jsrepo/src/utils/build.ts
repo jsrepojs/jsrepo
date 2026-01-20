@@ -1,4 +1,3 @@
-import { log } from '@clack/prompts';
 import { isDynamicPattern } from 'fast-glob';
 import { err, ok, type Result } from 'nevereverthrow';
 import path from 'pathe';
@@ -19,6 +18,7 @@ import type {
 import type { AbsolutePath, ItemRelativePath, LooseAutocomplete } from '@/utils/types';
 import {
 	createWarningHandler,
+	GlobPatternNoMatchWarning,
 	LanguageNotFoundWarning,
 	type WarningHandler,
 } from '@/utils/warnings';
@@ -294,12 +294,17 @@ type ExpandedRegistryItem = Omit<RegistryItem, 'files'> & {
  */
 export async function expandRegistryItems(
 	registry: RegistryConfig,
-	{ cwd }: { cwd: AbsolutePath }
+	{ cwd, warn }: { cwd: AbsolutePath; warn: WarningHandler }
 ): Promise<Result<ExpandedRegistryItem[], BuildError>> {
 	const expandedRegistryItems: ExpandedRegistryItem[] = [];
 
 	for (const item of registry.items) {
-		const expandedFilesResult = await expandItemFiles(item.files, { cwd, item, registry });
+		const expandedFilesResult = await expandItemFiles(item.files, {
+			cwd,
+			item,
+			registry,
+			warn,
+		});
 		if (expandedFilesResult.isErr()) return err(expandedFilesResult.error);
 		const expandedFiles = expandedFilesResult.value;
 		if (expandedFiles.length === 0) {
@@ -316,7 +321,12 @@ export async function expandRegistryItems(
 
 async function expandItemFiles(
 	files: RegistryItemFile[],
-	{ cwd, item, registry }: { cwd: AbsolutePath; item: RegistryItem; registry: RegistryConfig }
+	{
+		cwd,
+		item,
+		registry,
+		warn,
+	}: { cwd: AbsolutePath; item: RegistryItem; registry: RegistryConfig; warn: WarningHandler }
 ): Promise<Result<UnresolvedFile[], BuildError>> {
 	const unresolvedFiles: UnresolvedFile[] = [];
 
@@ -332,10 +342,8 @@ async function expandItemFiles(
 				if (entriesResult.isErr()) return err(entriesResult.error);
 				const entries = entriesResult.value;
 				if (entries.length === 0) {
-					log.warn(
-						`The glob pattern defined in ${pc.bold(item.name)}: ${pc.bold(
-							file.path
-						)} didn't match any files.`
+					warn(
+						new GlobPatternNoMatchWarning({ itemName: item.name, pattern: file.path })
 					);
 					continue;
 				}
@@ -384,6 +392,7 @@ async function expandItemFiles(
 				cwd,
 				item,
 				registry,
+				warn,
 			});
 			if (subFilesResult.isErr()) return err(subFilesResult.error);
 			unresolvedFiles.push(...subFilesResult.value);
@@ -462,6 +471,7 @@ async function expandItemFiles(
 				cwd,
 				item,
 				registry,
+				warn,
 			});
 			if (subFilesResult.isErr()) return err(subFilesResult.error);
 			unresolvedFiles.push(...subFilesResult.value);
@@ -478,6 +488,7 @@ async function expandItemFolderFiles(
 		item,
 		registry,
 		parent,
+		warn,
 	}: {
 		parent: {
 			type: RegistryItemType;
@@ -491,6 +502,7 @@ async function expandItemFolderFiles(
 		cwd: AbsolutePath;
 		item: RegistryItem;
 		registry: RegistryConfig;
+		warn: WarningHandler;
 	}
 ): Promise<Result<UnresolvedFile[], BuildError>> {
 	const unresolvedFiles: UnresolvedFile[] = [];
@@ -506,9 +518,7 @@ async function expandItemFolderFiles(
 				if (entriesResult.isErr()) return err(entriesResult.error);
 				const entries = entriesResult.value;
 				if (entries.length === 0) {
-					log.warn(
-						`The glob pattern defined in ${pc.bold(item.name)}: ${pc.bold(f.path)} didn't match any files.`
-					);
+					warn(new GlobPatternNoMatchWarning({ itemName: item.name, pattern: f.path }));
 					continue;
 				}
 				const files = entries.map((e) => ({
@@ -546,6 +556,7 @@ async function expandItemFolderFiles(
 				cwd,
 				item,
 				registry,
+				warn,
 			});
 			if (subFilesResult.isErr()) return err(subFilesResult.error);
 			unresolvedFiles.push(...subFilesResult.value);
@@ -616,6 +627,7 @@ async function expandItemFolderFiles(
 				cwd,
 				item,
 				registry,
+				warn,
 			});
 			if (subFilesResult.isErr()) return err(subFilesResult.error);
 			unresolvedFiles.push(...subFilesResult.value);
@@ -635,6 +647,7 @@ export async function buildRegistry(
 
 	const expandedRegistryItemsResult = await expandRegistryItems(registry, {
 		cwd: options.cwd,
+		warn,
 	});
 	if (expandedRegistryItemsResult.isErr()) return err(expandedRegistryItemsResult.error);
 	const expandedRegistryItems = expandedRegistryItemsResult.value;
@@ -720,7 +733,12 @@ async function resolveFile(
 		config,
 		registry,
 		warn,
-	}: { cwd: AbsolutePath; config: Config; registry: { name: string; excludeDeps?: string[] }; warn: WarningHandler }
+	}: {
+		cwd: AbsolutePath;
+		config: Config;
+		registry: { name: string; excludeDeps?: string[] };
+		warn: WarningHandler;
+	}
 ): Promise<Result<ResolvedFile, BuildError>> {
 	const contentResult = readFileSync(file.absolutePath);
 	if (contentResult.isErr())
@@ -771,12 +789,7 @@ async function resolveFile(
 		} else {
 			// only log a warning if the file is not a binary asset file
 			if (!endsWithOneOf(file.path, DO_NOT_RESOLVE_EXTENSIONS)) {
-				warn(
-					new LanguageNotFoundWarning(
-						`Couldn't find a language to resolve dependencies for ${file.absolutePath}.`,
-						{ path: file.absolutePath }
-					)
-				);
+				warn(new LanguageNotFoundWarning({ path: file.absolutePath }));
 			}
 		}
 	}
