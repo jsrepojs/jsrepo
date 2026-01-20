@@ -18,6 +18,11 @@ import type {
 } from '@/utils/config';
 import type { AbsolutePath, ItemRelativePath, LooseAutocomplete } from '@/utils/types';
 import {
+	createWarningHandler,
+	LanguageNotFoundWarning,
+	type WarningHandler,
+} from '@/utils/warnings';
+import {
 	BuildError,
 	DuplicateFileReferenceError,
 	DuplicateItemNameError,
@@ -626,6 +631,8 @@ export async function buildRegistry(
 	const result = await validateRegistryConfig(registry);
 	if (result.isErr()) return err(result.error);
 
+	const warn = createWarningHandler(config.onwarn);
+
 	const expandedRegistryItemsResult = await expandRegistryItems(registry, {
 		cwd: options.cwd,
 	});
@@ -638,6 +645,7 @@ export async function buildRegistry(
 			cwd: options.cwd,
 			config,
 			registry,
+			warn,
 		}
 	);
 	if (resolvedFilesResult.isErr()) return err(resolvedFilesResult.error);
@@ -665,11 +673,13 @@ export async function resolveFiles(
 		resolvedFiles = new Map<NormalizedAbsolutePath, ResolvedFile>(),
 		config,
 		registry,
+		warn,
 	}: {
 		cwd: AbsolutePath;
 		config: Config;
-		registry: { name: string; excludeDeps?: string[] };
+		registry: RegistryConfig | { name: string; excludeDeps?: string[] };
 		resolvedFiles?: ResolvedFiles;
+		warn: WarningHandler;
 	}
 ): Promise<Result<ResolvedFiles, BuildError>> {
 	for (const file of files) {
@@ -696,7 +706,7 @@ export async function resolveFiles(
 			);
 		}
 
-		const resolveResult = await resolveFile(file, { cwd, config, registry });
+		const resolveResult = await resolveFile(file, { cwd, config, registry, warn });
 		if (resolveResult.isErr()) return err(resolveResult.error);
 		resolvedFiles.set(normalizedPath, resolveResult.value);
 	}
@@ -709,7 +719,8 @@ async function resolveFile(
 		cwd,
 		config,
 		registry,
-	}: { cwd: AbsolutePath; config: Config; registry: { name: string; excludeDeps?: string[] } }
+		warn,
+	}: { cwd: AbsolutePath; config: Config; registry: { name: string; excludeDeps?: string[] }; warn: WarningHandler }
 ): Promise<Result<ResolvedFile, BuildError>> {
 	const contentResult = readFileSync(file.absolutePath);
 	if (contentResult.isErr())
@@ -752,7 +763,7 @@ async function resolveFile(
 				cwd,
 				fileName: file.absolutePath,
 				excludeDeps: registry.excludeDeps ?? [],
-				warn: log.warn,
+				warn,
 			});
 			localDependencies = localDeps;
 			dependencies = deps;
@@ -760,8 +771,11 @@ async function resolveFile(
 		} else {
 			// only log a warning if the file is not a binary asset file
 			if (!endsWithOneOf(file.path, DO_NOT_RESOLVE_EXTENSIONS)) {
-				log.warn(
-					`Couldn't find a language to resolve dependencies for ${file.absolutePath}.`
+				warn(
+					new LanguageNotFoundWarning(
+						`Couldn't find a language to resolve dependencies for ${file.absolutePath}.`,
+						{ path: file.absolutePath }
+					)
 				);
 			}
 		}

@@ -1,12 +1,13 @@
 import type { Ecosystem, LocalDependency, RemoteDependency, UnresolvedImport } from '@/utils/build';
 import type { RegistryItemType } from '@/utils/config';
 import type { AbsolutePath, ItemRelativePath } from '@/utils/types';
+import type { WarningHandler } from '@/utils/warnings';
 
 export type ResolveDependenciesOptions = {
 	fileName: AbsolutePath;
 	cwd: AbsolutePath;
 	excludeDeps: string[];
-	warn: (log: string) => void;
+	warn: WarningHandler;
 };
 
 export type InstallDependenciesOptions = {

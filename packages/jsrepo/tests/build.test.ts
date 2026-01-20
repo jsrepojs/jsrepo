@@ -5,6 +5,7 @@ import { loadConfigSearch } from '@/api';
 import { forEachRegistry } from '@/commands/utils';
 import { type BuildResult, buildRegistry, type ResolvedItem } from '@/utils/build';
 import type { AbsolutePath, ItemRelativePath } from '@/utils/types';
+import { LanguageNotFoundWarning } from '@/utils/warnings';
 
 const cwd = path.join(__dirname, './fixtures/build') as AbsolutePath;
 
@@ -386,12 +387,13 @@ describe('buildRegistry', () => {
 
 		it('should not warn about binary asset files (.glb, .png)', () => {
 			const calls = warnSpy.mock.calls;
-			const binaryFileWarnings = calls.filter(
-				(call) =>
-					typeof call[0] === 'string' &&
-					call[0].includes("Couldn't find a language to resolve dependencies") &&
-					(call[0].includes('.glb') || call[0].includes('.png'))
-			);
+			const binaryFileWarnings = calls.filter((call) => {
+				const warning = call[0];
+				return (
+					warning instanceof LanguageNotFoundWarning &&
+					(warning.path.includes('.glb') || warning.path.includes('.png'))
+				);
+			});
 			expect(binaryFileWarnings).toStrictEqual([]);
 		});
 	});

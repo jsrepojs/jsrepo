@@ -1,4 +1,4 @@
-import { defineConfig } from "../../../dist/api/index";
+import { defineConfig } from "../../../dist/api/index.mjs";
 
 export default defineConfig({
 	registry: {
