@@ -5,9 +5,9 @@ import { DEFAULT_PROVIDERS, type ProviderFactory } from '@/providers';
 import type { RemoteDependency } from '@/utils/build';
 import type { AbsolutePath, ItemRelativePath, LooseAutocomplete, Prettify } from '@/utils/types';
 import { extract, type MaybeGetterAsync } from '@/utils/utils';
-import type { Warning } from '@/utils/warnings';
+import type { Warning, WarningHandler } from '@/utils/warnings';
 
-export type RegistryConfigArgs = [{ cwd: string }];
+export type RegistryConfigArgs = [{ cwd: string, languages: Language[]; onwarn: WarningHandler }];
 
 export type Config = {
 	/** An array of registries to fetch items from.

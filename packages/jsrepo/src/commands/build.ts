@@ -28,6 +28,8 @@ import { joinAbsolute } from '@/utils/path';
 import { intro, isTTY, outro } from '@/utils/prompts';
 import type { AbsolutePath } from '@/utils/types';
 import { debounced } from '@/utils/utils';
+import { log } from '@clack/prompts';
+import type { Warning } from '@/utils/warnings';
 
 export const schema = defaultCommandOptionsSchema.extend({
 	watch: z.boolean(),
@@ -140,7 +142,7 @@ export async function runBuild(
 				outputs: registry.outputs.length,
 			});
 		},
-		{ cwd: options.cwd }
+		{ cwd: options.cwd, languages: config.languages, onwarn: (warning: Warning) => log.warn(warning.message) }
 	);
 
 	const end = performance.now();
@@ -238,7 +240,7 @@ async function runWatch(
 					);
 				}
 			},
-			{ cwd: options.cwd }
+			{ cwd: options.cwd, languages: currentConfig.languages, onwarn: (warning) => log.warn(warning.message) }
 		);
 	}
 
