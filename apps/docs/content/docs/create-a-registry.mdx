@@ -382,7 +382,45 @@ export default defineConfig({
 });
 ```
 
-Now any files that match `src/lib/demos/button-*.svelte` will be included with the button item as examples.
+This will match all files that match the pattern `button-*.svelte` in the `src/lib/demos` directory.
+
+**Recursive glob patterns:**
+
+Match files in subdirectories while preserving the directory structure:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+		items: [
+			{
+                name: 'button',
+                type: 'ui',
+				files: [
+                    {
+                        path: 'src/lib/components/button',
+                    },
+					{
+						path: "src/lib/demos/**/button-*.svelte", // [!code ++]
+                        role: 'example',
+                    },
+				],
+			},
+		],
+	});
+});
+```
+
+This will match all files (including those in subdirectories) that match the pattern `button-*.svelte` while maintaining the directory structure.
+
+For instance:
+
+| Source Path | Path Relative to Item |
+|-------------|----------------------|
+| `src/lib/demos/button-default.svelte` | `button-default.svelte` |
+| `src/lib/demos/variants/button-outlined.svelte` | `variants/button-outlined.svelte` |
+| `src/lib/demos/variants/themes/button-dark.svelte` | `variants/themes/button-dark.svelte` |
 
 ### Excluding dependencies
 
