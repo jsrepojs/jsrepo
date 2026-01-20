@@ -1,0 +1,50 @@
+{
+	"name": "@jsrepo/autobuild",
+	"description": "A package to automatically collect and build your jsrepo registry.",
+	"version": "0.0.0",
+	"license": "MIT",
+	"homepage": "https://jsrepo.dev/docs/autobuild",
+	"author": {
+		"name": "Aidan Bleser",
+		"url": "https://github.com/ieedan"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/jsrepojs/jsrepo"
+	},
+	"bugs": {
+		"url": "https://github.com/jsrepojs/jsrepo/issues"
+	},
+	"keywords": [
+		"jsrepo",
+		"autobuild",
+		"plugin"
+	],
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.mts",
+			"default": "./dist/index.mjs"
+		}
+	},
+	"main": "./dist/index.mjs",
+	"files": [
+		"dist/**/*",
+		"!dist/**/*.map"
+	],
+	"scripts": {
+		"build": "tsdown",
+		"dev": "tsdown --watch",
+		"check": "tsc --noEmit",
+		"bundle-analyze": "FORCE_COLOR=1 node ../../bundle-analyzer/dist/index.mjs analyze ."
+	},
+	"packageManager": "pnpm@10.17.1",
+	"peerDependencies": {
+		"jsrepo": "workspace:*"
+	},
+	"devDependencies": {
+		"@types/node": "catalog:",
+		"tsdown": "catalog:",
+		"typescript": "catalog:"
+	}
+}

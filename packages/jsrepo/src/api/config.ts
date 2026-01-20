@@ -8,6 +8,7 @@ export {
 	type RegistryItemAdd,
 	type RegistryItemFile,
 	type RegistryItemType,
+	type RegistryMeta,
 	type Transform,
 	type TransformOptions,
 } from '@/utils/config';

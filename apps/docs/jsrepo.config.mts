@@ -10,5 +10,5 @@ export default defineConfig({
 		lib: '@/lib',
 		hook: '@/hooks',
 	},
-	providers: [...DEFAULT_PROVIDERS, shadcn()]
+	providers: [...DEFAULT_PROVIDERS, shadcn()],
 });
