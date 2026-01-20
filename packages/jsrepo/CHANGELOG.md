@@ -1,5 +1,17 @@
 # jsrepo
 
+## 3.1.0
+### Minor Changes
+
+
+- feat: Support glob syntax for registry item files ([#738](https://github.com/jsrepojs/jsrepo/pull/738))
+
+
+### Patch Changes
+
+
+- feat: improve warning system with typed warnings and `onwarn` callback in config ([#739](https://github.com/jsrepojs/jsrepo/pull/739))
+
 ## 3.0.11
 ### Patch Changes
 
