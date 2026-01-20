@@ -1,3 +1,4 @@
+import type { Pattern } from 'fast-glob';
 import pc from 'picocolors';
 import type { z } from 'zod';
 import type { RegistryItemType } from './config';
@@ -24,7 +25,7 @@ export type CLIError =
 	| DuplicateItemNameError
 	| SelfReferenceError
 	| NoFilesError
-	| IllegalBlockNameError
+	| IllegalItemNameError
 	| InvalidRegistryDependencyError
 	| DuplicateFileReferenceError
 	| FileNotFoundError
@@ -301,11 +302,11 @@ export class NoFilesError extends BuildError {
 	}
 }
 
-export class IllegalBlockNameError extends BuildError {
+export class IllegalItemNameError extends BuildError {
 	constructor({ name, registryName }: { name: string; registryName: string }) {
-		super(`Illegal block name: ${pc.bold(name)}.`, {
+		super(`Illegal item name: ${pc.bold(name)}.`, {
 			registryName,
-			suggestion: 'Please ensure the block name is not the same as the manifest file name.',
+			suggestion: 'Please update the name of your item.',
 		});
 	}
 }
@@ -454,6 +455,18 @@ export class InvalidJSONError extends JsrepoError {
 			`Invalid JSON: ${error instanceof Error ? (error.stack ?? error.message) : `${error}`}`,
 			{
 				suggestion: 'Check the input JSON and try again.',
+			}
+		);
+	}
+}
+
+export class GlobError extends BuildError {
+	constructor(error: unknown, pattern: Pattern, registryName: string) {
+		super(
+			`Error while parsing glob pattern ${pc.bold(pattern)}: ${error instanceof Error ? error.message : String(error)}`,
+			{
+				registryName,
+				suggestion: 'Please check the glob pattern and try again.',
 			}
 		);
 	}

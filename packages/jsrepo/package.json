@@ -76,7 +76,7 @@
 		"dev": "tsdown --watch",
 		"check": "tsc --noEmit",
 		"test": "vitest",
-		"bundle-analyze": "FORCE_COLOR=1 node ../../bundle-analyzer/dist/index.mjs analyze ."
+		"bundle-analyze": "FORCE_COLOR=1 node ../../bundle-analyzer/dist/index.mjs analyze . --fail-if-exceeds-bytes 1250000"
 	},
 	"packageManager": "pnpm@10.20.0",
 	"dependencies": {
@@ -106,6 +106,7 @@
 		"dedent": "catalog:",
 		"diff": "^8.0.2",
 		"escape-string-regexp": "^5.0.0",
+		"fast-glob": "^3.3.3",
 		"get-tsconfig": "^4.13.0",
 		"is-unicode-supported": "^2.1.0",
 		"magic-string": "^0.30.21",

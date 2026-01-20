@@ -85,8 +85,11 @@ export default defineConfig({
 						path: "src/components/ui/button.tsx",
 					},
 					{
-						path: 'src/routes/demos/button-demo/page.tsx',
-						type: 'page',
+						path: 'src/routes/demos/button-*.tsx',
+						role: 'example',
+					},
+					{
+						path: 'src/routes/demos/subdir/**/*.tsx',
 						role: 'example',
 					}
 				],

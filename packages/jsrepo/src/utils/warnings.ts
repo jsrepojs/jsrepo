@@ -1,4 +1,5 @@
 import { log } from '@clack/prompts';
+import pc from 'picocolors';
 import type { Config } from '@/utils/config';
 
 /**
@@ -18,8 +19,8 @@ export type WarningHandler = (warning: Warning) => void;
  */
 export class LanguageNotFoundWarning extends Warning {
 	public readonly path: string;
-	constructor(message: string, options: { path: string }) {
-		super(message);
+	constructor(options: { path: string }) {
+		super(`Couldn't find a language to resolve dependencies for ${options.path}.`);
 		this.path = options.path;
 	}
 }
@@ -30,8 +31,10 @@ export class LanguageNotFoundWarning extends Warning {
 export class InvalidImportWarning extends Warning {
 	public readonly specifier: string;
 	public readonly fileName: string;
-	constructor(message: string, options: { specifier: string; fileName: string }) {
-		super(message);
+	constructor(options: { specifier: string; fileName: string }) {
+		super(
+			`Skipped adding import \`${pc.cyan(options.specifier)}\` from ${options.fileName}. Reason: Not a valid package name or path alias.`
+		);
 		this.specifier = options.specifier;
 		this.fileName = options.fileName;
 	}
@@ -41,12 +44,29 @@ export class InvalidImportWarning extends Warning {
  * Warning when a dynamic import cannot be resolved due to unresolvable syntax.
  */
 export class UnresolvableDynamicImportWarning extends Warning {
-	public readonly fullImport: string;
+	public readonly specifier: string;
 	public readonly fileName: string;
-	constructor(message: string, options: { fullImport: string; fileName: string }) {
-		super(message);
-		this.fullImport = options.fullImport;
+	constructor(options: { specifier: string; fileName: string }) {
+		super(
+			`Skipping ${pc.cyan(options.specifier)} from ${pc.bold(options.fileName)}. Reason: Unresolvable syntax. 💡 consider manually including the modules expected to be resolved by this import in your registry dependencies.`
+		);
+		this.specifier = options.specifier;
 		this.fileName = options.fileName;
+	}
+}
+
+/**
+ * Warning when a glob pattern doesn't match any files.
+ */
+export class GlobPatternNoMatchWarning extends Warning {
+	public readonly itemName: string;
+	public readonly pattern: string;
+	constructor(options: { itemName: string; pattern: string }) {
+		super(
+			`The glob pattern defined in ${pc.bold(options.itemName)}: ${pc.bold(options.pattern)} didn't match any files.`
+		);
+		this.itemName = options.itemName;
+		this.pattern = options.pattern;
 	}
 }
 
