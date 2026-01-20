@@ -3,6 +3,7 @@ export {
 	type Config,
 	defineConfig,
 	type RegistryConfig,
+	type RegistryConfigArgs,
 	RegistryFileRoles as OptionallyInstalledRegistryTypes,
 	type RegistryItem,
 	type RegistryItemAdd,

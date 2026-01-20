@@ -18,3 +18,4 @@ export {
 	promptInstallDependenciesByEcosystem,
 } from '@/utils/prompts';
 export type { AbsolutePath, ItemRelativePath } from '@/utils/types';
+export type { MaybeGetterAsync } from '@/utils/utils';

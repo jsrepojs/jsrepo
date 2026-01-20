@@ -1,4 +1,5 @@
 import { type FSWatcher, watch } from 'node:fs';
+import { log } from '@clack/prompts';
 import { Command } from 'commander';
 import { err, ok, type Result } from 'nevereverthrow';
 import path from 'pathe';
@@ -28,7 +29,6 @@ import { joinAbsolute } from '@/utils/path';
 import { intro, isTTY, outro } from '@/utils/prompts';
 import type { AbsolutePath } from '@/utils/types';
 import { debounced } from '@/utils/utils';
-import { log } from '@clack/prompts';
 import type { Warning } from '@/utils/warnings';
 
 export const schema = defaultCommandOptionsSchema.extend({
@@ -142,7 +142,11 @@ export async function runBuild(
 				outputs: registry.outputs.length,
 			});
 		},
-		{ cwd: options.cwd, languages: config.languages, onwarn: (warning: Warning) => log.warn(warning.message) }
+		{
+			cwd: options.cwd,
+			languages: config.languages,
+			onwarn: (warning: Warning) => log.warn(warning.message),
+		}
 	);
 
 	const end = performance.now();
@@ -240,7 +244,11 @@ async function runWatch(
 					);
 				}
 			},
-			{ cwd: options.cwd, languages: currentConfig.languages, onwarn: (warning) => log.warn(warning.message) }
+			{
+				cwd: options.cwd,
+				languages: currentConfig.languages,
+				onwarn: (warning) => log.warn(warning.message),
+			}
 		);
 	}
 

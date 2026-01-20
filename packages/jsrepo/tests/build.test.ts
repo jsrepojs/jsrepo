@@ -5,7 +5,7 @@ import { loadConfigSearch } from '@/api';
 import { forEachRegistry } from '@/commands/utils';
 import { type BuildResult, buildRegistry, type ResolvedItem } from '@/utils/build';
 import type { AbsolutePath, ItemRelativePath } from '@/utils/types';
-import { LanguageNotFoundWarning } from '@/utils/warnings';
+import { LanguageNotFoundWarning, type Warning } from '@/utils/warnings';
 
 const cwd = path.join(__dirname, './fixtures/build') as AbsolutePath;
 
@@ -24,7 +24,11 @@ describe('buildRegistry', () => {
 			async (registry) => {
 				return await buildRegistry(registry, { options: { cwd }, config: config.config });
 			},
-			{ cwd }
+			{
+				cwd,
+				languages: config.config.languages,
+				onwarn: (warning: Warning) => log.warn(warning.message),
+			}
 		);
 
 		const firstRegistryResult = results[0];

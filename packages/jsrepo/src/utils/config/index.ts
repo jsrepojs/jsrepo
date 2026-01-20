@@ -7,7 +7,7 @@ import type { AbsolutePath, ItemRelativePath, LooseAutocomplete, Prettify } from
 import { extract, type MaybeGetterAsync } from '@/utils/utils';
 import type { Warning, WarningHandler } from '@/utils/warnings';
 
-export type RegistryConfigArgs = [{ cwd: string, languages: Language[]; onwarn: WarningHandler }];
+export type RegistryConfigArgs = [{ cwd: string; languages: Language[]; onwarn: WarningHandler }];
 
 export type Config = {
 	/** An array of registries to fetch items from.

@@ -39,6 +39,7 @@ import { joinAbsolute } from '@/utils/path';
 import { initLogging, intro, outro } from '@/utils/prompts';
 import { TokenManager } from '@/utils/token-manager';
 import type { AbsolutePath } from '@/utils/types';
+import type { Warning } from '@/utils/warnings';
 
 export const schema = defaultCommandOptionsSchema.extend({
 	dryRun: z.boolean(),
@@ -167,7 +168,11 @@ export async function runPublish(
 			if (buildResult.isErr()) return err(buildResult.error);
 			return ok({ skipped: false, buildResult: buildResult.value });
 		},
-		{ cwd: options.cwd }
+		{
+			cwd: options.cwd,
+			languages: config.languages,
+			onwarn: (warning: Warning) => log.warn(warning.message),
+		}
 	);
 
 	const buildEnd = performance.now();
