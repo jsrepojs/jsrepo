@@ -199,3 +199,43 @@ export default defineConfig({
 	transforms: [prettier()], // [!code highlight]
 });
 ```
+
+### onwarn
+
+The `onwarn` option allows you to customize how warnings are handled during the build process. You can suppress specific warnings, transform them, or use the default logging behavior.
+
+The handler receives two arguments:
+- `warning`: The warning instance (extends the base `Warning` class)
+- `handler`: A function to log the warning using the default format
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { InvalidImportWarning, LanguageNotFoundWarning } from "jsrepo/warnings";
+
+export default defineConfig({
+	// ...
+	onwarn: (warning, handler) => { // [!code highlight]
+		// Suppress warnings for SvelteKit internal imports
+		if (warning instanceof InvalidImportWarning) { // [!code highlight]
+			if (['$app/server', '$app/navigation'].includes(warning.specifier)) { // [!code highlight]
+				return; // Don't log this warning // [!code highlight]
+			}
+		}
+		// Suppress language warnings for specific file types
+		if (warning instanceof LanguageNotFoundWarning) { // [!code highlight]
+			if (warning.path.endsWith('.glb') || warning.path.endsWith('.png')) { // [!code highlight]
+				return; // Don't log this warning // [!code highlight]
+			}
+		}
+		// Log all other warnings using the default handler
+		handler(warning); // [!code highlight]
+	},
+});
+```
+
+Available warning types:
+- `InvalidImportWarning`: Triggered when an import is skipped because it's not a valid package name or path alias
+- `LanguageNotFoundWarning`: Triggered when a language cannot be found to resolve dependencies for a file
+- `UnresolvableDynamicImportWarning`: Triggered when a dynamic import cannot be resolved due to unresolvable syntax
+
+All warnings extend the base `Warning` class which has a `message` property. Each specific warning type includes additional properties relevant to that warning type.

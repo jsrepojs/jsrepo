@@ -5,6 +5,7 @@ import { DEFAULT_PROVIDERS, type ProviderFactory } from '@/providers';
 import type { RemoteDependency } from '@/utils/build';
 import type { AbsolutePath, ItemRelativePath, LooseAutocomplete, Prettify } from '@/utils/types';
 import { extract, type MaybeGetterAsync } from '@/utils/utils';
+import type { Warning } from '@/utils/warnings';
 
 export type RegistryConfigArgs = [{ cwd: string }];
 
@@ -46,6 +47,29 @@ export type Config = {
 	paths: {
 		[key in RegistryItemType | '*']?: string;
 	};
+	/**
+	 * Custom warning handler. If not provided, warnings will be logged using the default logger.
+	 *
+	 * @example
+	 * ```ts
+	 * import { defineConfig } from "jsrepo";
+	 * import { InvalidImportWarning } from "jsrepo/warnings";
+	 *
+	 * export default defineConfig({
+	 *   // ...
+	 *   onwarn: (warning, handler) => {
+	 *     if (warning instanceof InvalidImportWarning) {
+	 *       // Skip warnings for $app/server and $app/navigation imports
+	 *       if (['$app/server', '$app/navigation'].includes(warning.specifier)) {
+	 *         return;
+	 *       }
+	 *     }
+	 *     handler(warning);
+	 *   }
+	 * });
+	 * ```
+	 */
+	onwarn?: (warning: Warning, handler: (message: Warning) => void) => void;
 };
 
 export const RegistryMetaSchema = z.object({
