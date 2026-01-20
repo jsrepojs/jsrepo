@@ -166,7 +166,7 @@ export async function getImports(
 
 		// we can't resolve dynamic imports that are not literals so we just skip them and warn the user
 		if (!isLiteral) {
-			warn(new UnresolvableDynamicImportWarning({ fullImport, fileName }));
+			warn(new UnresolvableDynamicImportWarning({ specifier: fullImport, fileName }));
 			continue;
 		}
 

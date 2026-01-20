@@ -44,13 +44,13 @@ export class InvalidImportWarning extends Warning {
  * Warning when a dynamic import cannot be resolved due to unresolvable syntax.
  */
 export class UnresolvableDynamicImportWarning extends Warning {
-	public readonly fullImport: string;
+	public readonly specifier: string;
 	public readonly fileName: string;
-	constructor(options: { fullImport: string; fileName: string }) {
+	constructor(options: { specifier: string; fileName: string }) {
 		super(
-			`Skipping ${pc.cyan(options.fullImport)} from ${pc.bold(options.fileName)}. Reason: Unresolvable syntax. 💡 consider manually including the modules expected to be resolved by this import in your registry dependencies.`
+			`Skipping ${pc.cyan(options.specifier)} from ${pc.bold(options.fileName)}. Reason: Unresolvable syntax. 💡 consider manually including the modules expected to be resolved by this import in your registry dependencies.`
 		);
-		this.fullImport = options.fullImport;
+		this.specifier = options.specifier;
 		this.fileName = options.fileName;
 	}
 }
