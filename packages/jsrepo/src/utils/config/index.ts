@@ -49,6 +49,25 @@ export type Config = {
 	};
 	/**
 	 * Custom warning handler. If not provided, warnings will be logged using the default logger.
+	 *
+	 * @example
+	 * ```ts
+	 * import { defineConfig } from "jsrepo";
+	 * import { InvalidImportWarning } from "jsrepo/warnings";
+	 *
+	 * export default defineConfig({
+	 *   // ...
+	 *   onwarn: (warning, handler) => {
+	 *     if (warning instanceof InvalidImportWarning) {
+	 *       // Skip warnings for $app/server and $app/navigation imports
+	 *       if (['$app/server', '$app/navigation'].includes(warning.specifier)) {
+	 *         return;
+	 *       }
+	 *     }
+	 *     handler(warning);
+	 *   }
+	 * });
+	 * ```
 	 */
 	onwarn?: (warning: Warning, handler: (message: Warning) => void) => void;
 };

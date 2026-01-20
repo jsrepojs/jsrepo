@@ -7,6 +7,7 @@ import { CodeBlock } from "./code-block";
 import { ProvidersSection } from "./providers-section";
 import { cn } from "@/lib/utils";
 import PrismaticBurst from "@/components/PrismaticBurst";
+import { ExternalLinkIcon } from "lucide-react";
 
 export const metadata: Metadata = {
 	title: "jsrepo.dev - The modern registry toolchain",
@@ -127,9 +128,15 @@ function HeroSection() {
 				<p className="mx-auto max-w-3xl text-pretty text-lg text-muted-foreground">
 					jsrepo handles the hard parts of registries so you can focus on building.
 				</p>
-				<div className="flex items-center justify-center">
+				<div className="flex items-center justify-center gap-2">
 					<Button variant="default" asChild>
 						<Link href="/docs">Get Started</Link>
+					</Button>
+					<Button variant="outline" asChild>
+						<Link href="https://jsrepo.com/" target="_blank">
+							Publish your Registry
+							<ExternalLinkIcon/>
+						</Link>
 					</Button>
 				</div>
 			</div>
