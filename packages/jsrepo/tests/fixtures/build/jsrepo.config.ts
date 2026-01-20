@@ -87,6 +87,10 @@ export default defineConfig({
 					{
 						path: 'src/routes/demos/button-*.tsx',
 						role: 'example',
+					},
+					{
+						path: 'src/routes/demos/subdir/**/*.tsx',
+						role: 'example',
 					}
 				],
 			},

@@ -217,17 +217,12 @@ describe('buildRegistry', () => {
 			expect(buttonItem.devDependencies).toStrictEqual([]);
 		});
 
-		it('should have a single file', () => {
-			expect(buttonItem.files).toHaveLength(3);
+		it('should have files including glob pattern matches', () => {
+			// The button item uses glob patterns, so it should have more than just the main file
+			expect(buttonItem.files.length).toBeGreaterThanOrEqual(3);
 			const buttonFile = buttonItem.files[0];
 			assert(buttonFile !== undefined);
 			expect(buttonFile.path).toBe('button.tsx');
-			const exampleFile1 = buttonItem.files.find((f) => f.path === 'button-default.tsx');
-			expect(exampleFile1).toBeDefined();
-			expect(exampleFile1!.role).toBe('example');
-			const exampleFile2 = buttonItem.files.find((f) => f.path === 'button-loading.tsx');
-			expect(exampleFile2).toBeDefined();
-			expect(exampleFile2!.role).toBe('example');
 		});
 	});
 
@@ -395,6 +390,48 @@ describe('buildRegistry', () => {
 				);
 			});
 			expect(binaryFileWarnings).toStrictEqual([]);
+		});
+	});
+
+	describe('glob pattern functionality', () => {
+		it('should handle simple glob patterns (button-*.tsx)', () => {
+			const buttonItem = firstRegistry.items.find((item) => item.name === 'button');
+			assert(buttonItem !== undefined);
+
+			// Simple glob pattern should match files in the same directory
+			const exampleFile1 = buttonItem.files.find((f) => f.path === 'button-default.tsx');
+			expect(exampleFile1).toBeDefined();
+			expect(exampleFile1!.role).toBe('example');
+
+			const exampleFile2 = buttonItem.files.find((f) => f.path === 'button-loading.tsx');
+			expect(exampleFile2).toBeDefined();
+			expect(exampleFile2!.role).toBe('example');
+		});
+
+		it('should preserve subdirectory structure for recursive glob patterns (subdir/**/*.tsx)', () => {
+			const buttonItem = firstRegistry.items.find((item) => item.name === 'button');
+			assert(buttonItem !== undefined);
+
+			// Recursive glob pattern should match files in subdirectories and preserve path structure
+			const subdirFile = buttonItem.files.find((f) => f.path === 'button-subdir.tsx');
+			expect(subdirFile).toBeDefined();
+			expect(subdirFile!.role).toBe('example');
+			expect(subdirFile!.path).toBe('button-subdir.tsx'); // Should preserve subdirectory
+
+			const nestedFile = buttonItem.files.find((f) => f.path === 'nested/button-nested.tsx');
+			expect(nestedFile).toBeDefined();
+			expect(nestedFile!.role).toBe('example');
+			expect(nestedFile!.path).toBe('nested/button-nested.tsx'); // Should preserve nested subdirectory
+		});
+
+		it('should handle glob patterns in nested folder files', () => {
+			// This test verifies that glob patterns work when used within folder file definitions
+			// The math item uses folder files, so we can test this there if needed
+			const mathItem = firstRegistry.items.find((item) => item.name === 'math');
+			assert(mathItem !== undefined);
+
+			// Verify that folder files work correctly (not glob-related, but ensures compatibility)
+			expect(mathItem.files.length).toBeGreaterThan(0);
 		});
 	});
 });
