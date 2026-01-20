@@ -36,7 +36,7 @@ import {
 	SelfReferenceError,
 } from './errors';
 import { existsSync, readdirSync, readFileSync, statSync } from './fs';
-import { glob } from './glob';
+import { getGlobBaseDirectory, glob } from './glob';
 import { parsePackageName } from './parse-package-name';
 import { joinAbsolute, joinRelative, type NormalizedAbsolutePath, normalizeAbsolute } from './path';
 import { endsWithOneOf } from './strings';
@@ -347,11 +347,19 @@ async function expandItemFiles(
 					);
 					continue;
 				}
-				const files = entries.map((e) => ({
-					...file,
-					path: path.basename(e) as ItemRelativePath,
-					absolutePath: e as AbsolutePath,
-				}));
+				// This preserves subdirectory structure when glob patterns match files in subdirectories
+				const globBaseDir = joinAbsolute(
+					cwd,
+					getGlobBaseDirectory(file.path, { cwd, dot: true })
+				);
+				const files = entries.map((e) => {
+					const relativePath = path.relative(globBaseDir, e);
+					return {
+						...file,
+						path: (relativePath || path.basename(e)) as ItemRelativePath,
+						absolutePath: e as AbsolutePath,
+					};
+				});
 
 				unresolvedFiles.push(
 					...files.map((f) => ({
@@ -521,11 +529,19 @@ async function expandItemFolderFiles(
 					warn(new GlobPatternNoMatchWarning({ itemName: item.name, pattern: f.path }));
 					continue;
 				}
-				const files = entries.map((e) => ({
-					...f,
-					path: path.basename(e) as ItemRelativePath,
-					absolutePath: e as AbsolutePath,
-				}));
+				// This preserves subdirectory structure when glob patterns match files in subdirectories
+				const globBaseDir = joinAbsolute(
+					parent.absolutePath,
+					getGlobBaseDirectory(f.path, { cwd: parent.absolutePath, dot: true })
+				);
+				const files = entries.map((e) => {
+					const relativePath = path.relative(globBaseDir, e);
+					return {
+						...f,
+						path: (relativePath || path.basename(e)) as ItemRelativePath,
+						absolutePath: e as AbsolutePath,
+					};
+				});
 				unresolvedFiles.push(
 					...files.map((f) => ({
 						absolutePath: f.absolutePath,
