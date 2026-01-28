@@ -211,6 +211,34 @@ export function ViewOptions({
         })}`,
         icon: <MessageCircleIcon />,
       },
+      {
+        title: 'Open in Finalchat',
+        href: `https://finalchat.app/chat?${new URLSearchParams({
+          q,
+        })}`,
+        icon: (
+          <svg
+            fill="currentColor"
+            role="img"
+            viewBox="0 -47.5 464 464"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlSpace="preserve"
+          >
+            <title>Finalchat</title>
+            <g transform="matrix(1,0,0,1,-744.674384,-723.689943)">
+              <g transform="matrix(0.990844,-0.130447,0.140819,1.069625,308.164017,323.729868)">
+                <path
+                  d="M770.129,607.794C774.18,607.794 777.966,609.661 780.228,612.775C782.489,615.89 782.93,619.842 781.402,623.319C773.191,642.009 760.491,670.918 760.491,670.918C756.73,679.479 747.954,685.245 737.989,685.703L537.829,694.901C534.462,695.055 531.226,696.158 528.553,698.062L456.554,749.342C453.254,751.693 449.308,753.138 445.164,753.514L356.235,761.579C348.198,762.308 340.518,758.334 336.973,751.613C333.428,744.891 334.764,736.837 340.324,731.412L379.001,693.674C380.018,692.681 380.936,691.605 381.744,690.459L527.505,483.649C531.748,477.629 538.985,474 546.747,474L819.359,474C825.548,474 831.332,476.853 834.787,481.611C838.241,486.368 838.914,492.406 836.581,497.717C836.581,497.717 825.908,522.01 819.369,536.897C816.363,543.739 809.183,548.213 801.209,548.213C761.203,548.213 643.945,548.213 643.945,548.213C640.897,548.213 638.014,549.495 636.108,551.697L593.802,600.589C592.651,601.919 592.425,603.743 593.222,605.279C594.018,606.816 595.695,607.794 597.535,607.794L770.129,607.794Z"
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  strokeLinejoin="round"
+                  strokeMiterlimit={2}
+                />
+              </g>
+            </g>
+          </svg>
+        ),
+      }
     ];
   }, [githubUrl, markdownUrl]);
 
@@ -228,7 +256,7 @@ export function ViewOptions({
         Open
         <ChevronDown className="size-3.5 text-fd-muted-foreground" />
       </PopoverTrigger>
-      <PopoverContent className="flex flex-col overflow-auto">
+      <PopoverContent className="flex flex-col overflow-auto" align="end">
         {items.map((item) => (
           <a
             key={item.href}
