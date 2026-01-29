@@ -52,4 +52,15 @@ describe('oxfmt', () => {
 		});
 		expect(result.code).toBeUndefined();
 	});
+
+	it('handles empty string input', async () => {
+		const plugin = oxfmt();
+		const code = '';
+		const result = await plugin.transform({
+			code,
+			fileName: 'test.js',
+			options: transformOptions,
+		});
+		expect(result.code).toBe('');
+	});
 });

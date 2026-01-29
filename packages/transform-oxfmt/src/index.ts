@@ -33,6 +33,7 @@ async function tryFormat(
 		const result = await format(fileName, code, options);
 		// oxfmt returns errors in the result object instead of throwing
 		if (result.errors.length > 0) {
+			console.error(`Failed to format ${fileName}:`, result.errors);
 			return undefined;
 		}
 		return result.code;

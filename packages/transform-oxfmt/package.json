@@ -47,8 +47,6 @@
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",
-		"jsrepo": "workspace:*",
-		"oxfmt": "0.x",
 		"tsdown": "catalog:",
 		"typescript": "catalog:",
 		"vitest": "catalog:"
