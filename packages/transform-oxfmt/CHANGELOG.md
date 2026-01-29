@@ -1,0 +1,10 @@
+# @jsrepo/transform-oxfmt
+
+## 1.0.1
+### Patch Changes
+
+
+- feat: 🎉 New plugin @jsrepo/transform-oxfmt for formatting code with oxfmt ([#743](https://github.com/jsrepojs/jsrepo/pull/743))
+
+- Updated dependencies [[`d249eff`](https://github.com/jsrepojs/jsrepo/commit/d249eff3d9f0a6b3fc557351568fc7e9f60f12c3)]:
+  - jsrepo@3.1.1
