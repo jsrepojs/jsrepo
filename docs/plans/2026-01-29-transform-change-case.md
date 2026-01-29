@@ -25,16 +25,16 @@ Introduce a new transform package `@jsrepo/transform-change-case` that transform
 - Create: `packages/transform-change-case/biome.json`
 
 Steps:
-- [ ] create package.json following transform-javascript pattern with:
+- [x] create package.json following transform-javascript pattern with:
   - name: `@jsrepo/transform-change-case`
   - peer dependency on `jsrepo` workspace
   - dependency on `change-case` package
   - dev dependencies: vitest, typescript, tsdown, @types/node (from catalog)
   - scripts: build, dev, check, test
-- [ ] create tsconfig.json matching transform-javascript
-- [ ] create tsdown.config.ts matching transform-javascript
-- [ ] create biome.json matching transform-javascript
-- [ ] run `pnpm install` to update lockfile
+- [x] create tsconfig.json matching transform-javascript
+- [x] create tsdown.config.ts matching transform-javascript
+- [x] create biome.json matching transform-javascript
+- [x] run `pnpm install` to update lockfile
 
 ## Task 2: Implement core transform with tests (TDD)
 
