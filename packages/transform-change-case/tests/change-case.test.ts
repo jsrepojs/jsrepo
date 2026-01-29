@@ -214,6 +214,24 @@ describe('changeCase', () => {
 	});
 
 	describe('edge cases', () => {
+		it('should throw error for invalid case type', () => {
+			// @ts-expect-error - testing invalid input
+			expect(() => changeCase({ to: 'invalid' })).toThrow(
+				'Invalid case type: "invalid". Expected one of: kebab, camel, snake, pascal'
+			);
+		});
+
+		it('should handle multi-dot filenames (e.g., Angular-style my.component.tsx)', async () => {
+			const plugin = changeCase({ to: 'camel' });
+			const result = await plugin.transform({
+				code: 'const x = 1;',
+				fileName: 'my-button.component.tsx' as ItemRelativePath,
+				options: transformOptions,
+			});
+			// Only the first segment (before first dot) is transformed
+			expect(result.fileName).toBe('myButton.component.tsx');
+		});
+
 		it('should handle single word filename', async () => {
 			const plugin = changeCase({ to: 'camel' });
 			const result = await plugin.transform({
