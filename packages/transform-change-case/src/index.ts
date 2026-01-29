@@ -38,11 +38,13 @@ export default function ({ to }: Options): Transform {
 		transform: async ({ code, fileName }) => {
 			const lastSlashIndex = fileName.lastIndexOf('/');
 			const directory = lastSlashIndex >= 0 ? fileName.slice(0, lastSlashIndex + 1) : '';
-			const fullFilename = lastSlashIndex >= 0 ? fileName.slice(lastSlashIndex + 1) : fileName;
+			const fullFilename =
+				lastSlashIndex >= 0 ? fileName.slice(lastSlashIndex + 1) : fileName;
 
 			// Extract the base name (first part before any dot) and extensions
 			const firstDotIndex = fullFilename.indexOf('.');
-			const baseName = firstDotIndex >= 0 ? fullFilename.slice(0, firstDotIndex) : fullFilename;
+			const baseName =
+				firstDotIndex >= 0 ? fullFilename.slice(0, firstDotIndex) : fullFilename;
 			const extensions = firstDotIndex >= 0 ? fullFilename.slice(firstDotIndex) : '';
 
 			const transformedBaseName = transformer(baseName);
@@ -52,7 +54,8 @@ export default function ({ to }: Options): Transform {
 				return { code };
 			}
 
-			const newFileName = `${directory}${transformedBaseName}${extensions}` as ItemRelativePath;
+			const newFileName =
+				`${directory}${transformedBaseName}${extensions}` as ItemRelativePath;
 
 			return {
 				code,

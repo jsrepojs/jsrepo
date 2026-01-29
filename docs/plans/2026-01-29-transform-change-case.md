@@ -66,11 +66,11 @@ Steps:
 - Modify: `packages/jsrepo/src/utils/config/mods/add-plugins.ts`
 
 Steps:
-- [ ] add entry to OFFICIAL_PLUGINS array:
+- [x] add entry to OFFICIAL_PLUGINS array:
   - shorthand: `change-case`
   - name: `@jsrepo/transform-change-case`
-- [ ] run `pnpm build` in jsrepo package
-- [ ] verify no type errors with `pnpm check`
+- [x] run `pnpm build` in jsrepo package
+- [x] verify no type errors with `pnpm check`
 
 ## Task 4: Add documentation
 

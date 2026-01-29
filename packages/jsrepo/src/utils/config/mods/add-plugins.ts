@@ -335,6 +335,10 @@ export const OFFICIAL_PLUGINS = [
 		shorthand: 'oxfmt',
 		name: '@jsrepo/transform-oxfmt',
 	},
+	{
+		shorthand: 'change-case',
+		name: '@jsrepo/transform-change-case',
+	},
 ];
 
 export function parsePlugins(
