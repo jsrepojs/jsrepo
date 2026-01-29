@@ -37,7 +37,7 @@ async function tryFormat(
 		}
 		return result.code;
 	} catch (err) {
-		console.error(err);
+		console.error(`Failed to format ${fileName}:`, err);
 		return undefined;
 	}
 }

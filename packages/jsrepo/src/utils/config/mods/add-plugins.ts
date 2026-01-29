@@ -331,6 +331,10 @@ export const OFFICIAL_PLUGINS = [
 		shorthand: 'javascript',
 		name: '@jsrepo/transform-javascript',
 	},
+	{
+		shorthand: 'oxfmt',
+		name: '@jsrepo/transform-oxfmt',
+	},
 ];
 
 export function parsePlugins(
