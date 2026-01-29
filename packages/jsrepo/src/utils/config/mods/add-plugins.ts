@@ -291,7 +291,7 @@ export async function addPluginsToConfig({
 			}
 
 			s.appendRight(
-				lastComma ? lastSpecifier.end : lastComma,
+				needsComma ? lastSpecifier.end : lastComma,
 				`${needsComma ? ',' : ''} ${defaultsArrayState.name}`
 			);
 		}
