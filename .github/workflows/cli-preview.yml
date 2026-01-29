@@ -22,4 +22,4 @@ jobs:
           run: pnpm install # packages automatically built on postinstall
 
         - name: publish preview
-          run: pnpm pkg-pr-new publish --pnpm './packages/jsrepo' './packages/mcp' './packages/transform-prettier' './packages/transform-biome' './packages/transform-javascript' './packages/migrate' './packages/transform-oxfmt' --packageManager=pnpm
+          run: pnpm pkg-pr-new publish --pnpm './packages/jsrepo' './packages/mcp' './packages/transform-prettier' './packages/transform-biome' './packages/transform-javascript' './packages/migrate' './packages/transform-oxfmt' './packages/transform-change-case' --packageManager=pnpm
