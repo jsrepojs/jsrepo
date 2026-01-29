@@ -106,4 +106,4 @@ Steps:
 
 ## Documentation Updates
 
-- [ ] move this plan to `docs/plans/completed/`
+- [x] move this plan to `docs/plans/completed/`
