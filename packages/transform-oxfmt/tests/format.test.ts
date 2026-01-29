@@ -41,14 +41,15 @@ describe('oxfmt', () => {
 		expect(result.code).toBe('const a = 1\n');
 	});
 
-	it('returns original code unchanged on unsupported file types', async () => {
+	it('returns undefined when format encounters errors', async () => {
 		const plugin = oxfmt();
-		const code = 'some random content';
+		// Invalid syntax that will cause parse errors
+		const code = 'const a = {{{';
 		const result = await plugin.transform({
 			code,
-			fileName: 'test.xyz',
+			fileName: 'test.js',
 			options: transformOptions,
 		});
-		expect(result.code).toBe(code);
+		expect(result.code).toBeUndefined();
 	});
 });
