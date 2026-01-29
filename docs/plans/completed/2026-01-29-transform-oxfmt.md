@@ -76,4 +76,4 @@ Add a new transform package that formats code using oxfmt (the Oxc formatter). T
 
 ## Cleanup
 
-- [ ] Move this plan to `docs/plans/completed/`
+- [x] Move this plan to `docs/plans/completed/`
