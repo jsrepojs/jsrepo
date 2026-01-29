@@ -92,9 +92,9 @@ Steps:
 - Create: `.changeset/<generated-name>.md`
 
 Steps:
-- [ ] run `pnpm changeset` to generate changeset
-- [ ] set package `@jsrepo/transform-change-case` as minor (new feature)
-- [ ] write description: "feat: Add transform-change-case package for filename case transformations"
+- [x] run `pnpm changeset` to generate changeset
+- [x] set package `@jsrepo/transform-change-case` as minor (new feature)
+- [x] write description: "feat: Add transform-change-case package for filename case transformations"
 
 ## Verification
 
