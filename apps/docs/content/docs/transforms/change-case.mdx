@@ -1,0 +1,110 @@
+---
+title: Change Case
+description: Transform file names to different case formats before adding them to your project.
+---
+
+<BadgeGroup>
+	<SourceBadge path="packages/transform-change-case/src/index.ts" />
+	<OfficialBadge />
+	<NpmBadge packageName="@jsrepo/transform-change-case" />
+</BadgeGroup>
+
+The [@jsrepo/transform-change-case](https://npmjs.com/package/@jsrepo/transform-change-case) package is a transform plugin for **jsrepo** that transforms file names to different case formats before adding them to your project.
+
+<Callout type="info">
+    This is useful when your project follows a specific file naming convention and you want registry items to automatically conform to it.
+</Callout>
+
+## Installation
+
+To add the **@jsrepo/transform-change-case** transform to your config run the following command:
+
+```sh
+jsrepo config transform change-case
+```
+
+This will automatically install the transform and add it to your config:
+
+```ts
+import { defineConfig } from "jsrepo";
+import changeCase from "@jsrepo/transform-change-case"; // [!code ++]
+
+export default defineConfig({
+	transforms: [changeCase({ to: "camel" })], // [!code ++]
+});
+```
+
+## Configuration
+
+The transform accepts an options object with the following property:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `to` | `"kebab" \| "camel" \| "snake" \| "pascal"` | The target case format for file names |
+
+## Examples
+
+### kebab-case to camelCase
+
+**Before:**
+
+```ts title="utils/my-helper.ts"
+export function myHelper() {}
+```
+
+**After:**
+
+```ts title="utils/myHelper.ts"
+export function myHelper() {}
+```
+
+### camelCase to kebab-case
+
+**Before:**
+
+```ts title="components/MyComponent.tsx"
+export function MyComponent() {}
+```
+
+**After:**
+
+```ts title="components/my-component.tsx"
+export function MyComponent() {}
+```
+
+### To snake_case
+
+**Before:**
+
+```ts title="utils/myHelper.ts"
+export function myHelper() {}
+```
+
+**After:**
+
+```ts title="utils/my_helper.ts"
+export function myHelper() {}
+```
+
+### To PascalCase
+
+**Before:**
+
+```ts title="models/user-profile.ts"
+export interface UserProfile {}
+```
+
+**After:**
+
+```ts title="models/UserProfile.ts"
+export interface UserProfile {}
+```
+
+## Supported Case Types
+
+| Case Type | Example | Option |
+|-----------|---------|--------|
+| kebab-case | `my-component.ts` | `"kebab"` |
+| camelCase | `myComponent.ts` | `"camel"` |
+| snake_case | `my_component.ts` | `"snake"` |
+| PascalCase | `MyComponent.ts` | `"pascal"` |
