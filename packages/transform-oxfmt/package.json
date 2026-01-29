@@ -37,6 +37,7 @@
 		"build": "tsdown",
 		"dev": "tsdown --watch",
 		"check": "tsc --noEmit",
+		"test": "vitest",
 		"bundle-analyze": "FORCE_COLOR=1 node ../../bundle-analyzer/dist/index.mjs analyze ."
 	},
 	"packageManager": "pnpm@10.17.1",
@@ -47,6 +48,7 @@
 	"devDependencies": {
 		"@types/node": "catalog:",
 		"tsdown": "catalog:",
-		"typescript": "catalog:"
+		"typescript": "catalog:",
+		"vitest": "catalog:"
 	}
 }

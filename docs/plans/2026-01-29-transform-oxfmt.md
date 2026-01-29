@@ -54,12 +54,12 @@ Add a new transform package that formats code using oxfmt (the Oxc formatter). T
 **Files:**
 - Create: `packages/transform-oxfmt/tests/format.test.ts`
 
-- [ ] Create `packages/transform-oxfmt/tests/format.test.ts` with test cases:
+- [x] Create `packages/transform-oxfmt/tests/format.test.ts` with test cases:
   - Formats JavaScript code
   - Formats TypeScript code
   - Respects formatting options (e.g. `semi: false`)
   - Returns original code unchanged on unsupported file types (graceful failure)
-- [ ] Run `pnpm test` to verify all tests pass
+- [x] Run `pnpm test` to verify all tests pass
 
 ## Task 4: Build and verify
 
