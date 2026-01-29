@@ -15,6 +15,7 @@ import { Cursor } from "./cursor";
 import { Shadcn } from "./shadcn";
 import { Biomejs } from "./biome";
 import { Prettier } from "./prettier";
+import { Oxfmt } from "./oxfmt";
 import { NPM } from "./npm";
 import { TypeScript } from "./typescript";
 import { RegistryKit } from "./registry-kit";
@@ -38,6 +39,7 @@ export {
 	Shadcn as ShadcnLogo,
 	Biomejs as BiomeLogo,
 	Prettier as PrettierLogo,
+	Oxfmt as OxfmtLogo,
 	NPM as NpmLogo,
 	TypeScript as TypeScriptLogo,
 	RegistryKit as RegistryKitLogo,
