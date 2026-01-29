@@ -31,7 +31,7 @@ const caseTransformers: Record<CaseType, (input: string) => string> = {
  *
  * @param options - The options for the transform plugin.
  */
-export default function ({ to }: Options): Transform {
+export default function ({ to = 'kebab' }: Partial<Options>): Transform {
 	const transformer = caseTransformers[to];
 	if (!transformer) {
 		throw new Error(`Invalid case type: "${to}". Expected one of: kebab, camel, snake, pascal`);
