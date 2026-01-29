@@ -3,4 +3,3 @@
 ---
 
 fix: Fixed a bug with adding plugins
-  
