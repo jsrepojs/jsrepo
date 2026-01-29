@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.1.1
+### Patch Changes
+
+
+- fix: Fixed a bug with adding plugins ([#743](https://github.com/jsrepojs/jsrepo/pull/743))
+
 ## 3.1.0
 ### Minor Changes
 
