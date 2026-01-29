@@ -42,12 +42,12 @@ Add a new transform package that formats code using oxfmt (the Oxc formatter). T
 **Files:**
 - Create: `packages/transform-oxfmt/src/index.ts`
 
-- [ ] Create `packages/transform-oxfmt/src/index.ts` implementing the transform:
+- [x] Create `packages/transform-oxfmt/src/index.ts` implementing the transform:
   - Export default function accepting optional `FormatOptions` from oxfmt
   - Return a `Transform` object with async `transform` method
   - Use `format(fileName, code, options)` from `oxfmt`
   - Wrap in try/catch returning `undefined` on failure (matching existing pattern)
-- [ ] Run `pnpm check` in the package to verify types
+- [x] Run `pnpm check` in the package to verify types
 
 ## Task 3: Write tests
 
