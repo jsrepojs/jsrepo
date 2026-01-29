@@ -2,4 +2,4 @@
 "@jsrepo/transform-oxfmt": minor
 ---
 
-Add transform-oxfmt plugin for formatting code with oxfmt
+feat: 🎉 New plugin @jsrepo/transform-oxfmt for formatting code with oxfmt
