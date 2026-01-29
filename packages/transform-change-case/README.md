@@ -28,7 +28,7 @@ import { defineConfig } from "jsrepo";
 import changeCase from "@jsrepo/transform-change-case";
 
 export default defineConfig({
-	transforms: [changeCase({ to: "camel" })],
+    transforms: [changeCase({ to: "camel" })],
 });
 ```
 
