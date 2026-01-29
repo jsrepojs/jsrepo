@@ -34,6 +34,14 @@ export default defineConfig({
 });
 ```
 
+Now when a file is added to your project it will be transformed to the target case format:
+
+```ts title="utils/my-helper.ts → utils/myHelper.ts"
+export function add(a: number, b: number): number {
+	return a + b;
+}
+```
+
 ## Configuration
 
 The transform accepts an options object with the following property:
@@ -41,70 +49,3 @@ The transform accepts an options object with the following property:
 | Option | Type | Description |
 |--------|------|-------------|
 | `to` | `"kebab" \| "camel" \| "snake" \| "pascal"` | The target case format for file names |
-
-## Examples
-
-### kebab-case to camelCase
-
-**Before:**
-
-```ts title="utils/my-helper.ts"
-export function myHelper() {}
-```
-
-**After:**
-
-```ts title="utils/myHelper.ts"
-export function myHelper() {}
-```
-
-### PascalCase to kebab-case
-
-**Before:**
-
-```ts title="components/MyComponent.tsx"
-export function MyComponent() {}
-```
-
-**After:**
-
-```ts title="components/my-component.tsx"
-export function MyComponent() {}
-```
-
-### To snake_case
-
-**Before:**
-
-```ts title="utils/myHelper.ts"
-export function myHelper() {}
-```
-
-**After:**
-
-```ts title="utils/my_helper.ts"
-export function myHelper() {}
-```
-
-### To PascalCase
-
-**Before:**
-
-```ts title="models/user-profile.ts"
-export interface UserProfile {}
-```
-
-**After:**
-
-```ts title="models/UserProfile.ts"
-export interface UserProfile {}
-```
-
-## Supported Case Types
-
-| Case Type | Example | Option |
-|-----------|---------|--------|
-| kebab-case | `my-component.ts` | `"kebab"` |
-| camelCase | `myComponent.ts` | `"camel"` |
-| snake_case | `my_component.ts` | `"snake"` |
-| PascalCase | `MyComponent.ts` | `"pascal"` |
