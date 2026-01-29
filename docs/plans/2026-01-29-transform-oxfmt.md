@@ -69,10 +69,10 @@ Add a new transform package that formats code using oxfmt (the Oxc formatter). T
 
 ## Verification
 
-- [ ] Run full test suite: `pnpm test`
-- [ ] Run linter: `pnpm lint`
-- [ ] Run type check: `pnpm check`
-- [ ] Build the package: `pnpm --filter @jsrepo/transform-oxfmt build`
+- [x] Run full test suite: `pnpm test`
+- [x] Run linter: `pnpm lint`
+- [x] Run type check: `pnpm check`
+- [x] Build the package: `pnpm --filter @jsrepo/transform-oxfmt build`
 
 ## Cleanup
 
