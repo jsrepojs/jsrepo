@@ -186,10 +186,10 @@ export async function runInit(
 					devDependencies: [
 						...(options.js
 							? [
-									{
-										name: '@jsrepo/transform-javascript',
-									},
-								]
+								{
+									name: '@jsrepo/transform-javascript',
+								},
+							]
 							: []),
 					],
 				},
@@ -267,10 +267,10 @@ export async function runInit(
 					...Array.from(neededDeps.values()),
 					...(options.js
 						? [
-								{
-									name: '@jsrepo/transform-javascript',
-								},
-							]
+							{
+								name: '@jsrepo/transform-javascript',
+							},
+						]
 						: []),
 				],
 			},
@@ -620,7 +620,7 @@ function initBlankConfig() {
 export default defineConfig({
     // configure where stuff comes from here
     registries: [],
-    // configure were stuff goes here
+    // configure where stuff goes here
     paths: {},
 });`;
 }
