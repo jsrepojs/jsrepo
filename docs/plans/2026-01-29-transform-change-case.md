@@ -43,7 +43,7 @@ Steps:
 - Create: `packages/transform-change-case/src/index.ts`
 
 Steps:
-- [ ] write tests for the transform covering:
+- [x] write tests for the transform covering:
   - converting kebab-case filename to camelCase
   - converting camelCase filename to kebab-case
   - converting to snake_case
@@ -52,13 +52,13 @@ Steps:
   - handling filenames with directories (e.g., `components/my-component.ts`)
   - no transformation when case matches target
   - handling edge cases (single word, already correct case)
-- [ ] implement the transform function that:
+- [x] implement the transform function that:
   - accepts options with target case type: `kebab`, `camel`, `snake`, `pascal`
   - returns Transform with transform method
   - extracts filename from path, transforms case, reconstructs path
   - returns `{ code, fileName }` with transformed filename
   - code passes through unchanged (this transform only modifies filenames)
-- [ ] run `pnpm test` in package - must pass before task 3
+- [x] run `pnpm test` in package - must pass before task 3
 
 ## Task 3: Register as official plugin
 
