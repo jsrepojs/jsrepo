@@ -33,6 +33,9 @@ const caseTransformers: Record<CaseType, (input: string) => string> = {
  */
 export default function ({ to }: Options): Transform {
 	const transformer = caseTransformers[to];
+	if (!transformer) {
+		throw new Error(`Invalid case type: "${to}". Expected one of: kebab, camel, snake, pascal`);
+	}
 
 	return {
 		transform: async ({ code, fileName }) => {

@@ -9,7 +9,6 @@ import {
 	parse,
 	Visitor,
 } from 'oxc-parser';
-import { vi } from 'vitest';
 import { getImports } from '@/langs/js';
 import { kebabToCamel } from '@/utils/casing';
 import {
@@ -20,6 +19,7 @@ import {
 } from '@/utils/errors';
 import { parsePackageName } from '@/utils/parse-package-name';
 import type { AbsolutePath } from '@/utils/types';
+import { noop } from '@/utils/utils';
 import type { RegistryPlugin } from '..';
 
 class VisitorState {
@@ -310,10 +310,9 @@ export async function neededPlugins({
 	};
 	plugins: RegistryPlugin[];
 }): Promise<RegistryPlugin[]> {
-	const fn = vi.fn();
 	const imports = await getImports(config.code, {
 		fileName: config.path,
-		warn: fn,
+		warn: noop,
 	});
 	return plugins.filter((plugin) => !imports.includes(plugin.package));
 }
