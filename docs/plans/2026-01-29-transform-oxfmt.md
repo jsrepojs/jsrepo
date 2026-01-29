@@ -63,9 +63,9 @@ Add a new transform package that formats code using oxfmt (the Oxc formatter). T
 
 ## Task 4: Build and verify
 
-- [ ] Run `pnpm build` in the transform-oxfmt package
-- [ ] Run `pnpm check` across the monorepo
-- [ ] Run `pnpm test` across the monorepo
+- [x] Run `pnpm build` in the transform-oxfmt package
+- [x] Run `pnpm check` across the monorepo
+- [x] Run `pnpm test` across the monorepo
 
 ## Verification
 
