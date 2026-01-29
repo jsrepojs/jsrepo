@@ -1,7 +1,7 @@
 # @jsrepo/mcp
 
-[![npm version](https://flat.badgen.net/npm/v/@jsrepo/mcp?color=pink)](https://npmjs.com/package/@jsrepo/mcp)
-[![npm downloads](https://flat.badgen.net/npm/dm/@jsrepo/mcp?color=pink)](https://npmjs.com/package/@jsrepo/mcp)
+[![npm version](https://flat.badgen.net/npm/v/@jsrepo/mcp)](https://npmjs.com/package/@jsrepo/mcp)
+[![npm downloads](https://flat.badgen.net/npm/dm/@jsrepo/mcp)](https://npmjs.com/package/@jsrepo/mcp)
 
 The MCP server for **jsrepo**.
 

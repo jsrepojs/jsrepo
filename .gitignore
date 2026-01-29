@@ -10,3 +10,5 @@ temp-test
 **/tests/fixtures/**/pnpm-lock.yaml
 
 .DS_Store
+# ralphex progress logs
+progress*.txt

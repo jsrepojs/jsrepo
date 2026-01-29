@@ -291,7 +291,7 @@ export async function addPluginsToConfig({
 			}
 
 			s.appendRight(
-				lastComma ? lastSpecifier.end : lastComma,
+				needsComma ? lastSpecifier.end : lastComma,
 				`${needsComma ? ',' : ''} ${defaultsArrayState.name}`
 			);
 		}
@@ -330,6 +330,10 @@ export const OFFICIAL_PLUGINS = [
 	{
 		shorthand: 'javascript',
 		name: '@jsrepo/transform-javascript',
+	},
+	{
+		shorthand: 'oxfmt',
+		name: '@jsrepo/transform-oxfmt',
 	},
 ];
 

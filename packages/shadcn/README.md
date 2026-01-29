@@ -1,7 +1,7 @@
 # @jsrepo/shadcn
 
-[![npm version](https://flat.badgen.net/npm/v/@jsrepo/shadcn?color=pink)](https://npmjs.com/package/@jsrepo/shadcn)
-[![npm downloads](https://flat.badgen.net/npm/dm/@jsrepo/shadcn?color=pink)](https://npmjs.com/package/@jsrepo/shadcn)
+[![npm version](https://flat.badgen.net/npm/v/@jsrepo/shadcn)](https://npmjs.com/package/@jsrepo/shadcn)
+[![npm downloads](https://flat.badgen.net/npm/dm/@jsrepo/shadcn)](https://npmjs.com/package/@jsrepo/shadcn)
 
 A package to help you distribute your jsrepo registry as a shadcn registry.
 

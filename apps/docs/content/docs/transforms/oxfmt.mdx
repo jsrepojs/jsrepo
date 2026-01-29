@@ -1,0 +1,35 @@
+---
+title: oxfmt
+description: Format code before it's added to your project using oxfmt.
+---
+
+<BadgeGroup>
+	<SourceBadge path="packages/transform-oxfmt/src/index.ts" />
+	<OfficialBadge />
+	<NpmBadge packageName="@jsrepo/transform-oxfmt" />
+</BadgeGroup>
+
+The [@jsrepo/transform-oxfmt](https://npmjs.com/package/@jsrepo/transform-oxfmt) package is a transform plugin for **jsrepo** that formats code using [oxfmt](https://github.com/oxc-project/oxfmt) before it's added to your project.
+
+<Callout type="info">
+    This is especially useful when you are making use of the `jsrepo update` command as it will format the code the same way as it is in your project preventing any formatting changes from being shown in the diff.
+</Callout>
+
+## Installation
+
+To add the **@jsrepo/transform-oxfmt** transform to your config run the following command:
+
+```sh
+jsrepo config transform oxfmt
+```
+
+This will automatically install the transform and add it to your config:
+
+```ts
+import { defineConfig } from "jsrepo";
+import oxfmt from "@jsrepo/transform-oxfmt"; // [!code ++]
+
+export default defineConfig({
+	transforms: [oxfmt()], // [!code ++]
+});
+```

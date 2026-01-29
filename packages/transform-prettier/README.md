@@ -1,7 +1,7 @@
 # @jsrepo/transform-prettier
 
-[![npm version](https://flat.badgen.net/npm/v/@jsrepo/transform-prettier?color=pink)](https://npmjs.com/package/@jsrepo/transform-prettier)
-[![npm downloads](https://flat.badgen.net/npm/dm/@jsrepo/transform-prettier?color=pink)](https://npmjs.com/package/@jsrepo/transform-prettier)
+[![npm version](https://flat.badgen.net/npm/v/@jsrepo/transform-prettier)](https://npmjs.com/package/@jsrepo/transform-prettier)
+[![npm downloads](https://flat.badgen.net/npm/dm/@jsrepo/transform-prettier)](https://npmjs.com/package/@jsrepo/transform-prettier)
 
 A transform plugin for formatting registry items with Prettier using your local Prettier configuration before they are added to your project.
 
