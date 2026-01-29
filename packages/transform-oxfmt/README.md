@@ -1,9 +1,9 @@
 # @jsrepo/transform-oxfmt
 
-[![npm version](https://flat.badgen.net/npm/v/@jsrepo/transform-oxfmt?color=pink)](https://npmjs.com/package/@jsrepo/transform-oxfmt)
-[![npm downloads](https://flat.badgen.net/npm/dm/@jsrepo/transform-oxfmt?color=pink)](https://npmjs.com/package/@jsrepo/transform-oxfmt)
+[![npm version](https://flat.badgen.net/npm/v/@jsrepo/transform-oxfmt)](https://npmjs.com/package/@jsrepo/transform-oxfmt)
+[![npm downloads](https://flat.badgen.net/npm/dm/@jsrepo/transform-oxfmt)](https://npmjs.com/package/@jsrepo/transform-oxfmt)
 
-A transform plugin for formatting registry items with oxfmt (the Oxc formatter) before they are added to your project.
+A transform plugin for formatting registry items with oxfmt before they are added to your project.
 
 ## Usage
 

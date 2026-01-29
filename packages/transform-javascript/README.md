@@ -1,7 +1,7 @@
 # @jsrepo/transform-prettier
 
-[![npm version](https://flat.badgen.net/npm/v/@jsrepo/transform-javascript?color=pink)](https://npmjs.com/package/@jsrepo/transform-javascript)
-[![npm downloads](https://flat.badgen.net/npm/dm/@jsrepo/transform-javascript?color=pink)](https://npmjs.com/package/@jsrepo/transform-javascript)
+[![npm version](https://flat.badgen.net/npm/v/@jsrepo/transform-javascript)](https://npmjs.com/package/@jsrepo/transform-javascript)
+[![npm downloads](https://flat.badgen.net/npm/dm/@jsrepo/transform-javascript)](https://npmjs.com/package/@jsrepo/transform-javascript)
 
 A transform plugin for transforming TypeScript registry items into JavaScript before adding them to your project.
 
