@@ -78,7 +78,7 @@ Steps:
 - Create: `apps/docs/content/docs/transforms/change-case.mdx`
 
 Steps:
-- [ ] create documentation page following javascript.mdx pattern with:
+- [x] create documentation page following javascript.mdx pattern with:
   - title and description
   - BadgeGroup with SourceBadge, OfficialBadge, NpmBadge
   - installation section showing `jsrepo config transform change-case`
