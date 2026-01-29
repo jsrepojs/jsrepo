@@ -98,11 +98,11 @@ Steps:
 
 ## Verification
 
-- [ ] manual test: configure transform in a test project and verify filename case changes
-- [ ] run full test suite: `pnpm test` from root
-- [ ] run linter: `pnpm check` from root
-- [ ] run build: `pnpm build` from root
-- [ ] verify package exports work correctly
+- [x] manual test: configure transform in a test project and verify filename case changes
+- [x] run full test suite: `pnpm test` from root
+- [x] run linter: `pnpm check` from root
+- [x] run build: `pnpm build` from root
+- [x] verify package exports work correctly
 
 ## Documentation Updates
 
