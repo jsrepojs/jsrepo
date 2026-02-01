@@ -145,11 +145,11 @@ export async function getImports(
 ): Promise<string[]> {
 	const result = await parse(fileName, code);
 
-	const modules: string[] = [];
+	const modules = new Set<string>();
 
 	// handle static imports
 	for (const imp of result.module.staticImports) {
-		modules.push(imp.moduleRequest.value);
+		modules.add(imp.moduleRequest.value);
 	}
 
 	// handle dynamic imports
@@ -171,19 +171,19 @@ export async function getImports(
 		}
 
 		// trim quotes from the start and end
-		modules.push(code.slice(imp.moduleRequest.start + 1, imp.moduleRequest.end - 1));
+		modules.add(code.slice(imp.moduleRequest.start + 1, imp.moduleRequest.end - 1));
 	}
 
 	// handle `export x from y` syntax
 	for (const exp of result.module.staticExports) {
 		for (const entry of exp.entries) {
 			if (entry.moduleRequest) {
-				modules.push(entry.moduleRequest.value);
+				modules.add(entry.moduleRequest.value);
 			}
 		}
 	}
 
-	return modules;
+	return Array.from(modules);
 }
 
 /** Searches around for the module
