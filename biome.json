@@ -17,7 +17,8 @@
 			"!**/docs",
 			"!**/temp-test",
 			"!**/tests/fixtures/**/*",
-			"!*.svelte"
+			"!*.svelte",
+			"!.pnpm-store"
 		]
 	},
 	"assist": { "actions": { "source": { "organizeImports": "on" } } },

@@ -12,3 +12,5 @@ temp-test
 .DS_Store
 # ralphex progress logs
 progress*.txt
+
+.pnpm-store

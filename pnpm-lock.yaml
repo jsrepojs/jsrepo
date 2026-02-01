@@ -617,6 +617,28 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
+  packages/transform-rtl:
+    dependencies:
+      jsrepo:
+        specifier: workspace:*
+        version: link:../jsrepo
+      magic-string:
+        specifier: ^0.30.21
+        version: 0.30.21
+      oxc-parser:
+        specifier: ^0.107.0
+        version: 0.107.0
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 25.0.3
+      tsdown:
+        specifier: 'catalog:'
+        version: 0.19.0-beta.3(@arethetypeswrong/core@0.18.2)(typescript@5.9.3)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
 packages:
 
   '@actions/core@1.11.1':

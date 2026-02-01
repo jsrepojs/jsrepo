@@ -20,6 +20,7 @@ import { NPM } from "./npm";
 import { TypeScript } from "./typescript";
 import { RegistryKit } from "./registry-kit";
 import { Antigravity } from "./antigravity";
+import { Tailwind } from "./tailwind";
 
 export {
 	GitHub as GitHubLogo,
@@ -44,4 +45,5 @@ export {
 	TypeScript as TypeScriptLogo,
 	RegistryKit as RegistryKitLogo,
 	Antigravity as AntigravityLogo,
+	Tailwind as TailwindLogo,
 };
