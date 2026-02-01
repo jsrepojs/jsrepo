@@ -222,7 +222,10 @@ export async function runUpdate(
 					filePath = result.fileName ?? file.path;
 				}
 
-				const filePathResult = getTargetPath({ ...file, path: filePath }, { itemPath: { path: itemPath }, options });
+				const filePathResult = getTargetPath(
+					{ ...file, path: filePath },
+					{ itemPath: { path: itemPath }, options }
+				);
 
 				if (!existsSync(filePathResult)) continue;
 				updateCandidates.push({ item: { ...item, registry }, registry });
@@ -336,14 +339,16 @@ function formatResult(result: UpdateCommandResult): string {
 
 	if (result.updatedFiles.length > 0) {
 		parts.push(
-			`    Updated ${pc.green(result.updatedFiles.length)} ${result.updatedFiles.length === 1 ? 'file' : 'files'
+			`    Updated ${pc.green(result.updatedFiles.length)} ${
+				result.updatedFiles.length === 1 ? 'file' : 'files'
 			}.`
 		);
 	}
 
 	if (result.updatedPaths && Object.keys(result.updatedPaths).length > 0) {
 		parts.push(
-			`    Updated ${pc.green(Object.keys(result.updatedPaths).length)} ${Object.keys(result.updatedPaths).length === 1 ? 'path' : 'paths'
+			`    Updated ${pc.green(Object.keys(result.updatedPaths).length)} ${
+				Object.keys(result.updatedPaths).length === 1 ? 'path' : 'paths'
 			}.`
 		);
 	}
@@ -351,9 +356,10 @@ function formatResult(result: UpdateCommandResult): string {
 	if (result.updatedDependencies.dependencies.length > 0) {
 		if (result.updatedDependencies.installed) {
 			parts.push(
-				`    Installed ${pc.green(result.updatedDependencies.dependencies.length)} ${result.updatedDependencies.dependencies.length === 1
-					? 'dependency'
-					: 'dependencies'
+				`    Installed ${pc.green(result.updatedDependencies.dependencies.length)} ${
+					result.updatedDependencies.dependencies.length === 1
+						? 'dependency'
+						: 'dependencies'
 				}.`
 			);
 		} else {
@@ -369,9 +375,10 @@ function formatResult(result: UpdateCommandResult): string {
 
 	if (result.updatedEnvVars && Object.keys(result.updatedEnvVars).length > 0) {
 		parts.push(
-			`    Updated ${pc.green(Object.keys(result.updatedEnvVars).length)} ${Object.keys(result.updatedEnvVars).length === 1
-				? 'environment variable'
-				: 'environment variables'
+			`    Updated ${pc.green(Object.keys(result.updatedEnvVars).length)} ${
+				Object.keys(result.updatedEnvVars).length === 1
+					? 'environment variable'
+					: 'environment variables'
 			}.`
 		);
 	}

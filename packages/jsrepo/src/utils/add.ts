@@ -12,7 +12,7 @@ import {
 } from '@/outputs/distributed';
 import type { RepositoryOutputFile } from '@/outputs/repository';
 import { fetchManifest, type Provider, type ProviderFactory } from '@/providers';
-import type { DependencyKey, RemoteDependency } from '@/utils/build';
+import type { DependencyKey, RemoteDependency, UnresolvedImport } from '@/utils/build';
 import type { Config, RegistryItemAdd, RegistryItemType } from '@/utils/config';
 import { getPathsMatcher, resolvePath, resolvePaths } from '@/utils/config/utils';
 import { formatDiff } from '@/utils/diff';
@@ -497,10 +497,8 @@ export async function transformRemoteContent(
 	file: FileWithContents,
 	{
 		item,
-		languages,
 		options,
 		config,
-		itemPaths,
 	}: {
 		item: FetchedItem;
 		languages: Language[];
@@ -509,29 +507,6 @@ export async function transformRemoteContent(
 		itemPaths: Record<string, { path: string; alias?: string }>;
 	}
 ): Promise<FileWithContents> {
-	const lang = languages.find((lang) => lang.canResolveDependencies(file.path));
-	file.content =
-		(await lang?.transformImports(file.content, file._imports_ ?? [], {
-			cwd: options.cwd,
-			targetPath: file.path,
-			item: item.name,
-			file: { type: file.type, path: file.path },
-			getItemPath: ({ item, file }) => {
-				const fileType = normalizeItemTypeForPath(file.type);
-				// there are two types of paths
-				// <type> and <type>/<name>
-				for (const [key, value] of Object.entries(itemPaths)) {
-					// <type>/<name>
-					if (key === `${fileType}/${item}`) return value;
-
-					// <type>
-					if (key === fileType) return value;
-				}
-				// by now we should have already got all the necessary paths from the user
-				throw new Unreachable();
-			},
-		})) ?? file.content;
-
 	for (const transform of config?.transforms ?? []) {
 		const result = await transform.transform({
 			code: file.content,
@@ -830,7 +805,10 @@ export function getItemPaths(
 export type UpdatedFile = {
 	itemName: string;
 	registryUrl: string;
+	_imports_: UnresolvedImport[];
 	filePath: AbsolutePath;
+	newPath: ItemRelativePath;
+	originalPath: ItemRelativePath;
 	content: string;
 } & (
 	| {
@@ -891,6 +869,8 @@ export async function prepareUpdates({
 			const type = normalizeItemTypeForPath(file.type);
 			const expectedPath = itemPaths[`${type}/${item.name}`]!;
 
+			const originalPath = file.path;
+
 			file = await transformRemoteContent(file, {
 				item,
 				languages: configResult?.config.languages ?? DEFAULT_LANGS,
@@ -925,7 +905,10 @@ export async function prepareUpdates({
 				neededFiles.push({
 					type: 'update',
 					oldContent: originalContents,
+					_imports_: file._imports_ ?? [],
 					filePath,
+					newPath: file.path,
+					originalPath,
 					content: file.content,
 					itemName: item.name,
 					registryUrl: item.registry.url,
@@ -933,7 +916,10 @@ export async function prepareUpdates({
 			} else {
 				neededFiles.push({
 					type: 'create',
+					_imports_: file._imports_ ?? [],
 					filePath,
+					newPath: file.path,
+					originalPath,
 					content: file.content,
 					itemName: item.name,
 					registryUrl: item.registry.url,
@@ -1001,6 +987,56 @@ export async function prepareUpdates({
 			}
 			neededEnvVars[name] = value;
 		}
+	}
+
+	// transform the imports for each file
+	for (const file of neededFiles) {
+		// update _imports_ so that they reference the transformed file path
+		const newImports: UnresolvedImport[] = [];
+		for (const imp of file._imports_ ?? []) {
+			const targetFile = neededFiles.find(
+				(f) =>
+					f.originalPath === imp.import &&
+					imp.item === f.itemName &&
+					f.type === imp.file.type
+			);
+			if (!targetFile) {
+				newImports.push(imp);
+				continue;
+			}
+
+			newImports.push({
+				import: imp.import,
+				item: imp.item,
+				file: { type: imp.file.type, path: targetFile.newPath },
+				meta: imp.meta,
+			});
+		}
+
+		const lang = configResult?.config.languages.find((lang) =>
+			lang.canResolveDependencies(file.newPath)
+		);
+		file.content =
+			(await lang?.transformImports(file.content, file._imports_ ?? [], {
+				cwd: options.cwd,
+				targetPath: file.newPath,
+				item: file.itemName,
+				file: { type: file.type, path: file.newPath },
+				getItemPath: ({ item, file }) => {
+					const fileType = normalizeItemTypeForPath(file.type);
+					// there are two types of paths
+					// <type> and <type>/<name>
+					for (const [key, value] of Object.entries(itemPaths)) {
+						// <type>/<name>
+						if (key === `${fileType}/${item}`) return value;
+
+						// <type>
+						if (key === fileType) return value;
+					}
+					// by now we should have already got all the necessary paths from the user
+					throw new Unreachable();
+				},
+			})) ?? file.content;
 	}
 
 	return ok({
