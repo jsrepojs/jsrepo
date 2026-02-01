@@ -385,12 +385,19 @@ export async function transformImports(
 		const { dir: filePathRelativeToItemDir, name: filePathRelativeToItemName } = path.parse(
 			imp.file.path
 		);
+		const importExt = path.parse(imp.import).ext;
+
 		// this handles the case where the import is referencing an index file but by the directory name instead of the index file itself
 		// for example: './utils/math' instead of './utils/math/index.ts'
-		const baseName =
+		let baseName =
 			filePathRelativeToItemName === 'index' && path.parse(imp.import).name !== 'index'
 				? ''
 				: filePathRelativeToItemName;
+
+		// Preserve the original import's extension if the file name doesn't already include it
+		if (baseName && importExt && !baseName.endsWith(importExt)) {
+			baseName += importExt;
+		}
 
 		// if relative make it relative
 		if (itemPath.alias === undefined) {

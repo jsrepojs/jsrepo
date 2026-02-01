@@ -64,7 +64,9 @@ import { utils } from '$lib/utils.js';
 import { add } from '../../utils/math/add.js';
 import { Separator } from '@/registry/new-york-v4/ui/separator';
 import foo from './foo.js';
-import bar from './bar';`,
+import bar from './bar';
+import nestedFoo from './nested/foo.js';
+import nestedBar from './nested/bar';`,
 			[
 				{
 					import: '$lib/components/ui/button',
@@ -101,7 +103,19 @@ import bar from './bar';`,
 					item: 'bar',
 					file: { type: 'util', path: 'Bar.ts' as ItemRelativePath },
 					meta: {},
-				}
+				},
+				{
+					import: './nested/foo.js',
+					item: 'nestedFoo',
+					file: { type: 'util', path: 'Nested/Foo.ts' as ItemRelativePath },
+					meta: {},
+				},
+				{
+					import: './nested/bar',
+					item: 'nestedBar',
+					file: { type: 'util', path: 'Nested/Bar.ts' as ItemRelativePath },
+					meta: {},
+				},
 			],
 			{
 				cwd: CWD,
@@ -127,6 +141,10 @@ import bar from './bar';`,
 							return { path: 'src/lib/utils', alias: '$lib/utils' };
 						case 'bar':
 							return { path: 'src/lib/utils', alias: '$lib/utils' };
+						case 'nestedFoo':
+							return { path: 'src/lib/utils', alias: '$lib/utils' };
+						case 'nestedBar':
+							return { path: 'src/lib/utils', alias: '$lib/utils' };
 						default: {
 							if (item.file.type === 'ui')
 								return { path: 'src/components/ui', alias: '@/components/ui' };
@@ -147,7 +165,9 @@ import { utils } from '$lib/utils.js';
 import { add } from '$lib/utils/math/add.js';
 import { Separator } from '@/components/ui/separator';
 import foo from '$lib/utils/Foo.js';
-import bar from '$lib/utils/Bar';`);
+import bar from '$lib/utils/Bar';
+import nestedFoo from '$lib/utils/Nested/Foo.js';
+import nestedBar from '$lib/utils/Nested/Bar';`);
 	});
 });
 
