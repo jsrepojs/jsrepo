@@ -810,6 +810,7 @@ export type UpdatedFile = {
 	newPath: ItemRelativePath;
 	originalPath: ItemRelativePath;
 	content: string;
+	fileType: RegistryItemType;
 } & (
 	| {
 			type: 'update';
@@ -904,6 +905,7 @@ export async function prepareUpdates({
 
 				neededFiles.push({
 					type: 'update',
+					fileType: file.type,
 					oldContent: originalContents,
 					_imports_: file._imports_ ?? [],
 					filePath,
@@ -916,6 +918,7 @@ export async function prepareUpdates({
 			} else {
 				neededFiles.push({
 					type: 'create',
+					fileType: file.type,
 					_imports_: file._imports_ ?? [],
 					filePath,
 					newPath: file.path,
@@ -996,9 +999,9 @@ export async function prepareUpdates({
 		for (const imp of file._imports_ ?? []) {
 			const targetFile = neededFiles.find(
 				(f) =>
-					f.originalPath === imp.import &&
+					f.originalPath === imp.file.path &&
 					imp.item === f.itemName &&
-					f.type === imp.file.type
+					f.fileType === imp.file.type
 			);
 			if (!targetFile) {
 				newImports.push(imp);
@@ -1017,11 +1020,11 @@ export async function prepareUpdates({
 			lang.canResolveDependencies(file.newPath)
 		);
 		file.content =
-			(await lang?.transformImports(file.content, file._imports_ ?? [], {
+			(await lang?.transformImports(file.content, newImports, {
 				cwd: options.cwd,
 				targetPath: file.newPath,
 				item: file.itemName,
-				file: { type: file.type, path: file.newPath },
+				file: { type: file.fileType, path: file.newPath },
 				getItemPath: ({ item, file }) => {
 					const fileType = normalizeItemTypeForPath(file.type);
 					// there are two types of paths

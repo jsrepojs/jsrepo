@@ -62,7 +62,9 @@ describe('js', () => {
 import { useClipboard } from '$lib/hooks/use-clipboard.svelte';
 import { utils } from '$lib/utils.js';
 import { add } from '../../utils/math/add.js';
-import { Separator } from '@/registry/new-york-v4/ui/separator';`,
+import { Separator } from '@/registry/new-york-v4/ui/separator';
+import foo from './foo.js';
+import bar from './bar';`,
 			[
 				{
 					import: '$lib/components/ui/button',
@@ -88,6 +90,18 @@ import { Separator } from '@/registry/new-york-v4/ui/separator';`,
 					file: { type: 'util', path: 'math/add.ts' as ItemRelativePath },
 					meta: {},
 				},
+				{
+					import: './foo.js',
+					item: 'foo',
+					file: { type: 'util', path: 'Foo.ts' as ItemRelativePath },
+					meta: {},
+				},
+				{
+					import: './bar',
+					item: 'bar',
+					file: { type: 'util', path: 'Bar.ts' as ItemRelativePath },
+					meta: {},
+				}
 			],
 			{
 				cwd: CWD,
@@ -109,6 +123,10 @@ import { Separator } from '@/registry/new-york-v4/ui/separator';`,
 								path: 'src/lib/utils',
 								alias: '$lib/utils',
 							};
+						case 'foo':
+							return { path: 'src/lib/utils', alias: '$lib/utils' };
+						case 'bar':
+							return { path: 'src/lib/utils', alias: '$lib/utils' };
 						default: {
 							if (item.file.type === 'ui')
 								return { path: 'src/components/ui', alias: '@/components/ui' };
@@ -127,7 +145,9 @@ import { Separator } from '@/registry/new-york-v4/ui/separator';`,
 import { useClipboard } from '$lib/hooks/use-clipboard.svelte';
 import { utils } from '$lib/utils.js';
 import { add } from '$lib/utils/math/add.js';
-import { Separator } from '@/components/ui/separator';`);
+import { Separator } from '@/components/ui/separator';
+import foo from '$lib/utils/Foo.js';
+import bar from '$lib/utils/Bar';`);
 	});
 });
 

@@ -390,7 +390,7 @@ export async function transformImports(
 		const baseName =
 			filePathRelativeToItemName === 'index' && path.parse(imp.import).name !== 'index'
 				? ''
-				: path.basename(imp.import);
+				: filePathRelativeToItemName;
 
 		// if relative make it relative
 		if (itemPath.alias === undefined) {
