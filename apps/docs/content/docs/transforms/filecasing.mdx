@@ -1,0 +1,51 @@
+---
+title: File Casing
+description: Transform file and folder names to different case formats before adding them to your project.
+---
+
+<BadgeGroup>
+	<SourceBadge path="packages/transform-filecasing/src/index.ts" />
+	<OfficialBadge />
+	<NpmBadge packageName="@jsrepo/transform-filecasing" />
+</BadgeGroup>
+
+The [@jsrepo/transform-filecasing](https://npmjs.com/package/@jsrepo/transform-filecasing) package is a transform plugin for **jsrepo** that transforms file and folder names to different case formats before adding them to your project.
+
+<Callout type="info">
+    This is useful when your project follows a specific file or folder naming convention and you want registry items to automatically conform to it.
+</Callout>
+
+## Installation
+
+To add the **@jsrepo/transform-filecasing** transform to your config run the following command:
+
+```sh
+jsrepo config transform filecasing
+```
+
+This will automatically install the transform and add it to your config:
+
+```ts
+import { defineConfig } from "jsrepo";
+import fileCasing from "@jsrepo/transform-filecasing"; // [!code ++]
+
+export default defineConfig({
+	transforms: [fileCasing({ to: "camel" })], // [!code ++]
+});
+```
+
+Now when a file is added to your project its file and folder names will be transformed to the target case format:
+
+```ts title="components/my-components/use-hook.ts → components/myComponents/useHook.ts"
+export function add(a: number, b: number): number {
+	return a + b;
+}
+```
+
+## Configuration
+
+The transform accepts an options object with the following property:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `to` | `"kebab" \| "camel" \| "snake" \| "pascal"` | The target case format for file and folder names |

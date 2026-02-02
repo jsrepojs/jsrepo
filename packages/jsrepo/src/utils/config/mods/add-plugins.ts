@@ -335,8 +335,12 @@ export const OFFICIAL_PLUGINS = [
 		name: '@jsrepo/transform-oxfmt',
 	},
 	{
+		shorthand: 'filecasing',
+		name: '@jsrepo/transform-filecasing',
+	},
+	{
 		shorthand: 'change-case',
-		name: '@jsrepo/transform-change-case',
+		name: '@jsrepo/transform-filecasing',
 	},
 ];
 

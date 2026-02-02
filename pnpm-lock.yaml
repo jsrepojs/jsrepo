@@ -520,7 +520,7 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
-  packages/transform-change-case:
+  packages/transform-filecasing:
     dependencies:
       change-case:
         specifier: ^5.4.4

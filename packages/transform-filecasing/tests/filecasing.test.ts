@@ -1,6 +1,6 @@
 import type { AbsolutePath, ItemRelativePath } from 'jsrepo/utils';
 import { describe, expect, it } from 'vitest';
-import changeCase from '../src';
+import fileCasing from '../src';
 
 const transformOptions = {
 	cwd: '' as AbsolutePath,
@@ -8,10 +8,10 @@ const transformOptions = {
 	registryUrl: 'https://example.com',
 };
 
-describe('changeCase', () => {
+describe('fileCasing', () => {
 	describe('kebab-case to camelCase', () => {
 		it('should convert kebab-case filename to camelCase', async () => {
-			const plugin = changeCase({ to: 'camel' });
+			const plugin = fileCasing({ to: 'camel' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'my-component.ts' as ItemRelativePath,
@@ -24,7 +24,7 @@ describe('changeCase', () => {
 
 	describe('camelCase to kebab-case', () => {
 		it('should convert camelCase filename to kebab-case', async () => {
-			const plugin = changeCase({ to: 'kebab' });
+			const plugin = fileCasing({ to: 'kebab' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'myComponent.ts' as ItemRelativePath,
@@ -37,7 +37,7 @@ describe('changeCase', () => {
 
 	describe('to snake_case', () => {
 		it('should convert kebab-case filename to snake_case', async () => {
-			const plugin = changeCase({ to: 'snake' });
+			const plugin = fileCasing({ to: 'snake' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'my-component.ts' as ItemRelativePath,
@@ -48,7 +48,7 @@ describe('changeCase', () => {
 		});
 
 		it('should convert camelCase filename to snake_case', async () => {
-			const plugin = changeCase({ to: 'snake' });
+			const plugin = fileCasing({ to: 'snake' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'myComponent.ts' as ItemRelativePath,
@@ -61,7 +61,7 @@ describe('changeCase', () => {
 
 	describe('to PascalCase', () => {
 		it('should convert kebab-case filename to PascalCase', async () => {
-			const plugin = changeCase({ to: 'pascal' });
+			const plugin = fileCasing({ to: 'pascal' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'my-component.ts' as ItemRelativePath,
@@ -72,7 +72,7 @@ describe('changeCase', () => {
 		});
 
 		it('should convert camelCase filename to PascalCase', async () => {
-			const plugin = changeCase({ to: 'pascal' });
+			const plugin = fileCasing({ to: 'pascal' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'myComponent.tsx' as ItemRelativePath,
@@ -85,7 +85,7 @@ describe('changeCase', () => {
 
 	describe('preserves file extension', () => {
 		it('should preserve .ts extension', async () => {
-			const plugin = changeCase({ to: 'camel' });
+			const plugin = fileCasing({ to: 'camel' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'my-file.ts' as ItemRelativePath,
@@ -95,7 +95,7 @@ describe('changeCase', () => {
 		});
 
 		it('should preserve .tsx extension', async () => {
-			const plugin = changeCase({ to: 'camel' });
+			const plugin = fileCasing({ to: 'camel' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'my-file.tsx' as ItemRelativePath,
@@ -105,7 +105,7 @@ describe('changeCase', () => {
 		});
 
 		it('should preserve .js extension', async () => {
-			const plugin = changeCase({ to: 'camel' });
+			const plugin = fileCasing({ to: 'camel' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'my-file.js' as ItemRelativePath,
@@ -115,7 +115,7 @@ describe('changeCase', () => {
 		});
 
 		it('should preserve .svelte extension', async () => {
-			const plugin = changeCase({ to: 'pascal' });
+			const plugin = fileCasing({ to: 'pascal' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'my-component.svelte' as ItemRelativePath,
@@ -125,7 +125,7 @@ describe('changeCase', () => {
 		});
 
 		it('should preserve .d.ts extension', async () => {
-			const plugin = changeCase({ to: 'camel' });
+			const plugin = fileCasing({ to: 'camel' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'my-types.d.ts' as ItemRelativePath,
@@ -136,40 +136,40 @@ describe('changeCase', () => {
 	});
 
 	describe('handles filenames with directories', () => {
-		it('should only transform the filename, not the directory path', async () => {
-			const plugin = changeCase({ to: 'camel' });
-			const result = await plugin.transform({
-				code: 'const x = 1;',
-				fileName: 'components/my-component.ts' as ItemRelativePath,
-				options: transformOptions,
-			});
-			expect(result.fileName).toBe('components/myComponent.ts');
-		});
-
-		it('should handle deeply nested paths', async () => {
-			const plugin = changeCase({ to: 'pascal' });
-			const result = await plugin.transform({
-				code: 'const x = 1;',
-				fileName: 'src/components/ui/my-button.tsx' as ItemRelativePath,
-				options: transformOptions,
-			});
-			expect(result.fileName).toBe('src/components/ui/MyButton.tsx');
-		});
-
-		it('should handle kebab-case directories without transforming them', async () => {
-			const plugin = changeCase({ to: 'camel' });
+		it('should transform directory segments', async () => {
+			const plugin = fileCasing({ to: 'camel' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'my-components/use-hook.ts' as ItemRelativePath,
 				options: transformOptions,
 			});
-			expect(result.fileName).toBe('my-components/useHook.ts');
+			expect(result.fileName).toBe('myComponents/useHook.ts');
+		});
+
+		it('should handle deeply nested paths', async () => {
+			const plugin = fileCasing({ to: 'camel' });
+			const result = await plugin.transform({
+				code: 'const x = 1;',
+				fileName: 'src/my-components/ui/my-button.tsx' as ItemRelativePath,
+				options: transformOptions,
+			});
+			expect(result.fileName).toBe('src/myComponents/ui/myButton.tsx');
+		});
+
+		it('should still return a new path when only directories change', async () => {
+			const plugin = fileCasing({ to: 'camel' });
+			const result = await plugin.transform({
+				code: 'const x = 1;',
+				fileName: 'my-components/index.ts' as ItemRelativePath,
+				options: transformOptions,
+			});
+			expect(result.fileName).toBe('myComponents/index.ts');
 		});
 	});
 
 	describe('no transformation when case matches target', () => {
 		it('should return undefined fileName when already camelCase and target is camel', async () => {
-			const plugin = changeCase({ to: 'camel' });
+			const plugin = fileCasing({ to: 'camel' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'myComponent.ts' as ItemRelativePath,
@@ -180,7 +180,7 @@ describe('changeCase', () => {
 		});
 
 		it('should return undefined fileName when already kebab-case and target is kebab', async () => {
-			const plugin = changeCase({ to: 'kebab' });
+			const plugin = fileCasing({ to: 'kebab' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'my-component.ts' as ItemRelativePath,
@@ -191,7 +191,7 @@ describe('changeCase', () => {
 		});
 
 		it('should return undefined fileName when already PascalCase and target is pascal', async () => {
-			const plugin = changeCase({ to: 'pascal' });
+			const plugin = fileCasing({ to: 'pascal' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'MyComponent.ts' as ItemRelativePath,
@@ -202,7 +202,7 @@ describe('changeCase', () => {
 		});
 
 		it('should return undefined fileName when already snake_case and target is snake', async () => {
-			const plugin = changeCase({ to: 'snake' });
+			const plugin = fileCasing({ to: 'snake' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'my_component.ts' as ItemRelativePath,
@@ -216,13 +216,13 @@ describe('changeCase', () => {
 	describe('edge cases', () => {
 		it('should throw error for invalid case type', () => {
 			// @ts-expect-error - testing invalid input
-			expect(() => changeCase({ to: 'invalid' })).toThrow(
+			expect(() => fileCasing({ to: 'invalid' })).toThrow(
 				'Invalid case type: "invalid". Expected one of: kebab, camel, snake, pascal'
 			);
 		});
 
 		it('should handle multi-dot filenames (e.g., Angular-style my.component.tsx)', async () => {
-			const plugin = changeCase({ to: 'camel' });
+			const plugin = fileCasing({ to: 'camel' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'my-button.component.tsx' as ItemRelativePath,
@@ -233,7 +233,7 @@ describe('changeCase', () => {
 		});
 
 		it('should handle single word filename', async () => {
-			const plugin = changeCase({ to: 'camel' });
+			const plugin = fileCasing({ to: 'camel' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'component.ts' as ItemRelativePath,
@@ -244,7 +244,7 @@ describe('changeCase', () => {
 		});
 
 		it('should handle single word with PascalCase target', async () => {
-			const plugin = changeCase({ to: 'pascal' });
+			const plugin = fileCasing({ to: 'pascal' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'component.ts' as ItemRelativePath,
@@ -254,7 +254,7 @@ describe('changeCase', () => {
 		});
 
 		it('should handle file with multiple dots in name', async () => {
-			const plugin = changeCase({ to: 'camel' });
+			const plugin = fileCasing({ to: 'camel' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'my-component.test.ts' as ItemRelativePath,
@@ -264,7 +264,7 @@ describe('changeCase', () => {
 		});
 
 		it('should handle index files', async () => {
-			const plugin = changeCase({ to: 'pascal' });
+			const plugin = fileCasing({ to: 'pascal' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'index.ts' as ItemRelativePath,
@@ -274,7 +274,7 @@ describe('changeCase', () => {
 		});
 
 		it('should handle file without extension', async () => {
-			const plugin = changeCase({ to: 'camel' });
+			const plugin = fileCasing({ to: 'camel' });
 			const result = await plugin.transform({
 				code: 'const x = 1;',
 				fileName: 'my-file' as ItemRelativePath,

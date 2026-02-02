@@ -1,6 +1,6 @@
 {
-	"name": "@jsrepo/transform-change-case",
-	"description": "A transform plugin for jsrepo to transform file name cases.",
+	"name": "@jsrepo/transform-filecasing",
+	"description": "A transform plugin for jsrepo to transform file and folder name cases.",
 	"version": "1.0.0",
 	"license": "MIT",
 	"homepage": "https://jsrepo.dev",
@@ -19,6 +19,7 @@
 		"jsrepo",
 		"transform",
 		"change-case",
+		"filecasing",
 		"filename",
 		"plugin"
 	],
