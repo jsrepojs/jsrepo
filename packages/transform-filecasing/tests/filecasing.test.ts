@@ -9,6 +9,16 @@ const transformOptions = {
 };
 
 describe('fileCasing', () => {
+	it('should allow being called with no options', async () => {
+		const plugin = fileCasing();
+		const result = await plugin.transform({
+			code: 'const x = 1;',
+			fileName: 'myComponent.ts' as ItemRelativePath,
+			options: transformOptions,
+		});
+		expect(result.fileName).toBe('my-component.ts');
+	});
+
 	describe('kebab-case to camelCase', () => {
 		it('should convert kebab-case filename to camelCase', async () => {
 			const plugin = fileCasing({ to: 'camel' });
