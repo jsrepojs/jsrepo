@@ -1003,11 +1003,6 @@ async function resolveFileDependencies(
 					}
 				}
 
-				// we don't need to resolve relative imports that reference the same item
-				if (selfReference && dependency.import.startsWith('.')) {
-					continue;
-				}
-
 				_imports_.push({
 					import: dependency.import,
 					item: localDependency.parent.name,
