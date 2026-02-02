@@ -1,5 +1,5 @@
 ---
-"@jsrepo/transform-change-case": minor
+"@jsrepo/transform-filecasing": minor
 ---
 
-feat: 🎉 Add `@jsrepo/transform-change-case` package for filename case transformations
+feat: 🎉 Add `@jsrepo/transform-filecasing` package for filename case transformations
