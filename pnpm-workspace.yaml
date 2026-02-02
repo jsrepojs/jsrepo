@@ -2,7 +2,6 @@ packages:
   - "packages/*"
   - "examples/*"
   - "apps/*"
-  - "bundle-analyzer"
 
 catalog:
   vitest: ^4.0.7

@@ -35,7 +35,7 @@
 		"check": "tsc --noEmit",
 		"mcp:inspector": "pnpm dlx @modelcontextprotocol/inspector node ./dist/index.mjs mcp",
 		"test": "vitest",
-		"bundle-analyze": "FORCE_COLOR=1 node ../../bundle-analyzer/dist/index.mjs analyze ."
+		"bundle-analyze": "FORCE_COLOR=1 pnpx bundle-analyze . --fail-if-exceeds-bytes 500000"
 	},
 	"packageManager": "pnpm@10.17.1",
 	"dependencies": {

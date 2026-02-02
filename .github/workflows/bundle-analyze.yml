@@ -21,9 +21,6 @@ jobs:
             - name: Install dependencies
               run: pnpm install
 
-            - name: Build bundle analyzer
-              run: pnpm build:bundle-analyzer
-
             - name: Build packages
               run: pnpm build:packages
 
