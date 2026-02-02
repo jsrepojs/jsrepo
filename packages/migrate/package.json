@@ -33,7 +33,7 @@
 		"build": "tsdown",
 		"dev": "tsdown --watch",
 		"check": "tsc --noEmit",
-		"bundle-analyze": "FORCE_COLOR=1 pnpx bundle-analyze ."
+		"bundle-analyze": "FORCE_COLOR=1 pnpx bundle-analyze . --fail-if-exceeds-bytes 500000"
 	},
 	"packageManager": "pnpm@10.20.0",
 	"dependencies": {
