@@ -1,5 +1,14 @@
 # @jsrepo/shadcn
 
+## 2.0.1
+### Patch Changes
+
+
+- chore: bump deps ([#751](https://github.com/jsrepojs/jsrepo/pull/751))
+
+- Updated dependencies [[`e8e4289`](https://github.com/jsrepojs/jsrepo/commit/e8e4289d1045bc1a9cb89c6c55efd7108583ff01)]:
+  - jsrepo@3.2.1
+
 ## 2.0.0
 ### Patch Changes
 
