@@ -337,10 +337,6 @@ export const OFFICIAL_PLUGINS = [
 		shorthand: 'filecasing',
 		name: '@jsrepo/transform-filecasing',
 	},
-	{
-		shorthand: 'filecasing',
-		name: '@jsrepo/transform-filecasing',
-	},
 ];
 
 export function parsePlugins(
