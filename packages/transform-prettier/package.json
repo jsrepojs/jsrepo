@@ -39,7 +39,7 @@
 		"check": "tsc --noEmit",
 		"bundle-analyze": "FORCE_COLOR=1 pnpx bundle-analyze . --fail-if-exceeds-bytes 500000"
 	},
-	"packageManager": "pnpm@10.17.1",
+	"packageManager": "pnpm@10.28.2",
 	"peerDependencies": {
 		"jsrepo": "workspace:*",
 		"prettier": "3.x"

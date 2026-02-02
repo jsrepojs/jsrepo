@@ -3,7 +3,7 @@
 	"version": "0.0.0",
 	"description": "The monorepo for jsrepo",
 	"license": "MIT",
-	"packageManager": "pnpm@10.4.1",
+	"packageManager": "pnpm@10.28.2",
 	"type": "module",
 	"scripts": {
 		"build": "pnpm --r --filter '!./examples/**' build",
@@ -26,7 +26,7 @@
 		"@changesets/cli": "^2.29.8",
 		"@svitejs/changesets-changelog-github-compact": "^1.2.0",
 		"concurrently": "catalog:",
-		"pkg-pr-new": "^0.0.62",
+		"pkg-pr-new": "^0.0.63",
 		"wait-on": "^9.0.3"
 	},
 	"pnpm": {
