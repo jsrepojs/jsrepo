@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.2.1
+### Patch Changes
+
+
+- chore: bump deps ([#751](https://github.com/jsrepojs/jsrepo/pull/751))
+
 ## 3.2.0
 ### Minor Changes
 
