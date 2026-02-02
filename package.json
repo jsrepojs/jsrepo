@@ -17,8 +17,7 @@
 		"ci:release": "pnpm build:packages && changeset publish",
 		"postinstall": "pnpm build:packages",
 		"build:packages": "pnpm -parallel --filter './packages/*' build",
-		"bundle-analyze": "pnpm build:bundle-analyzer && pnpm -r --filter './packages/*' --color=always bundle-analyze",
-		"build:bundle-analyzer": "pnpm -F @jsrepo/bundle-analyzer build",
+		"bundle-analyze": "pnpm -r --filter './packages/*' --color=always bundle-analyze",
 		"build:examples": "pnpm -r --filter './examples/**' build",
 		"build:example-registries": "pnpm -r --filter './examples/**' registry:build"
 	},

@@ -7,6 +7,6 @@
 	"access": "public",
 	"baseBranch": "main",
 	"updateInternalDependencies": "patch",
-	"ignore": ["@jsrepo/docs", "@example/react", "@example/svelte", "@jsrepo/bundle-analyzer"],
+	"ignore": ["@jsrepo/docs", "@example/react", "@example/svelte"],
 	"prettier": false
 }

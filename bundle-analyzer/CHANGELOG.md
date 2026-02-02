@@ -1,3 +1,0 @@
-# @jsrepo/bundle-analyzer
-
-## null

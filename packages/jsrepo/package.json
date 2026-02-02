@@ -76,7 +76,7 @@
 		"dev": "tsdown --watch",
 		"check": "tsc --noEmit",
 		"test": "vitest",
-		"bundle-analyze": "FORCE_COLOR=1 node ../../bundle-analyzer/dist/index.mjs analyze . --fail-if-exceeds-bytes 1250000"
+		"bundle-analyze": "FORCE_COLOR=1 pnpx bundle-analyze . --fail-if-exceeds-bytes 1250000"
 	},
 	"packageManager": "pnpm@10.20.0",
 	"dependencies": {
