@@ -207,8 +207,27 @@ export async function runUpdate(
 			if (!itemPath) continue; // don't know where it is so we can't update it
 
 			for (const file of item.files) {
-				const filePath = getTargetPath(file, { itemPath: { path: itemPath }, options });
-				if (!existsSync(filePath)) continue;
+				let filePath = file.path;
+				// check to see if the file path changes after applying transforms
+				for (const transform of config?.transforms ?? []) {
+					const result = await transform.transform({
+						code: '', // content is not needed
+						fileName: file.path,
+						options: {
+							cwd: options.cwd,
+							registryUrl: registry.url,
+							item,
+						},
+					});
+					filePath = result.fileName ?? file.path;
+				}
+
+				const filePathResult = getTargetPath(
+					{ ...file, path: filePath },
+					{ itemPath: { path: itemPath }, options }
+				);
+
+				if (!existsSync(filePathResult)) continue;
 				updateCandidates.push({ item: { ...item, registry }, registry });
 				break;
 			}

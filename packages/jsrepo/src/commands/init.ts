@@ -307,6 +307,7 @@ export async function runInit(
 				label: item.item.name,
 				value: item.item.name,
 			})),
+			required: false,
 		});
 
 		if (isCancel(response)) {
