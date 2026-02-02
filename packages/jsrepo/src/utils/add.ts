@@ -899,10 +899,6 @@ export async function prepareUpdates({
 			if (existsSync(filePath)) {
 				const originalContents = readFileSync(filePath)._unsafeUnwrap();
 
-				if (originalContents === file.content) {
-					continue;
-				}
-
 				neededFiles.push({
 					type: 'update',
 					fileType: file.type,
@@ -1048,7 +1044,12 @@ export async function prepareUpdates({
 			devDependencies: Array.from(neededDevDependencies.values()),
 		},
 		neededEnvVars,
-		neededFiles,
+		neededFiles: neededFiles.filter((file) => {
+			if ('oldContent' in file) {
+				return file.oldContent !== file.content;
+			}
+			return true;
+		}),
 	});
 }
 
