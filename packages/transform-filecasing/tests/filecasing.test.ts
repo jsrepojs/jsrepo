@@ -282,4 +282,120 @@ describe('fileCasing', () => {
 			expect(result.fileName).toBe('myFile');
 		});
 	});
+
+	describe('transformDirectories option', () => {
+		it('should default to true (transform directories)', async () => {
+			const plugin = fileCasing({ to: 'camel' });
+			const result = await plugin.transform({
+				code: 'const x = 1;',
+				fileName: 'my-components/use-hook.ts' as ItemRelativePath,
+				options: transformOptions,
+			});
+			expect(result.fileName).toBe('myComponents/useHook.ts');
+		});
+
+		describe('transformDirectories: true', () => {
+			it('should transform both directories and filename', async () => {
+				const plugin = fileCasing({ to: 'camel', transformDirectories: true });
+				const result = await plugin.transform({
+					code: 'const x = 1;',
+					fileName: 'my-components/use-hook.ts' as ItemRelativePath,
+					options: transformOptions,
+				});
+				expect(result.fileName).toBe('myComponents/useHook.ts');
+			});
+
+			it('should transform deeply nested directories', async () => {
+				const plugin = fileCasing({ to: 'camel', transformDirectories: true });
+				const result = await plugin.transform({
+					code: 'const x = 1;',
+					fileName: 'src/my-components/ui/my-button.tsx' as ItemRelativePath,
+					options: transformOptions,
+				});
+				expect(result.fileName).toBe('src/myComponents/ui/myButton.tsx');
+			});
+
+			it('should transform directories even when filename matches target case', async () => {
+				const plugin = fileCasing({ to: 'camel', transformDirectories: true });
+				const result = await plugin.transform({
+					code: 'const x = 1;',
+					fileName: 'my-components/myComponent.ts' as ItemRelativePath,
+					options: transformOptions,
+				});
+				expect(result.fileName).toBe('myComponents/myComponent.ts');
+			});
+
+			it('should transform all directory segments, not just the first', async () => {
+				const plugin = fileCasing({ to: 'pascal', transformDirectories: true });
+				const result = await plugin.transform({
+					code: 'const x = 1;',
+					fileName: 'math/util/calculator.ts' as ItemRelativePath,
+					options: transformOptions,
+				});
+				expect(result.fileName).toBe('Math/Util/Calculator.ts');
+			});
+		});
+
+		describe('transformDirectories: false', () => {
+			it('should only transform filename, preserve directory names', async () => {
+				const plugin = fileCasing({ to: 'camel', transformDirectories: false });
+				const result = await plugin.transform({
+					code: 'const x = 1;',
+					fileName: 'my-components/use-hook.ts' as ItemRelativePath,
+					options: transformOptions,
+				});
+				expect(result.fileName).toBe('my-components/useHook.ts');
+			});
+
+			it('should preserve deeply nested directory names', async () => {
+				const plugin = fileCasing({ to: 'camel', transformDirectories: false });
+				const result = await plugin.transform({
+					code: 'const x = 1;',
+					fileName: 'src/my-components/ui/my-button.tsx' as ItemRelativePath,
+					options: transformOptions,
+				});
+				expect(result.fileName).toBe('src/my-components/ui/myButton.tsx');
+			});
+
+			it('should still transform filename when directories are preserved', async () => {
+				const plugin = fileCasing({ to: 'pascal', transformDirectories: false });
+				const result = await plugin.transform({
+					code: 'const x = 1;',
+					fileName: 'components/my-button.ts' as ItemRelativePath,
+					options: transformOptions,
+				});
+				expect(result.fileName).toBe('components/MyButton.ts');
+			});
+
+			it('should work with files without directories', async () => {
+				const plugin = fileCasing({ to: 'camel', transformDirectories: false });
+				const result = await plugin.transform({
+					code: 'const x = 1;',
+					fileName: 'my-component.ts' as ItemRelativePath,
+					options: transformOptions,
+				});
+				expect(result.fileName).toBe('myComponent.ts');
+			});
+
+			it('should preserve directory names even if they match target case', async () => {
+				const plugin = fileCasing({ to: 'kebab', transformDirectories: false });
+				const result = await plugin.transform({
+					code: 'const x = 1;',
+					fileName: 'my-components/myComponent.ts' as ItemRelativePath,
+					options: transformOptions,
+				});
+				expect(result.fileName).toBe('my-components/my-component.ts');
+			});
+
+			it('should preserve multiple directory segments', async () => {
+				const plugin = fileCasing({ to: 'snake', transformDirectories: false });
+				const result = await plugin.transform({
+					code: 'const x = 1;',
+					fileName: 'src/components/ui/my-button.tsx' as ItemRelativePath,
+					options: transformOptions,
+				});
+				expect(result.fileName).toBe('src/components/ui/my_button.tsx');
+			});
+		});
+	});
 });

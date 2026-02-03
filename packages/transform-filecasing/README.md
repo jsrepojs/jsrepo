@@ -37,3 +37,36 @@ export default defineConfig({
 | Option | Type | Description |
 |--------|------|-------------|
 | `to` | `"kebab" \| "camel" \| "snake" \| "pascal"` | The target case format for file and folder names |
+| `transformDirectories` | `boolean` | Whether to transform directory segments in the path. When `false`, only the filename baseName is transformed. Defaults to `true` |
+
+### Examples
+
+Transform both directories and filenames (default behavior):
+
+```ts
+import { defineConfig } from "jsrepo";
+import fileCasing from "@jsrepo/transform-filecasing";
+
+export default defineConfig({
+    // Config path: 'src/lib/components/ui'
+    // Item path: 'button/index.ts'
+    transforms: [fileCasing({ to: "pascal" })],
+});
+// Result: 'src/lib/components/ui/Button/Index.ts'
+// Only the item's relative path is transformed, not the config path
+```
+
+Transform only filenames, preserve directory names:
+
+```ts
+import { defineConfig } from "jsrepo";
+import fileCasing from "@jsrepo/transform-filecasing";
+
+export default defineConfig({
+    // Config path: 'src/lib/components/ui'
+    // Item path: 'my-components/use-hook.ts'
+    transforms: [fileCasing({ to: "camel", transformDirectories: false })],
+});
+// Result: 'src/lib/components/ui/my-components/useHook.ts'
+// Only the filename is transformed, directories in the item path are preserved
+```
