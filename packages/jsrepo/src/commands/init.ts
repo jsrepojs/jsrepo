@@ -186,10 +186,10 @@ export async function runInit(
 					devDependencies: [
 						...(options.js
 							? [
-								{
-									name: '@jsrepo/transform-javascript',
-								},
-							]
+									{
+										name: '@jsrepo/transform-javascript',
+									},
+								]
 							: []),
 					],
 				},
@@ -267,10 +267,10 @@ export async function runInit(
 					...Array.from(neededDeps.values()),
 					...(options.js
 						? [
-							{
-								name: '@jsrepo/transform-javascript',
-							},
-						]
+								{
+									name: '@jsrepo/transform-javascript',
+								},
+							]
 						: []),
 				],
 			},

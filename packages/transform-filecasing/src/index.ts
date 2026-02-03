@@ -38,7 +38,7 @@ export default function ({ to = 'kebab' }: Partial<Options> = {}): Transform {
 	}
 
 	return {
-		transform: async ({ code, fileName }) => {
+		transform: async ({ fileName }) => {
 			const parts = fileName.split('/');
 
 			const transformedParts = parts.map((part, index) => {
@@ -47,6 +47,7 @@ export default function ({ to = 'kebab' }: Partial<Options> = {}): Transform {
 				}
 
 				// Extract the base name (first part before any dot) and extensions
+				// example: my-file.test.ts -> my-file & .test.ts
 				const firstDotIndex = part.indexOf('.');
 				const baseName = firstDotIndex >= 0 ? part.slice(0, firstDotIndex) : part;
 				const extensions = firstDotIndex >= 0 ? part.slice(firstDotIndex) : '';
@@ -58,11 +59,10 @@ export default function ({ to = 'kebab' }: Partial<Options> = {}): Transform {
 			const newFileName = transformedParts.join('/') as ItemRelativePath;
 
 			if (newFileName === fileName) {
-				return { code };
+				return {};
 			}
 
 			return {
-				code,
 				fileName: newFileName,
 			};
 		},

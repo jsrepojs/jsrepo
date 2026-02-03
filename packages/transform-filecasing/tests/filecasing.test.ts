@@ -28,7 +28,6 @@ describe('fileCasing', () => {
 				options: transformOptions,
 			});
 			expect(result.fileName).toBe('myComponent.ts');
-			expect(result.code).toBe('const x = 1;');
 		});
 	});
 
@@ -41,7 +40,6 @@ describe('fileCasing', () => {
 				options: transformOptions,
 			});
 			expect(result.fileName).toBe('my-component.ts');
-			expect(result.code).toBe('const x = 1;');
 		});
 	});
 
@@ -54,7 +52,6 @@ describe('fileCasing', () => {
 				options: transformOptions,
 			});
 			expect(result.fileName).toBe('my_component.ts');
-			expect(result.code).toBe('const x = 1;');
 		});
 
 		it('should convert camelCase filename to snake_case', async () => {
@@ -65,7 +62,6 @@ describe('fileCasing', () => {
 				options: transformOptions,
 			});
 			expect(result.fileName).toBe('my_component.ts');
-			expect(result.code).toBe('const x = 1;');
 		});
 	});
 
@@ -78,7 +74,6 @@ describe('fileCasing', () => {
 				options: transformOptions,
 			});
 			expect(result.fileName).toBe('MyComponent.ts');
-			expect(result.code).toBe('const x = 1;');
 		});
 
 		it('should convert camelCase filename to PascalCase', async () => {
@@ -89,7 +84,6 @@ describe('fileCasing', () => {
 				options: transformOptions,
 			});
 			expect(result.fileName).toBe('MyComponent.tsx');
-			expect(result.code).toBe('const x = 1;');
 		});
 	});
 
@@ -186,7 +180,6 @@ describe('fileCasing', () => {
 				options: transformOptions,
 			});
 			expect(result.fileName).toBeUndefined();
-			expect(result.code).toBe('const x = 1;');
 		});
 
 		it('should return undefined fileName when already kebab-case and target is kebab', async () => {
@@ -197,7 +190,6 @@ describe('fileCasing', () => {
 				options: transformOptions,
 			});
 			expect(result.fileName).toBeUndefined();
-			expect(result.code).toBe('const x = 1;');
 		});
 
 		it('should return undefined fileName when already PascalCase and target is pascal', async () => {
@@ -208,7 +200,6 @@ describe('fileCasing', () => {
 				options: transformOptions,
 			});
 			expect(result.fileName).toBeUndefined();
-			expect(result.code).toBe('const x = 1;');
 		});
 
 		it('should return undefined fileName when already snake_case and target is snake', async () => {
@@ -219,7 +210,6 @@ describe('fileCasing', () => {
 				options: transformOptions,
 			});
 			expect(result.fileName).toBeUndefined();
-			expect(result.code).toBe('const x = 1;');
 		});
 	});
 
@@ -250,7 +240,6 @@ describe('fileCasing', () => {
 				options: transformOptions,
 			});
 			expect(result.fileName).toBeUndefined();
-			expect(result.code).toBe('const x = 1;');
 		});
 
 		it('should handle single word with PascalCase target', async () => {
