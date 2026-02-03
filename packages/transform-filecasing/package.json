@@ -1,0 +1,57 @@
+{
+	"name": "@jsrepo/transform-filecasing",
+	"description": "A transform plugin for jsrepo to transform file and folder name cases.",
+	"version": "1.0.0",
+	"license": "MIT",
+	"homepage": "https://jsrepo.dev",
+	"author": {
+		"name": "Aleksei Gurianov",
+		"url": "https://github.com/guria"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/jsrepojs/jsrepo"
+	},
+	"bugs": {
+		"url": "https://github.com/jsrepojs/jsrepo/issues"
+	},
+	"keywords": [
+		"jsrepo",
+		"transform",
+		"change-case",
+		"filecasing",
+		"filename",
+		"plugin"
+	],
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.mts",
+			"default": "./dist/index.mjs"
+		}
+	},
+	"main": "./dist/index.mjs",
+	"files": [
+		"dist/**/*",
+		"!dist/**/*.map"
+	],
+	"scripts": {
+		"build": "tsdown",
+		"dev": "tsdown --watch",
+		"check": "tsc --noEmit",
+		"test": "vitest",
+		"bundle-analyze": "FORCE_COLOR=1 pnpx bundle-analyze . --fail-if-exceeds-bytes 500000"
+	},
+	"peerDependencies": {
+		"jsrepo": "workspace:*"
+	},
+	"dependencies": {
+		"change-case": "^5.4.4"
+	},
+	"devDependencies": {
+		"@types/node": "catalog:",
+		"tsdown": "catalog:",
+		"typescript": "catalog:",
+		"vitest": "catalog:"
+	}
+}
