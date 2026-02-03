@@ -222,7 +222,7 @@ export async function addPluginsToConfig({
 		} else {
 			const lastElement =
 				state.configKeyPropertyDeclaration.value.elements[
-					state.configKeyPropertyDeclaration.value.elements.length - 1
+				state.configKeyPropertyDeclaration.value.elements.length - 1
 				]!;
 
 			let needsComma = false;
@@ -256,7 +256,7 @@ export async function addPluginsToConfig({
 		} else {
 			const lastProperty =
 				state.mainObjectExpression.properties[
-					state.mainObjectExpression.properties.length - 1
+				state.mainObjectExpression.properties.length - 1
 				]!;
 
 			let needsComma = false;
@@ -268,8 +268,7 @@ export async function addPluginsToConfig({
 
 			s.appendRight(
 				needsComma ? lastProperty.end : lastComma,
-				`${needsComma ? ',' : ''}\n\t${key}: [${
-					defaultsArrayState ? `...${defaultsArrayState.name}, ` : ''
+				`${needsComma ? ',' : ''}\n\t${key}: [${defaultsArrayState ? `...${defaultsArrayState.name}, ` : ''
 				}${plugins.map((plugin) => `${plugin.name}()`).join(', ')}]`
 			);
 		}
@@ -335,8 +334,8 @@ export const OFFICIAL_PLUGINS = [
 		name: '@jsrepo/transform-oxfmt',
 	},
 	{
-		shorthand: 'change-case',
-		name: '@jsrepo/transform-change-case',
+		shorthand: 'filecasing',
+		name: '@jsrepo/transform-filecasing',
 	},
 ];
 

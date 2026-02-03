@@ -1,7 +1,7 @@
 {
 	"name": "@jsrepo/migrate",
 	"description": "Automatically migrate your jsrepo project to the newest version of jsrepo.",
-	"version": "0.0.14",
+	"version": "0.0.16",
 	"license": "MIT",
 	"homepage": "https://jsrepo.dev",
 	"author": {
@@ -33,9 +33,9 @@
 		"build": "tsdown",
 		"dev": "tsdown --watch",
 		"check": "tsc --noEmit",
-		"bundle-analyze": "FORCE_COLOR=1 node ../../bundle-analyzer/dist/index.mjs analyze ."
+		"bundle-analyze": "FORCE_COLOR=1 pnpx bundle-analyze . --fail-if-exceeds-bytes 500000"
 	},
-	"packageManager": "pnpm@10.20.0",
+	"packageManager": "pnpm@10.28.2",
 	"dependencies": {
 		"commander": "catalog:",
 		"jsrepo": "workspace:*"

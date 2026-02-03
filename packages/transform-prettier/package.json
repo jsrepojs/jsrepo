@@ -1,7 +1,7 @@
 {
 	"name": "@jsrepo/transform-prettier",
 	"description": "A transform plugin for jsrepo to format code with prettier.",
-	"version": "1.0.1",
+	"version": "2.0.1",
 	"license": "MIT",
 	"homepage": "https://jsrepo.dev",
 	"author": {
@@ -37,9 +37,9 @@
 		"build": "tsdown",
 		"dev": "tsdown --watch",
 		"check": "tsc --noEmit",
-		"bundle-analyze": "FORCE_COLOR=1 node ../../bundle-analyzer/dist/index.mjs analyze ."
+		"bundle-analyze": "FORCE_COLOR=1 pnpx bundle-analyze . --fail-if-exceeds-bytes 500000"
 	},
-	"packageManager": "pnpm@10.17.1",
+	"packageManager": "pnpm@10.28.2",
 	"peerDependencies": {
 		"jsrepo": "workspace:*",
 		"prettier": "3.x"

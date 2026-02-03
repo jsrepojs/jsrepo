@@ -1,5 +1,23 @@
 # jsrepo
 
+## 3.2.1
+### Patch Changes
+
+
+- chore: bump deps ([#751](https://github.com/jsrepojs/jsrepo/pull/751))
+
+## 3.2.0
+### Minor Changes
+
+
+- feat: Correctly handle files renamed by transforms ([#747](https://github.com/jsrepojs/jsrepo/pull/747))
+
+
+### Patch Changes
+
+
+- fix: Allow users to not select `optionally-on-init` items ([#747](https://github.com/jsrepojs/jsrepo/pull/747))
+
 ## 3.1.1
 ### Patch Changes
 

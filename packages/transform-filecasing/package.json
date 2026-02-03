@@ -1,12 +1,12 @@
 {
-	"name": "@jsrepo/transform-biome",
-	"description": "A transform plugin for jsrepo to format code with biome.",
-	"version": "2.0.1",
+	"name": "@jsrepo/transform-filecasing",
+	"description": "A transform plugin for jsrepo to transform file and folder name cases.",
+	"version": "1.0.0",
 	"license": "MIT",
 	"homepage": "https://jsrepo.dev",
 	"author": {
-		"name": "Aidan Bleser",
-		"url": "https://github.com/ieedan"
+		"name": "Aleksei Gurianov",
+		"url": "https://github.com/guria"
 	},
 	"repository": {
 		"type": "git",
@@ -18,7 +18,9 @@
 	"keywords": [
 		"jsrepo",
 		"transform",
-		"biome",
+		"change-case",
+		"filecasing",
+		"filename",
 		"plugin"
 	],
 	"type": "module",
@@ -37,19 +39,19 @@
 		"build": "tsdown",
 		"dev": "tsdown --watch",
 		"check": "tsc --noEmit",
+		"test": "vitest",
 		"bundle-analyze": "FORCE_COLOR=1 pnpx bundle-analyze . --fail-if-exceeds-bytes 500000"
 	},
-	"packageManager": "pnpm@10.28.2",
 	"peerDependencies": {
 		"jsrepo": "workspace:*"
 	},
 	"dependencies": {
-		"@biomejs/js-api": "^4.0.0",
-		"@biomejs/wasm-nodejs": "^2.3.13"
+		"change-case": "^5.4.4"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",
 		"tsdown": "catalog:",
-		"typescript": "catalog:"
+		"typescript": "catalog:",
+		"vitest": "catalog:"
 	}
 }

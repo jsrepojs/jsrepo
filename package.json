@@ -3,7 +3,7 @@
 	"version": "0.0.0",
 	"description": "The monorepo for jsrepo",
 	"license": "MIT",
-	"packageManager": "pnpm@10.4.1",
+	"packageManager": "pnpm@10.28.2",
 	"type": "module",
 	"scripts": {
 		"build": "pnpm --r --filter '!./examples/**' build",
@@ -17,8 +17,7 @@
 		"ci:release": "pnpm build:packages && changeset publish",
 		"postinstall": "pnpm build:packages",
 		"build:packages": "pnpm -parallel --filter './packages/*' build",
-		"bundle-analyze": "pnpm build:bundle-analyzer && pnpm -r --filter './packages/*' --color=always bundle-analyze",
-		"build:bundle-analyzer": "pnpm -F @jsrepo/bundle-analyzer build",
+		"bundle-analyze": "pnpm -r --filter './packages/*' --color=always bundle-analyze",
 		"build:examples": "pnpm -r --filter './examples/**' build",
 		"build:example-registries": "pnpm -r --filter './examples/**' registry:build"
 	},
@@ -27,7 +26,7 @@
 		"@changesets/cli": "^2.29.8",
 		"@svitejs/changesets-changelog-github-compact": "^1.2.0",
 		"concurrently": "catalog:",
-		"pkg-pr-new": "^0.0.62",
+		"pkg-pr-new": "^0.0.63",
 		"wait-on": "^9.0.3"
 	},
 	"pnpm": {
