@@ -520,28 +520,6 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
-  packages/transform-change-case:
-    dependencies:
-      change-case:
-        specifier: ^5.4.4
-        version: 5.4.4
-      jsrepo:
-        specifier: workspace:*
-        version: link:../jsrepo
-    devDependencies:
-      '@types/node':
-        specifier: 'catalog:'
-        version: 25.2.0
-      tsdown:
-        specifier: 'catalog:'
-        version: 0.19.0-beta.3(@arethetypeswrong/core@0.18.2)(typescript@5.9.3)
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
-      vitest:
-        specifier: 'catalog:'
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.2.0)(jiti@2.6.1)(lightningcss@1.30.2)(msw@2.11.6(@types/node@25.2.0)(typescript@5.9.3))
-
   packages/transform-filecasing:
     dependencies:
       change-case:
