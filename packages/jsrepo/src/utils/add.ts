@@ -16,6 +16,7 @@ import type { DependencyKey, RemoteDependency, UnresolvedImport } from '@/utils/
 import type { Config, RegistryItemAdd, RegistryItemType } from '@/utils/config';
 import { getPathsMatcher, resolvePath, resolvePaths } from '@/utils/config/utils';
 import { formatDiff } from '@/utils/diff';
+import { shouldIncludeRole } from '@/utils/roles';
 import type { PathsMatcher } from '@/utils/tsconfig';
 import { safeParseFromJSON } from '@/utils/zod';
 import {
@@ -548,7 +549,7 @@ export async function resolveAndFetchAllItems(
 	{
 		options,
 	}: {
-		options: { withExamples: boolean; withDocs: boolean; withTests: boolean };
+		options: { withRoles: Set<string> };
 	}
 ): Promise<
 	Result<
@@ -584,7 +585,7 @@ export function resolveTree(
 		options,
 	}: {
 		resolvedItems: Map<string, ResolvedItem>;
-		options: { withExamples: boolean; withDocs: boolean; withTests: boolean };
+		options: { withRoles: Set<string> };
 	}
 ): Result<ResolvedItem[], RegistryItemNotFoundError> {
 	for (const wantedItem of wantedItems) {
@@ -608,9 +609,7 @@ export function resolveTree(
 
 		// ensure we also add any registry dependencies of added files
 		for (const file of wantedItem.item.files) {
-			if (file.role === 'example' && !options.withExamples) continue;
-			if (file.role === 'doc' && !options.withDocs) continue;
-			if (file.role === 'test' && !options.withTests) continue;
+			if (!shouldIncludeRole(file.role, options.withRoles)) continue;
 
 			for (const registryDependency of file.registryDependencies ?? []) {
 				if (resolvedItems.has(registryDependency)) continue;
@@ -837,9 +836,7 @@ export async function prepareUpdates({
 	options: {
 		cwd: AbsolutePath;
 		yes: boolean;
-		withExamples: boolean;
-		withDocs: boolean;
-		withTests: boolean;
+		withRoles: Set<string>;
 	};
 	itemPaths: Record<string, { path: string; alias?: string }>;
 	items: (ItemRepository | ItemDistributed)[];
@@ -863,9 +860,7 @@ export async function prepareUpdates({
 
 	for (const item of items) {
 		for (let file of item.files) {
-			if (file.role === 'example' && !options.withExamples) continue;
-			if (file.role === 'doc' && !options.withDocs) continue;
-			if (file.role === 'test' && !options.withTests) continue;
+			if (!shouldIncludeRole(file.role, options.withRoles)) continue;
 
 			const type = normalizeItemTypeForPath(file.type);
 			const expectedPath = itemPaths[`${type}/${item.name}`]!;

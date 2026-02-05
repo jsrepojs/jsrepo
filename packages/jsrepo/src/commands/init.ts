@@ -331,7 +331,7 @@ export async function runInit(
 		);
 
 		const itemsResult = await resolveAndFetchAllItems(itemsToAdd, {
-			options: { withExamples: false, withDocs: false, withTests: false },
+			options: { withRoles: new Set() },
 		});
 		if (itemsResult.isErr()) {
 			spinner.stop('Failed to fetch items');
@@ -349,9 +349,7 @@ export async function runInit(
 			options: {
 				cwd: options.cwd,
 				yes: options.yes,
-				withExamples: false,
-				withDocs: false,
-				withTests: false,
+				withRoles: new Set(),
 			},
 			itemPaths,
 			items,

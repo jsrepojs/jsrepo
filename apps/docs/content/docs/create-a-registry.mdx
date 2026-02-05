@@ -208,14 +208,18 @@ export default defineConfig({
 
 #### File roles
 
-There are a few file roles that are supported by **jsrepo**. 
+File roles are arbitrary strings. The built-in roles are:
 
-- `file` - The default (doesn't need to be specified always installed)
-- `example` - An example file 
+- `file` - The default (doesn't need to be specified, always installed)
+- `example` - An example file
 - `doc` - A documentation file
 - `test` - A test file
 
-`example`, `doc`, and `test` files are optionally installed when adding/updating an item by specifying the `--with-examples`, `--with-docs`, or `--with-tests` flags. 
+`file` is always included. Any other role is optional and only included when adding/updating an item with `--with <role>` (repeatable). For example:
+
+```sh
+jsrepo add --with example --with storybook
+```
 
 <Callout type="info">
     These files are also made available to LLMs when using the `@jsrepo/mcp` server.
@@ -244,13 +248,13 @@ export default defineConfig({
 });
 ```
 
-Files with any of the 3 special roles will only install their dependencies when added to a users project.
+Files with any non-`file` role will only install their dependencies when the file is included.
 
-For example if you have a file with `role: "test"` that depends on `vitest`. `vitest` will only be installed to the users project when the user provides the `--with-tests` flag.
+For example if you have a file with `role: "test"` that depends on `vitest`. `vitest` will only be installed to the users project when the user provides `--with test` (or the deprecated `--with-tests` flag).
 
 Similarly if that same file was to depend on another item in the registry. Then that item will only be installed to the users project when the test file is added.
 
-This allows you to add **documentation**, **examples**, and **tests** to your registry without forcing the user to install them.
+This allows you to add **documentation**, **examples**, **tests**, or any other optional role to your registry without forcing the user to install them.
 
 #### Folders
 
