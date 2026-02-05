@@ -250,7 +250,7 @@ export default defineConfig({
 
 Files with any non-`file` role will only install their dependencies when the file is included.
 
-For example if you have a file with `role: "test"` that depends on `vitest`. `vitest` will only be installed to the users project when the user provides `--with test` (or the deprecated `--with-tests` flag).
+For example if you have a file with `role: "test"` that depends on `vitest`. `vitest` will only be installed to the users project when the user provides `--with test`.
 
 Similarly if that same file was to depend on another item in the registry. Then that item will only be installed to the users project when the test file is added.
 
