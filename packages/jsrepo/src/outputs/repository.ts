@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { type Output, RegistryPluginsSchema, RemoteDependencySchema } from '@/outputs/types';
 import { MANIFEST_FILE, UnresolvedImportSchema } from '@/utils/build';
-import { RegistryFileRoles, RegistryItemAddSchema, RegistryMetaSchema } from '@/utils/config';
+import { RegistryItemAddSchema, RegistryMetaSchema } from '@/utils/config';
 import { rmSync, writeFileSync } from '@/utils/fs';
 import { stringify } from '@/utils/json';
 import { joinAbsolute, type RelativeToCwdPath, relativeToCwd } from '@/utils/path';
@@ -88,7 +88,7 @@ export function repository({ format }: RepositoryOutputOptions = {}): Output {
 export const RepositoryOutputFileSchema = z.object({
 	path: z.string().transform((v) => v as ItemRelativePath),
 	type: z.string(),
-	role: z.union([z.union(RegistryFileRoles.map((role) => z.literal(role))), z.undefined()]),
+	role: z.string().optional(),
 	relativePath: z.string().transform((v) => v as RelativeToCwdPath),
 	_imports_: z.array(UnresolvedImportSchema),
 	target: z.union([z.string(), z.undefined()]),

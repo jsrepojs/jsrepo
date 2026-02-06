@@ -40,6 +40,7 @@ import {
 	promptAddEnvVars,
 	promptInstallDependenciesByEcosystem,
 } from '@/utils/prompts';
+import { resolveWithRoles } from '@/utils/roles';
 import type { AbsolutePath } from '@/utils/types';
 
 export const schema = defaultCommandOptionsSchema.extend({
@@ -50,6 +51,7 @@ export const schema = defaultCommandOptionsSchema.extend({
 	overwrite: z.boolean(),
 	expand: z.boolean(),
 	maxUnchanged: z.number(),
+	with: z.array(z.string()).default([]),
 	withExamples: z.boolean(),
 	withDocs: z.boolean(),
 	withTests: z.boolean(),
@@ -65,9 +67,10 @@ export const update = new Command('update')
 	)
 	.option('--registry <registry>', 'The registry to update items from.', undefined)
 	.option('--all', 'Update all items in the project.', false)
-	.option('--with-examples', 'Include examples in the update.', false)
-	.option('--with-docs', 'Include docs in the update.', false)
-	.option('--with-tests', 'Include tests in the update.', false)
+	.option('--with <roles...>', 'Include files with the given roles.')
+	.option('--with-examples', 'Deprecated. Use --with example.', false)
+	.option('--with-docs', 'Deprecated. Use --with doc.', false)
+	.option('--with-tests', 'Deprecated. Use --with test.', false)
 	.addOption(commonOptions.cwd)
 	.addOption(commonOptions.yes)
 	.addOption(commonOptions.verbose)
@@ -114,6 +117,7 @@ export async function runUpdate(
 	configResult: { path: AbsolutePath; config: Config } | null
 ): Promise<Result<UpdateCommandResult, CLIError>> {
 	const { verbose: _, spinner } = initLogging({ options });
+	const withRoles = resolveWithRoles(options.with, options);
 
 	const config = configResult?.config;
 	const providers = config?.providers ?? DEFAULT_PROVIDERS;
@@ -272,7 +276,9 @@ export async function runUpdate(
 		`Fetching ${pc.cyan(resolvedWantedItems.map((item) => item.item.name).join(', '))}...`
 	);
 
-	const itemsResult = await resolveAndFetchAllItems(resolvedWantedItems, { options });
+	const itemsResult = await resolveAndFetchAllItems(resolvedWantedItems, {
+		options: { withRoles },
+	});
 	if (itemsResult.isErr()) {
 		spinner.stop('Failed to fetch items');
 		return err(itemsResult.error);
@@ -288,7 +294,7 @@ export async function runUpdate(
 
 	const prepareUpdatesResult = await prepareUpdates({
 		configResult,
-		options,
+		options: { cwd: options.cwd, yes: options.yes, withRoles },
 		itemPaths,
 		items,
 	});

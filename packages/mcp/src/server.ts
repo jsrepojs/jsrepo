@@ -41,6 +41,19 @@ const server = new McpServer(
 	}
 );
 
+function resolveWithRoles(options: {
+	with?: string[];
+	withExamples?: boolean;
+	withDocs?: boolean;
+	withTests?: boolean;
+}): Set<string> {
+	const withRoles = new Set(options.with ?? []);
+	if (options.withExamples) withRoles.add('example');
+	if (options.withDocs) withRoles.add('doc');
+	if (options.withTests) withRoles.add('test');
+	return withRoles;
+}
+
 server.tool(
 	{
 		name: 'add_item_to_project',
@@ -58,12 +71,19 @@ server.tool(
 				.describe(
 					'Fully qualifed registry items to add. i.e. ["github/ieedan/std/math", "@ieedan/std/math", "https://example.com/registry/math"]'
 				),
+			with: z
+				.array(z.string())
+				.optional()
+				.describe(
+					'Include files with these roles. Built-in optional roles: example, doc, test. Custom roles are also supported.'
+				),
 			withExamples: z.boolean().optional().describe('Add items with examples.'),
 			withDocs: z.boolean().optional().describe('Add items with docs.'),
 			withTests: z.boolean().optional().describe('Add items with tests.'),
 		}),
 	},
 	async ({ itemNames, ...options }) => {
+		const withRoles = resolveWithRoles(options);
 		const configResult = await loadConfigSearch({
 			cwd: options.cwd as AbsolutePath,
 			promptForContinueIfNull: false,
@@ -109,9 +129,7 @@ server.tool(
 		const items = (
 			await resolveAndFetchAllItems(resolvedWantedItems, {
 				options: {
-					withExamples: options.withExamples ?? false,
-					withDocs: options.withDocs ?? false,
-					withTests: options.withTests ?? false,
+					withRoles,
 				},
 			})
 		).match(
@@ -159,9 +177,7 @@ server.tool(
 				options: {
 					cwd: options.cwd as AbsolutePath,
 					yes: true,
-					withExamples: options.withExamples ?? false,
-					withDocs: options.withDocs ?? false,
-					withTests: options.withTests ?? false,
+					withRoles,
 				},
 				itemPaths,
 				items,
@@ -259,9 +275,7 @@ server.tool(
 		const items = (
 			await resolveAndFetchAllItems(resolvedWantedItems, {
 				options: {
-					withExamples: false,
-					withDocs: false,
-					withTests: false,
+					withRoles: new Set(),
 				},
 			})
 		).match(
