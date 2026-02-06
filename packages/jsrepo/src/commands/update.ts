@@ -40,10 +40,8 @@ import {
 	promptAddEnvVars,
 	promptInstallDependenciesByEcosystem,
 } from '@/utils/prompts';
-import { normalizeWithRoles } from '@/utils/roles';
+import { resolveWithRoles } from '@/utils/roles';
 import type { AbsolutePath } from '@/utils/types';
-
-const collectWithRoles = (value: string, previous: string[] = []) => [...previous, value];
 
 export const schema = defaultCommandOptionsSchema.extend({
 	yes: z.boolean(),
@@ -69,12 +67,7 @@ export const update = new Command('update')
 	)
 	.option('--registry <registry>', 'The registry to update items from.', undefined)
 	.option('--all', 'Update all items in the project.', false)
-	.option(
-		'--with <role>',
-		'Include files with the given role. Can be used multiple times.',
-		collectWithRoles,
-		[]
-	)
+	.option('--with <roles...>', 'Include files with the given roles.')
 	.option('--with-examples', 'Deprecated. Use --with example.', false)
 	.option('--with-docs', 'Deprecated. Use --with doc.', false)
 	.option('--with-tests', 'Deprecated. Use --with test.', false)
@@ -124,7 +117,7 @@ export async function runUpdate(
 	configResult: { path: AbsolutePath; config: Config } | null
 ): Promise<Result<UpdateCommandResult, CLIError>> {
 	const { verbose: _, spinner } = initLogging({ options });
-	const withRoles = normalizeWithRoles(options.with, options);
+	const withRoles = resolveWithRoles(options.with, options);
 
 	const config = configResult?.config;
 	const providers = config?.providers ?? DEFAULT_PROVIDERS;

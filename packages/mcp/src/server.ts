@@ -4,7 +4,6 @@ import fuzzysort from 'fuzzysort';
 import {
 	getPathsForItems,
 	normalizeItemTypeForPath,
-	normalizeWithRoles,
 	prepareUpdates,
 	promptAddEnvVars,
 	RegistryItemNotFoundError,
@@ -42,6 +41,19 @@ const server = new McpServer(
 	}
 );
 
+function resolveWithRoles(options: {
+	with?: string[];
+	withExamples?: boolean;
+	withDocs?: boolean;
+	withTests?: boolean;
+}): Set<string> {
+	const withRoles = new Set(options.with ?? []);
+	if (options.withExamples) withRoles.add('example');
+	if (options.withDocs) withRoles.add('doc');
+	if (options.withTests) withRoles.add('test');
+	return withRoles;
+}
+
 server.tool(
 	{
 		name: 'add_item_to_project',
@@ -62,14 +74,16 @@ server.tool(
 			with: z
 				.array(z.string())
 				.optional()
-				.describe('Include files with the given role. Can be provided multiple times.'),
+				.describe(
+					'Include files with these roles. Built-in optional roles: example, doc, test. Custom roles are also supported.'
+				),
 			withExamples: z.boolean().optional().describe('Add items with examples.'),
 			withDocs: z.boolean().optional().describe('Add items with docs.'),
 			withTests: z.boolean().optional().describe('Add items with tests.'),
 		}),
 	},
 	async ({ itemNames, ...options }) => {
-		const withRoles = normalizeWithRoles(options.with, options);
+		const withRoles = resolveWithRoles(options);
 		const configResult = await loadConfigSearch({
 			cwd: options.cwd as AbsolutePath,
 			promptForContinueIfNull: false,

@@ -1,34 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import {
-	isOptionalRole,
-	normalizeRole,
-	normalizeRoleName,
-	normalizeWithRoles,
-	shouldIncludeRole,
-} from '@/utils/roles';
+import { isOptionalRole, resolveWithRoles, shouldIncludeRole } from '@/utils/roles';
 
-describe('normalizeRole', () => {
-	it('trims, lowercases, and handles empty input', () => {
-		expect(normalizeRole(undefined)).toBeUndefined();
-		expect(normalizeRole('')).toBeUndefined();
-		expect(normalizeRole('   ')).toBeUndefined();
-		expect(normalizeRole(' EXAMPLE ')).toBe('example');
-	});
-});
-
-describe('normalizeRoleName', () => {
-	it('resolves aliases and preserves custom roles', () => {
-		expect(normalizeRoleName(undefined)).toBeUndefined();
-		expect(normalizeRoleName(' examples ')).toBe('example');
-		expect(normalizeRoleName('DOCS')).toBe('doc');
-		expect(normalizeRoleName('tests')).toBe('test');
-		expect(normalizeRoleName('StoryBook')).toBe('storybook');
-	});
-});
-
-describe('normalizeWithRoles', () => {
+describe('resolveWithRoles', () => {
 	it('combines explicit roles with legacy flags', () => {
-		const result = normalizeWithRoles([' storybook ', 'EXAMPLES'], {
+		const result = resolveWithRoles(['storybook', 'example'], {
 			withExamples: true,
 			withDocs: false,
 			withTests: true,
@@ -42,15 +17,16 @@ describe('normalizeWithRoles', () => {
 });
 
 describe('shouldIncludeRole', () => {
-	it('includes file roles by default and respects custom roles', () => {
+	it('includes file roles by default and respects exact role matching', () => {
 		const withRoles = new Set(['example', 'storybook']);
 
 		expect(shouldIncludeRole(undefined, withRoles)).toBe(true);
 		expect(shouldIncludeRole('file', withRoles)).toBe(true);
 		expect(shouldIncludeRole('example', withRoles)).toBe(true);
-		expect(shouldIncludeRole('examples', withRoles)).toBe(true);
 		expect(shouldIncludeRole('storybook', withRoles)).toBe(true);
 		expect(shouldIncludeRole('doc', withRoles)).toBe(false);
+		expect(shouldIncludeRole('EXAMPLE', withRoles)).toBe(false);
+		expect(shouldIncludeRole(' example ', withRoles)).toBe(false);
 	});
 });
 
