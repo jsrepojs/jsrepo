@@ -15,6 +15,7 @@ import type {
 	RegistryMeta,
 	RegistryPlugin,
 } from '@/utils/config';
+import { isOptionalRole } from '@/utils/roles';
 import type { AbsolutePath, ItemRelativePath, LooseAutocomplete } from '@/utils/types';
 import {
 	createWarningHandler,
@@ -965,7 +966,7 @@ async function resolveFileDependencies(
 		BuildError
 	>
 > {
-	const optionalFileType = isOptionalFileType(resolvedFile.role);
+	const optionalFileType = isOptionalRole(resolvedFile.role);
 
 	const _imports_: UnresolvedImport[] = [];
 
@@ -1119,10 +1120,4 @@ export function stringToRemoteDependency(
 		name: parsed.value.name,
 		version: parsed.value.version,
 	});
-}
-
-export function isOptionalFileType(
-	role: RegistryFileRoles | undefined
-): role is 'example' | 'doc' | 'test' {
-	return role === 'example' || role === 'doc' || role === 'test';
 }

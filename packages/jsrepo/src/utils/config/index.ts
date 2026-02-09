@@ -208,9 +208,11 @@ export type RegistryItem = {
 	meta?: Record<string, string>;
 };
 
+/** Built-in file roles. Custom roles are allowed. */
 export const RegistryFileRoles = ['example', 'doc', 'test', 'file'] as const;
 
-export type RegistryFileRoles = (typeof RegistryFileRoles)[number];
+export type BuiltinRegistryFileRole = (typeof RegistryFileRoles)[number];
+export type RegistryFileRoles = LooseAutocomplete<BuiltinRegistryFileRole>;
 
 export type RegistryItemFile = {
 	/** Path of the file/folder relative to registry config. */
@@ -220,12 +222,15 @@ export type RegistryItemFile = {
 	 */
 	type?: RegistryItemType;
 	/**
-	 * The role of the file.
+	 * The role of the file. Roles are arbitrary strings.
 	 *
 	 * - "file" - A regular file (always installed)
 	 * - "example" - An example file (optionally installed, great for LLMs)
 	 * - "test" - A test file (optionally installed)
 	 * - "doc" - A documentation file (optionally installed, great for LLMs)
+	 *
+	 * Any role other than "file" is considered optional and is only included when
+	 * the user passes `--with <role>`.
 	 *
 	 * If a parent folder has a role this file will inherit the role from the parent folder.
 	 *

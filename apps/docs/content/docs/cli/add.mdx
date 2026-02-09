@@ -100,25 +100,33 @@ Include debug logs:
 jsrepo add button --verbose
 ```
 
-### `--with-docs`
+### `--with`
 
-Add items with docs:
+Include files with the given roles:
+
+```sh
+jsrepo add --with example test storybook
+```
+
+### `--with-docs` (Deprecated)
+
+Use `--with doc`:
 
 ```sh
 jsrepo add --with-docs
 ```
 
-### `--with-examples`
+### `--with-examples` (Deprecated)
 
-Add items with examples:
+Use `--with example`:
 
 ```sh
 jsrepo add --with-examples
 ```
 
-### `--with-tests`
+### `--with-tests` (Deprecated)
 
-Add items with tests:
+Use `--with test`:
 
 ```sh
 jsrepo add --with-tests

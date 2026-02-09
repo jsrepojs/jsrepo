@@ -42,6 +42,7 @@ import {
 	promptAddEnvVars,
 	promptInstallDependenciesByEcosystem,
 } from '@/utils/prompts';
+import { resolveWithRoles } from '@/utils/roles';
 import type { AbsolutePath } from '@/utils/types';
 
 export const schema = defaultCommandOptionsSchema.extend({
@@ -50,6 +51,7 @@ export const schema = defaultCommandOptionsSchema.extend({
 	overwrite: z.boolean(),
 	verbose: z.boolean(),
 	registry: z.string().optional(),
+	with: z.array(z.string()).default([]),
 	withExamples: z.boolean(),
 	withDocs: z.boolean(),
 	withTests: z.boolean(),
@@ -67,9 +69,10 @@ export const add = new Command('add')
 	)
 	.option('--registry <registry>', 'The registry to add items from.', undefined)
 	.option('--all', 'Add all items from every registry.', false)
-	.option('--with-examples', 'Add items with examples.', false)
-	.option('--with-docs', 'Add items with docs.', false)
-	.option('--with-tests', 'Add items with tests.', false)
+	.option('--with <roles...>', 'Include files with the given roles.')
+	.option('--with-examples', 'Deprecated. Use `--with example`.', false)
+	.option('--with-docs', 'Deprecated. Use `--with doc`.', false)
+	.option('--with-tests', 'Deprecated. Use `--with test`.', false)
 	.addOption(commonOptions.cwd)
 	.addOption(commonOptions.yes)
 	.addOption(commonOptions.verbose)
@@ -257,7 +260,11 @@ export async function runAdd(
 		`Fetching ${pc.cyan(resolvedWantedItems.map((item) => item.item.name).join(', '))}...`
 	);
 
-	const itemsResult = await resolveAndFetchAllItems(resolvedWantedItems, { options });
+	const withRoles = resolveWithRoles(options);
+
+	const itemsResult = await resolveAndFetchAllItems(resolvedWantedItems, {
+		withRoles,
+	});
 	if (itemsResult.isErr()) {
 		spinner.stop('Failed to fetch items');
 		return err(itemsResult.error);
@@ -273,7 +280,7 @@ export async function runAdd(
 
 	const prepareUpdatesResult = await prepareUpdates({
 		configResult,
-		options,
+		options: { cwd: options.cwd, yes: options.yes, withRoles },
 		itemPaths,
 		items,
 	});

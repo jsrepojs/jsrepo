@@ -19,6 +19,7 @@ import {
 	promptInstallDependenciesByEcosystem,
 	resolveRegistries,
 	resolveWantedItems,
+	resolveWithRoles,
 } from 'jsrepo/utils';
 import { McpServer } from 'tmcp';
 import { z } from 'zod';
@@ -58,12 +59,19 @@ server.tool(
 				.describe(
 					'Fully qualifed registry items to add. i.e. ["github/ieedan/std/math", "@ieedan/std/math", "https://example.com/registry/math"]'
 				),
+			with: z
+				.array(z.string())
+				.optional()
+				.describe(
+					'Include files with these roles. Built-in optional roles: example, doc, test. Custom roles are also supported.'
+				),
 			withExamples: z.boolean().optional().describe('Add items with examples.'),
 			withDocs: z.boolean().optional().describe('Add items with docs.'),
 			withTests: z.boolean().optional().describe('Add items with tests.'),
 		}),
 	},
 	async ({ itemNames, ...options }) => {
+		const withRoles = resolveWithRoles(options);
 		const configResult = await loadConfigSearch({
 			cwd: options.cwd as AbsolutePath,
 			promptForContinueIfNull: false,
@@ -108,11 +116,7 @@ server.tool(
 
 		const items = (
 			await resolveAndFetchAllItems(resolvedWantedItems, {
-				options: {
-					withExamples: options.withExamples ?? false,
-					withDocs: options.withDocs ?? false,
-					withTests: options.withTests ?? false,
-				},
+				withRoles,
 			})
 		).match(
 			(value) => value,
@@ -159,9 +163,7 @@ server.tool(
 				options: {
 					cwd: options.cwd as AbsolutePath,
 					yes: true,
-					withExamples: options.withExamples ?? false,
-					withDocs: options.withDocs ?? false,
-					withTests: options.withTests ?? false,
+					withRoles,
 				},
 				itemPaths,
 				items,
@@ -256,15 +258,7 @@ server.tool(
 			}
 		);
 
-		const items = (
-			await resolveAndFetchAllItems(resolvedWantedItems, {
-				options: {
-					withExamples: false,
-					withDocs: false,
-					withTests: false,
-				},
-			})
-		).match(
+		const items = (await resolveAndFetchAllItems(resolvedWantedItems)).match(
 			(value) => value,
 			(error) => {
 				throw error;

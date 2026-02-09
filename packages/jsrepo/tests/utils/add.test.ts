@@ -312,9 +312,7 @@ describe('resolveTree', () => {
 			],
 			{
 				options: {
-					withExamples: false,
-					withDocs: false,
-					withTests: false,
+					withRoles: new Set(),
 				},
 				resolvedItems: new Map(),
 			}
@@ -337,9 +335,7 @@ describe('resolveTree', () => {
 			],
 			{
 				options: {
-					withExamples: false,
-					withDocs: false,
-					withTests: true,
+					withRoles: new Set(['test']),
 				},
 				resolvedItems: new Map(),
 			}
@@ -364,9 +360,7 @@ describe('resolveTree', () => {
 			],
 			{
 				options: {
-					withExamples: false,
-					withDocs: false,
-					withTests: false,
+					withRoles: new Set(),
 				},
 				resolvedItems: new Map(),
 			}

@@ -17,4 +17,5 @@ export {
 	promptAddEnvVars,
 	promptInstallDependenciesByEcosystem,
 } from '@/utils/prompts';
+export { resolveWithRoles } from '@/utils/roles';
 export type { AbsolutePath, ItemRelativePath } from '@/utils/types';

@@ -99,25 +99,33 @@ Include debug logs:
 jsrepo update button --verbose
 ```
 
-### `--with-docs`
+### `--with`
 
-Include docs in the update:
+Include files with the given roles:
+
+```sh
+jsrepo update --with example test storybook
+```
+
+### `--with-docs` (Deprecated)
+
+Use `--with doc`:
 
 ```sh
 jsrepo update --with-docs
 ```
 
-### `--with-examples`
+### `--with-examples` (Deprecated)
 
-Include examples in the update:
+Use `--with example`:
 
 ```sh
 jsrepo update --with-examples
 ```
 
-### `--with-tests`
+### `--with-tests` (Deprecated)
 
-Include tests in the update:
+Use `--with test`:
 
 ```sh
 jsrepo update --with-tests
@@ -130,4 +138,3 @@ Skip the confirmation prompt:
 ```sh
 jsrepo update button --yes
 ```
-

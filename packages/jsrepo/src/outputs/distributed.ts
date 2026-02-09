@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { type Output, RegistryPluginsSchema, RemoteDependencySchema } from '@/outputs/types';
 import { MANIFEST_FILE, UnresolvedImportSchema } from '@/utils/build';
-import { RegistryFileRoles, RegistryItemAddSchema, RegistryMetaSchema } from '@/utils/config';
+import { RegistryItemAddSchema, RegistryMetaSchema } from '@/utils/config';
 import { existsSync, readFileSync, rmSync, writeFileSync } from '@/utils/fs';
 import { stringify } from '@/utils/json';
 import { joinAbsolute } from '@/utils/path';
@@ -144,7 +144,7 @@ export function distributed({ dir, format }: DistributedOutputOptions): Output {
 export const DistributedOutputManifestFileSchema = z.object({
 	path: z.string().transform((v) => v as ItemRelativePath),
 	type: z.string(),
-	role: z.union([z.union(RegistryFileRoles.map((role) => z.literal(role))), z.undefined()]),
+	role: z.string().optional(),
 	target: z.union([z.string(), z.undefined()]),
 	registryDependencies: z.union([z.array(z.string()), z.undefined()]),
 	dependencies: z.union([z.array(RemoteDependencySchema), z.undefined()]),
@@ -184,7 +184,7 @@ export const DistributedOutputFileSchema = z.object({
 	path: z.string().transform((v) => v as ItemRelativePath),
 	content: z.string(),
 	type: z.string(),
-	role: z.union([z.union(RegistryFileRoles.map((role) => z.literal(role))), z.undefined()]),
+	role: z.string().optional(),
 	_imports_: z.union([z.array(UnresolvedImportSchema), z.undefined()]),
 	target: z.union([z.string(), z.undefined()]),
 	registryDependencies: z.union([z.array(z.string()), z.undefined()]),
