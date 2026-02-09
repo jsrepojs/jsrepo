@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.3.0
+### Minor Changes
+
+
+- feat: Add --with <role> support for optional file roles and allow arbitrary role strings; deprecate legacy --with-* flags. MCP now accepts role filters too. ([#759](https://github.com/jsrepojs/jsrepo/pull/759))
+
 ## 3.2.1
 ### Patch Changes
 
