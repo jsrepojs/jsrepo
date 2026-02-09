@@ -68,9 +68,9 @@ export const update = new Command('update')
 	.option('--registry <registry>', 'The registry to update items from.', undefined)
 	.option('--all', 'Update all items in the project.', false)
 	.option('--with <roles...>', 'Include files with the given roles.')
-	.option('--with-examples', 'Deprecated. Use --with example.', false)
-	.option('--with-docs', 'Deprecated. Use --with doc.', false)
-	.option('--with-tests', 'Deprecated. Use --with test.', false)
+	.option('--with-examples', 'Deprecated. Use `--with example`.', false)
+	.option('--with-docs', 'Deprecated. Use `--with doc`.', false)
+	.option('--with-tests', 'Deprecated. Use `--with test`.', false)
 	.addOption(commonOptions.cwd)
 	.addOption(commonOptions.yes)
 	.addOption(commonOptions.verbose)
@@ -117,7 +117,6 @@ export async function runUpdate(
 	configResult: { path: AbsolutePath; config: Config } | null
 ): Promise<Result<UpdateCommandResult, CLIError>> {
 	const { verbose: _, spinner } = initLogging({ options });
-	const withRoles = resolveWithRoles(options);
 
 	const config = configResult?.config;
 	const providers = config?.providers ?? DEFAULT_PROVIDERS;
@@ -276,8 +275,10 @@ export async function runUpdate(
 		`Fetching ${pc.cyan(resolvedWantedItems.map((item) => item.item.name).join(', '))}...`
 	);
 
+	const withRoles = resolveWithRoles(options);
+
 	const itemsResult = await resolveAndFetchAllItems(resolvedWantedItems, {
-		options: { withRoles },
+		withRoles,
 	});
 	if (itemsResult.isErr()) {
 		spinner.stop('Failed to fetch items');

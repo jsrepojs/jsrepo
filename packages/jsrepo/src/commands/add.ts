@@ -70,9 +70,9 @@ export const add = new Command('add')
 	.option('--registry <registry>', 'The registry to add items from.', undefined)
 	.option('--all', 'Add all items from every registry.', false)
 	.option('--with <roles...>', 'Include files with the given roles.')
-	.option('--with-examples', 'Deprecated. Use --with example.', false)
-	.option('--with-docs', 'Deprecated. Use --with doc.', false)
-	.option('--with-tests', 'Deprecated. Use --with test.', false)
+	.option('--with-examples', 'Deprecated. Use `--with example`.', false)
+	.option('--with-docs', 'Deprecated. Use `--with doc`.', false)
+	.option('--with-tests', 'Deprecated. Use `--with test`.', false)
 	.addOption(commonOptions.cwd)
 	.addOption(commonOptions.yes)
 	.addOption(commonOptions.verbose)
@@ -121,7 +121,6 @@ export async function runAdd(
 	configResult: { path: AbsolutePath; config: Config } | null
 ): Promise<Result<AddCommandResult, CLIError>> {
 	const { verbose: _, spinner } = initLogging({ options });
-	const withRoles = resolveWithRoles(options);
 
 	const config = configResult?.config;
 
@@ -261,8 +260,10 @@ export async function runAdd(
 		`Fetching ${pc.cyan(resolvedWantedItems.map((item) => item.item.name).join(', '))}...`
 	);
 
+	const withRoles = resolveWithRoles(options);
+
 	const itemsResult = await resolveAndFetchAllItems(resolvedWantedItems, {
-		options: { withRoles },
+		withRoles,
 	});
 	if (itemsResult.isErr()) {
 		spinner.stop('Failed to fetch items');

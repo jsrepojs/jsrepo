@@ -116,9 +116,7 @@ server.tool(
 
 		const items = (
 			await resolveAndFetchAllItems(resolvedWantedItems, {
-				options: {
-					withRoles,
-				},
+				withRoles,
 			})
 		).match(
 			(value) => value,
@@ -260,13 +258,7 @@ server.tool(
 			}
 		);
 
-		const items = (
-			await resolveAndFetchAllItems(resolvedWantedItems, {
-				options: {
-					withRoles: new Set(),
-				},
-			})
-		).match(
+		const items = (await resolveAndFetchAllItems(resolvedWantedItems)).match(
 			(value) => value,
 			(error) => {
 				throw error;

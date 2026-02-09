@@ -3,7 +3,8 @@ import { isOptionalRole, resolveWithRoles, shouldIncludeRole } from '@/utils/rol
 
 describe('resolveWithRoles', () => {
 	it('combines explicit roles with legacy flags', () => {
-		const result = resolveWithRoles(['storybook', 'example'], {
+		const result = resolveWithRoles({
+			with: ['storybook', 'example'],
 			withExamples: true,
 			withDocs: false,
 			withTests: true,

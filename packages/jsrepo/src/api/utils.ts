@@ -11,11 +11,11 @@ export {
 	resolveWantedItems,
 	updateFiles,
 } from '@/utils/add';
-export { resolveWithRoles } from '@/utils/roles';
 export { joinAbsolute } from '@/utils/path';
 export {
 	detectPackageManager,
 	promptAddEnvVars,
 	promptInstallDependenciesByEcosystem,
 } from '@/utils/prompts';
+export { resolveWithRoles } from '@/utils/roles';
 export type { AbsolutePath, ItemRelativePath } from '@/utils/types';

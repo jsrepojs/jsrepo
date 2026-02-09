@@ -330,9 +330,7 @@ export async function runInit(
 			`Fetching ${pc.cyan(itemsToAdd.map((item) => item.item.name).join(', '))}...`
 		);
 
-		const itemsResult = await resolveAndFetchAllItems(itemsToAdd, {
-			options: { withRoles: new Set() },
-		});
+		const itemsResult = await resolveAndFetchAllItems(itemsToAdd);
 		if (itemsResult.isErr()) {
 			spinner.stop('Failed to fetch items');
 			return err(itemsResult.error);
@@ -349,7 +347,6 @@ export async function runInit(
 			options: {
 				cwd: options.cwd,
 				yes: options.yes,
-				withRoles: new Set(),
 			},
 			itemPaths,
 			items,

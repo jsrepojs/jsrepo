@@ -546,10 +546,8 @@ export type RegistryItemWithContent = ItemRepository | ItemDistributed;
 
 export async function resolveAndFetchAllItems(
 	wantedItems: ResolvedWantedItem[],
-	{
-		options,
-	}: {
-		options: { withRoles: Set<string> };
+	options?: {
+		withRoles?: Set<string>;
 	}
 ): Promise<
 	Result<
@@ -560,7 +558,10 @@ export async function resolveAndFetchAllItems(
 		| InvalidJSONError
 	>
 > {
-	const resolvedResult = resolveTree(wantedItems, { resolvedItems: new Map(), options });
+	const resolvedResult = resolveTree(wantedItems, {
+		resolvedItems: new Map(),
+		options: options ?? {},
+	});
 	if (resolvedResult.isErr()) return err(resolvedResult.error);
 	const resolvedItems = resolvedResult.value;
 
@@ -585,7 +586,7 @@ export function resolveTree(
 		options,
 	}: {
 		resolvedItems: Map<string, ResolvedItem>;
-		options: { withRoles: Set<string> };
+		options: { withRoles?: Set<string> };
 	}
 ): Result<ResolvedItem[], RegistryItemNotFoundError> {
 	for (const wantedItem of wantedItems) {
@@ -609,7 +610,7 @@ export function resolveTree(
 
 		// ensure we also add any registry dependencies of added files
 		for (const file of wantedItem.item.files) {
-			if (!shouldIncludeRole(file.role, options.withRoles)) continue;
+			if (!shouldIncludeRole(file.role, options.withRoles ?? new Set())) continue;
 
 			for (const registryDependency of file.registryDependencies ?? []) {
 				if (resolvedItems.has(registryDependency)) continue;
@@ -836,7 +837,7 @@ export async function prepareUpdates({
 	options: {
 		cwd: AbsolutePath;
 		yes: boolean;
-		withRoles: Set<string>;
+		withRoles?: Set<string>;
 	};
 	itemPaths: Record<string, { path: string; alias?: string }>;
 	items: (ItemRepository | ItemDistributed)[];
@@ -860,7 +861,7 @@ export async function prepareUpdates({
 
 	for (const item of items) {
 		for (let file of item.files) {
-			if (!shouldIncludeRole(file.role, options.withRoles)) continue;
+			if (!shouldIncludeRole(file.role, options.withRoles ?? new Set())) continue;
 
 			const type = normalizeItemTypeForPath(file.type);
 			const expectedPath = itemPaths[`${type}/${item.name}`]!;
