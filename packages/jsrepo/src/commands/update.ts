@@ -117,7 +117,7 @@ export async function runUpdate(
 	configResult: { path: AbsolutePath; config: Config } | null
 ): Promise<Result<UpdateCommandResult, CLIError>> {
 	const { verbose: _, spinner } = initLogging({ options });
-	const withRoles = resolveWithRoles(options.with, options);
+	const withRoles = resolveWithRoles(options);
 
 	const config = configResult?.config;
 	const providers = config?.providers ?? DEFAULT_PROVIDERS;

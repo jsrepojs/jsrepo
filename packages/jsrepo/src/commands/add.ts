@@ -121,7 +121,7 @@ export async function runAdd(
 	configResult: { path: AbsolutePath; config: Config } | null
 ): Promise<Result<AddCommandResult, CLIError>> {
 	const { verbose: _, spinner } = initLogging({ options });
-	const withRoles = resolveWithRoles(options.with, options);
+	const withRoles = resolveWithRoles(options);
 
 	const config = configResult?.config;
 

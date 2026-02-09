@@ -19,6 +19,7 @@ import {
 	promptInstallDependenciesByEcosystem,
 	resolveRegistries,
 	resolveWantedItems,
+	resolveWithRoles,
 } from 'jsrepo/utils';
 import { McpServer } from 'tmcp';
 import { z } from 'zod';
@@ -40,19 +41,6 @@ const server = new McpServer(
 		},
 	}
 );
-
-function resolveWithRoles(options: {
-	with?: string[];
-	withExamples?: boolean;
-	withDocs?: boolean;
-	withTests?: boolean;
-}): Set<string> {
-	const withRoles = new Set(options.with ?? []);
-	if (options.withExamples) withRoles.add('example');
-	if (options.withDocs) withRoles.add('doc');
-	if (options.withTests) withRoles.add('test');
-	return withRoles;
-}
 
 server.tool(
 	{

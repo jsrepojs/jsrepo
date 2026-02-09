@@ -11,6 +11,7 @@ export {
 	resolveWantedItems,
 	updateFiles,
 } from '@/utils/add';
+export { resolveWithRoles } from '@/utils/roles';
 export { joinAbsolute } from '@/utils/path';
 export {
 	detectPackageManager,
