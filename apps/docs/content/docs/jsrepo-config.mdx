@@ -239,3 +239,56 @@ Available warning types:
 - `UnresolvableDynamicImportWarning`: Triggered when a dynamic import cannot be resolved due to unresolvable syntax
 
 All warnings extend the base `Warning` class which has a `message` property. Each specific warning type includes additional properties relevant to that warning type.
+
+### hooks
+
+Hooks allow you to run custom logic before and after CLI commands.
+
+- `before` hooks run before the command executes.
+- `after` hooks run after the command completes.
+
+Hooks can be a function, a shell command string, or an array of either.
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	hooks: {
+		before: ({ command }) => {
+			console.log(`Running ${command}...`);
+		},
+		after: "echo done",
+	},
+});
+```
+
+Function hooks receive typed arguments with a `command` discriminant. Use it to narrow and access command-specific data:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	hooks: {
+		after: (args) => {
+			if (args.command === "add") {
+				console.log(`Added ${args.result.items.length} items`);
+			}
+		},
+	},
+});
+```
+
+You can also use an array of hooks:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	hooks: {
+		before: [
+			({ command }) => console.log(`Starting ${command}...`),
+			"echo 'before hook done'",
+		],
+	},
+});
+```

@@ -12,3 +12,12 @@ export {
 	type TransformOptions,
 } from '@/utils/config';
 export { loadConfigSearch } from '@/utils/config/utils';
+export type {
+	AfterArgs,
+	AfterHook,
+	BeforeArgs,
+	BeforeHook,
+	Hook,
+	HookFn,
+	InferHookArgs,
+} from '@/utils/hooks';
