@@ -56,7 +56,6 @@ export type BeforeHook = Hook<BeforeArgs>;
 export type AfterHook = Hook<AfterArgs>;
 
 async function runCommand(
-	key: string,
 	command: string,
 	cwd: string = process.cwd()
 ): Promise<Result<void, Error>> {
@@ -67,10 +66,9 @@ async function runCommand(
 			: (['sh', ['-c', command]] as [string, string[]]);
 
 		const proc = x(shell, [...shellArgs], { nodeOptions: { cwd } });
-		const prefix = `[${key}] `;
 
 		for await (const line of proc) {
-			process.stdout.write(`${prefix}${line}\n`);
+			process.stdout.write(`${line}\n`);
 		}
 		return ok(undefined);
 	} catch (e) {
@@ -100,7 +98,7 @@ export async function runHooks<HookKey extends keyof NonNullable<Config['hooks']
 				return err(e instanceof Error ? e : new Error(String(e)));
 			}
 		} else if (typeof hook === 'string') {
-			const result = await runCommand(key, hook, runCwd);
+			const result = await runCommand(hook, runCwd);
 			if (result.isErr()) return result;
 		}
 	}
@@ -113,8 +111,12 @@ export async function runBeforeHooksWithBail(
 	args: BeforeArgs,
 	opts: { cwd?: string; yes?: boolean }
 ): Promise<void> {
+	const hooks = config.hooks?.before ?? [];
+	const hooksArr = Array.isArray(hooks) ? hooks : [hooks];
+	if (hooksArr.length === 0) return;
+
 	console.clear();
-	intro('Before hooks');
+	intro('Running before hooks');
 	const result = await runHooks(config, 'before', args, opts.cwd);
 	if (result.isErr()) {
 		if (opts.yes) {
@@ -137,7 +139,11 @@ export async function runAfterHooksWithLog(
 	args: AfterArgs,
 	opts?: { cwd?: string }
 ): Promise<void> {
-	intro('After hooks');
+	const hooks = config.hooks?.after ?? [];
+	const hooksArr = Array.isArray(hooks) ? hooks : [hooks];
+	if (hooksArr.length === 0) return;
+
+	intro('Running after hooks');
 	const result = await runHooks(config, 'after', args, opts?.cwd);
 	if (result.isErr()) {
 		log.warn(`After hooks failed: ${result.error.message}`);
