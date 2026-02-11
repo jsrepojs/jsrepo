@@ -15,7 +15,7 @@ import { addPluginsToConfig, parsePlugins } from '@/utils/config/mods/add-plugin
 import { loadConfigSearch } from '@/utils/config/utils';
 import { type CLIError, ConfigNotFoundError } from '@/utils/errors';
 import { readFileSync, writeFileSync } from '@/utils/fs';
-import { runAfterHooksWithLog, runBeforeHooksWithBail } from '@/utils/hooks';
+import { runAfterHooks, runBeforeHooks } from '@/utils/hooks';
 import { intro, outro, promptInstallDependencies } from '@/utils/prompts';
 import type { AbsolutePath } from '@/utils/types';
 
@@ -47,7 +47,7 @@ export const provider = new Command('provider')
 		const cwd = path.dirname(configResult.path) as AbsolutePath;
 		const providerOptions = { ...options, cwd };
 
-		await runBeforeHooksWithBail(
+		await runBeforeHooks(
 			config,
 			{ command: 'config.provider', options: providerOptions },
 			{ cwd, yes: options.yes }
@@ -59,7 +59,7 @@ export const provider = new Command('provider')
 
 		outro(formatResult(result));
 
-		await runAfterHooksWithLog(config, { command: 'config.provider', result }, { cwd });
+		await runAfterHooks(config, { command: 'config.provider', result }, { cwd });
 	});
 
 export type ConfigAddProviderCommandResult = {

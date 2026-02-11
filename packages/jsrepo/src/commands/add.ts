@@ -35,7 +35,7 @@ import { updateConfigPaths } from '@/utils/config/mods/update-paths';
 import { loadConfigSearch } from '@/utils/config/utils';
 import { type CLIError, InvalidRegistryError, RegistryNotProvidedError } from '@/utils/errors';
 import { readFileSync, writeFileSync } from '@/utils/fs';
-import { runAfterHooksWithLog, runBeforeHooksWithBail } from '@/utils/hooks';
+import { runAfterHooks, runBeforeHooks } from '@/utils/hooks';
 import {
 	initLogging,
 	intro,
@@ -91,7 +91,7 @@ export const add = new Command('add')
 		const config = configResult?.config ?? {};
 		const cwd = configResult ? (path.dirname(configResult.path) as AbsolutePath) : options.cwd;
 
-		await runBeforeHooksWithBail(
+		await runBeforeHooks(
 			config as Config,
 			{ command: 'add', options: { ...options, cwd } },
 			{ cwd, yes: options.yes }
@@ -113,7 +113,7 @@ export const add = new Command('add')
 
 		outro(formatResult(result));
 
-		await runAfterHooksWithLog(config as Config, { command: 'add', result }, { cwd });
+		await runAfterHooks(config as Config, { command: 'add', result }, { cwd });
 	});
 
 export type AddCommandResult = {

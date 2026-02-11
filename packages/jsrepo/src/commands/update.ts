@@ -33,7 +33,7 @@ import { updateConfigPaths } from '@/utils/config/mods/update-paths';
 import { loadConfigSearch } from '@/utils/config/utils';
 import { type CLIError, ConfigNotFoundError, NoItemsToUpdateError } from '@/utils/errors';
 import { existsSync, readFileSync, writeFileSync } from '@/utils/fs';
-import { runAfterHooksWithLog, runBeforeHooksWithBail } from '@/utils/hooks';
+import { runAfterHooks, runBeforeHooks } from '@/utils/hooks';
 import {
 	initLogging,
 	intro,
@@ -90,7 +90,7 @@ export const update = new Command('update')
 		const config = configResult.config;
 		const cwd = path.dirname(configResult.path) as AbsolutePath;
 
-		await runBeforeHooksWithBail(
+		await runBeforeHooks(
 			config,
 			{ command: 'update', options: { ...options, cwd } },
 			{ cwd, yes: options.yes }
@@ -109,7 +109,7 @@ export const update = new Command('update')
 
 		outro(formatResult(result));
 
-		await runAfterHooksWithLog(config, { command: 'update', result }, { cwd });
+		await runAfterHooks(config, { command: 'update', result }, { cwd });
 	});
 
 export type UpdateCommandResult = {

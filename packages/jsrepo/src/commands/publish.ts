@@ -34,7 +34,7 @@ import {
 	NoRegistriesError,
 } from '@/utils/errors';
 import { existsSync, readFileSync } from '@/utils/fs';
-import { runAfterHooksWithLog, runBeforeHooksWithBail } from '@/utils/hooks';
+import { runAfterHooks, runBeforeHooks } from '@/utils/hooks';
 import { findNearestPackageJson, type PackageJson } from '@/utils/package';
 import { joinAbsolute } from '@/utils/path';
 import { initLogging, intro, outro } from '@/utils/prompts';
@@ -70,7 +70,7 @@ export const publish = new Command('publish')
 		const cwd = path.dirname(configResult.path) as AbsolutePath;
 		const publishOptions = { ...options, cwd };
 
-		await runBeforeHooksWithBail(
+		await runBeforeHooks(
 			config,
 			{ command: 'publish', options: publishOptions },
 			{ cwd, yes: false }
@@ -87,7 +87,7 @@ export const publish = new Command('publish')
 
 		outro(formatResult(result));
 
-		await runAfterHooksWithLog(config, { command: 'publish', result }, { cwd });
+		await runAfterHooks(config, { command: 'publish', result }, { cwd });
 
 		// if any of the registries failed to publish, exit with an error
 		if (

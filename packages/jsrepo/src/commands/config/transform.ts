@@ -15,7 +15,7 @@ import { addPluginsToConfig, parsePlugins } from '@/utils/config/mods/add-plugin
 import { loadConfigSearch } from '@/utils/config/utils';
 import { type CLIError, ConfigNotFoundError } from '@/utils/errors';
 import { readFileSync, writeFileSync } from '@/utils/fs';
-import { runAfterHooksWithLog, runBeforeHooksWithBail } from '@/utils/hooks';
+import { runAfterHooks, runBeforeHooks } from '@/utils/hooks';
 import { intro, outro, promptInstallDependencies } from '@/utils/prompts';
 import type { AbsolutePath } from '@/utils/types';
 
@@ -46,7 +46,7 @@ export const transform = new Command('transform')
 		const cwd = path.dirname(configResult.path) as AbsolutePath;
 		const transformOptions = { ...options, cwd };
 
-		await runBeforeHooksWithBail(
+		await runBeforeHooks(
 			config,
 			{ command: 'config.transform', options: transformOptions },
 			{ cwd, yes: options.yes }
@@ -58,7 +58,7 @@ export const transform = new Command('transform')
 
 		outro(formatResult(result));
 
-		await runAfterHooksWithLog(config, { command: 'config.transform', result }, { cwd });
+		await runAfterHooks(config, { command: 'config.transform', result }, { cwd });
 	});
 
 export type ConfigAddTransformCommandResult = {

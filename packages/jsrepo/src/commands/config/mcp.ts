@@ -15,7 +15,7 @@ import {
 import { loadConfigSearch } from '@/utils/config/utils';
 import { type CLIError, JsrepoError } from '@/utils/errors';
 import { existsSync, readFileSync, writeFileSync } from '@/utils/fs';
-import { runAfterHooksWithLog, runBeforeHooksWithBail } from '@/utils/hooks';
+import { runAfterHooks, runBeforeHooks } from '@/utils/hooks';
 import { stringify } from '@/utils/json';
 import { joinAbsolute } from '@/utils/path';
 import { intro, outro } from '@/utils/prompts';
@@ -51,11 +51,7 @@ export const mcp = new Command('mcp')
 		const config = (configResult?.config ?? {}) as Config;
 		const cwd = options.cwd;
 
-		await runBeforeHooksWithBail(
-			config,
-			{ command: 'config.mcp', options },
-			{ cwd, yes: false }
-		);
+		await runBeforeHooks(config, { command: 'config.mcp', options }, { cwd, yes: false });
 
 		intro();
 
@@ -63,7 +59,7 @@ export const mcp = new Command('mcp')
 
 		outro(formatResult({ ...result, cwd: options.cwd }));
 
-		await runAfterHooksWithLog(config, { command: 'config.mcp', result }, { cwd });
+		await runAfterHooks(config, { command: 'config.mcp', result }, { cwd });
 	});
 
 export type ClientConfigResult = {

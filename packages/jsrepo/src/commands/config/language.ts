@@ -15,7 +15,7 @@ import { addPluginsToConfig, parsePlugins } from '@/utils/config/mods/add-plugin
 import { loadConfigSearch } from '@/utils/config/utils';
 import { type CLIError, ConfigNotFoundError } from '@/utils/errors';
 import { readFileSync, writeFileSync } from '@/utils/fs';
-import { runAfterHooksWithLog, runBeforeHooksWithBail } from '@/utils/hooks';
+import { runAfterHooks, runBeforeHooks } from '@/utils/hooks';
 import { intro, outro, promptInstallDependencies } from '@/utils/prompts';
 import type { AbsolutePath } from '@/utils/types';
 
@@ -46,7 +46,7 @@ export const language = new Command('language')
 		const cwd = path.dirname(configResult.path) as AbsolutePath;
 		const languageOptions = { ...options, cwd };
 
-		await runBeforeHooksWithBail(
+		await runBeforeHooks(
 			config,
 			{ command: 'config.language', options: languageOptions },
 			{ cwd, yes: options.yes }
@@ -58,7 +58,7 @@ export const language = new Command('language')
 
 		outro(formatResult(result));
 
-		await runAfterHooksWithLog(config, { command: 'config.language', result }, { cwd });
+		await runAfterHooks(config, { command: 'config.language', result }, { cwd });
 	});
 
 export type ConfigAddLanguageCommandResult = {

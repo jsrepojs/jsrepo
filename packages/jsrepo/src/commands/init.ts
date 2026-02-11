@@ -42,7 +42,7 @@ import {
 	NoPackageJsonFoundError,
 } from '@/utils/errors';
 import { readFileSync, writeFileSync } from '@/utils/fs';
-import { runAfterHooksWithLog, runBeforeHooksWithBail } from '@/utils/hooks';
+import { runAfterHooks, runBeforeHooks } from '@/utils/hooks';
 import { tryGetPackage } from '@/utils/package';
 import { joinAbsolute } from '@/utils/path';
 import {
@@ -95,7 +95,7 @@ export const init = new Command('init')
 		const config = configResult?.config ?? {};
 		const cwd = configResult ? (path.dirname(configResult.path) as AbsolutePath) : options.cwd;
 
-		await runBeforeHooksWithBail(
+		await runBeforeHooks(
 			config as Config,
 			{ command: 'init', options: { ...options, cwd } },
 			{ cwd, yes: options.yes }
@@ -117,7 +117,7 @@ export const init = new Command('init')
 
 		outro(pc.green('Initialization complete!'));
 
-		await runAfterHooksWithLog(config as Config, { command: 'init', result }, { cwd });
+		await runAfterHooks(config as Config, { command: 'init', result }, { cwd });
 	});
 
 export async function runInit(

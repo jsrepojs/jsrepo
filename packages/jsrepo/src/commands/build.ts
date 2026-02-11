@@ -24,7 +24,7 @@ import {
 	NoRegistriesError,
 } from '@/utils/errors';
 import { existsSync } from '@/utils/fs';
-import { runAfterHooksWithLog, runBeforeHooksWithBail } from '@/utils/hooks';
+import { runAfterHooks, runBeforeHooks } from '@/utils/hooks';
 import { joinAbsolute } from '@/utils/path';
 import { intro, isTTY, outro } from '@/utils/prompts';
 import type { AbsolutePath } from '@/utils/types';
@@ -63,7 +63,7 @@ export const build = new Command('build')
 			const cwd = path.dirname(configResult.path) as AbsolutePath;
 			const buildOptions = { ...options, cwd };
 
-			await runBeforeHooksWithBail(
+			await runBeforeHooks(
 				config,
 				{ command: 'build', options: buildOptions },
 				{ cwd, yes: false }
@@ -75,7 +75,7 @@ export const build = new Command('build')
 
 			outro(formatResult(result, { type: 'build' }));
 
-			await runAfterHooksWithLog(config, { command: 'build', result }, { cwd });
+			await runAfterHooks(config, { command: 'build', result }, { cwd });
 
 			// if any of the registries failed to build, exit with an error
 			if (result.results.some((r) => r.isErr())) {

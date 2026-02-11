@@ -106,7 +106,7 @@ export async function runHooks<HookKey extends keyof NonNullable<Config['hooks']
 	return ok(undefined);
 }
 
-export async function runBeforeHooksWithBail(
+export async function runBeforeHooks(
 	config: Config,
 	args: BeforeArgs,
 	opts: { cwd?: string; yes?: boolean }
@@ -134,7 +134,7 @@ export async function runBeforeHooksWithBail(
 	outro('');
 }
 
-export async function runAfterHooksWithLog(
+export async function runAfterHooks(
 	config: Config,
 	args: AfterArgs,
 	opts?: { cwd?: string }

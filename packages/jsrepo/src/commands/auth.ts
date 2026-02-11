@@ -25,7 +25,7 @@ import { DEFAULT_PROVIDERS, type ProviderFactory } from '@/providers';
 import type { Config } from '@/utils/config';
 import { loadConfigSearch } from '@/utils/config/utils';
 import { type CLIError, NoProviderFoundError } from '@/utils/errors';
-import { runAfterHooksWithLog, runBeforeHooksWithBail } from '@/utils/hooks';
+import { runAfterHooks, runBeforeHooks } from '@/utils/hooks';
 import { initLogging, intro, outro } from '@/utils/prompts';
 import { TokenManager } from '@/utils/token-manager';
 
@@ -57,7 +57,7 @@ export const auth = new Command('auth')
 			? (path.dirname(configResult.path) as import('@/utils/types').AbsolutePath)
 			: options.cwd;
 
-		await runBeforeHooksWithBail(
+		await runBeforeHooks(
 			config,
 			{ command: 'auth', options: { ...options, cwd } },
 			{ cwd, yes: false }
@@ -69,7 +69,7 @@ export const auth = new Command('auth')
 
 		outro(formatResult(result));
 
-		await runAfterHooksWithLog(config, { command: 'auth', result }, { cwd });
+		await runAfterHooks(config, { command: 'auth', result }, { cwd });
 	});
 
 export type AuthCommandResult = {
