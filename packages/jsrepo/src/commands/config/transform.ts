@@ -15,6 +15,7 @@ import { addPluginsToConfig, parsePlugins } from '@/utils/config/mods/add-plugin
 import { loadConfigSearch } from '@/utils/config/utils';
 import { type CLIError, ConfigNotFoundError } from '@/utils/errors';
 import { readFileSync, writeFileSync } from '@/utils/fs';
+import { runAfterHooksWithLog, runBeforeHooksWithBail } from '@/utils/hooks';
 import { intro, outro, promptInstallDependencies } from '@/utils/prompts';
 import type { AbsolutePath } from '@/utils/types';
 
@@ -35,29 +36,29 @@ export const transform = new Command('transform')
 	.action(async (transforms, rawOptions) => {
 		const options = parseOptions(schema, rawOptions);
 
-		intro();
-
 		const configResult = await loadConfigSearch({
 			cwd: options.cwd,
 			promptForContinueIfNull: !options.yes,
 		});
 		if (!configResult) error(new ConfigNotFoundError(options.cwd));
 
-		const result = await tryCommand(
-			runTransform(
-				transforms,
-				// this way if the config is found in a higher directory we base everything off of that directory
-				{
-					...options,
-					cwd: configResult
-						? (path.dirname(configResult.path) as AbsolutePath)
-						: options.cwd,
-				},
-				configResult
-			)
+		const config = configResult.config;
+		const cwd = path.dirname(configResult.path) as AbsolutePath;
+		const transformOptions = { ...options, cwd };
+
+		await runBeforeHooksWithBail(
+			config,
+			{ command: 'config.transform', options: transformOptions },
+			{ cwd, yes: options.yes }
 		);
 
+		intro();
+
+		const result = await tryCommand(runTransform(transforms, transformOptions, configResult));
+
 		outro(formatResult(result));
+
+		await runAfterHooksWithLog(config, { command: 'config.transform', result }, { cwd });
 	});
 
 export type ConfigAddTransformCommandResult = {

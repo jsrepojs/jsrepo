@@ -35,6 +35,7 @@ import { updateConfigPaths } from '@/utils/config/mods/update-paths';
 import { loadConfigSearch } from '@/utils/config/utils';
 import { type CLIError, InvalidRegistryError, RegistryNotProvidedError } from '@/utils/errors';
 import { readFileSync, writeFileSync } from '@/utils/fs';
+import { runAfterHooksWithLog, runBeforeHooksWithBail } from '@/utils/hooks';
 import {
 	initLogging,
 	intro,
@@ -82,12 +83,21 @@ export const add = new Command('add')
 	.action(async (blockNames, rawOptions) => {
 		const options = parseOptions(schema, rawOptions);
 
-		intro();
-
-		const config = await loadConfigSearch({
+		const configResult = await loadConfigSearch({
 			cwd: options.cwd,
 			promptForContinueIfNull: !options.yes,
 		});
+
+		const config = configResult?.config ?? {};
+		const cwd = configResult ? (path.dirname(configResult.path) as AbsolutePath) : options.cwd;
+
+		await runBeforeHooksWithBail(
+			config as Config,
+			{ command: 'add', options: { ...options, cwd } },
+			{ cwd, yes: options.yes }
+		);
+
+		intro();
 
 		const result = await tryCommand(
 			runAdd(
@@ -95,13 +105,15 @@ export const add = new Command('add')
 				// this way if the config is found in a higher directory we base everything off of that directory
 				{
 					...options,
-					cwd: config ? (path.dirname(config.path) as AbsolutePath) : options.cwd,
+					cwd,
 				},
-				config
+				configResult
 			)
 		);
 
 		outro(formatResult(result));
+
+		await runAfterHooksWithLog(config as Config, { command: 'add', result }, { cwd });
 	});
 
 export type AddCommandResult = {

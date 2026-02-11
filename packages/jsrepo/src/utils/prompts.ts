@@ -33,8 +33,6 @@ import { dirname, joinAbsolute } from './path';
 export const isTTY = process.stdout.isTTY;
 
 export function intro() {
-	console.clear();
-
 	_intro(`${pc.bgYellow(pc.black(` ${pkg.name} `))}${pc.gray(` v${pkg.version} `)}`);
 }
 

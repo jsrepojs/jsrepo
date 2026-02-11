@@ -24,6 +24,7 @@ import {
 	NoRegistriesError,
 } from '@/utils/errors';
 import { existsSync } from '@/utils/fs';
+import { runAfterHooksWithLog, runBeforeHooksWithBail } from '@/utils/hooks';
 import { joinAbsolute } from '@/utils/path';
 import { intro, isTTY, outro } from '@/utils/prompts';
 import type { AbsolutePath } from '@/utils/types';
@@ -58,25 +59,26 @@ export const build = new Command('build')
 		if (options.watch) {
 			await runWatch(options, configResult);
 		} else {
+			const config = configResult.config;
+			const cwd = path.dirname(configResult.path) as AbsolutePath;
+			const buildOptions = { ...options, cwd };
+
+			await runBeforeHooksWithBail(
+				config,
+				{ command: 'build', options: buildOptions },
+				{ cwd, yes: false }
+			);
+
 			intro();
 
-			const result = await tryCommand(
-				runBuild(
-					// this way if the config is found in a higher directory we base everything off of that directory
-					{
-						...options,
-						cwd: configResult
-							? (path.dirname(configResult.path) as AbsolutePath)
-							: options.cwd,
-					},
-					configResult.config
-				)
-			);
+			const result = await tryCommand(runBuild(buildOptions, config));
 
 			outro(formatResult(result, { type: 'build' }));
 
+			await runAfterHooksWithLog(config, { command: 'build', result }, { cwd });
+
 			// if any of the registries failed to build, exit with an error
-			if (result.results.some((result) => result.isErr())) {
+			if (result.results.some((r) => r.isErr())) {
 				process.exit(1);
 			}
 		}

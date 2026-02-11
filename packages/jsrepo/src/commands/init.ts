@@ -42,6 +42,7 @@ import {
 	NoPackageJsonFoundError,
 } from '@/utils/errors';
 import { readFileSync, writeFileSync } from '@/utils/fs';
+import { runAfterHooksWithLog, runBeforeHooksWithBail } from '@/utils/hooks';
 import { tryGetPackage } from '@/utils/package';
 import { joinAbsolute } from '@/utils/path';
 import {
@@ -65,6 +66,10 @@ export const schema = defaultCommandOptionsSchema.extend({
 
 export type InitOptions = z.infer<typeof schema>;
 
+export type InitCommandResult = {
+	registries: string[];
+};
+
 export const init = new Command('init')
 	.description('Initialize a new jsrepo project.')
 	.argument('[registries...]', 'The registries to initialize.')
@@ -87,30 +92,39 @@ export const init = new Command('init')
 			promptForContinueIfNull: false,
 		});
 
+		const config = configResult?.config ?? {};
+		const cwd = configResult ? (path.dirname(configResult.path) as AbsolutePath) : options.cwd;
+
+		await runBeforeHooksWithBail(
+			config as Config,
+			{ command: 'init', options: { ...options, cwd } },
+			{ cwd, yes: options.yes }
+		);
+
 		intro();
 
-		await tryCommand(
+		const result = await tryCommand(
 			runInit(
 				registries,
 				// this way if the config is found in a higher directory we base everything off of that directory
 				{
 					...options,
-					cwd: configResult
-						? (path.dirname(configResult.path) as AbsolutePath)
-						: options.cwd,
+					cwd,
 				},
 				configResult
 			)
 		);
 
 		outro(pc.green('Initialization complete!'));
+
+		await runAfterHooksWithLog(config as Config, { command: 'init', result }, { cwd });
 	});
 
 export async function runInit(
 	registriesArg: string[],
 	options: InitOptions,
 	configResult: { config: Config; path: AbsolutePath } | null
-): Promise<Result<void, CLIError>> {
+): Promise<Result<InitCommandResult, CLIError>> {
 	const { verbose: _, spinner } = initLogging({ options });
 
 	const packagePath = joinAbsolute(options.cwd, 'package.json');
@@ -196,7 +210,7 @@ export async function runInit(
 				{ configPath, options }
 			);
 		}
-		return ok();
+		return ok({ registries: [] });
 	}
 
 	const registries = registriesArg.length > 0 ? registriesArg : (config?.registries ?? []);
@@ -393,7 +407,7 @@ export async function runInit(
 
 	await promptInstallDependenciesByEcosystem(neededDependencies, { options, config });
 
-	return ok();
+	return ok({ registries: registriesArg });
 }
 
 async function initRegistry(

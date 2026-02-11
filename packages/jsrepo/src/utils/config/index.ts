@@ -3,6 +3,7 @@ import { DEFAULT_LANGS, type Language } from '@/langs';
 import type { Output } from '@/outputs/types';
 import { DEFAULT_PROVIDERS, type ProviderFactory } from '@/providers';
 import type { RemoteDependency } from '@/utils/build';
+import type { AfterHook, BeforeHook } from '@/utils/hooks';
 import type { AbsolutePath, ItemRelativePath, LooseAutocomplete, Prettify } from '@/utils/types';
 import { extract, type MaybeGetterAsync } from '@/utils/utils';
 import type { Warning } from '@/utils/warnings';
@@ -70,6 +71,24 @@ export type Config = {
 	 * ```
 	 */
 	onwarn?: (warning: Warning, handler: (message: Warning) => void) => void;
+	/**
+	 * Lifecycle hooks run before and after CLI commands.
+	 * @example
+	 * ```ts
+	 * import { defineConfig } from "jsrepo";
+	 *
+	 * export default defineConfig({
+	 *   hooks: {
+	 *     before: ({ command }) => console.log(`Running ${command}...`),
+	 *     after: "echo done",
+	 *   },
+	 * });
+	 * ```
+	 */
+	hooks?: {
+		after?: AfterHook | AfterHook[];
+		before?: BeforeHook | BeforeHook[];
+	};
 };
 
 export const RegistryMetaSchema = z.object({
@@ -313,5 +332,6 @@ export function defineConfig(config: Partial<Config> | (() => Partial<Config>)):
 		languages: c.languages ?? DEFAULT_LANGS,
 		transforms: c.transforms ?? [],
 		paths: c.paths ?? {},
+		hooks: c.hooks,
 	};
 }
