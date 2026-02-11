@@ -65,10 +65,12 @@ async function runCommand(
 			? (['cmd', ['/c', command]] as [string, string[]])
 			: (['sh', ['-c', command]] as [string, string[]]);
 
-		const proc = x(shell, [...shellArgs], { nodeOptions: { cwd } });
-
-		for await (const line of proc) {
-			process.stdout.write(`${line}\n`);
+		const proc = x(shell, [...shellArgs], {
+			nodeOptions: { stdio: 'inherit', cwd },
+		});
+		await proc;
+		if (proc.exitCode !== 0) {
+			return err(new Error(`Command "${command}" failed with exit code ${proc.exitCode}`));
 		}
 		return ok(undefined);
 	} catch (e) {
