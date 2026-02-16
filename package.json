@@ -8,6 +8,8 @@
 	"scripts": {
 		"build": "pnpm --r --filter '!./examples/**' build",
 		"dev": "concurrently -n packages,apps --kill-others=false -c \"blue,green\" \"pnpm --r --parallel --filter '!./examples/**' --filter '!./apps/**' dev\" \"wait-on packages/jsrepo/dist/api/index.mjs && pnpm -r --parallel --filter './apps/**' dev\"",
+		"dev:packages": "pnpm --r --parallel --filter './packages/*' dev",
+		"dev:apps": "pnpm -r --parallel --filter './apps/**' dev",
 		"lint": "biome lint --write",
 		"format": "biome format --write",
 		"check": "biome check --fix && pnpm type:check",
