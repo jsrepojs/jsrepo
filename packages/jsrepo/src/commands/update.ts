@@ -33,6 +33,7 @@ import { updateConfigPaths } from '@/utils/config/mods/update-paths';
 import { loadConfigSearch } from '@/utils/config/utils';
 import { type CLIError, ConfigNotFoundError, NoItemsToUpdateError } from '@/utils/errors';
 import { existsSync, readFileSync, writeFileSync } from '@/utils/fs';
+import { runAfterHooks, runBeforeHooks } from '@/utils/hooks';
 import {
 	initLogging,
 	intro,
@@ -80,24 +81,35 @@ export const update = new Command('update')
 	.action(async (blockNames, rawOptions) => {
 		const options = parseOptions(schema, rawOptions);
 
-		intro();
-
-		const config = await loadConfigSearch({
+		const configResult = await loadConfigSearch({
 			cwd: options.cwd,
 			promptForContinueIfNull: !options.yes,
 		});
-		if (!config) error(new ConfigNotFoundError(options.cwd));
+		if (!configResult) error(new ConfigNotFoundError(options.cwd));
+
+		const config = configResult.config;
+		const cwd = path.dirname(configResult.path) as AbsolutePath;
+
+		await runBeforeHooks(
+			config,
+			{ command: 'update', options: { ...options, cwd } },
+			{ cwd, yes: options.yes }
+		);
+
+		intro();
 
 		const result = await tryCommand(
 			runUpdate(
 				blockNames,
 				// this way if the config is found in a higher directory we base everything off of that directory
-				{ ...options, cwd: path.dirname(config.path) as AbsolutePath },
-				config
+				{ ...options, cwd },
+				configResult
 			)
 		);
 
 		outro(formatResult(result));
+
+		await runAfterHooks(config, { command: 'update', options: { ...options, cwd }, result }, { cwd });
 	});
 
 export type UpdateCommandResult = {

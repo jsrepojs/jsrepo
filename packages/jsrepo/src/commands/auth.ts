@@ -12,6 +12,7 @@ import {
 } from '@clack/prompts';
 import { Command } from 'commander';
 import { err, ok, type Result } from 'nevereverthrow';
+import path from 'pathe';
 import pc from 'picocolors';
 import { z } from 'zod';
 import {
@@ -24,6 +25,7 @@ import { DEFAULT_PROVIDERS, type ProviderFactory } from '@/providers';
 import type { Config } from '@/utils/config';
 import { loadConfigSearch } from '@/utils/config/utils';
 import { type CLIError, NoProviderFoundError } from '@/utils/errors';
+import { runAfterHooks, runBeforeHooks } from '@/utils/hooks';
 import { initLogging, intro, outro } from '@/utils/prompts';
 import { TokenManager } from '@/utils/token-manager';
 
@@ -45,16 +47,29 @@ export const auth = new Command('auth')
 	.action(async (provider, rawOptions) => {
 		const options = parseOptions(schema, rawOptions);
 
-		intro();
-
-		const config = await loadConfigSearch({
+		const configResult = await loadConfigSearch({
 			cwd: options.cwd,
 			promptForContinueIfNull: false,
 		});
 
-		const result = await tryCommand(runAuth(provider, options, config?.config));
+		const config = configResult?.config ?? ({} as Config);
+		const cwd = configResult
+			? (path.dirname(configResult.path) as import('@/utils/types').AbsolutePath)
+			: options.cwd;
+
+		await runBeforeHooks(
+			config,
+			{ command: 'auth', options: { ...options, cwd } },
+			{ cwd, yes: false }
+		);
+
+		intro();
+
+		const result = await tryCommand(runAuth(provider, options, configResult?.config));
 
 		outro(formatResult(result));
+
+		await runAfterHooks(config, { command: 'auth', options: { ...options, cwd }, result }, { cwd });
 	});
 
 export type AuthCommandResult = {

@@ -34,6 +34,7 @@ import {
 	NoRegistriesError,
 } from '@/utils/errors';
 import { existsSync, readFileSync } from '@/utils/fs';
+import { runAfterHooks, runBeforeHooks } from '@/utils/hooks';
 import { findNearestPackageJson, type PackageJson } from '@/utils/package';
 import { joinAbsolute } from '@/utils/path';
 import { initLogging, intro, outro } from '@/utils/prompts';
@@ -65,22 +66,28 @@ export const publish = new Command('publish')
 		});
 		if (!configResult) error(new ConfigNotFoundError(options.cwd));
 
+		const config = configResult.config;
+		const cwd = path.dirname(configResult.path) as AbsolutePath;
+		const publishOptions = { ...options, cwd };
+
+		await runBeforeHooks(
+			config,
+			{ command: 'publish', options: publishOptions },
+			{ cwd, yes: false }
+		);
+
 		intro();
 
 		const result = await tryCommand(
 			runPublish(registries, {
-				config: configResult.config,
-				options: {
-					...options,
-					// this way if the config is found in a higher directory we base everything off of that directory
-					cwd: configResult
-						? (path.dirname(configResult.path) as AbsolutePath)
-						: options.cwd,
-				},
+				config,
+				options: publishOptions,
 			})
 		);
 
 		outro(formatResult(result));
+
+		await runAfterHooks(config, { command: 'publish', options: publishOptions, result }, { cwd });
 
 		// if any of the registries failed to publish, exit with an error
 		if (

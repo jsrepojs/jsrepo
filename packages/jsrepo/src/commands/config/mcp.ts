@@ -5,15 +5,17 @@ import { err, ok, type Result } from 'nevereverthrow';
 import path from 'pathe';
 import pc from 'picocolors';
 import { z } from 'zod';
-import type { AbsolutePath } from '@/api';
+import type { AbsolutePath, Config } from '@/api';
 import {
 	commonOptions,
 	defaultCommandOptionsSchema,
 	parseOptions,
 	tryCommand,
 } from '@/commands/utils';
+import { loadConfigSearch } from '@/utils/config/utils';
 import { type CLIError, JsrepoError } from '@/utils/errors';
 import { existsSync, readFileSync, writeFileSync } from '@/utils/fs';
+import { runAfterHooks, runBeforeHooks } from '@/utils/hooks';
 import { stringify } from '@/utils/json';
 import { joinAbsolute } from '@/utils/path';
 import { intro, outro } from '@/utils/prompts';
@@ -42,11 +44,22 @@ export const mcp = new Command('mcp')
 	.action(async (rawOptions) => {
 		const options = parseOptions(schema, rawOptions);
 
+		const configResult = await loadConfigSearch({
+			cwd: options.cwd,
+			promptForContinueIfNull: false,
+		});
+		const config = (configResult?.config ?? {}) as Config;
+		const cwd = options.cwd;
+
+		await runBeforeHooks(config, { command: 'config.mcp', options }, { cwd, yes: false });
+
 		intro();
 
 		const result = await tryCommand(runMcp(options));
 
 		outro(formatResult({ ...result, cwd: options.cwd }));
+
+		await runAfterHooks(config, { command: 'config.mcp', options, result }, { cwd });
 	});
 
 export type ClientConfigResult = {

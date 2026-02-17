@@ -15,6 +15,7 @@ import { addPluginsToConfig, parsePlugins } from '@/utils/config/mods/add-plugin
 import { loadConfigSearch } from '@/utils/config/utils';
 import { type CLIError, ConfigNotFoundError } from '@/utils/errors';
 import { readFileSync, writeFileSync } from '@/utils/fs';
+import { runAfterHooks, runBeforeHooks } from '@/utils/hooks';
 import { intro, outro, promptInstallDependencies } from '@/utils/prompts';
 import type { AbsolutePath } from '@/utils/types';
 
@@ -35,8 +36,6 @@ export const provider = new Command('provider')
 	.action(async (providers, rawOptions) => {
 		const options = parseOptions(schema, rawOptions);
 
-		intro();
-
 		const configResult = await loadConfigSearch({
 			cwd: options.cwd,
 			promptForContinueIfNull: !options.yes,
@@ -44,21 +43,23 @@ export const provider = new Command('provider')
 
 		if (!configResult) error(new ConfigNotFoundError(options.cwd));
 
-		const result = await tryCommand(
-			runProvider(
-				providers,
-				// this way if the config is found in a higher directory we base everything off of that directory
-				{
-					...options,
-					cwd: configResult
-						? (path.dirname(configResult.path) as AbsolutePath)
-						: options.cwd,
-				},
-				configResult
-			)
+		const config = configResult.config;
+		const cwd = path.dirname(configResult.path) as AbsolutePath;
+		const providerOptions = { ...options, cwd };
+
+		await runBeforeHooks(
+			config,
+			{ command: 'config.provider', options: providerOptions },
+			{ cwd, yes: options.yes }
 		);
 
+		intro();
+
+		const result = await tryCommand(runProvider(providers, providerOptions, configResult));
+
 		outro(formatResult(result));
+
+		await runAfterHooks(config, { command: 'config.provider', options: providerOptions, result }, { cwd });
 	});
 
 export type ConfigAddProviderCommandResult = {
