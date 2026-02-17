@@ -58,7 +58,7 @@ export const transform = new Command('transform')
 
 		outro(formatResult(result));
 
-		await runAfterHooks(config, { command: 'config.transform', result }, { cwd });
+		await runAfterHooks(config, { command: 'config.transform', options: transformOptions, result }, { cwd });
 	});
 
 export type ConfigAddTransformCommandResult = {

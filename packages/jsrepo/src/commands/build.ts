@@ -75,7 +75,7 @@ export const build = new Command('build')
 
 			outro(formatResult(result, { type: 'build' }));
 
-			await runAfterHooks(config, { command: 'build', result }, { cwd });
+			await runAfterHooks(config, { command: 'build', options: buildOptions, result }, { cwd });
 
 			// if any of the registries failed to build, exit with an error
 			if (result.results.some((r) => r.isErr())) {

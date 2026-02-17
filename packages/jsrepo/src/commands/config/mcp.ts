@@ -59,7 +59,7 @@ export const mcp = new Command('mcp')
 
 		outro(formatResult({ ...result, cwd: options.cwd }));
 
-		await runAfterHooks(config, { command: 'config.mcp', result }, { cwd });
+		await runAfterHooks(config, { command: 'config.mcp', options, result }, { cwd });
 	});
 
 export type ClientConfigResult = {

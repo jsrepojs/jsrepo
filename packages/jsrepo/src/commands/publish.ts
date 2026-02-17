@@ -87,7 +87,7 @@ export const publish = new Command('publish')
 
 		outro(formatResult(result));
 
-		await runAfterHooks(config, { command: 'publish', result }, { cwd });
+		await runAfterHooks(config, { command: 'publish', options: publishOptions, result }, { cwd });
 
 		// if any of the registries failed to publish, exit with an error
 		if (
