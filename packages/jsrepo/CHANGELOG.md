@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.4.0
+### Minor Changes
+
+
+- feat: Lifecycle hooks ([#762](https://github.com/jsrepojs/jsrepo/pull/762))
+
 ## 3.3.0
 ### Minor Changes
 
