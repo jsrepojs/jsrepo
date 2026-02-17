@@ -1,0 +1,29 @@
+{
+	"$schema": "https://getbizi.dev/schemas/task.config.json",
+	"tasks": {
+		"dev": {
+			"tasks": {
+				"packages": {
+					"color": "blue",
+					"command": "pnpm dev:packages"
+				},
+				"apps": {
+					"color": "green",
+					"command": "wait-on packages/jsrepo/dist/api/index.mjs && pnpm dev:apps"
+				}
+			}
+		},
+		"format": {
+			"command": "pnpm format"
+		},
+		"lint": {
+			"command": "pnpm lint"
+		},
+		"check": {
+			"command": "pnpm check"
+		},
+		"test": {
+			"command": "pnpm test"
+		}
+	}
+}
