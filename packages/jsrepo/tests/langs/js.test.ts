@@ -6,6 +6,10 @@ import { joinAbsolute } from '@/utils/path';
 import type { AbsolutePath, ItemRelativePath } from '@/utils/types';
 
 const CWD = path.join(__dirname, '../fixtures/langs/js') as AbsolutePath;
+const SUBPATH_IMPORTS_CWD = path.join(
+	__dirname,
+	'../fixtures/langs/js-subpath-imports'
+) as AbsolutePath;
 
 describe('js', () => {
 	it('should resolve dependencies', async () => {
@@ -38,6 +42,36 @@ describe('js', () => {
 		expect(result.localDependencies[0]?.import).toBe('./math/add');
 		expect(result.localDependencies[1]?.import).toBe('./math/subtract');
 		expect(result.localDependencies[2]?.import).toBe('./stdout');
+	});
+
+	it('should resolve dependencies using package.json subpath imports', async () => {
+		const warn = vi.fn();
+		const absolutePath = joinAbsolute(SUBPATH_IMPORTS_CWD, 'index.ts');
+		const code = fs.readFileSync(absolutePath, 'utf-8');
+		const result = await js().resolveDependencies(code, {
+			fileName: absolutePath,
+			cwd: SUBPATH_IMPORTS_CWD,
+			excludeDeps: [],
+			warn,
+		});
+
+		expect(result.localDependencies.map((dep) => dep.import)).toStrictEqual([
+			'#utils/print',
+			'#meta',
+		]);
+		expect(result.localDependencies.map((dep) => dep.fileName)).toStrictEqual([
+			joinAbsolute(SUBPATH_IMPORTS_CWD, 'src/utils/print.ts'),
+			joinAbsolute(SUBPATH_IMPORTS_CWD, 'src/meta.ts'),
+		]);
+		expect(result.dependencies).toStrictEqual([
+			{
+				ecosystem: 'js',
+				name: 'zustand',
+				version: '^5.0.0',
+			},
+		]);
+		expect(result.devDependencies).toStrictEqual([]);
+		expect(warn).not.toHaveBeenCalled();
 	});
 
 	it('should exclude excluded dependencies', async () => {

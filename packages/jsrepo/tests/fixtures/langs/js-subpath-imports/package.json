@@ -1,0 +1,18 @@
+{
+	"name": "js-subpath-imports-fixture",
+	"type": "module",
+	"imports": {
+		"#utils/*": [
+			"./src/missing/*.ts",
+			"./src/utils/*.ts"
+		],
+		"#meta": {
+			"development": "./src/dev-meta.ts",
+			"default": "./src/meta.ts"
+		},
+		"#state": "zustand/vanilla"
+	},
+	"dependencies": {
+		"zustand": "^5.0.0"
+	}
+}
