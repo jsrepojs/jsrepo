@@ -113,7 +113,11 @@ export const add = new Command('add')
 
 		outro(formatResult(result));
 
-		await runAfterHooks(config as Config, { command: 'add', options: { ...options, cwd }, result }, { cwd });
+		await runAfterHooks(
+			config as Config,
+			{ command: 'add', options: { ...options, cwd }, result },
+			{ cwd }
+		);
 	});
 
 export type AddCommandResult = {

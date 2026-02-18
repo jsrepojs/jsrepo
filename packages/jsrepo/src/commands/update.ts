@@ -109,7 +109,11 @@ export const update = new Command('update')
 
 		outro(formatResult(result));
 
-		await runAfterHooks(config, { command: 'update', options: { ...options, cwd }, result }, { cwd });
+		await runAfterHooks(
+			config,
+			{ command: 'update', options: { ...options, cwd }, result },
+			{ cwd }
+		);
 	});
 
 export type UpdateCommandResult = {

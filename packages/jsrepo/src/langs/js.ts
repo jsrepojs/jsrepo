@@ -379,7 +379,7 @@ function getMatchingPackageImport(
 	specifier: string,
 	imports: Record<string, unknown>
 ): { target: unknown; wildcardMatch?: string } | null {
-	if (Object.prototype.hasOwnProperty.call(imports, specifier)) {
+	if (Object.hasOwn(imports, specifier)) {
 		return { target: imports[specifier] };
 	}
 
