@@ -7,5 +7,7 @@ import { server } from './server';
 const transport = new StdioTransport(server);
 transport.listen();
 
-process.stdout.write(`Server running...\n`);
-process.stdout.write(pc.dim(`Press ${pc.bold('Ctrl+C')} to exit\n`));
+// Important: stdout must remain reserved for MCP JSON-RPC traffic.
+// Log any human-readable messages to stderr so MCP clients (like Antigravity) don't see non-JSON text when parsing responses.
+process.stderr.write(`Server running...\n`);
+process.stderr.write(pc.dim(`Press ${pc.bold('Ctrl+C')} to exit\n`));
