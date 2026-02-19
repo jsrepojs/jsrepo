@@ -314,7 +314,10 @@ function tryResolveTsconfigAlias(
 	if (config === null) return ok(null);
 
 	const matcher = createPathsMatcher(config, { cwd });
-	const hasMatchingPathAlias = hasMatchingTsconfigPathAlias(mod, config.config.compilerOptions?.paths);
+	const hasMatchingPathAlias = hasMatchingTsconfigPathAlias(
+		mod,
+		config.config.compilerOptions?.paths
+	);
 	const allowExtensionlessFallback =
 		!isPotentiallyRemotePackageSpecifier(mod) || hasMatchingPathAlias;
 

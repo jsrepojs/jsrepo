@@ -1,0 +1,73 @@
+name: Test External Projects
+
+on:
+    pull_request:
+        branches: [main]
+
+jobs:
+    test-external-projects:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                project:
+                    - name: shadcn-svelte-extras
+                      repo: ieedan/shadcn-svelte-extras
+                      pm: pnpm
+                      build: pnpm registry:build
+                    - name: react-bits
+                      repo: DavidHDev/react-bits
+                      pm: npm
+                      build: npm run registry:build
+
+        steps:
+            - name: Checkout jsrepo
+              uses: actions/checkout@v4
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+                  cache: pnpm
+
+            - name: Install jsrepo dependencies
+              run: pnpm install
+
+            - name: Build jsrepo
+              run: pnpm build:packages
+
+            - name: Pack jsrepo
+              id: pack
+              run: |
+                  cd packages/jsrepo && pnpm pack
+                  TARBALL="$(ls jsrepo-*.tgz)"
+                  echo "tarball_path=${{ github.workspace }}/packages/jsrepo/$TARBALL" >> $GITHUB_OUTPUT
+
+            - name: Clone ${{ matrix.project.name }}
+              uses: actions/checkout@v4
+              with:
+                  repository: ${{ matrix.project.repo }}
+                  path: external-project
+
+            - name: Cache ${{ matrix.project.name }} dependencies
+              uses: actions/cache@v4
+              with:
+                  path: external-project/node_modules
+                  key: ${{ matrix.project.name }}-deps-${{ hashFiles('external-project/package-lock.json', 'external-project/pnpm-lock.yaml') }}
+
+            - name: Install local jsrepo in ${{ matrix.project.name }}
+              working-directory: external-project
+              env:
+                  TARBALL: ${{ steps.pack.outputs.tarball_path }}
+              run: |
+                  if [ "${{ matrix.project.pm }}" = "pnpm" ]; then
+                      pnpm add "jsrepo@file:$TARBALL"
+                  else
+                      npm install "jsrepo@file:$TARBALL"
+                  fi
+
+            - name: Build ${{ matrix.project.name }} registry
+              working-directory: external-project
+              run: ${{ matrix.project.build }}
