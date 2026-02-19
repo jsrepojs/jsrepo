@@ -1,5 +1,11 @@
 # @jsrepo/mcp
 
+## 0.0.20
+### Patch Changes
+
+
+- fix(mcp): Log to stdout instead of stderr so that clients like antigravity work properly ([#768](https://github.com/jsrepojs/jsrepo/pull/768))
+
 ## 0.0.19
 ### Patch Changes
 
