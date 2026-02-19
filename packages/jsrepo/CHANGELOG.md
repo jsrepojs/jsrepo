@@ -1,5 +1,17 @@
 # jsrepo
 
+## 3.5.0
+### Minor Changes
+
+
+- feat: Support NodeJs subpath imports ([#764](https://github.com/jsrepojs/jsrepo/pull/764))
+
+
+### Patch Changes
+
+
+- fix: Fix an issue where jsrepo would resolve bun imports to the bun.lock file ([`c7f7703`](https://github.com/jsrepojs/jsrepo/commit/c7f770317f75406db6da84d7504c988b615af359))
+
 ## 3.4.0
 ### Minor Changes
 
