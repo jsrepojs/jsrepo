@@ -69,7 +69,11 @@ export const auth = new Command('auth')
 
 		outro(formatResult(result));
 
-		await runAfterHooks(config, { command: 'auth', options: { ...options, cwd }, result }, { cwd });
+		await runAfterHooks(
+			config,
+			{ command: 'auth', options: { ...options, cwd }, result },
+			{ cwd }
+		);
 	});
 
 export type AuthCommandResult = {

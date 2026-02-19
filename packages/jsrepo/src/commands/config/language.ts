@@ -58,7 +58,11 @@ export const language = new Command('language')
 
 		outro(formatResult(result));
 
-		await runAfterHooks(config, { command: 'config.language', options: languageOptions, result }, { cwd });
+		await runAfterHooks(
+			config,
+			{ command: 'config.language', options: languageOptions, result },
+			{ cwd }
+		);
 	});
 
 export type ConfigAddLanguageCommandResult = {

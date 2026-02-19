@@ -59,7 +59,11 @@ export const provider = new Command('provider')
 
 		outro(formatResult(result));
 
-		await runAfterHooks(config, { command: 'config.provider', options: providerOptions, result }, { cwd });
+		await runAfterHooks(
+			config,
+			{ command: 'config.provider', options: providerOptions, result },
+			{ cwd }
+		);
 	});
 
 export type ConfigAddProviderCommandResult = {

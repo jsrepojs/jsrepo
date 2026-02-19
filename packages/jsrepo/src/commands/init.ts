@@ -117,7 +117,11 @@ export const init = new Command('init')
 
 		outro(pc.green('Initialization complete!'));
 
-		await runAfterHooks(config as Config, { command: 'init', options: { ...options, cwd }, result }, { cwd });
+		await runAfterHooks(
+			config as Config,
+			{ command: 'init', options: { ...options, cwd }, result },
+			{ cwd }
+		);
 	});
 
 export async function runInit(

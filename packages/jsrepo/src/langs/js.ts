@@ -27,6 +27,7 @@ import { validateNpmPackageName } from '@/utils/validate-npm-package-name';
 import { InvalidImportWarning, UnresolvableDynamicImportWarning } from '@/utils/warnings';
 
 const SUPPORTED_EXTENSIONS = ['.js', '.ts', '.jsx', '.tsx', '.mjs', '.mts'] as const;
+const SUPPORTED_PACKAGE_IMPORT_CONDITIONS = new Set(['default', 'import', 'node']);
 
 // biome-ignore lint/complexity/noBannedTypes: leave me alone for a minute
 export type JsOptions = {};
@@ -81,25 +82,25 @@ export async function resolveImports(
 			continue;
 		}
 
-		// if specifier wasn't a local dependency then it might be a path alias
-		const localDep = tryResolveLocalAlias(specifier, {
+		// if specifier wasn't a local dependency then it might be a path alias or subpath import
+		const resolvedAlias = tryResolveAliasImport(specifier, {
 			fileName: opts.fileName,
 			cwd: opts.cwd,
 		});
 
-		if (localDep.isOk() && localDep.value !== null) {
-			const dep = localDep.value;
-
-			if (dep) {
-				localDeps.push(dep);
-				continue;
-			}
+		if (resolvedAlias.isOk() && resolvedAlias.value?.localDependency) {
+			localDeps.push(resolvedAlias.value.localDependency);
+			continue;
 		}
 
-		const parsed = parsePackageName(specifier);
+		const parsedSpecifier =
+			resolvedAlias.isOk() && resolvedAlias.value?.remoteSpecifier
+				? resolvedAlias.value.remoteSpecifier
+				: specifier;
+		const parsed = parsePackageName(parsedSpecifier);
 
 		// if the specifier is not a valid package either then we know it's unresolvable and we throw an error
-		if (parsed.isErr() && localDep.isErr()) {
+		if (parsed.isErr() && resolvedAlias.isErr()) {
 			throw new ModuleNotFoundError(specifier, { fileName: opts.fileName });
 		}
 
@@ -265,8 +266,36 @@ function searchForModule(
 	return undefined;
 }
 
+type AliasResolution =
+	| {
+			localDependency: LocalDependency;
+			remoteSpecifier?: never;
+	  }
+	| {
+			remoteSpecifier: string;
+			localDependency?: never;
+	  };
+
+/** Tries to resolve the modules as an alias using tsconfig or package.json imports. */
+function tryResolveAliasImport(
+	mod: string,
+	{ fileName, cwd }: { fileName: string; cwd: AbsolutePath }
+): Result<AliasResolution | null, string> {
+	const tsconfigAlias = tryResolveTsconfigAlias(mod, { fileName, cwd });
+
+	if (tsconfigAlias.isErr()) return err(tsconfigAlias.error);
+
+	if (tsconfigAlias.value !== null) {
+		return ok({ localDependency: tsconfigAlias.value });
+	}
+
+	if (!mod.startsWith('#')) return ok(null);
+
+	return tryResolvePackageImportsAlias(mod, { fileName, cwd });
+}
+
 /** Tries to resolve the modules as an alias using the tsconfig. */
-function tryResolveLocalAlias(
+function tryResolveTsconfigAlias(
 	mod: string,
 	{ fileName, cwd }: { fileName: string; cwd: AbsolutePath }
 ): Result<LocalDependency | null, string> {
@@ -300,6 +329,127 @@ function tryResolveLocalAlias(
 	}
 
 	return ok(null);
+}
+
+function tryResolvePackageImportsAlias(
+	mod: string,
+	{ fileName, cwd }: { fileName: string; cwd: AbsolutePath }
+): Result<AliasResolution | null, string> {
+	const nearestPackage = findNearestPackageJson(dirname(joinAbsolute(cwd, fileName)));
+	if (!nearestPackage) return ok(null);
+
+	const imports = nearestPackage.package.imports;
+	if (!isRecord(imports)) return ok(null);
+
+	const matchedImport = getMatchingPackageImport(mod, imports);
+	if (!matchedImport) return ok(null);
+
+	const resolvedTargets = resolvePackageImportTargets(
+		matchedImport.target,
+		matchedImport.wildcardMatch
+	);
+	if (resolvedTargets.length === 0) return err('Module not found');
+
+	const packageRoot = dirname(nearestPackage.path);
+
+	for (const target of resolvedTargets) {
+		if (target.startsWith('.')) {
+			const foundMod = searchForModule(joinAbsolute(packageRoot, target));
+			if (!foundMod) continue;
+
+			return ok({
+				localDependency: {
+					fileName: foundMod.path,
+					import: mod,
+					createTemplate: () => ({}),
+				},
+			});
+		}
+
+		// package imports can also map to external npm packages
+		if (parsePackageName(target).isOk()) {
+			return ok({ remoteSpecifier: target });
+		}
+	}
+
+	return err('Module not found');
+}
+
+function getMatchingPackageImport(
+	specifier: string,
+	imports: Record<string, unknown>
+): { target: unknown; wildcardMatch?: string } | null {
+	if (Object.hasOwn(imports, specifier)) {
+		return { target: imports[specifier] };
+	}
+
+	const patternMatches: Array<{
+		target: unknown;
+		wildcardMatch: string;
+		prefixLength: number;
+		suffixLength: number;
+	}> = [];
+
+	for (const [key, target] of Object.entries(imports)) {
+		const wildcardIndex = key.indexOf('*');
+		if (wildcardIndex === -1) continue;
+
+		const prefix = key.slice(0, wildcardIndex);
+		const suffix = key.slice(wildcardIndex + 1);
+
+		if (!specifier.startsWith(prefix)) continue;
+		if (!specifier.endsWith(suffix)) continue;
+
+		patternMatches.push({
+			target,
+			wildcardMatch: specifier.slice(prefix.length, specifier.length - suffix.length),
+			prefixLength: prefix.length,
+			suffixLength: suffix.length,
+		});
+	}
+
+	if (patternMatches.length === 0) return null;
+
+	patternMatches.sort((a, b) => {
+		if (a.prefixLength !== b.prefixLength) return b.prefixLength - a.prefixLength;
+		return b.suffixLength - a.suffixLength;
+	});
+
+	const bestMatch = patternMatches[0];
+	if (!bestMatch) return null;
+
+	return {
+		target: bestMatch.target,
+		wildcardMatch: bestMatch.wildcardMatch,
+	};
+}
+
+function resolvePackageImportTargets(target: unknown, wildcardMatch?: string): string[] {
+	if (typeof target === 'string') {
+		if (wildcardMatch === undefined) return [target];
+		return [target.replaceAll('*', wildcardMatch)];
+	}
+
+	if (Array.isArray(target)) {
+		return target.flatMap((entry) => resolvePackageImportTargets(entry, wildcardMatch));
+	}
+
+	if (isRecord(target)) {
+		const resolvedTargets: string[] = [];
+
+		for (const [condition, value] of Object.entries(target)) {
+			if (!SUPPORTED_PACKAGE_IMPORT_CONDITIONS.has(condition)) continue;
+			resolvedTargets.push(...resolvePackageImportTargets(value, wildcardMatch));
+		}
+
+		return resolvedTargets;
+	}
+
+	return [];
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 /** Iterates over the dependency and resolves each one using the nearest package.json file.

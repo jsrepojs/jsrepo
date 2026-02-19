@@ -35,10 +35,22 @@ export type BeforeArgs =
 	| { command: 'update'; options: UpdateOptions };
 
 export type AfterArgs =
-	| { command: 'config.language'; options: ConfigAddLanguageOptions; result: ConfigAddLanguageCommandResult }
+	| {
+			command: 'config.language';
+			options: ConfigAddLanguageOptions;
+			result: ConfigAddLanguageCommandResult;
+	  }
 	| { command: 'config.mcp'; options: ConfigMcpOptions; result: ConfigMcpCommandResult }
-	| { command: 'config.provider'; options: ConfigAddProviderOptions; result: ConfigAddProviderCommandResult }
-	| { command: 'config.transform'; options: ConfigAddTransformOptions; result: ConfigAddTransformCommandResult }
+	| {
+			command: 'config.provider';
+			options: ConfigAddProviderOptions;
+			result: ConfigAddProviderCommandResult;
+	  }
+	| {
+			command: 'config.transform';
+			options: ConfigAddTransformOptions;
+			result: ConfigAddTransformCommandResult;
+	  }
 	| { command: 'add'; options: AddOptions; result: AddCommandResult }
 	| { command: 'auth'; options: AuthOptions; result: AuthCommandResult }
 	| { command: 'build'; options: BuildOptions; result: BuildCommandResult }
