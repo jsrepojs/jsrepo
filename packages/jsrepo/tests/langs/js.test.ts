@@ -10,6 +10,14 @@ const SUBPATH_IMPORTS_CWD = path.join(
 	__dirname,
 	'../fixtures/langs/js-subpath-imports'
 ) as AbsolutePath;
+const BASE_URL_BARE_IMPORTS_CWD = path.join(
+	__dirname,
+	'../fixtures/langs/js-baseurl-bare-imports'
+) as AbsolutePath;
+const ARBITRARY_EXTENSIONS_CWD = path.join(
+	__dirname,
+	'../fixtures/langs/js-arbitrary-extensions'
+) as AbsolutePath;
 
 describe('js', () => {
 	it('should resolve dependencies', async () => {
@@ -70,6 +78,69 @@ describe('js', () => {
 				version: '^5.0.0',
 			},
 		]);
+		expect(result.devDependencies).toStrictEqual([]);
+		expect(warn).not.toHaveBeenCalled();
+	});
+
+	it('should not resolve bare imports to lock files when baseUrl is set', async () => {
+		const warn = vi.fn();
+		const absolutePath = joinAbsolute(BASE_URL_BARE_IMPORTS_CWD, 'types.ts');
+		const code = fs.readFileSync(absolutePath, 'utf-8');
+		const result = await js().resolveDependencies(code, {
+			fileName: absolutePath,
+			cwd: BASE_URL_BARE_IMPORTS_CWD,
+			excludeDeps: [],
+			warn,
+		});
+
+		expect(result.localDependencies).toStrictEqual([]);
+		expect(result.dependencies).toStrictEqual([
+			{
+				ecosystem: 'js',
+				name: 'bun',
+				version: '^1.0.0',
+			},
+		]);
+		expect(result.devDependencies).toStrictEqual([]);
+		expect(warn).not.toHaveBeenCalled();
+	});
+
+	it('should resolve extensionless local imports to json files', async () => {
+		const warn = vi.fn();
+		const absolutePath = joinAbsolute(ARBITRARY_EXTENSIONS_CWD, 'index.ts');
+		const code = fs.readFileSync(absolutePath, 'utf-8');
+		const result = await js().resolveDependencies(code, {
+			fileName: absolutePath,
+			cwd: ARBITRARY_EXTENSIONS_CWD,
+			excludeDeps: [],
+			warn,
+		});
+
+		expect(result.localDependencies.map((dep) => dep.import)).toStrictEqual(['./config']);
+		expect(result.localDependencies.map((dep) => dep.fileName)).toStrictEqual([
+			joinAbsolute(ARBITRARY_EXTENSIONS_CWD, 'config.json'),
+		]);
+		expect(result.dependencies).toStrictEqual([]);
+		expect(result.devDependencies).toStrictEqual([]);
+		expect(warn).not.toHaveBeenCalled();
+	});
+
+	it('should resolve extensionless local imports to svelte files', async () => {
+		const warn = vi.fn();
+		const absolutePath = joinAbsolute(ARBITRARY_EXTENSIONS_CWD, 'svelte-entry.ts');
+		const code = fs.readFileSync(absolutePath, 'utf-8');
+		const result = await js().resolveDependencies(code, {
+			fileName: absolutePath,
+			cwd: ARBITRARY_EXTENSIONS_CWD,
+			excludeDeps: [],
+			warn,
+		});
+
+		expect(result.localDependencies.map((dep) => dep.import)).toStrictEqual(['./component']);
+		expect(result.localDependencies.map((dep) => dep.fileName)).toStrictEqual([
+			joinAbsolute(ARBITRARY_EXTENSIONS_CWD, 'component.svelte'),
+		]);
+		expect(result.dependencies).toStrictEqual([]);
 		expect(result.devDependencies).toStrictEqual([]);
 		expect(warn).not.toHaveBeenCalled();
 	});

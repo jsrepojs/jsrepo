@@ -192,7 +192,8 @@ export async function getImports(
  * @param path
  */
 function searchForModule(
-	modPath: AbsolutePath
+	modPath: AbsolutePath,
+	{ allowExtensionlessFallback = true }: { allowExtensionlessFallback?: boolean } = {}
 ): { path: AbsolutePath; prettyPath: string; type: 'file' | 'directory' } | undefined {
 	if (existsSync(modPath)) {
 		// if it's already pointing to a file then return it
@@ -241,6 +242,8 @@ function searchForModule(
 		if (existsSync(newPath)) return { path: newPath, prettyPath: modPath, type: 'file' };
 	}
 
+	if (!allowExtensionlessFallback) return undefined;
+
 	const filesResult = readdirSync(containing);
 	if (filesResult.isErr()) return undefined;
 	const files = filesResult.value;
@@ -251,6 +254,9 @@ function searchForModule(
 		// this way the extension doesn't matter
 		if (fileParsed.name === modParsed.base) {
 			const filePath = joinAbsolute(containing, file);
+			const fileStats = statSync(filePath);
+			if (fileStats.isErr()) continue;
+			const isDirectory = fileStats.value.isDirectory();
 
 			// we remove the extension since it wasn't included by the user
 			const prettyPath = filePath.slice(0, filePath.length - fileParsed.ext.length);
@@ -258,7 +264,7 @@ function searchForModule(
 			return {
 				path: filePath,
 				prettyPath: prettyPath,
-				type: statSync(filePath)._unsafeUnwrap().isDirectory() ? 'directory' : 'file',
+				type: isDirectory ? 'directory' : 'file',
 			};
 		}
 	}
@@ -308,6 +314,9 @@ function tryResolveTsconfigAlias(
 	if (config === null) return ok(null);
 
 	const matcher = createPathsMatcher(config, { cwd });
+	const hasMatchingPathAlias = hasMatchingTsconfigPathAlias(mod, config.config.compilerOptions?.paths);
+	const allowExtensionlessFallback =
+		!isPotentiallyRemotePackageSpecifier(mod) || hasMatchingPathAlias;
 
 	if (matcher) {
 		// if the mod is actually remote the returns paths will be empty
@@ -316,7 +325,9 @@ function tryResolveTsconfigAlias(
 		if (paths.length === 0) return ok(null);
 
 		for (const modPath of paths) {
-			const foundMod = searchForModule(modPath as AbsolutePath);
+			const foundMod = searchForModule(modPath as AbsolutePath, {
+				allowExtensionlessFallback,
+			});
 			if (!foundMod) continue;
 			return ok({
 				fileName: foundMod.path,
@@ -450,6 +461,39 @@ function resolvePackageImportTargets(target: unknown, wildcardMatch?: string): s
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isPotentiallyRemotePackageSpecifier(specifier: string): boolean {
+	if (specifier.startsWith('.') || specifier.startsWith('/') || specifier.startsWith('#')) {
+		return false;
+	}
+
+	// Ignore url-style imports and protocol imports (e.g. node:, https:, npm:)
+	if (specifier.includes(':')) return false;
+
+	return parsePackageName(specifier).isOk();
+}
+
+function hasMatchingTsconfigPathAlias(
+	specifier: string,
+	paths: Record<string, readonly string[]> | undefined
+): boolean {
+	if (!paths) return false;
+
+	for (const pattern of Object.keys(paths)) {
+		const wildcardIndex = pattern.indexOf('*');
+
+		if (wildcardIndex === -1) {
+			if (pattern === specifier) return true;
+			continue;
+		}
+
+		const prefix = pattern.slice(0, wildcardIndex);
+		const suffix = pattern.slice(wildcardIndex + 1);
+		if (specifier.startsWith(prefix) && specifier.endsWith(suffix)) return true;
+	}
+
+	return false;
 }
 
 /** Iterates over the dependency and resolves each one using the nearest package.json file.

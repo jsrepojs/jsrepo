@@ -1,0 +1,6 @@
+{
+	"name": "js-baseurl-bare-imports-fixture",
+	"dependencies": {
+		"bun": "^1.0.0"
+	}
+}
