@@ -96,7 +96,7 @@ export async function runAuth(
 	let provider: ProviderFactory | undefined;
 	if (!providerArg) {
 		if (options.registry) {
-			provider = providers.find((p) => p.matches(options.registry));
+			provider = providers.find((p) => p.matches(options.registry!));
 			if (!provider) return err(new NoProviderFoundError(options.registry));
 		} else {
 			const providerSelection = await select({
