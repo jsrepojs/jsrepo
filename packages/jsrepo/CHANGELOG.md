@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.5.1
+### Patch Changes
+
+
+- feat: Add `--registry` option to `auth` command ([#772](https://github.com/jsrepojs/jsrepo/pull/772))
+
 ## 3.5.0
 ### Minor Changes
 
