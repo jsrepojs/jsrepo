@@ -52,6 +52,12 @@ Authenticate using a token directly:
 jsrepo auth github --token <your-token>
 ```
 
+Authenticate non-interactively for a specific registry:
+
+```sh
+jsrepo auth --registry https://private-registry.example.com --token <your-token>
+```
+
 ## Options
 
 ### `--cwd`
@@ -68,6 +74,14 @@ Execute the logout flow:
 
 ```sh
 jsrepo auth github --logout
+```
+
+### `--registry`
+
+The registry to authenticate to. This is especially useful in non-interactive environments where prompts are unavailable:
+
+```sh
+jsrepo auth --registry https://private-registry.example.com --token <your-token>
 ```
 
 ### `--token`

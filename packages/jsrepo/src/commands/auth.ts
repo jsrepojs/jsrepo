@@ -24,12 +24,13 @@ import {
 import { DEFAULT_PROVIDERS, type ProviderFactory } from '@/providers';
 import type { Config } from '@/utils/config';
 import { loadConfigSearch } from '@/utils/config/utils';
-import { type CLIError, NoProviderFoundError } from '@/utils/errors';
+import { type CLIError, JsrepoError, NoProviderFoundError } from '@/utils/errors';
 import { runAfterHooks, runBeforeHooks } from '@/utils/hooks';
 import { initLogging, intro, outro } from '@/utils/prompts';
 import { TokenManager } from '@/utils/token-manager';
 
 export const schema = defaultCommandOptionsSchema.extend({
+	registry: z.string().optional(),
 	token: z.string().optional(),
 	logout: z.boolean(),
 	verbose: z.boolean(),
@@ -41,6 +42,7 @@ export const auth = new Command('auth')
 	.description('Authenticate to a provider or registry.')
 	.argument('[provider]', 'The provider to authenticate to.')
 	.option('--logout', 'Execute the logout flow.', false)
+	.option('--registry <registry>', 'The registry to authenticate to.')
 	.option('--token <token>', 'The token to use for authenticating to this provider.')
 	.addOption(commonOptions.cwd)
 	.addOption(commonOptions.verbose)
@@ -90,48 +92,61 @@ export async function runAuth(
 	const { verbose: _verbose, spinner: _spinner } = initLogging({ options });
 
 	const providers = (config?.providers ?? DEFAULT_PROVIDERS).filter((p) => p.auth !== undefined);
-	const registries = config?.registries ?? [];
-
-	const registriesByProvider = new Map<string, string[]>();
-	for (const registry of registries) {
-		const provider = providers.find((p) => p.matches(registry));
-		if (!provider) return err(new NoProviderFoundError(registry));
-		registriesByProvider.set(provider.name, [
-			...(registriesByProvider.get(provider.name) ?? []),
-			registry,
-		]);
-	}
 
 	let provider: ProviderFactory | undefined;
 	if (!providerArg) {
-		const providerSelection = await select({
-			message: 'Select a provider to authenticate to.',
-			options: providers.map((p) => ({
-				label: p.name,
-				value: p.name,
-			})),
-		});
+		if (options.registry) {
+			provider = providers.find((p) => p.matches(options.registry));
+			if (!provider) return err(new NoProviderFoundError(options.registry));
+		} else {
+			const providerSelection = await select({
+				message: 'Select a provider to authenticate to.',
+				options: providers.map((p) => ({
+					label: p.name,
+					value: p.name,
+				})),
+			});
 
-		if (isCancel(providerSelection)) {
-			cancel('Canceled!');
-			process.exit(0);
+			if (isCancel(providerSelection)) {
+				cancel('Canceled!');
+				process.exit(0);
+			}
+
+			// we know it's valid because we checked for cancel
+			provider = providers.find((p) => p.name === providerSelection)!;
 		}
-
-		// we know it's valid because we checked for cancel
-		provider = providers.find((p) => p.name === providerSelection)!;
 	} else {
 		provider = providers.find((p) => p.name === providerArg);
 		if (!provider) return err(new NoProviderFoundError(providerArg));
 	}
 
-	if (options.logout) return await logout(provider);
+	if (options.registry && !provider.matches(options.registry)) {
+		return err(
+			new JsrepoError(
+				`Registry ${pc.bold(options.registry)} cannot be parsed by provider ${pc.bold(provider.name)}.`,
+				{
+					suggestion: `Pass a registry that matches ${pc.bold(provider.name)} or omit the provider argument.`,
+				}
+			)
+		);
+	}
+
+	if (options.logout) return await logout(provider, options);
 
 	return await login(provider, { config, options });
 }
 
-async function logout(provider: ProviderFactory): Promise<Result<AuthCommandResult, CLIError>> {
+async function logout(
+	provider: ProviderFactory,
+	options: AuthOptions
+): Promise<Result<AuthCommandResult, CLIError>> {
 	const tokenManager = new TokenManager();
 	if (provider.auth!.tokenStoredFor === 'registry') {
+		if (options.registry) {
+			tokenManager.delete(provider, options.registry);
+			return ok({ type: 'logout', provider: provider.name, registry: options.registry });
+		}
+
 		const registryTokens = tokenManager.getProviderRegistryTokens(provider);
 		if (Object.keys(registryTokens).length === 0) {
 			return ok({ type: 'logout', provider: provider.name, registry: undefined });
@@ -165,44 +180,9 @@ async function login(
 	const tokenManager = new TokenManager();
 	if (provider.auth!.tokenStoredFor === 'registry') {
 		const registries = config?.registries ?? [];
-		let registry: string;
-		if (registries.length === 0) {
-			const registrySelection = await text({
-				message: 'Enter the name of the registry to authenticate to.',
-				validate(value) {
-					if (!value || value.trim() === '') return 'Please provide a value';
-					if (!provider.matches(value))
-						return 'Registry cannot be parsed by this provider';
-				},
-			});
-
-			if (isCancel(registrySelection)) {
-				cancel('Canceled!');
-				process.exit(0);
-			}
-
-			registry = registrySelection;
-		} else {
-			const registrySelection = await select({
-				message: 'Select a registry to authenticate to.',
-				options: [
-					...registries.map((registry) => ({
-						label: registry,
-						value: registry,
-					})),
-					{
-						label: 'Other',
-						value: 'other',
-					},
-				],
-			});
-
-			if (isCancel(registrySelection)) {
-				cancel('Canceled!');
-				process.exit(0);
-			}
-
-			if (registrySelection === 'other') {
+		let registry = options.registry;
+		if (!registry) {
+			if (registries.length === 0) {
 				const registrySelection = await text({
 					message: 'Enter the name of the registry to authenticate to.',
 					validate(value) {
@@ -219,7 +199,44 @@ async function login(
 
 				registry = registrySelection;
 			} else {
-				registry = registrySelection;
+				const registrySelection = await select({
+					message: 'Select a registry to authenticate to.',
+					options: [
+						...registries.map((registry) => ({
+							label: registry,
+							value: registry,
+						})),
+						{
+							label: 'Other',
+							value: 'other',
+						},
+					],
+				});
+
+				if (isCancel(registrySelection)) {
+					cancel('Canceled!');
+					process.exit(0);
+				}
+
+				if (registrySelection === 'other') {
+					const registrySelection = await text({
+						message: 'Enter the name of the registry to authenticate to.',
+						validate(value) {
+							if (!value || value.trim() === '') return 'Please provide a value';
+							if (!provider.matches(value))
+								return 'Registry cannot be parsed by this provider';
+						},
+					});
+
+					if (isCancel(registrySelection)) {
+						cancel('Canceled!');
+						process.exit(0);
+					}
+
+					registry = registrySelection;
+				} else {
+					registry = registrySelection;
+				}
 			}
 		}
 
