@@ -9,6 +9,7 @@ export {
 	type RegistryItemFile,
 	type RegistryItemType,
 	type RemoteDependencyResolver,
+	type RemoteDependencyResolverOptions,
 	type Transform,
 	type TransformOptions,
 } from '@/utils/config';

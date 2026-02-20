@@ -246,6 +246,34 @@ The `build.remoteDependencyResolver` option lets you rewrite each detected remot
 
 This is useful when your source `package.json` uses version protocols like `workspace:*` or `catalog:` and you want to replace them with concrete versions during build.
 
+For pnpm workspaces (workspace and catalog protocols), use `@jsrepo/pnpm`:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { pnpm } from "@jsrepo/pnpm";
+
+export default defineConfig({
+	build: {
+		remoteDependencyResolver: pnpm(),
+	},
+});
+```
+
+For bun workspaces, use `@jsrepo/bun`:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { bun } from "@jsrepo/bun";
+
+export default defineConfig({
+	build: {
+		remoteDependencyResolver: bun(),
+	},
+});
+```
+
+Or implement a custom resolver:
+
 ```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
 

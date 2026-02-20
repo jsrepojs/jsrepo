@@ -4,34 +4,34 @@ overview: Create @jsrepo/pnpm and @jsrepo/bun packages that export resolver func
 todos:
   - id: jsrepo-export
     content: Export RemoteDependencyResolverOptions from jsrepo/api/config
-    status: pending
+    status: completed
   - id: pnpm-scaffold
     content: "@jsrepo/pnpm - Create package scaffold (package.json, tsdown, tsconfig)"
-    status: pending
+    status: completed
   - id: pnpm-workspace
     content: "@jsrepo/pnpm - Implement workspace discovery (find pnpm-workspace.yaml, expand globs, build package map)"
-    status: pending
+    status: completed
   - id: pnpm-catalog
     content: "@jsrepo/pnpm - Implement catalog parsing and lookup from pnpm-workspace.yaml"
-    status: pending
+    status: completed
   - id: pnpm-resolver
     content: "@jsrepo/pnpm - Implement pnpm resolver with workspace + catalog resolution and caching"
-    status: pending
+    status: completed
   - id: bun-scaffold
     content: "@jsrepo/bun - Create package scaffold (package.json, tsdown, tsconfig)"
-    status: pending
+    status: completed
   - id: bun-workspace
     content: "@jsrepo/bun - Implement workspace discovery (find root package.json with workspaces, expand globs, build package map)"
-    status: pending
+    status: completed
   - id: bun-resolver
     content: "@jsrepo/bun - Implement bun resolver with workspace resolution and caching"
-    status: pending
+    status: completed
   - id: pnpm-tests
     content: "@jsrepo/pnpm - Add unit tests with pnpm workspace fixtures"
-    status: pending
+    status: completed
   - id: bun-tests
     content: "@jsrepo/bun - Add unit tests with bun workspace fixtures"
-    status: pending
+    status: completed
 isProject: false
 ---
 
