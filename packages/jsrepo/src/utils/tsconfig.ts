@@ -3,18 +3,13 @@ import { err, ok, type Result } from 'nevereverthrow';
 import path from 'pathe';
 import pc from 'picocolors';
 import type { AbsolutePath } from '@/utils/types';
+import { cachedFn } from './cache';
 import { existsSync, statSync } from './fs';
 import { dirname, joinAbsolute } from './path';
 
-/** Attempts to get the js/tsconfig file for the searched path
- *
- * @param searchPath
- * @returns
- */
-export function tryGetTsconfig(
-	searchPath?: string,
-	fileName?: string
-): Result<TsConfigResult | null, string> {
+const tsconfigCache = new Map<string, ReturnType<typeof _tryGetTsconfig>>();
+
+function _tryGetTsconfig(searchPath?: string, fileName?: string) {
 	let config: TsConfigResult | null;
 
 	try {
@@ -22,7 +17,7 @@ export function tryGetTsconfig(
 
 		if (!config) {
 			// if we don't find the config at first check for a jsconfig
-			config = getTsconfig(searchPath, fileName);
+			config = getTsconfig(searchPath, 'jsconfig.json');
 
 			if (!config) {
 				return ok(null);
@@ -33,6 +28,27 @@ export function tryGetTsconfig(
 	}
 
 	return ok(config);
+}
+
+/** Attempts to get the js/tsconfig file for the searched path
+ *
+ * @param searchPath
+ * @returns
+ */
+export function tryGetTsconfig(
+	searchPath?: string,
+	fileName?: string
+): Result<TsConfigResult | null, string> {
+	return cachedFn(
+		_tryGetTsconfig,
+		{
+			cache: tsconfigCache,
+			getCacheKey: (searchPath?: string, fileName?: string) =>
+				`${searchPath ?? ''}::${fileName ?? 'tsconfig.json'}`,
+		},
+		searchPath,
+		fileName
+	);
 }
 
 export type PathsMatcher = ((specifier: string) => string[]) | null;

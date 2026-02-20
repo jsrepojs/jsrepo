@@ -4,22 +4,31 @@ import path from 'pathe';
 import semver from 'semver';
 import type { AbsolutePath } from '@/api/utils';
 import type { RemoteDependency } from '@/utils/build';
+import { cachedFn } from './cache';
 import { existsSync, readFileSync } from './fs';
 import { dirname, joinAbsolute } from './path';
 
-export function findNearestPackageJson(
+const packageJsonCache = new Map<string, ReturnType<typeof _findNearestPackageJson>>();
+
+function _findNearestPackageJson(
 	cwd: AbsolutePath
 ): { path: AbsolutePath; package: Partial<PackageJson> } | undefined {
 	if (cwd === os.homedir() || cwd === path.parse(cwd).root) return undefined;
 
 	const packagePath = joinAbsolute(cwd, 'package.json');
-	if (existsSync(packagePath))
-		return {
-			path: packagePath,
-			package: getPackage(packagePath),
-		};
+	if (existsSync(packagePath)) return { path: packagePath, package: getPackage(packagePath) };
 
 	return findNearestPackageJson(dirname(cwd));
+}
+
+export function findNearestPackageJson(
+	cwd: AbsolutePath
+): { path: AbsolutePath; package: Partial<PackageJson> } | undefined {
+	return cachedFn(
+		_findNearestPackageJson,
+		{ cache: packageJsonCache, getCacheKey: (cwd) => cwd },
+		cwd
+	);
 }
 
 export function tryGetPackage(path: AbsolutePath): Result<Partial<PackageJson>, string> {
