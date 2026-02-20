@@ -660,7 +660,7 @@ export async function buildRegistry(
 	const result = await validateRegistryConfig(registry);
 	if (result.isErr()) return err(result.error);
 
-	const warn = createWarningHandler(config.onwarn);
+	const warn = createWarningHandler(config.build?.onwarn);
 
 	const expandedRegistryItemsResult = await expandRegistryItems(registry, {
 		cwd: options.cwd,
@@ -683,6 +683,7 @@ export async function buildRegistry(
 
 	const resolvedItemsResult = await resolveRegistryItems(expandedRegistryItems, {
 		cwd: options.cwd,
+		config,
 		resolvedFiles,
 		registry,
 	});
@@ -836,11 +837,13 @@ export async function resolveRegistryItems(
 	items: ExpandedRegistryItem[],
 	{
 		cwd,
+		config,
 		resolvedItems = new Map<string, ResolvedItem>(),
 		resolvedFiles,
 		registry,
 	}: {
 		cwd: AbsolutePath;
+		config: Config;
 		resolvedItems?: Map<string, ResolvedItem>;
 		resolvedFiles: ResolvedFiles;
 		registry: { name: string };
@@ -849,6 +852,7 @@ export async function resolveRegistryItems(
 	for (const item of items) {
 		const resolvedItem = await resolveRegistryItem(item, {
 			cwd,
+			config,
 			resolvedItems,
 			resolvedFiles,
 			registry,
@@ -861,15 +865,48 @@ export async function resolveRegistryItems(
 
 export type DependencyKey = `${Ecosystem}:${string}@${string}`;
 
+function toDependencyKey(dep: RemoteDependency): DependencyKey {
+	return `${dep.ecosystem}:${dep.name}@${dep.version}`;
+}
+
+async function resolveRemoteDependencies(
+	deps: RemoteDependency[],
+	{ config, registryName, itemName }: { config: Config; registryName: string; itemName: string }
+): Promise<Result<RemoteDependency[], BuildError>> {
+	const resolver = config.build?.remoteDependencyResolver;
+	if (!resolver) return ok(deps);
+
+	const resolved: RemoteDependency[] = [];
+	for (const dep of deps) {
+		try {
+			resolved.push(await resolver(dep));
+		} catch {
+			return err(
+				new BuildError(
+					`Failed to resolve remote dependency ${pc.bold(dep.name)} referenced by ${pc.bold(itemName)}.`,
+					{
+						registryName,
+						suggestion: `Please ensure build.remoteDependencyResolver can resolve ${dep.name}${dep.version ? `@${dep.version}` : ''}.`,
+					}
+				)
+			);
+		}
+	}
+
+	return ok(resolved);
+}
+
 export async function resolveRegistryItem(
 	item: ExpandedRegistryItem,
 	{
 		cwd,
+		config,
 		resolvedItems,
 		resolvedFiles,
 		registry,
 	}: {
 		cwd: AbsolutePath;
+		config: Config;
 		resolvedItems: Map<string, ResolvedItem>;
 		resolvedFiles: ResolvedFiles;
 		registry: { name: string };
@@ -886,8 +923,14 @@ export async function resolveRegistryItem(
 		itemName: item.name,
 	});
 	if (dependenciesResult.isErr()) return err(dependenciesResult.error);
+	const resolvedDependenciesResult = await resolveRemoteDependencies(dependenciesResult.value, {
+		config,
+		registryName: registry.name,
+		itemName: item.name,
+	});
+	if (resolvedDependenciesResult.isErr()) return err(resolvedDependenciesResult.error);
 	const dependencies = new Map<DependencyKey, RemoteDependency>(
-		dependenciesResult.value.map((dep) => [`${dep.ecosystem}:${dep.name}@${dep.version}`, dep])
+		resolvedDependenciesResult.value.map((dep) => [toDependencyKey(dep), dep])
 	);
 
 	const devDependenciesResult = toRemoteDependencies(item.devDependencies ?? [], {
@@ -895,11 +938,17 @@ export async function resolveRegistryItem(
 		itemName: item.name,
 	});
 	if (devDependenciesResult.isErr()) return err(devDependenciesResult.error);
+	const resolvedDevDependenciesResult = await resolveRemoteDependencies(
+		devDependenciesResult.value,
+		{
+			config,
+			registryName: registry.name,
+			itemName: item.name,
+		}
+	);
+	if (resolvedDevDependenciesResult.isErr()) return err(resolvedDevDependenciesResult.error);
 	const devDependencies = new Map<DependencyKey, RemoteDependency>(
-		devDependenciesResult.value.map((dep) => [
-			`${dep.ecosystem}:${dep.name}@${dep.version}`,
-			dep,
-		])
+		resolvedDevDependenciesResult.value.map((dep) => [toDependencyKey(dep), dep])
 	);
 
 	const itemFiles = Array.from(resolvedFiles.values()).filter(
@@ -909,6 +958,7 @@ export async function resolveRegistryItem(
 	for (const resolvedFile of itemFiles) {
 		const resolvedResult = await resolveFileDependencies(resolvedFile, {
 			item,
+			config,
 			resolvedFiles,
 			cwd,
 		});
@@ -923,10 +973,10 @@ export async function resolveRegistryItem(
 		files.push(file);
 
 		for (const dep of deps) {
-			dependencies.set(`${dep.ecosystem}:${dep.name}@${dep.version}`, dep);
+			dependencies.set(toDependencyKey(dep), dep);
 		}
 		for (const dep of devDeps) {
-			devDependencies.set(`${dep.ecosystem}:${dep.name}@${dep.version}`, dep);
+			devDependencies.set(toDependencyKey(dep), dep);
 		}
 		for (const dep of regDeps) {
 			registryDependencies.add(dep);
@@ -954,7 +1004,13 @@ async function resolveFileDependencies(
 	{
 		resolvedFiles,
 		item,
-	}: { resolvedFiles: ResolvedFiles; item: ExpandedRegistryItem; cwd: AbsolutePath }
+		config,
+	}: {
+		resolvedFiles: ResolvedFiles;
+		item: ExpandedRegistryItem;
+		config: Config;
+		cwd: AbsolutePath;
+	}
 ): Promise<
 	Result<
 		{
@@ -974,23 +1030,59 @@ async function resolveFileDependencies(
 	const devDependencies = new Map<DependencyKey, RemoteDependency>();
 	const registryDependencies = new Set<string>();
 
-	const fileDependencies = new Map<DependencyKey, RemoteDependency>(
-		resolvedFile.manualDependencies.dependencies.map((dep) => [
-			`${dep.ecosystem}:${dep.name}@${dep.version}`,
-			dep,
-		])
+	const resolvedFileDependenciesResult = await resolveRemoteDependencies(
+		resolvedFile.manualDependencies.dependencies,
+		{
+			config,
+			registryName: resolvedFile.parent.registryName,
+			itemName: item.name,
+		}
 	);
+	if (resolvedFileDependenciesResult.isErr()) return err(resolvedFileDependenciesResult.error);
+
+	const fileDependencies = new Map<DependencyKey, RemoteDependency>(
+		resolvedFileDependenciesResult.value.map((dep) => [toDependencyKey(dep), dep])
+	);
+
+	const resolvedFileDevDependenciesResult = await resolveRemoteDependencies(
+		resolvedFile.manualDependencies.devDependencies,
+		{
+			config,
+			registryName: resolvedFile.parent.registryName,
+			itemName: item.name,
+		}
+	);
+	if (resolvedFileDevDependenciesResult.isErr())
+		return err(resolvedFileDevDependenciesResult.error);
+
 	const fileDevDependencies = new Map<DependencyKey, RemoteDependency>(
-		resolvedFile.manualDependencies.devDependencies.map((dep) => [
-			`${dep.ecosystem}:${dep.name}@${dep.version}`,
-			dep,
-		])
+		resolvedFileDevDependenciesResult.value.map((dep) => [toDependencyKey(dep), dep])
 	);
 	const fileRegistryDependencies = new Set<string>(
 		resolvedFile.manualDependencies.registryDependencies
 	);
 
 	if (resolvedFile.dependencyResolution === 'auto') {
+		const resolvedDependenciesResult = await resolveRemoteDependencies(
+			resolvedFile.dependencies,
+			{
+				config,
+				registryName: resolvedFile.parent.registryName,
+				itemName: item.name,
+			}
+		);
+		if (resolvedDependenciesResult.isErr()) return err(resolvedDependenciesResult.error);
+
+		const resolvedDevDependenciesResult = await resolveRemoteDependencies(
+			resolvedFile.devDependencies,
+			{
+				config,
+				registryName: resolvedFile.parent.registryName,
+				itemName: item.name,
+			}
+		);
+		if (resolvedDevDependenciesResult.isErr()) return err(resolvedDevDependenciesResult.error);
+
 		for (const dependency of resolvedFile.localDependencies) {
 			const localDependency = resolvedFiles.get(normalizeAbsolute(dependency.fileName));
 			if (localDependency) {
@@ -1027,31 +1119,19 @@ async function resolveFileDependencies(
 			}
 		}
 
-		for (const dependency of resolvedFile.dependencies) {
+		for (const dependency of resolvedDependenciesResult.value) {
 			if (optionalFileType) {
-				fileDependencies.set(
-					`${dependency.ecosystem}:${dependency.name}@${dependency.version}`,
-					dependency
-				);
+				fileDependencies.set(toDependencyKey(dependency), dependency);
 			} else {
-				dependencies.set(
-					`${dependency.ecosystem}:${dependency.name}@${dependency.version}`,
-					dependency
-				);
+				dependencies.set(toDependencyKey(dependency), dependency);
 			}
 		}
 
-		for (const dependency of resolvedFile.devDependencies) {
+		for (const dependency of resolvedDevDependenciesResult.value) {
 			if (optionalFileType) {
-				fileDevDependencies.set(
-					`${dependency.ecosystem}:${dependency.name}@${dependency.version}`,
-					dependency
-				);
+				fileDevDependencies.set(toDependencyKey(dependency), dependency);
 			} else {
-				devDependencies.set(
-					`${dependency.ecosystem}:${dependency.name}@${dependency.version}`,
-					dependency
-				);
+				devDependencies.set(toDependencyKey(dependency), dependency);
 			}
 		}
 	}
@@ -1096,7 +1176,7 @@ export function toRemoteDependencies(
 		} else {
 			dep = dependency;
 		}
-		remoteDependencies.set(`${dep.ecosystem}:${dep.name}@${dep.version}`, dep);
+		remoteDependencies.set(toDependencyKey(dep), dep);
 	}
 	return ok(Array.from(remoteDependencies.values()));
 }

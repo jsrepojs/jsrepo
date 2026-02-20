@@ -240,6 +240,30 @@ Available warning types:
 
 All warnings extend the base `Warning` class which has a `message` property. Each specific warning type includes additional properties relevant to that warning type.
 
+### build.remoteDependencyResolver
+
+The `build.remoteDependencyResolver` option lets you rewrite each detected remote dependency before it is added to the built registry output.
+
+This is useful when your source `package.json` uses version protocols like `workspace:*` or `catalog:` and you want to replace them with concrete versions during build.
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	build: {
+		remoteDependencyResolver: async (dep) => {
+			if (dep.version === "workspace:*") {
+				return { ...dep, version: "1.2.3" };
+			}
+			if (dep.version === "catalog:") {
+				return { ...dep, version: "^4.0.0" };
+			}
+			return dep;
+		},
+	},
+});
+```
+
 ### hooks
 
 Hooks allow you to run custom logic before and after CLI commands.
