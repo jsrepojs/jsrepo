@@ -4,15 +4,17 @@ export function cachedFn<Fn extends (...args: any[]) => any>(
 	{
 		cache,
 		getCacheKey,
+        noCache = false,
 	}: {
 		cache: NoInfer<Map<string, ReturnType<Fn>>>;
 		getCacheKey: (...args: NoInfer<Parameters<Fn>>) => string;
+        noCache?: boolean;
 	},
 	...args: NoInfer<Parameters<Fn>>
 ) {
 	const cacheKey = getCacheKey(...args);
 
-	if (cache.has(cacheKey)) return cache.get(cacheKey);
+	if (cache.has(cacheKey) && !noCache) return cache.get(cacheKey);
 
 	const result = fn(...args);
 	cache.set(cacheKey, result);
