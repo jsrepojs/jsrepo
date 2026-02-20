@@ -16,7 +16,14 @@ import type { Warning } from '@/utils/warnings';
 
 export type RegistryConfigArgs = [{ cwd: string }];
 
-export type ResolveRemoteDependency = (dep: RemoteDependency) => MaybePromise<RemoteDependency>;
+export type RemoteDependencyResolverOptions = {
+	cwd: AbsolutePath;
+};
+
+export type RemoteDependencyResolver = (
+	dep: RemoteDependency,
+	options: RemoteDependencyResolverOptions
+) => MaybePromise<RemoteDependency>;
 
 export type Config = {
 	/** An array of registries to fetch items from.
@@ -84,7 +91,7 @@ export type Config = {
 		 * Resolve each remote dependency before it is added to the built registry output.
 		 * Useful for rewriting protocol-based versions (e.g. `workspace:*`, `catalog:`).
 		 */
-		remoteDependencyResolver?: ResolveRemoteDependency;
+		remoteDependencyResolver?: RemoteDependencyResolver;
 	};
 	/**
 	 * Custom warning handler. If not provided, warnings will be logged using the default logger.

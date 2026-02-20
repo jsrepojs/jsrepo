@@ -871,7 +871,12 @@ function toDependencyKey(dep: RemoteDependency): DependencyKey {
 
 async function resolveRemoteDependencies(
 	deps: RemoteDependency[],
-	{ config, registryName, itemName }: { config: Config; registryName: string; itemName: string }
+	{
+		cwd,
+		config,
+		registryName,
+		itemName,
+	}: { cwd: AbsolutePath; config: Config; registryName: string; itemName: string }
 ): Promise<Result<RemoteDependency[], BuildError>> {
 	const resolver = config.build?.remoteDependencyResolver;
 	if (!resolver) return ok(deps);
@@ -879,7 +884,7 @@ async function resolveRemoteDependencies(
 	const resolved: RemoteDependency[] = [];
 	for (const dep of deps) {
 		try {
-			resolved.push(await resolver(dep));
+			resolved.push(await resolver(dep, { cwd }));
 		} catch {
 			return err(
 				new BuildError(
@@ -924,6 +929,7 @@ export async function resolveRegistryItem(
 	});
 	if (dependenciesResult.isErr()) return err(dependenciesResult.error);
 	const resolvedDependenciesResult = await resolveRemoteDependencies(dependenciesResult.value, {
+		cwd,
 		config,
 		registryName: registry.name,
 		itemName: item.name,
@@ -941,6 +947,7 @@ export async function resolveRegistryItem(
 	const resolvedDevDependenciesResult = await resolveRemoteDependencies(
 		devDependenciesResult.value,
 		{
+			cwd,
 			config,
 			registryName: registry.name,
 			itemName: item.name,
@@ -1005,6 +1012,7 @@ async function resolveFileDependencies(
 		resolvedFiles,
 		item,
 		config,
+		cwd,
 	}: {
 		resolvedFiles: ResolvedFiles;
 		item: ExpandedRegistryItem;
@@ -1033,6 +1041,7 @@ async function resolveFileDependencies(
 	const resolvedFileDependenciesResult = await resolveRemoteDependencies(
 		resolvedFile.manualDependencies.dependencies,
 		{
+			cwd,
 			config,
 			registryName: resolvedFile.parent.registryName,
 			itemName: item.name,
@@ -1047,6 +1056,7 @@ async function resolveFileDependencies(
 	const resolvedFileDevDependenciesResult = await resolveRemoteDependencies(
 		resolvedFile.manualDependencies.devDependencies,
 		{
+			cwd,
 			config,
 			registryName: resolvedFile.parent.registryName,
 			itemName: item.name,
@@ -1066,6 +1076,7 @@ async function resolveFileDependencies(
 		const resolvedDependenciesResult = await resolveRemoteDependencies(
 			resolvedFile.dependencies,
 			{
+				cwd,
 				config,
 				registryName: resolvedFile.parent.registryName,
 				itemName: item.name,
@@ -1076,6 +1087,7 @@ async function resolveFileDependencies(
 		const resolvedDevDependenciesResult = await resolveRemoteDependencies(
 			resolvedFile.devDependencies,
 			{
+				cwd,
 				config,
 				registryName: resolvedFile.parent.registryName,
 				itemName: item.name,

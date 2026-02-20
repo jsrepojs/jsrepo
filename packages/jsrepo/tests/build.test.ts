@@ -442,7 +442,10 @@ describe('buildRegistry', () => {
 
 	describe('build.remoteDependencyResolver', () => {
 		async function buildWithResolver(
-			resolver: (dep: RemoteDependency) => RemoteDependency | Promise<RemoteDependency>
+			resolver: (
+				dep: RemoteDependency,
+				options: { cwd: AbsolutePath }
+			) => RemoteDependency | Promise<RemoteDependency>
 		) {
 			const config = await loadConfigSearch({ cwd, promptForContinueIfNull: false });
 			if (config === null) throw new Error('Config not found');
