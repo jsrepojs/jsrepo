@@ -1,5 +1,11 @@
 # @jsrepo/migrate
 
+## 0.0.21
+### Patch Changes
+
+- Updated dependencies [[`d591b14`](https://github.com/jsrepojs/jsrepo/commit/d591b14231af6d9cd8109343ba6617faccdeb010)]:
+  - jsrepo@3.5.2
+
 ## 0.0.20
 ### Patch Changes
 
