@@ -3,7 +3,12 @@ import path from 'pathe';
 import { assert, beforeAll, describe, expect, it, type MockInstance, vi } from 'vitest';
 import { loadConfigSearch } from '@/api';
 import { forEachRegistry } from '@/commands/utils';
-import { type BuildResult, buildRegistry, type ResolvedItem } from '@/utils/build';
+import {
+	type BuildResult,
+	buildRegistry,
+	type RemoteDependency,
+	type ResolvedItem,
+} from '@/utils/build';
 import type { AbsolutePath, ItemRelativePath } from '@/utils/types';
 import { LanguageNotFoundWarning } from '@/utils/warnings';
 
@@ -432,6 +437,87 @@ describe('buildRegistry', () => {
 
 			// Verify that folder files work correctly (not glob-related, but ensures compatibility)
 			expect(mathItem.files.length).toBeGreaterThan(0);
+		});
+	});
+
+	describe('build.remoteDependencyResolver', () => {
+		async function buildWithResolver(
+			resolver: (
+				dep: RemoteDependency,
+				options: { cwd: AbsolutePath }
+			) => RemoteDependency | Promise<RemoteDependency>
+		) {
+			const config = await loadConfigSearch({ cwd, promptForContinueIfNull: false });
+			if (config === null) throw new Error('Config not found');
+			config.config.build ??= {};
+			config.config.build.remoteDependencyResolver = resolver;
+
+			const results = await forEachRegistry(
+				config.config,
+				async (registry) => {
+					return await buildRegistry(registry, {
+						options: { cwd },
+						config: config.config,
+					});
+				},
+				{ cwd }
+			);
+			const first = results[0];
+			assert(first !== undefined);
+			return first;
+		}
+
+		it('should rewrite resolved remote dependency versions', async () => {
+			const result = await buildWithResolver((dep) =>
+				dep.name === 'chalk' ? { ...dep, version: '9.9.9' } : dep
+			);
+			const build = result.match(
+				(v) => v,
+				(e) => {
+					throw e;
+				}
+			);
+			const math = build.items.find((item) => item.name === 'math');
+			assert(math !== undefined);
+			expect(math.dependencies).toContainEqual({
+				ecosystem: 'js',
+				name: 'chalk',
+				version: '9.9.9',
+			});
+		});
+
+		it('should dedupe dependencies after resolver rewrites keys', async () => {
+			const result = await buildWithResolver((dep) => ({
+				...dep,
+				name: 'dedup-target',
+				version: '1.0.0',
+			}));
+			const build = result.match(
+				(v) => v,
+				(e) => {
+					throw e;
+				}
+			);
+			const shiki = build.items.find((item) => item.name === 'shiki');
+			assert(shiki !== undefined);
+			expect(shiki.dependencies).toStrictEqual([
+				{
+					ecosystem: 'js',
+					name: 'dedup-target',
+					version: '1.0.0',
+				},
+			]);
+		});
+
+		it('should return a build error when resolver throws', async () => {
+			const result = await buildWithResolver((dep) => {
+				if (dep.name === 'chalk') throw new Error('boom');
+				return dep;
+			});
+			expect(result.isErr()).toBe(true);
+			if (result.isErr()) {
+				expect(result.error.message).toContain('Failed to resolve remote dependency');
+			}
 		});
 	});
 });

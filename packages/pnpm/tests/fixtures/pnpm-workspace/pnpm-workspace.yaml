@@ -1,0 +1,9 @@
+packages:
+  - "packages/*"
+
+catalog:
+  lodash: "^4.17.21"
+
+catalogs:
+  deps:
+    react: "^18.0.0"
