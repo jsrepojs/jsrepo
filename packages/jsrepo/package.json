@@ -81,8 +81,8 @@
 	"packageManager": "pnpm@10.28.2",
 	"dependencies": {
 		"commander": "catalog:",
-		"oxc-parser": "^0.112.0",
-		"unconfig": "^7.4.2"
+		"oxc-parser": "^0.114.0",
+		"unconfig": "^7.5.0"
 	},
 	"peerDependencies": {
 		"svelte": "^5.0.0",
@@ -97,17 +97,17 @@
 		}
 	},
 	"devDependencies": {
-		"@clack/prompts": "1.0.0-alpha.6",
 		"@types/node": "catalog:",
+		"@clack/prompts": "1.0.1",
 		"@types/semver": "^7.7.1",
 		"@types/tar-stream": "^3.1.4",
-		"conf": "^15.0.2",
+		"conf": "^15.1.0",
 		"css-dependency": "^0.0.3",
 		"dedent": "catalog:",
 		"diff": "^8.0.3",
 		"escape-string-regexp": "^5.0.0",
 		"fast-glob": "^3.3.3",
-		"get-tsconfig": "^4.13.1",
+		"get-tsconfig": "^4.13.6",
 		"is-unicode-supported": "^2.1.0",
 		"magic-string": "^0.30.21",
 		"nevereverthrow": "^0.3.0",
@@ -116,7 +116,7 @@
 		"parse5": "^8.0.0",
 		"pathe": "^2.0.3",
 		"picocolors": "catalog:",
-		"semver": "^7.7.3",
+		"semver": "^7.7.4",
 		"tar-stream": "^3.1.7",
 		"tinyexec": "^1.0.2",
 		"tsdown": "catalog:",
