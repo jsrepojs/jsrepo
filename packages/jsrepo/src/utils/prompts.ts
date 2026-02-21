@@ -99,6 +99,15 @@ function spinner({
 				loading.start(msg);
 			}
 		},
+		error: (msg) => {
+			if (verbose) {
+				verbose(msg ?? '');
+			} else {
+				loading.start(msg);
+			}
+		},
+		cancel: () => loading.cancel(),
+		clear: () => loading.clear(),
 		get isCancelled() {
 			return loading.isCancelled;
 		},
