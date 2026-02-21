@@ -13,8 +13,8 @@ import {
 } from 'jsrepo';
 import { loadConfigSearch } from 'jsrepo/config';
 import { DEFAULT_PROVIDERS } from 'jsrepo/providers';
-import type { AbsolutePath } from 'jsrepo/utils';
 import {
+	type AbsolutePath,
 	parseWantedItems,
 	promptInstallDependenciesByEcosystem,
 	resolveRegistries,
