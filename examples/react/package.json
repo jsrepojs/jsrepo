@@ -15,18 +15,18 @@
 		"react-dom": "19.2.3"
 	},
 	"devDependencies": {
-		"concurrently": "catalog:",
 		"@jsrepo/shadcn": "workspace:*",
-		"@tailwindcss/postcss": "^4",
-		"@types/node": "^20",
-		"@types/react": "^19",
-		"@types/react-dom": "^19",
+		"@tailwindcss/postcss": "^4.2.0",
+		"@types/node": "^20.19.33",
+		"@types/react": "^19.2.14",
+		"@types/react-dom": "^19.2.3",
 		"babel-plugin-react-compiler": "1.0.0",
 		"clsx": "^2.1.1",
+		"concurrently": "catalog:",
 		"jsrepo": "workspace:*",
-		"tailwind-merge": "^3.3.1",
-		"tailwind-variants": "^3.1.1",
-		"tailwindcss": "^4",
-		"typescript": "^5"
+		"tailwind-merge": "^3.5.0",
+		"tailwind-variants": "^3.2.2",
+		"tailwindcss": "^4.2.0",
+		"typescript": "^5.9.3"
 	}
 }
