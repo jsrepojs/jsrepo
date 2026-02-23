@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.6.0
+### Minor Changes
+
+
+- feat: Add `build.remoteDependencyResolver` to allow for resolving `workspace:` and `catalog:` dependencies ([#775](https://github.com/jsrepojs/jsrepo/pull/775))
+
 ## 3.5.2
 ### Patch Changes
 
