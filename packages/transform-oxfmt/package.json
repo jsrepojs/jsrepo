@@ -1,7 +1,7 @@
 {
 	"name": "@jsrepo/transform-oxfmt",
 	"description": "A transform plugin for jsrepo to format code with oxfmt.",
-	"version": "5.0.2",
+	"version": "6.0.0",
 	"license": "MIT",
 	"homepage": "https://jsrepo.dev",
 	"author": {

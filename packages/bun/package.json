@@ -1,7 +1,7 @@
 {
 	"name": "@jsrepo/bun",
 	"description": "Remote dependency resolver for bun workspace protocol.",
-	"version": "0.0.0",
+	"version": "1.0.0",
 	"license": "MIT",
 	"homepage": "https://jsrepo.dev",
 	"author": {

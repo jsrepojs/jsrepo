@@ -1,7 +1,7 @@
 {
 	"name": "@jsrepo/pnpm",
 	"description": "Remote dependency resolver for pnpm workspace and catalog protocols.",
-	"version": "0.0.0",
+	"version": "1.0.0",
 	"license": "MIT",
 	"homepage": "https://jsrepo.dev",
 	"author": {
