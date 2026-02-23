@@ -43,7 +43,7 @@
 		"@tailwindcss/postcss": "^4.2.0",
 		"@types/mdx": "^2.0.13",
 		"@types/node": "25.3.0",
-		"@types/react": "^19.2.14",
+		"@types/react": "^19.2.7",
 		"@types/react-dom": "^19.2.3",
 		"fuzzysort": "^3.1.0",
 		"jsrepo": "workspace:*",
