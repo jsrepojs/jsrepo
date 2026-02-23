@@ -1,0 +1,58 @@
+{
+	"name": "@jsrepo/pnpm",
+	"description": "Remote dependency resolver for pnpm workspace and catalog protocols.",
+	"version": "0.0.0",
+	"license": "MIT",
+	"homepage": "https://jsrepo.dev",
+	"author": {
+		"name": "Aidan Bleser",
+		"url": "https://github.com/ieedan"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/jsrepojs/jsrepo"
+	},
+	"bugs": {
+		"url": "https://github.com/jsrepojs/jsrepo/issues"
+	},
+	"keywords": [
+		"jsrepo",
+		"pnpm",
+		"workspace",
+		"catalog",
+		"resolver"
+	],
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.mts",
+			"default": "./dist/index.mjs"
+		}
+	},
+	"main": "./dist/index.mjs",
+	"files": [
+		"dist/**/*",
+		"!dist/**/*.map"
+	],
+	"scripts": {
+		"build": "tsdown",
+		"dev": "tsdown --watch",
+		"check": "tsc --noEmit",
+		"test": "vitest"
+	},
+	"packageManager": "pnpm@10.28.2",
+	"peerDependencies": {
+		"jsrepo": "workspace:*"
+	},
+	"dependencies": {
+		"fast-glob": "^3.3.3",
+		"pathe": "^2.0.3",
+		"yaml": "^2.7.0"
+	},
+	"devDependencies": {
+		"@types/node": "catalog:",
+		"tsdown": "catalog:",
+		"typescript": "catalog:",
+		"vitest": "catalog:"
+	}
+}

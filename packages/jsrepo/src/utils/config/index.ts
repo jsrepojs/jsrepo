@@ -4,11 +4,26 @@ import type { Output } from '@/outputs/types';
 import { DEFAULT_PROVIDERS, type ProviderFactory } from '@/providers';
 import type { RemoteDependency } from '@/utils/build';
 import type { AfterHook, BeforeHook } from '@/utils/hooks';
-import type { AbsolutePath, ItemRelativePath, LooseAutocomplete, Prettify } from '@/utils/types';
+import type {
+	AbsolutePath,
+	ItemRelativePath,
+	LooseAutocomplete,
+	MaybePromise,
+	Prettify,
+} from '@/utils/types';
 import { extract, type MaybeGetterAsync } from '@/utils/utils';
 import type { Warning } from '@/utils/warnings';
 
 export type RegistryConfigArgs = [{ cwd: string }];
+
+export type RemoteDependencyResolverOptions = {
+	cwd: AbsolutePath;
+};
+
+export type RemoteDependencyResolver = (
+	dep: RemoteDependency,
+	options: RemoteDependencyResolverOptions
+) => MaybePromise<RemoteDependency>;
 
 export type Config = {
 	/** An array of registries to fetch items from.
@@ -48,8 +63,40 @@ export type Config = {
 	paths: {
 		[key in RegistryItemType | '*']?: string;
 	};
+	build: {
+		/**
+		 * Custom warning handler. If not provided, warnings will be logged using the default logger.
+		 *
+		 * @example
+		 * ```ts
+		 * import { defineConfig } from "jsrepo";
+		 * import { InvalidImportWarning } from "jsrepo/warnings";
+		 *
+		 * export default defineConfig({
+		 *   // ...
+		 *   onwarn: (warning, handler) => {
+		 *     if (warning instanceof InvalidImportWarning) {
+		 *       // Skip warnings for $app/server and $app/navigation imports
+		 *       if (['$app/server', '$app/navigation'].includes(warning.specifier)) {
+		 *         return;
+		 *       }
+		 *     }
+		 *     handler(warning);
+		 *   }
+		 * });
+		 * ```
+		 */
+		onwarn?: (warning: Warning, handler: (message: Warning) => void) => void;
+		/**
+		 * Resolve each remote dependency before it is added to the built registry output.
+		 * Useful for rewriting protocol-based versions (e.g. `workspace:*`, `catalog:`).
+		 */
+		remoteDependencyResolver?: RemoteDependencyResolver;
+	};
 	/**
 	 * Custom warning handler. If not provided, warnings will be logged using the default logger.
+	 *
+	 * @deprecated Use `build.onwarn` instead.
 	 *
 	 * @example
 	 * ```ts
@@ -333,5 +380,9 @@ export function defineConfig(config: Partial<Config> | (() => Partial<Config>)):
 		transforms: c.transforms ?? [],
 		paths: c.paths ?? {},
 		hooks: c.hooks,
+		build: {
+			onwarn: c.build?.onwarn ?? c.onwarn,
+			...c.build,
+		},
 	};
 }

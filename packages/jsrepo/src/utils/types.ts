@@ -26,3 +26,5 @@ export type AbsolutePath = Branded<string, 'absolutePath'>;
  * A path relative to the parent item.
  */
 export type ItemRelativePath = Branded<string, 'itemRelativePath'>;
+
+export type MaybePromise<T> = T | Promise<T> | PromiseLike<T>;
