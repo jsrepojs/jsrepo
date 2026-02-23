@@ -73,7 +73,7 @@ export class GlobPatternNoMatchWarning extends Warning {
 /**
  * Creates a warning handler that uses the onwarn callback if provided, otherwise uses the default logger.
  */
-export function createWarningHandler(onwarn?: Config['onwarn']): WarningHandler {
+export function createWarningHandler(onwarn?: Config['build']['onwarn']): WarningHandler {
 	return (warning: Warning) => {
 		if (!onwarn) {
 			log.warn(warning.message);

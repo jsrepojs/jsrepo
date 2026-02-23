@@ -9,12 +9,12 @@ import { type ParsedState, parsePnpmState } from './catalog.js';
 
 /**
  * Resolve `workspace:` and `catalog:` versions to concrete semver strings.
- * 
+ *
  * @example
  * ```ts
  * import { defineConfig } from "jsrepo";
  * import { pnpm } from "@jsrepo/pnpm";
- * 
+ *
  * export default defineConfig({
  *   // ...
  *   build: {

@@ -11,12 +11,12 @@ import {
 
 /**
  * Resolve `workspace:` and `catalog:` versions to concrete semver strings.
- * 
+ *
  * @example
  * ```ts
  * import { defineConfig } from "jsrepo";
  * import { bun } from "@jsrepo/bun";
- * 
+ *
  * export default defineConfig({
  *   // ...
  *   build: {

@@ -202,7 +202,13 @@ export default defineConfig({
 
 ### onwarn
 
-The `onwarn` option allows you to customize how warnings are handled during the build process. You can suppress specific warnings, transform them, or use the default logging behavior.
+<Callout type="warning">
+**Deprecated:** The top-level `onwarn` option is deprecated. Use [`build.onwarn`](#buildonwarn) instead.
+</Callout>
+
+### build.onwarn
+
+The `build.onwarn` option allows you to customize how warnings are handled during the build process. You can suppress specific warnings, transform them, or use the default logging behavior.
 
 The handler receives two arguments:
 - `warning`: The warning instance (extends the base `Warning` class)
@@ -214,21 +220,23 @@ import { InvalidImportWarning, LanguageNotFoundWarning } from "jsrepo/warnings";
 
 export default defineConfig({
 	// ...
-	onwarn: (warning, handler) => { // [!code highlight]
-		// Suppress warnings for SvelteKit internal imports
-		if (warning instanceof InvalidImportWarning) { // [!code highlight]
-			if (['$app/server', '$app/navigation'].includes(warning.specifier)) { // [!code highlight]
-				return; // Don't log this warning // [!code highlight]
+	build: {
+		onwarn: (warning, handler) => { // [!code highlight]
+			// Suppress warnings for SvelteKit internal imports
+			if (warning instanceof InvalidImportWarning) { // [!code highlight]
+				if (['$app/server', '$app/navigation'].includes(warning.specifier)) { // [!code highlight]
+					return; // Don't log this warning // [!code highlight]
+				}
 			}
-		}
-		// Suppress language warnings for specific file types
-		if (warning instanceof LanguageNotFoundWarning) { // [!code highlight]
-			if (warning.path.endsWith('.glb') || warning.path.endsWith('.png')) { // [!code highlight]
-				return; // Don't log this warning // [!code highlight]
+			// Suppress language warnings for specific file types
+			if (warning instanceof LanguageNotFoundWarning) { // [!code highlight]
+				if (warning.path.endsWith('.glb') || warning.path.endsWith('.png')) { // [!code highlight]
+					return; // Don't log this warning // [!code highlight]
+				}
 			}
-		}
-		// Log all other warnings using the default handler
-		handler(warning); // [!code highlight]
+			// Log all other warnings using the default handler
+			handler(warning); // [!code highlight]
+		},
 	},
 });
 ```
