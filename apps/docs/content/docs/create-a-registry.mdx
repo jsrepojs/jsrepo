@@ -153,6 +153,86 @@ For more advanced usage you can continue reading below...
 
 Now that we have covered the basics of creating a registry we can start to explore some of the features that make **jsrepo** so powerful.
 
+### Resolving Dependencies
+
+**jsrepo** automatically resolves dependencies both to other items in the registry and to remote packages. This ensures that when building your registry it will work out of the box for end users.
+
+#### Excluding dependencies
+
+Many times you may not want certain dependencies to be installed with your registry items. For instance if you import `useState` from `react` you probably don't want to force users to install `react` with your registry.
+
+For this you can use the `excludeDeps` key of your registry config.
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+        // ...
+		excludeDeps: ["react"], // [!code ++]
+	},
+});
+```
+
+<Callout type="info">
+    It's good practice to put your framework in the `excludeDeps` list whether that be `react`, `vue`, `svelte` etc.
+</Callout>
+
+#### Opting out of automatic dependency resolution
+
+Occasionally you may want to opt out of automatic dependency resolution for a particular item or file.
+
+To do this you can set the `dependencyResolution` key to `manual` on the item or on specific files within the item:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+		items: [
+			{
+				// ...
+				dependencyResolution: "manual", // [!code ++]
+			}
+		]
+	},
+});
+```
+
+#### Resolving `workspace:` and `catalog:` dependencies
+
+By default `workspace:` and `catalog:` dependencies won't be handled by **jsrepo**, however if you are using `pnpm` or `bun` you can use the `@jsrepo/pnpm` or `@jsrepo/bun` packages to automatically resolve these dependencies.
+
+pnpm:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { pnpm } from "@jsrepo/pnpm"; // [!code ++]
+
+export default defineConfig({
+    // ...
+	build: {
+		remoteDependencyResolver: pnpm(), // [!code ++]
+	},
+});
+```
+
+bun:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { bun } from "@jsrepo/bun"; // [!code ++]
+
+export default defineConfig({
+    // ...
+	build: {
+		remoteDependencyResolver: bun(), // [!code ++]
+	},
+});
+```
+
+Now when you build your registry the `workspace:` and `catalog:` dependencies will be resolved to concrete versions.
+
 ### Files
 
 We showed you how to include files in the registry earlier by referencing them by their path but there's much more to know!
@@ -428,27 +508,6 @@ For instance:
 | `src/lib/demos/button-default.svelte` | `button-default.svelte` |
 | `src/lib/demos/variants/button-outlined.svelte` | `variants/button-outlined.svelte` |
 | `src/lib/demos/variants/themes/button-dark.svelte` | `variants/themes/button-dark.svelte` |
-
-### Excluding dependencies
-
-Many times you may not want certain dependencies to be installed with your registry items. For instance if you import `useState` from `react` you probably don't want to force users to install `react` with your registry.
-
-For this you can use the `excludeDeps` key of your registry config.
-
-```ts title="jsrepo.config.ts"
-import { defineConfig } from "jsrepo";
-
-export default defineConfig({
-	registry: {
-        // ...
-		excludeDeps: ["react"], // [!code ++]
-	},
-});
-```
-
-<Callout type="info">
-    It's good practice to put your framework in the `excludeDeps` list whether that be `react`, `vue`, `svelte` etc.
-</Callout>
 
 ### Configure when an item is added
 
