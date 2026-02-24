@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.6.1
+### Patch Changes
+
+
+- fix: Ensure dependencies can be installed on `init` ([#781](https://github.com/jsrepojs/jsrepo/pull/781))
+
 ## 3.6.0
 ### Minor Changes
 
