@@ -2,4 +2,4 @@
 "jsrepo": patch
 ---
 
-fix(init): dependency merge error
+fix: Ensure dependencies can be installed on `init`
