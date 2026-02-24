@@ -392,8 +392,8 @@ export async function runInit(
 			}
 		}
 
-		neededDeps.dependencies.push(...neededDependencies.dependencies);
-		neededDeps.devDependencies.push(...neededDependencies.devDependencies);
+		neededDependencies.dependencies.push(...neededDeps.dependencies);
+		neededDependencies.devDependencies.push(...neededDeps.devDependencies);
 	}
 
 	if (config.paths !== undefined) {
