@@ -195,11 +195,11 @@ const ServerConfigSchema = z.object({
 export type ServerConfig = z.infer<typeof ServerConfigSchema>;
 
 export const McpServerConfigSchema = z.object({
-	mcpServers: z.record(z.string(), ServerConfigSchema),
+	mcpServers: z.record(z.string(), z.unknown()),
 });
 
 export const VSCodeServerConfigSchema = z.object({
-	servers: z.record(z.string(), ServerConfigSchema),
+	servers: z.record(z.string(), z.unknown()),
 });
 
 export type McpServerConfig = z.infer<typeof McpServerConfigSchema>;
