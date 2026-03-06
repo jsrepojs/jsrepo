@@ -186,11 +186,16 @@ export function updateTomlConfig(existingContent: string): string {
 	return `${existingContent}${MCP_SERVER_CONFIG_TOML}`;
 }
 
-const ServerConfigSchema = z.object({
-	command: z.string(),
-	args: z.array(z.string()),
-	env: z.record(z.string(), z.string()).optional(),
-});
+const ServerConfigSchema = z
+	.object({
+		command: z.string().optional(),
+		args: z.array(z.string()).optional(),
+		env: z.record(z.string(), z.string()).optional(),
+		type: z.string().optional(),
+		url: z.string().optional(),
+		headers: z.record(z.string(), z.string()).optional(),
+	})
+	.catchall(z.unknown());
 
 export type ServerConfig = z.infer<typeof ServerConfigSchema>;
 
