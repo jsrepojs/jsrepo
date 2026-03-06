@@ -99,4 +99,48 @@ describe('updateJsonConfig', () => {
 			)
 		);
 	});
+
+	it('should preserve non-stdio server configs', () => {
+		const config = {
+			mcpServers: {
+				stitch: {
+					type: 'http',
+					url: 'https://stitch.googleapis.com/mcp',
+					headers: {
+						'X-Goog-Api-Key': 'test-key',
+					},
+				},
+			},
+		};
+
+		const result = updateJsonConfig({
+			existingContent: JSON.stringify(config),
+			serverName: 'jsrepo',
+			serverConfig: {
+				command: 'npx',
+				args: ['@jsrepo/mcp'],
+			},
+		});
+		assert(result.isOk());
+		expect(result.value).toBe(
+			stringify(
+				{
+					mcpServers: {
+						stitch: {
+							type: 'http',
+							url: 'https://stitch.googleapis.com/mcp',
+							headers: {
+								'X-Goog-Api-Key': 'test-key',
+							},
+						},
+						jsrepo: {
+							command: 'npx',
+							args: ['@jsrepo/mcp'],
+						},
+					},
+				},
+				{ format: true }
+			)
+		);
+	});
 });
