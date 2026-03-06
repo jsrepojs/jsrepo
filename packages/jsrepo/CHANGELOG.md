@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.6.2
+### Patch Changes
+
+
+- fix: Loosely validate mcp servers during mcp init to prevent validation errors ([#784](https://github.com/jsrepojs/jsrepo/pull/784))
+
 ## 3.6.1
 ### Patch Changes
 
