@@ -769,7 +769,16 @@ async function resolveFile(
 				}
 			)
 		);
-	const content = contentResult.value;
+
+	// run any prebuild transforms on the content
+	let content = contentResult.value;
+	for (const transform of config.build.transforms ?? []) {
+		const { content: newContent } = await transform.transform(content, {
+			cwd,
+			file,
+		});
+		content = newContent;
+	}
 
 	const manualDependencies = toRemoteDependencies(file.dependencies ?? [], {
 		registryName: registry.name,

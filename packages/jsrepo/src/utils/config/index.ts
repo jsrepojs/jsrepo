@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { DEFAULT_LANGS, type Language } from '@/langs';
 import type { Output } from '@/outputs/types';
 import { DEFAULT_PROVIDERS, type ProviderFactory } from '@/providers';
-import type { RemoteDependency } from '@/utils/build';
+import type { RemoteDependency, UnresolvedFile } from '@/utils/build';
 import type { AfterHook, BeforeHook } from '@/utils/hooks';
 import type {
 	AbsolutePath,
@@ -24,6 +24,13 @@ export type RemoteDependencyResolver = (
 	dep: RemoteDependency,
 	options: RemoteDependencyResolverOptions
 ) => MaybePromise<RemoteDependency>;
+
+export type BuildTransform = {
+	transform: (
+		content: string,
+		opts: { cwd: AbsolutePath; file: UnresolvedFile }
+	) => MaybePromise<{ content: string }>;
+};
 
 export type Config = {
 	/** An array of registries to fetch items from.
@@ -87,6 +94,7 @@ export type Config = {
 		 * ```
 		 */
 		onwarn?: (warning: Warning, handler: (message: Warning) => void) => void;
+		transforms?: BuildTransform[];
 		/**
 		 * Resolve each remote dependency before it is added to the built registry output.
 		 * Useful for rewriting protocol-based versions (e.g. `workspace:*`, `catalog:`).
