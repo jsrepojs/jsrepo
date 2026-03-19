@@ -9,7 +9,7 @@
 				},
 				"apps": {
 					"color": "green",
-					"command": "wait-on packages/jsrepo/dist/api/index.mjs && pnpm dev:apps"
+					"command": "pnpm wait-on packages/jsrepo/dist/api/index.mjs && pnpm dev:apps"
 				}
 			}
 		},

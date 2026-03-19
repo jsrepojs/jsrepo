@@ -300,6 +300,26 @@ export default defineConfig({
 });
 ```
 
+### build.transforms
+
+The `build.transforms` option allows you to transform the content of files before they are added to your project.
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	build: {
+		transforms: [
+			{
+				transform: async (content, opts) => {
+					return { content: content.replaceAll('{{PROJECT_NAME}}', 'jsrepo') };
+				},
+			}
+		],
+	},
+});
+```
+
 ### hooks
 
 Hooks allow you to run custom logic before and after CLI commands.

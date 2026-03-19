@@ -762,3 +762,29 @@ We recommend when you do this to follow a few best practices:
 
 1. Credit the upstream registry in some way so users know where those items came from.
 2. Ensure to set `add: "when-needed"` on items from external registries to prevent them from being listed by the `add` command.
+
+### Modifying items in your registry before build
+
+Sometimes you may want to modify the content of registry items before they are built to an output.
+
+For example you may want to build multiple different types of your registry for each style you offer.
+
+You can do this with the `build.transforms` option:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	build: {
+		transforms: [
+			{
+				transform: async (content, opts) => {
+					return { content: content.replaceAll('{{PROJECT_NAME}}', 'jsrepo') };
+				},
+			}
+		],
+	},
+});
+```
+
+This will run the transform on the content of each file in your registry before it's added to the output. This way you can easily modify the content at build time without needing to write another registry to the filesystem.
