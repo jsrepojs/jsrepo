@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.7.0
+### Minor Changes
+
+
+- feat: Add `build.transforms` to config to allow users to transform file content before build ([#786](https://github.com/jsrepojs/jsrepo/pull/786))
+
 ## 3.6.2
 ### Patch Changes
 

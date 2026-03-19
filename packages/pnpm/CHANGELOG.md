@@ -1,5 +1,11 @@
 # @jsrepo/pnpm
 
+## 2.0.0
+### Patch Changes
+
+- Updated dependencies [[`84c436e`](https://github.com/jsrepojs/jsrepo/commit/84c436ea2a98ededf10e0c13ab2fc882ed6f632b)]:
+  - jsrepo@3.7.0
+
 ## 1.0.2
 ### Patch Changes
 
