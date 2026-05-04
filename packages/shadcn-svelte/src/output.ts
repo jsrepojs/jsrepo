@@ -32,11 +32,11 @@ export type OutputOptions = {
 	 * ```json
 	 * {
 	 * 	"aliases": {
-	 * 		"lib": "@/lib", // Matches your internal imports
-	 * 		"ui": "@/lib/registry/ui", // Matches your internal imports
-	 * 		"components": "@/lib/registry/components", // Matches your internal imports
-	 * 		"utils": "@/lib/utils", // Matches your internal imports
-	 * 		"hooks": "@/lib/hooks" // Matches your internal imports
+	 * 		"lib": "$lib", // Matches your internal imports
+	 * 		"ui": "$lib/registry/ui", // Matches your internal imports
+	 * 		"components": "$lib/registry/components", // Matches your internal imports
+	 * 		"utils": "$lib/utils", // Matches your internal imports
+	 * 		"hooks": "$lib/hooks" // Matches your internal imports
 	 * 	}
 	 * }
 	 * ```

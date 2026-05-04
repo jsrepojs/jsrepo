@@ -18,6 +18,10 @@ export type ShadcnSvelteRegistry = {
 	homepage: string;
 	excludeDeps: string[];
 	items: ShadcnSvelteRegistryItem[];
+	/**
+	 * @deprecated Aliases should be defined on your `@jsrepo/shadcn-svelte` output instead.
+	 */
+	aliases?: Record<string, string>;
 	outputs: Output[];
 };
 
@@ -60,6 +64,15 @@ export type ShadcnSvelteRegistryItem = {
 };
 
 export function defineShadcnSvelteRegistry(registry: ShadcnSvelteRegistry): RegistryConfig {
+	if (registry.aliases !== undefined) {
+		throw new JsrepoError(
+			'Aliases should be defined on your `@jsrepo/shadcn-svelte` output instead.',
+			{
+				suggestion:
+					'Please remove the aliases from your registry config and defined them on your `@jsrepo/shadcn-svelte` output instead.',
+			}
+		);
+	}
 	return {
 		...registry,
 		items: registry.items.map((item) => {
