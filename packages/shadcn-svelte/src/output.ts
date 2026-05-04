@@ -6,6 +6,7 @@ import { resolveCommand } from 'package-manager-detector';
 import {
 	type Registry,
 	type RegistryItem,
+	type RegistryItemType,
 	registryItemFileSchema,
 	registryItemSchema,
 	registrySchema,
@@ -50,6 +51,10 @@ export type OutputOptions = {
 	 * @default true
 	 */
 	cleanOnFailure?: boolean;
+	/**
+	 * Remap the types of items in your registry to the correct shadcn-svelte type.
+	 */
+	typeMap?: Record<string, RegistryItemType>;
 };
 
 export function output(options: OutputOptions): Output {
@@ -79,7 +84,8 @@ export function output(options: OutputOptions): Output {
 							item.name
 						}. Expected one of: ${registryItemFileSchema.shape.type.options.join(', ')}`,
 						{
-							suggestion: 'Please use a valid item type.',
+							suggestion:
+								'Please use a valid item type or remap the type using the `typeMap` option.',
 						}
 					);
 				}
@@ -234,9 +240,10 @@ export function output(options: OutputOptions): Output {
 	};
 }
 
-function getType(type?: string) {
+function getType(type?: string, typeMap?: Record<string, RegistryItemType>) {
 	// this way we don't require target by default
 	if (!type) return 'registry:ui';
+	if (typeMap?.[type]) return typeMap[type];
 	return type.startsWith('registry:') ? type : `registry:${type}`;
 }
 

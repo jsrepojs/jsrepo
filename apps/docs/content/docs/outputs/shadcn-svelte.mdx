@@ -96,3 +96,25 @@ export default defineConfig({
 	},
 });
 ```
+
+## Remapping item types
+
+If you are already using custom item types in your registry and you want to support building to **shadcn-svelte** you can use the `typeMap` option to remap the types to the correct **shadcn-svelte** type.
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { output } from "@jsrepo/shadcn-svelte/output";
+
+export default defineConfig({
+	registry: {
+		outputs: [
+			output({ 
+				dir: "./public/r/shadcn-svelte", 
+				typeMap: {
+					"custom-type": "registry:ui"
+				} 
+			})
+		],
+	},
+});
+```
