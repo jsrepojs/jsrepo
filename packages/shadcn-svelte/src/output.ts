@@ -221,8 +221,6 @@ export function output(options: OutputOptions): Output {
 				'registry',
 				'build',
 				tempRegistryJsonPath,
-				'--cwd',
-				cwd,
 				'--output',
 				outDir,
 			]);
@@ -235,7 +233,9 @@ export function output(options: OutputOptions): Output {
 
 			let failed = false;
 			try {
-				await x(shadcnSvelteCommand.command, shadcnSvelteCommand.args);
+				await x(shadcnSvelteCommand.command, shadcnSvelteCommand.args, {
+					nodeOptions: { stdio: 'inherit', cwd },
+				});
 			} catch (err) {
 				failed = true;
 				throw new JsrepoError(
