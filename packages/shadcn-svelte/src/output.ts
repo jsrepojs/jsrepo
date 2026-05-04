@@ -235,6 +235,7 @@ export function output(options: OutputOptions): Output {
 			try {
 				await x(shadcnSvelteCommand.command, shadcnSvelteCommand.args, {
 					nodeOptions: { stdio: 'inherit', cwd },
+					throwOnError: true,
 				});
 			} catch (err) {
 				failed = true;
