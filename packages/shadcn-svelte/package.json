@@ -1,0 +1,62 @@
+{
+	"name": "@jsrepo/shadcn-svelte",
+	"description": "A package to help you distribute your jsrepo registry as a shadcn-svelte registry.",
+	"version": "0.0.0",
+	"license": "MIT",
+	"homepage": "https://jsrepo.dev/docs/outputs/shadcn-svelte",
+	"author": {
+		"name": "Aidan Bleser",
+		"url": "https://github.com/ieedan"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/jsrepojs/jsrepo"
+	},
+	"bugs": {
+		"url": "https://github.com/jsrepojs/jsrepo/issues"
+	},
+	"keywords": [
+		"jsrepo",
+		"shadcn",
+		"svelte",
+		"shadcn-svelte",
+		"registry",
+		"output",
+		"adapter"
+	],
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.mts",
+			"default": "./dist/index.mjs"
+		},
+		"./output": {
+			"types": "./dist/output.d.mts",
+			"default": "./dist/output.mjs"
+		}
+	},
+	"main": "./dist/index.mjs",
+	"files": [
+		"dist/**/*",
+		"!dist/**/*.map"
+	],
+	"scripts": {
+		"build": "tsdown",
+		"dev": "tsdown --watch",
+		"check": "tsc --noEmit",
+		"bundle-analyze": "FORCE_COLOR=1 pnpx bundle-analyze . --fail-if-exceeds-bytes 500000"
+	},
+	"packageManager": "pnpm@10.28.2",
+	"peerDependencies": {
+		"jsrepo": "workspace:*"
+	},
+	"devDependencies": {
+		"@types/node": "catalog:",
+		"package-manager-detector": "^1.6.0",
+		"shadcn-svelte": "^1.2.7",
+		"tinyexec": "^1.0.2",
+		"tsdown": "catalog:",
+		"typescript": "catalog:",
+		"zod": "catalog:"
+	}
+}

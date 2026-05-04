@@ -551,6 +551,34 @@ importers:
         specifier: 'catalog:'
         version: 4.3.6
 
+  packages/shadcn-svelte:
+    dependencies:
+      jsrepo:
+        specifier: workspace:*
+        version: link:../jsrepo
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 25.3.0
+      package-manager-detector:
+        specifier: ^1.6.0
+        version: 1.6.0
+      shadcn-svelte:
+        specifier: ^1.2.7
+        version: 1.2.7(svelte@5.53.2)
+      tinyexec:
+        specifier: ^1.0.2
+        version: 1.0.2
+      tsdown:
+        specifier: 'catalog:'
+        version: 0.19.0-beta.3(@arethetypeswrong/core@0.18.2)(typescript@5.9.3)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.6
+
   packages/transform-biome:
     dependencies:
       '@biomejs/js-api':
@@ -4958,6 +4986,9 @@ packages:
     engines: {node: '>=10.5.0'}
     deprecated: Use your platform's native DOMException instead
 
+  node-fetch-native@1.6.7:
+    resolution: {integrity: sha512-g9yhqoedzIUm0nTnTqAQvueMPVOuIY16bqgAJJC8XOOubYFNwz6IER9qs0Gq2Xd0+CecCKFjtdDTMA4u4xG06Q==}
+
   node-fetch@2.7.0:
     resolution: {integrity: sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==}
     engines: {node: 4.x || >=6.0.0}
@@ -5482,6 +5513,12 @@ packages:
 
   setprototypeof@1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
+
+  shadcn-svelte@1.2.7:
+    resolution: {integrity: sha512-mWuQk4H4gtV+J2wJQ7nEPKNnB/v86AALFryZU0SSM7ChHmJJMZ1kH+qIuxYKrXm9vOOOcSWHRsWzPDB71DnjYA==}
+    hasBin: true
+    peerDependencies:
+      svelte: ^5.0.0
 
   shadcn@3.8.5:
     resolution: {integrity: sha512-jPRx44e+eyeV7xwY3BLJXcfrks00+M0h5BGB9l6DdcBW4BpAj4x3lVmVy0TXPEs2iHEisxejr62sZAAw6B1EVA==}
@@ -10419,6 +10456,8 @@ snapshots:
 
   node-domexception@1.0.0: {}
 
+  node-fetch-native@1.6.7: {}
+
   node-fetch@2.7.0(encoding@0.1.13):
     dependencies:
       whatwg-url: 5.0.0
@@ -10938,7 +10977,7 @@ snapshots:
     dependencies:
       '@babel/generator': 7.28.5
       '@babel/parser': 7.28.5
-      '@babel/types': 7.28.5
+      '@babel/types': 7.29.0
       ast-kit: 2.2.0
       birpc: 4.0.0
       dts-resolver: 2.1.3
@@ -11084,6 +11123,14 @@ snapshots:
   set-cookie-parser@3.0.1: {}
 
   setprototypeof@1.2.0: {}
+
+  shadcn-svelte@1.2.7(svelte@5.53.2):
+    dependencies:
+      commander: 14.0.3
+      node-fetch-native: 1.6.7
+      postcss: 8.5.6
+      svelte: 5.53.2
+      tailwind-merge: 3.5.0
 
   shadcn@3.8.5(@types/node@25.3.0)(typescript@5.9.3):
     dependencies:
