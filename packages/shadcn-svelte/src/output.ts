@@ -141,7 +141,7 @@ export function output(options: OutputOptions): Output {
 							return {
 								// biome-ignore lint/suspicious/noExplicitAny: already checked it
 								type: type as any,
-								path: file.path,
+								path: file.absolutePath,
 								target: file.target,
 							};
 						}),
