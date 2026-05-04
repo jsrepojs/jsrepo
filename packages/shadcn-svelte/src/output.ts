@@ -8,6 +8,7 @@ import {
 import type { Output } from 'jsrepo/outputs';
 import { normalizeItemTypeForPath } from 'jsrepo/utils';
 import { resolveCommand } from 'package-manager-detector';
+import pc from 'picocolors';
 import {
 	type Registry,
 	type RegistryItem,
@@ -163,7 +164,7 @@ export function output(options: OutputOptions): Output {
 						return {
 							// biome-ignore lint/suspicious/noExplicitAny: already checked it
 							type: shadcnFileType as any,
-							path: file.path,
+							path: file.absolutePath,
 							target: synthesizeRegistryItemTarget({
 								shadcnType: shadcnFileType,
 								filePath: file.path,
@@ -227,14 +228,14 @@ export function output(options: OutputOptions): Output {
 
 			if (shadcnSvelteCommand === null) {
 				throw new JsrepoError('Failed to resolve `shadcn-svelte registry build` command', {
-					suggestion: `Please ensure you can build your registry with the \`shadcn-svelte registry build ${tempRegistryJsonPath} --cwd ${cwd} --output ${outDir}\` command.`,
+					suggestion: 'We had trouble resolving the command for you package manager.',
 				});
 			}
 
 			let failed = false;
 			try {
 				await x(shadcnSvelteCommand.command, shadcnSvelteCommand.args, {
-					nodeOptions: { stdio: 'inherit', cwd },
+					nodeOptions: { cwd },
 					throwOnError: true,
 				});
 			} catch (err) {
@@ -242,7 +243,7 @@ export function output(options: OutputOptions): Output {
 				throw new JsrepoError(
 					`Failed to build registry with shadcn-svelte. Error: ${err instanceof Error ? err.message : String(err)}`,
 					{
-						suggestion: `Please ensure you can build your registry with the \`shadcn-svelte registry build ${tempRegistryJsonPath} --cwd ${cwd} --output ${outDir}\` command.`,
+						suggestion: `Please ensure you can build your registry with the \`${pc.bold([shadcnSvelteCommand.command, ...shadcnSvelteCommand.args].join(' '))}\` command.`,
 					}
 				);
 			} finally {

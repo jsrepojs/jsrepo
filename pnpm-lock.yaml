@@ -563,6 +563,9 @@ importers:
       package-manager-detector:
         specifier: ^1.6.0
         version: 1.6.0
+      picocolors:
+        specifier: 'catalog:'
+        version: 1.1.1
       shadcn-svelte:
         specifier: ^1.2.7
         version: 1.2.7(svelte@5.53.2)

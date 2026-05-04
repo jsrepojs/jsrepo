@@ -53,6 +53,7 @@
 	"devDependencies": {
 		"@types/node": "catalog:",
 		"package-manager-detector": "^1.6.0",
+		"picocolors": "catalog:",
 		"shadcn-svelte": "^1.2.7",
 		"tinyexec": "^1.0.2",
 		"tsdown": "catalog:",
