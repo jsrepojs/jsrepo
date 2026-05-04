@@ -59,6 +59,13 @@ export type OutputOptions = {
 
 export function output(options: OutputOptions): Output {
 	const cleanOnFailure = options.cleanOnFailure ?? true;
+	const getType = (type: string | undefined) => {
+		// this way we don't require target by default
+		if (!type) return 'registry:ui';
+		if (options.typeMap?.[type]) return options.typeMap[type];
+		return type.startsWith('registry:') ? type : `registry:${type}`;
+	};
+
 	return {
 		output: async (buildResult, { cwd }) => {
 			if (buildResult.homepage === undefined) {
@@ -238,13 +245,6 @@ export function output(options: OutputOptions): Output {
 			fs.rmSync(path.join(cwd, options.dir), { recursive: true });
 		},
 	};
-}
-
-function getType(type?: string, typeMap?: Record<string, RegistryItemType>) {
-	// this way we don't require target by default
-	if (!type) return 'registry:ui';
-	if (typeMap?.[type]) return typeMap[type];
-	return type.startsWith('registry:') ? type : `registry:${type}`;
 }
 
 function stringify(data: unknown, options: { format?: boolean } = {}): string {
