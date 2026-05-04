@@ -104,8 +104,6 @@ export function output(options: OutputOptions): Output {
 				}
 			}
 
-			const itemNames = new Set(buildResult.items.map((item) => item.name));
-
 			const registryJson: Registry & { $schema: string } = {
 				$schema: 'https://shadcn-svelte.com/schema/registry.json',
 				name: buildResult.name,
@@ -113,7 +111,7 @@ export function output(options: OutputOptions): Output {
 				aliases: options.aliases ?? {},
 				items: buildResult.items.map((item) => {
 					const registryDependencies = item.registryDependencies?.map((dep) =>
-						toRelativeRegistryDep(dep, itemNames)
+						toRelativeRegistryDep(dep)
 					);
 					return {
 						name: item.name,
@@ -156,7 +154,7 @@ export function output(options: OutputOptions): Output {
 
 			const items: RegistryItem[] = buildResult.items.map((item) => {
 				const registryDependencies = item.registryDependencies?.map((dep) =>
-					toRelativeRegistryDep(dep, itemNames)
+					toRelativeRegistryDep(dep)
 				);
 				return {
 					$schema: 'https://shadcn-svelte.com/schema/registry-item.json',
@@ -274,7 +272,7 @@ function toPosixPath(segment: string) {
 	return segment.replaceAll('\\', '/');
 }
 
-function toRelativeRegistryDep(dep: string, itemNames: Set<string>): string {
+function toRelativeRegistryDep(dep: string): string {
 	if (
 		dep.startsWith('http://') ||
 		dep.startsWith('https://') ||
@@ -283,7 +281,7 @@ function toRelativeRegistryDep(dep: string, itemNames: Set<string>): string {
 	) {
 		return dep;
 	}
-	return itemNames.has(dep) ? `./${dep}.json` : dep;
+	return `./${dep}.json`;
 }
 
 /**
