@@ -1,0 +1,120 @@
+---
+title: shadcn-svelte
+description: Output your registry as a shadcn-svelte registry.
+---
+
+<BadgeGroup>
+	<SourceBadge path="packages/shadcn-svelte/src/output.ts" />
+	<OfficialBadge />
+	<NpmBadge packageName="@jsrepo/shadcn-svelte" />
+</BadgeGroup>
+
+The `@jsrepo/shadcn-svelte` package helps you distribute your jsrepo registry as a [shadcn-svelte](https://shadcn-svelte.com) registry.
+
+## Usage
+
+To get started install the package:
+
+```npm
+npm install @jsrepo/shadcn-svelte -D
+```
+
+Next let's add the output to our config file:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { output } from "@jsrepo/shadcn-svelte/output";
+
+export default defineConfig({
+	registry: {
+        // ...
+		outputs: [
+			output({ 
+				dir: "./public/r/shadcn-svelte",
+				// while jsrepo doesn't need you to define aliases to resolve your imports shadcn-svelte does
+				// because of this you will need to define them here so the shadcn-svelte cli can use them
+				aliases: {
+					"lib": "$lib",
+					"ui": "$lib/registry/ui",
+					"components": "$lib/registry/components",
+					"utils": "$lib/utils",
+					"hooks": "$lib/hooks",
+				},
+			})
+		],
+	},
+});
+```
+
+Now running `jsrepo build` will output a **shadcn-svelte** registry to the `./public/r/shadcn-svelte` directory.
+
+## defineShadcnSvelteRegistry
+
+**shadcn-svelte** registries are defined a bit differently than **jsrepo** registries, generally this plugin should correctly resolve those differences or warn you if it is unable to. .
+
+If you only distribute your registry as a **shadcn-svelte** registry and want to define it in the **shadcn-svelte** shape, use `defineShadcnSvelteRegistry`.
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { defineShadcnSvelteRegistry, output } from "@jsrepo/shadcn-svelte";
+
+export default defineConfig({
+	registry: defineShadcnSvelteRegistry({
+		// make sure you still include the output
+		outputs: [
+			output({ 
+				dir: "./public/r/shadcn-svelte",
+				aliases: {
+					// ...
+				},
+			})
+		],
+	}),
+});
+```
+
+## Outputting jsrepo registries alongside shadcn-svelte registries
+
+As with the **shadcn** output, the **jsrepo** default outputs and **shadcn-svelte** output are not compatible in the same directory. Serve each registry from a different URL.
+
+The preferred way to avoid this conflict is to publish your registry to [jsrepo.com](https://jsrepo.com).
+
+Otherwise, postfix the **shadcn-svelte** registry output `dir` option (for example `./public/r/shadcn-svelte`).
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { distributed } from "jsrepo/outputs";
+import { output } from "@jsrepo/shadcn-svelte/output";
+
+export default defineConfig({
+	registry: {
+		outputs: [
+            distributed({ dir: "./public/r" }),
+            output({ dir: "./public/r" }), // [!code --]
+            output({ dir: "./public/r/shadcn-svelte" }), // [!code ++]
+        ],
+	},
+});
+```
+
+## Remapping item types
+
+If you are already using custom item types in your registry and you want to support building to **shadcn-svelte** you can use the `typeMap` option to remap the types to the correct **shadcn-svelte** type.
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import { output } from "@jsrepo/shadcn-svelte/output";
+
+export default defineConfig({
+	registry: {
+		outputs: [
+			output({ 
+				dir: "./public/r/shadcn-svelte", 
+				typeMap: {
+					"custom-type": "registry:ui"
+				} 
+			})
+		],
+	},
+});
+```
