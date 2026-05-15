@@ -1,20 +1,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import {
-	detectPackageManager,
-	JsrepoError,
-	type RegistryItemType as JsrepoRegistryItemType,
-} from 'jsrepo';
+import { detectPackageManager, JsrepoError } from 'jsrepo';
 import type { Output } from 'jsrepo/outputs';
-import { normalizeItemTypeForPath } from 'jsrepo/utils';
 import { resolveCommand } from 'package-manager-detector';
 import pc from 'picocolors';
 import {
 	type Registry,
-	type RegistryItem,
 	type RegistryItemType,
 	registryItemFileSchema,
-	registryItemSchema,
 	registrySchema,
 } from 'shadcn-svelte/schema';
 import { x } from 'tinyexec';
@@ -144,51 +137,13 @@ export function output(options: OutputOptions): Output {
 							return {
 								// biome-ignore lint/suspicious/noExplicitAny: already checked it
 								type: type as any,
-								path: file.absolutePath,
-								target: file.target,
+								path: toPosixPath(path.relative(cwd, file.absolutePath)),
+								target: file.target ? toPosixPath(file.target) : undefined,
 							};
 						}),
 					} satisfies Registry['items'][number];
 				}),
 			};
-
-			const items: RegistryItem[] = buildResult.items.map((item) => {
-				const registryDependencies = item.registryDependencies?.map((dep) =>
-					toRelativeRegistryDep(dep)
-				);
-				return {
-					$schema: 'https://shadcn-svelte.com/schema/registry-item.json',
-					name: item.name,
-					title: item.title,
-					description: item.description,
-					type: getType(item.type) as Exclude<
-						RegistryItem['type'],
-						'registry:base' | 'registry:font'
-					>,
-					files: item.files.map((file) => {
-						const shadcnFileType = getType(file.type);
-						return {
-							// biome-ignore lint/suspicious/noExplicitAny: already checked it
-							type: shadcnFileType as any,
-							path: file.absolutePath,
-							target: synthesizeRegistryItemTarget({
-								shadcnType: shadcnFileType,
-								filePath: file.path,
-								sourceType: file.type,
-								explicitTarget: file.target,
-								itemName: item.name,
-								defaultPaths: buildResult.defaultPaths,
-							}),
-							content: file.content,
-						};
-					}),
-					registryDependencies: registryDependencies ?? [],
-					dependencies: item.dependencies?.map(
-						(dependency) =>
-							`${dependency.name}${dependency.version ? `@${dependency.version}` : ''}`
-					),
-				} satisfies RegistryItem;
-			});
 
 			// contain errors to this plugin so there aren't issues for users
 			const parsedRegistryResult = registrySchema.safeParse(registryJson);
@@ -200,19 +155,6 @@ export function output(options: OutputOptions): Output {
 							"This one's on us. Please file an issue at https://github.com/jsrepojs/jsrepo/issues",
 					}
 				);
-			}
-
-			for (const item of items) {
-				const parsedItemResult = registryItemSchema.safeParse(item);
-				if (!parsedItemResult.success) {
-					throw new JsrepoError(
-						`Invalid item ${item.name}: ${parsedItemResult.error.message}`,
-						{
-							suggestion:
-								"This one's on us. Please file an issue at https://github.com/jsrepojs/jsrepo/issues",
-						}
-					);
-				}
 			}
 
 			const tempRegistryJsonPath = path.join(cwd, `registry-temp-${Date.now()}.json`);
@@ -282,56 +224,6 @@ function toRelativeRegistryDep(dep: string): string {
 		return dep;
 	}
 	return `./${dep}.json`;
-}
-
-/**
- * shadcn-svelte's {@link registryItemSchema} requires every file entry to include
- * `target: string`. When `files[].target` is omitted, jsrepo installs use
- * `defaultPaths[<type>/<name>]` or `defaultPaths[<type>]` plus the file's path
- * (see `getTargetPath` in jsrepo).
- */
-function synthesizeRegistryItemTarget({
-	shadcnType,
-	filePath,
-	sourceType,
-	explicitTarget,
-	itemName,
-	defaultPaths,
-}: {
-	shadcnType: string;
-	filePath: string;
-	sourceType: JsrepoRegistryItemType;
-	explicitTarget: string | undefined;
-	itemName: string;
-	defaultPaths: Record<string, string> | undefined;
-}): string {
-	if (explicitTarget !== undefined && explicitTarget !== '') {
-		return toPosixPath(explicitTarget);
-	}
-
-	if (shadcnType === 'registry:page' || shadcnType === 'registry:file') {
-		throw new JsrepoError(
-			`Target is required for registry items with type ${shadcnType}. Please provide a target for ${filePath} on ${itemName}`,
-			{
-				suggestion: 'Please provide a target for the file.',
-			}
-		);
-	}
-
-	const normalizedType = normalizeItemTypeForPath(sourceType);
-	const specificKey = `${normalizedType}/${itemName}`;
-	const base = defaultPaths?.[specificKey] ?? defaultPaths?.[normalizedType];
-
-	if (base === undefined || base === '') {
-		throw new JsrepoError(
-			`Cannot derive shadcn-svelte registry file target for ${filePath} on item ${itemName}.`,
-			{
-				suggestion: `Set registry.defaultPaths['${normalizedType}'] or registry.defaultPaths['${specificKey}'], or set an explicit files[].target in your jsrepo config.`,
-			}
-		);
-	}
-
-	return path.posix.join(toPosixPath(base), toPosixPath(filePath));
 }
 
 function stringify(data: unknown, options: { format?: boolean } = {}): string {
