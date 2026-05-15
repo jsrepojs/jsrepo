@@ -138,7 +138,9 @@ export function output(options: OutputOptions): Output {
 								// biome-ignore lint/suspicious/noExplicitAny: already checked it
 								type: type as any,
 								path: toPosixPath(path.relative(cwd, file.absolutePath)),
-								target: file.target ? toPosixPath(file.target) : undefined,
+								target: file.target
+									? toPosixPath(registryInstallTarget(item.name, file.path))
+									: undefined,
 							};
 						}),
 					} satisfies Registry['items'][number];
@@ -212,6 +214,24 @@ export function output(options: OutputOptions): Output {
 /** Normalize path segments for POSIX-style registry targets */
 function toPosixPath(segment: string) {
 	return segment.replaceAll('\\', '/');
+}
+
+/**
+ * shadcn-svelte registry file `target` must be relative to the item (e.g. `window/window.svelte`),
+ * not project alias paths such as `$lib/components/...` that jsrepo uses during builds.
+ *
+ * {@link https://shadcn-svelte.com/docs/registry/registry-json}
+ */
+function registryInstallTarget(itemName: string, filePath: string): string {
+	const normalized = toPosixPath(filePath);
+	if (!normalized.includes('/')) {
+		return `${itemName}/${normalized}`;
+	}
+	const segments = normalized.split('/');
+	if (segments[0] === itemName) {
+		return normalized;
+	}
+	return [itemName, ...segments.slice(1)].filter(Boolean).join('/');
 }
 
 function toRelativeRegistryDep(dep: string): string {
