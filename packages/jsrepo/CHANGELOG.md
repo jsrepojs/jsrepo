@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.7.1
+### Patch Changes
+
+
+- feat: allow for configuring the indent character in JSON files ([#790](https://github.com/jsrepojs/jsrepo/pull/790))
+
 ## 3.7.0
 ### Minor Changes
 
