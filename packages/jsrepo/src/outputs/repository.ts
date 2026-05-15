@@ -3,13 +3,13 @@ import { type Output, RegistryPluginsSchema, RemoteDependencySchema } from '@/ou
 import { MANIFEST_FILE, UnresolvedImportSchema } from '@/utils/build';
 import { RegistryItemAddSchema, RegistryMetaSchema } from '@/utils/config';
 import { rmSync, writeFileSync } from '@/utils/fs';
-import { stringify } from '@/utils/json';
+import { type StringifyFormat, stringify } from '@/utils/json';
 import { joinAbsolute, type RelativeToCwdPath, relativeToCwd } from '@/utils/path';
 import type { ItemRelativePath } from '@/utils/types';
 
 export type RepositoryOutputOptions = {
 	/** Whether or not to format the output. @default false */
-	format?: boolean;
+	format?: StringifyFormat;
 };
 
 /**

@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { JsrepoError } from 'jsrepo';
+import { JsrepoError, type StringifyFormat, stringify } from 'jsrepo';
 import type { Output } from 'jsrepo/outputs';
 import {
 	type Registry,
@@ -11,7 +11,7 @@ import {
 } from 'shadcn/schema';
 
 export type OutputOptions = {
-	format?: boolean;
+	format?: StringifyFormat;
 	dir: string;
 };
 
@@ -171,8 +171,4 @@ function getType(type?: string) {
 	// this way we don't require target by default
 	if (!type) return 'registry:ui';
 	return type.startsWith('registry:') ? type : `registry:${type}`;
-}
-
-function stringify(data: unknown, options: { format?: boolean } = {}): string {
-	return JSON.stringify(data, null, options.format ? '\t' : undefined);
 }

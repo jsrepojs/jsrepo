@@ -3,7 +3,7 @@ import { type Output, RegistryPluginsSchema, RemoteDependencySchema } from '@/ou
 import { MANIFEST_FILE, UnresolvedImportSchema } from '@/utils/build';
 import { RegistryItemAddSchema, RegistryMetaSchema } from '@/utils/config';
 import { existsSync, readFileSync, rmSync, writeFileSync } from '@/utils/fs';
-import { stringify } from '@/utils/json';
+import { type StringifyFormat, stringify } from '@/utils/json';
 import { joinAbsolute } from '@/utils/path';
 import type { AbsolutePath, ItemRelativePath } from '@/utils/types';
 import { safeParseFromJSON } from '@/utils/zod';
@@ -12,7 +12,7 @@ export type DistributedOutputOptions = {
 	/** The directory to output the files to */
 	dir: string;
 	/** Whether or not to format the output. @default false */
-	format?: boolean;
+	format?: StringifyFormat;
 };
 
 /**
