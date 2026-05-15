@@ -3,7 +3,7 @@ import { cancel, confirm, isCancel, log, text } from '@clack/prompts';
 import { Command } from 'commander';
 import type { RegistryConfig, RegistryItem, RegistryItemFile } from 'jsrepo/config';
 import { DEFAULT_PROVIDERS } from 'jsrepo/providers';
-import { resolveRegistries } from 'jsrepo/utils';
+import { resolveRegistries, stringify } from 'jsrepo/utils';
 import { err, ok, type Result } from 'nevereverthrow';
 import { detect, resolveCommand } from 'package-manager-detector';
 import path from 'pathe';
@@ -23,7 +23,6 @@ import {
 	NoPackageJsonFoundError,
 } from '@/utils/errors';
 import { readFileSync, rmSync, writeFileSync } from '@/utils/fs';
-import { stringify } from '@/utils/json';
 import { type PackageJson, tryGetPackage } from '@/utils/package';
 import { joinAbsolute } from '@/utils/path';
 import { installDependencies, intro, outro, runCommands } from '@/utils/prompts';

@@ -11,6 +11,7 @@ export {
 	resolveWantedItems,
 	updateFiles,
 } from '@/utils/add';
+export { type StringifyFormat, type StringifyOptions, stringify } from '@/utils/json';
 export { joinAbsolute } from '@/utils/path';
 export {
 	detectPackageManager,
