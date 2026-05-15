@@ -1,5 +1,14 @@
 # @jsrepo/migrate
 
+## 0.0.26
+### Patch Changes
+
+
+- feat: allow for configuring the indent character in JSON files ([#790](https://github.com/jsrepojs/jsrepo/pull/790))
+
+- Updated dependencies [[`cf2eaf8`](https://github.com/jsrepojs/jsrepo/commit/cf2eaf8cdb2c964038dbee76ff51d9c6a92652f1)]:
+  - jsrepo@3.7.1
+
 ## 0.0.25
 ### Patch Changes
 
