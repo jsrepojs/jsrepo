@@ -1,5 +1,7 @@
-import { defineConfig } from 'jsrepo';
 import { describe, expect, it } from 'vitest';
+import { defineConfig } from '@/utils/config';
+import type { Transform } from '@/utils/config';
+import { definePlugin } from '@/utils/plugins';
 
 describe('config', () => {
 	it('should add default providers', () => {
@@ -24,5 +26,15 @@ describe('config', () => {
 			languages: [],
 		});
 		expect(config.languages.length === 0).toBe(true);
+	});
+
+	it('should resolve plugins from the unified plugins array', () => {
+		const sampleTransform: Transform = {
+			transform: async ({ code }) => ({ code }),
+		};
+		const config = defineConfig({
+			plugins: [definePlugin({ transforms: [sampleTransform] })],
+		});
+		expect(config.transforms).toHaveLength(1);
 	});
 });

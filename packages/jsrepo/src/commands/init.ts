@@ -482,7 +482,7 @@ async function initPlugins(
 		const wantedPlugins = getWantedPluginsResult.value;
 		const addPluginsToConfigResult = await addPluginsToConfig({
 			plugins: wantedPlugins,
-			key: key as keyof typeof registry.manifest.plugins,
+			key: 'plugins',
 			config: { path: configPath, code: configCode },
 		});
 		if (addPluginsToConfigResult.isErr()) return err(addPluginsToConfigResult.error);
@@ -590,7 +590,7 @@ async function getWantedPlugins(
 	const unAddedPlugins = await neededPlugins({ config, plugins });
 	for (const plugin of unAddedPlugins) {
 		if (pluginChoices.has(plugin.package)) continue;
-		const parsePluginNameResult = parsePluginName(plugin.package, type);
+		const parsePluginNameResult = parsePluginName(plugin.package, 'plugin');
 		if (parsePluginNameResult.isErr()) return err(parsePluginNameResult.error);
 		const pluginName = parsePluginNameResult.value.name;
 		const mappedPlugin: Plugin = {

@@ -568,4 +568,41 @@ describe('parsePluginName', () => {
 			version: undefined,
 		});
 	});
+
+	it('should parse unified plugin names', () => {
+		const result = parsePluginName('@jsrepo/shadcn', 'plugin');
+		expect(result._unsafeUnwrap()).toEqual({
+			name: 'shadcn',
+			packageName: '@jsrepo/shadcn',
+			version: undefined,
+		});
+	});
+
+	it('should add plugins to the unified plugins array', async () => {
+		const configCode = dedent`import { defineConfig } from 'jsrepo';
+
+        export default defineConfig({
+            registries: [],
+        });
+        `;
+
+		const result = await addPluginsToConfig({
+			plugins: [
+				{
+					name: 'prettier',
+					packageName: '@jsrepo/transform-prettier',
+					version: undefined,
+				},
+			],
+			config: {
+				code: configCode,
+				path: 'jsrepo.config.ts',
+			},
+			key: 'plugins',
+		});
+
+		const updated = result._unsafeUnwrap();
+		expect(updated).toContain("import prettier from '@jsrepo/transform-prettier'");
+		expect(updated).toContain('plugins: [prettier()]');
+	});
 });
