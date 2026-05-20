@@ -4,6 +4,7 @@ export type {
 	JsrepoPlugin,
 	JsrepoPluginBuild,
 	JsrepoPluginFactory,
+	JsrepoPluginHooks,
 	PluginInput,
 	ResolvedPluginContributions,
 } from '@/utils/plugins/types';

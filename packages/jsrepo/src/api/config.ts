@@ -14,7 +14,12 @@ export {
 	type TransformOptions,
 } from '@/utils/config';
 export { loadConfigSearch } from '@/utils/config/utils';
-export { definePlugin, type JsrepoPlugin, type JsrepoPluginFactory } from '@/utils/plugins';
+export {
+	definePlugin,
+	type JsrepoPlugin,
+	type JsrepoPluginFactory,
+	type JsrepoPluginHooks,
+} from '@/utils/plugins';
 export { type PartialConfig, resolveConfig } from '@/utils/config/resolve';
 export type {
 	AfterArgs,

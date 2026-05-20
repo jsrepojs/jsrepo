@@ -4,6 +4,7 @@ import type {
 	BuildTransform,
 	JsrepoPlugin,
 	JsrepoPluginBuild,
+	JsrepoPluginHooks,
 	PluginInput,
 	ResolvedPluginContributions,
 } from '@/utils/plugins/types';
@@ -14,7 +15,37 @@ const EMPTY_CONTRIBUTIONS: ResolvedPluginContributions = {
 	providers: [],
 	languages: [],
 	build: {},
+	hooks: {},
 };
+
+function normalizeBeforeHooks(
+	hook: JsrepoPluginHooks['before']
+): NonNullable<JsrepoPluginHooks['before']>[] {
+	if (!hook) return [];
+	return Array.isArray(hook) ? hook : [hook];
+}
+
+function normalizeAfterHooks(
+	hook: JsrepoPluginHooks['after']
+): NonNullable<JsrepoPluginHooks['after']>[] {
+	if (!hook) return [];
+	return Array.isArray(hook) ? hook : [hook];
+}
+
+function mergeHooks(
+	target: JsrepoPluginHooks,
+	source: JsrepoPluginHooks | undefined
+): JsrepoPluginHooks {
+	if (!source) return target;
+
+	const before = [...normalizeBeforeHooks(target.before), ...normalizeBeforeHooks(source.before)];
+	const after = [...normalizeAfterHooks(target.after), ...normalizeAfterHooks(source.after)];
+
+	return {
+		...(before.length > 0 ? { before: before.length === 1 ? before[0]! : before } : {}),
+		...(after.length > 0 ? { after: after.length === 1 ? after[0]! : after } : {}),
+	};
+}
 
 function isTransform(value: PluginInput): value is Transform {
 	return (
@@ -60,7 +91,8 @@ function isJsrepoPlugin(value: PluginInput): value is JsrepoPlugin {
 		'transforms' in value ||
 		'providers' in value ||
 		'languages' in value ||
-		'build' in value
+		'build' in value ||
+		'hooks' in value
 	);
 }
 
@@ -88,6 +120,7 @@ function appendContributions(
 		providers: [...target.providers, ...source.providers],
 		languages: [...target.languages, ...source.languages],
 		build: mergeBuild(target.build, source.build),
+		hooks: mergeHooks(target.hooks, source.hooks),
 	};
 }
 
@@ -98,6 +131,7 @@ export function resolvePluginContributions(plugin: PluginInput): ResolvedPluginC
 			providers: plugin.providers ?? [],
 			languages: plugin.languages ?? [],
 			build: plugin.build ?? {},
+			hooks: plugin.hooks ?? {},
 		};
 	}
 

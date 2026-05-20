@@ -3,7 +3,6 @@ import { DEFAULT_LANGS, type Language } from '@/langs';
 import type { Output } from '@/outputs/types';
 import { DEFAULT_PROVIDERS, type ProviderFactory } from '@/providers';
 import type { RemoteDependency, UnresolvedFile } from '@/utils/build';
-import type { AfterHook, BeforeHook } from '@/utils/hooks';
 import type {
 	AbsolutePath,
 	ItemRelativePath,
@@ -142,8 +141,8 @@ export type Config = {
 	 * ```
 	 */
 	hooks?: {
-		after?: AfterHook | AfterHook[];
-		before?: BeforeHook | BeforeHook[];
+		after?: import('@/utils/hooks').AfterHook | import('@/utils/hooks').AfterHook[];
+		before?: import('@/utils/hooks').BeforeHook | import('@/utils/hooks').BeforeHook[];
 	};
 };
 

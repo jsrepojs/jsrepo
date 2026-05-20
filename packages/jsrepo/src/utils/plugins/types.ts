@@ -9,6 +9,11 @@ import type { Warning } from '@/utils/warnings';
 
 export type { BuildTransform, RemoteDependencyResolver, Transform } from '@/utils/config/plugin-types';
 
+export type JsrepoPluginHooks = {
+	before?: import('@/utils/hooks').BeforeHook | import('@/utils/hooks').BeforeHook[];
+	after?: import('@/utils/hooks').AfterHook | import('@/utils/hooks').AfterHook[];
+};
+
 export type JsrepoPluginBuild = {
 	transforms?: BuildTransform[];
 	remoteDependencyResolver?: RemoteDependencyResolver;
@@ -20,6 +25,7 @@ export type JsrepoPlugin = {
 	providers?: ProviderFactory[];
 	languages?: Language[];
 	build?: JsrepoPluginBuild;
+	hooks?: JsrepoPluginHooks;
 };
 
 export type JsrepoPluginFactory<TOptions = void> = TOptions extends void
@@ -31,6 +37,7 @@ export type ResolvedPluginContributions = {
 	providers: ProviderFactory[];
 	languages: Language[];
 	build: JsrepoPluginBuild;
+	hooks: JsrepoPluginHooks;
 };
 
 export type PluginInput =

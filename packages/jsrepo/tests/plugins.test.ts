@@ -68,4 +68,51 @@ describe('plugins', () => {
 		});
 		expect(config.transforms).toHaveLength(1);
 	});
+
+	it('should merge hooks from plugins and config', () => {
+		const pluginBefore = async () => {};
+		const configBefore = async () => {};
+		const pluginAfter = 'plugin-after';
+		const configAfter = 'config-after';
+
+		const config = resolveConfig({
+			plugins: [
+				definePlugin({
+					hooks: {
+						before: pluginBefore,
+						after: pluginAfter,
+					},
+				}),
+			],
+			hooks: {
+				before: configBefore,
+				after: configAfter,
+			},
+		});
+
+		expect(Array.isArray(config.hooks?.before)).toBe(true);
+		expect((config.hooks?.before as unknown[]).length).toBe(2);
+		expect((config.hooks?.before as unknown[])[0]).toBe(pluginBefore);
+		expect((config.hooks?.before as unknown[])[1]).toBe(configBefore);
+
+		expect(Array.isArray(config.hooks?.after)).toBe(true);
+		expect((config.hooks?.after as unknown[]).length).toBe(2);
+		expect((config.hooks?.after as unknown[])[0]).toBe(pluginAfter);
+		expect((config.hooks?.after as unknown[])[1]).toBe(configAfter);
+	});
+
+	it('should merge hooks from multiple plugins in order', () => {
+		const first = async () => {};
+		const second = async () => {};
+
+		const config = resolveConfig({
+			plugins: [
+				definePlugin({ hooks: { before: first } }),
+				definePlugin({ hooks: { before: second } }),
+			],
+		});
+
+		expect((config.hooks?.before as unknown[])[0]).toBe(first);
+		expect((config.hooks?.before as unknown[])[1]).toBe(second);
+	});
 });

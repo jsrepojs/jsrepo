@@ -2,7 +2,6 @@ import { DEFAULT_LANGS } from '@/langs';
 import type { Language } from '@/langs/types';
 import { DEFAULT_PROVIDERS } from '@/providers';
 import type { ProviderFactory } from '@/providers/types';
-import type { AfterHook, BeforeHook } from '@/utils/hooks';
 import {
 	resolveBuildTransformEntries,
 	resolveLanguageEntries,
@@ -12,11 +11,57 @@ import {
 } from '@/utils/plugins/normalize';
 import type {
 	BuildTransform,
+	JsrepoPluginHooks,
 	PluginInput,
 	RemoteDependencyResolver,
 	Transform,
 } from '@/utils/plugins/types';
 import type { Warning } from '@/utils/warnings';
+
+type BeforeHook = import('@/utils/hooks').BeforeHook;
+type AfterHook = import('@/utils/hooks').AfterHook;
+
+type ConfigHooks = {
+	after?: AfterHook | AfterHook[];
+	before?: BeforeHook | BeforeHook[];
+};
+
+function normalizeBeforeHooks(hook: BeforeHook | BeforeHook[] | undefined): BeforeHook[] {
+	if (!hook) return [];
+	return Array.isArray(hook) ? hook : [hook];
+}
+
+function normalizeAfterHooks(hook: AfterHook | AfterHook[] | undefined): AfterHook[] {
+	if (!hook) return [];
+	return Array.isArray(hook) ? hook : [hook];
+}
+
+function mergeConfigHooks(
+	pluginHooks: JsrepoPluginHooks,
+	configHooks: ConfigHooks | undefined
+): ConfigHooks | undefined {
+	const before = [
+		...normalizeBeforeHooks(pluginHooks.before),
+		...normalizeBeforeHooks(configHooks?.before),
+	];
+	const after = [
+		...normalizeAfterHooks(pluginHooks.after),
+		...normalizeAfterHooks(configHooks?.after),
+	];
+
+	if (before.length === 0 && after.length === 0) {
+		return configHooks;
+	}
+
+	const merged: ConfigHooks = {};
+	if (before.length > 0) {
+		merged.before = before.length === 1 ? before[0]! : before;
+	}
+	if (after.length > 0) {
+		merged.after = after.length === 1 ? after[0]! : after;
+	}
+	return merged;
+}
 
 export type ResolvedConfig = {
 	registries: string[];
@@ -30,10 +75,7 @@ export type ResolvedConfig = {
 		transforms?: BuildTransform[];
 		remoteDependencyResolver?: RemoteDependencyResolver;
 	};
-	hooks?: {
-		after?: AfterHook | AfterHook[];
-		before?: BeforeHook | BeforeHook[];
-	};
+	hooks?: ConfigHooks;
 	onwarn?: (warning: Warning, handler: (message: Warning) => void) => void;
 };
 
@@ -91,7 +133,7 @@ export function resolveConfig(c: PartialConfig): ResolvedConfig {
 				: DEFAULT_LANGS,
 		transforms,
 		paths: c.paths ?? {},
-		hooks: c.hooks,
+		hooks: mergeConfigHooks(pluginContributions.hooks, c.hooks),
 		build,
 	};
 }
