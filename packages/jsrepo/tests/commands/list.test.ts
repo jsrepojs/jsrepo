@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { formatResult, type ListCommandResult, type ListItem } from '@/commands/list';
+import {
+	formatJsonResult,
+	formatResult,
+	type ListCommandResult,
+	type ListItem,
+} from '@/commands/list';
 
 type ListManifestItem = ListItem['item'];
 
@@ -104,5 +109,51 @@ describe('formatResult', () => {
 		);
 
 		expect(output).toContain('No items found.');
+	});
+});
+
+describe('formatJsonResult', () => {
+	it('outputs basic item fields by default', () => {
+		const output = JSON.parse(formatJsonResult(createResult()));
+
+		expect(output).toEqual({
+			items: [
+				{
+					registry: '@example/svelte',
+					name: 'button',
+					title: 'Button',
+					description: 'A reusable button component.',
+				},
+				{
+					registry: '@example/svelte',
+					name: 'utils',
+				},
+			],
+		});
+	});
+
+	it('outputs full item data when detail is full', () => {
+		const output = JSON.parse(
+			formatJsonResult(
+				createResult({
+					detail: 'full',
+					items: [{ registry: REGISTRY, item: BUTTON_ITEM }],
+				})
+			)
+		);
+
+		expect(output.items[0]).toMatchObject({
+			registry: '@example/svelte',
+			name: 'button',
+			title: 'Button',
+			type: 'ui',
+			files: [{ path: 'button/button.svelte' }],
+		});
+	});
+
+	it('returns an empty items array when no items are found', () => {
+		const output = JSON.parse(formatJsonResult(createResult({ items: [] })));
+
+		expect(output).toEqual({ items: [] });
 	});
 });

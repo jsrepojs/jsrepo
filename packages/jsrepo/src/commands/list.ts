@@ -17,6 +17,7 @@ import type { Config } from '@/utils/config';
 import { loadConfigSearch } from '@/utils/config/utils';
 import { type CLIError, InvalidRegistryError, RegistryNotProvidedError } from '@/utils/errors';
 import { runAfterHooks, runBeforeHooks } from '@/utils/hooks';
+import { stringify } from '@/utils/json';
 import type { AbsolutePath } from '@/utils/types';
 
 export const detailLevels = ['basic', 'full'] as const;
@@ -25,6 +26,7 @@ export type DetailLevel = (typeof detailLevels)[number];
 export const schema = defaultCommandOptionsSchema.extend({
 	verbose: z.boolean(),
 	all: z.boolean(),
+	json: z.boolean(),
 	detail: z.enum(detailLevels).default('basic'),
 });
 
@@ -34,6 +36,7 @@ export const list = new Command('list')
 	.description('List items available in registries.')
 	.argument('[registries...]', 'Registry URLs to list items from.')
 	.option('--all', 'Include when-needed and index items.', false)
+	.option('--json', 'Output as JSON.', false)
 	.addOption(
 		new Option(
 			'--detail <level>',
@@ -65,7 +68,7 @@ export const list = new Command('list')
 
 		const result = await tryCommand(runList(registriesArg, { ...options, cwd }, configResult?.config));
 
-		process.stdout.write(`${formatResult(result)}\n`);
+		process.stdout.write(`${options.json ? formatJsonResult(result) : formatResult(result)}\n`);
 
 		await runAfterHooks(
 			config,
@@ -160,6 +163,26 @@ export function formatResult({ registries, items, detail }: ListCommandResult): 
 	}
 
 	return lines.join('\n').trimEnd();
+}
+
+export function formatJsonResult({ items, detail }: ListCommandResult): string {
+	const serializedItems = items.map(({ registry, item }) => {
+		if (detail === 'basic') {
+			return {
+				registry: registry.url,
+				name: item.name,
+				...(item.title !== undefined ? { title: item.title } : {}),
+				...(item.description !== undefined ? { description: item.description } : {}),
+			};
+		}
+
+		return {
+			registry: registry.url,
+			...item,
+		};
+	});
+
+	return stringify({ items: serializedItems });
 }
 
 function formatItem(
