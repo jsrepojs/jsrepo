@@ -17,7 +17,6 @@ import type { Config } from '@/utils/config';
 import { loadConfigSearch } from '@/utils/config/utils';
 import { type CLIError, InvalidRegistryError, RegistryNotProvidedError } from '@/utils/errors';
 import { runAfterHooks, runBeforeHooks } from '@/utils/hooks';
-import { initLogging, intro, outro } from '@/utils/prompts';
 import type { AbsolutePath } from '@/utils/types';
 
 export const detailLevels = ['basic', 'full'] as const;
@@ -64,11 +63,9 @@ export const list = new Command('list')
 			{ cwd, yes: true }
 		);
 
-		intro();
-
 		const result = await tryCommand(runList(registriesArg, { ...options, cwd }, configResult?.config));
 
-		outro(formatResult(result));
+		process.stdout.write(`${formatResult(result)}\n`);
 
 		await runAfterHooks(
 			config,
@@ -93,8 +90,6 @@ export async function runList(
 	options: ListOptions,
 	config: Config | undefined
 ): Promise<Result<ListCommandResult, CLIError>> {
-	const { verbose: _, spinner } = initLogging({ options });
-
 	const providers = config?.providers ?? DEFAULT_PROVIDERS;
 	const registries = registriesArg.length > 0 ? registriesArg : (config?.registries ?? []);
 
@@ -105,23 +100,14 @@ export async function runList(
 		if (!foundProvider) return err(new InvalidRegistryError(registry));
 	}
 
-	spinner.start(
-		`Retrieving manifest${registries.length > 1 ? 's' : ''} from ${pc.cyan(registries.join(', '))}`
-	);
-
 	const resolvedRegistriesResult = await resolveRegistries(registries, {
 		cwd: options.cwd,
 		providers,
 	});
 
 	if (resolvedRegistriesResult.isErr()) {
-		spinner.stop('Failed to retrieve manifests');
 		return err(resolvedRegistriesResult.error);
 	}
-
-	spinner.stop(
-		`Retrieved manifest${registries.length > 1 ? 's' : ''} from ${pc.cyan(registries.join(', '))}`
-	);
 
 	const resolvedRegistries = resolvedRegistriesResult.value;
 	const items = Array.from(resolvedRegistries.entries()).flatMap(([_, registry]) =>
