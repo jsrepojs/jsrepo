@@ -115,7 +115,6 @@ export async function runList(
 	const resolvedRegistries = resolvedRegistriesResult.value;
 	const items = Array.from(resolvedRegistries.entries()).flatMap(([_, registry]) =>
 		registry.manifest.items
-			.filter((item) => item)
 			.filter((item) => shouldIncludeItem(item, options.all))
 			.map((item) => ({ registry, item }))
 	);
