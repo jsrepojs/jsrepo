@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.8.0
+### Minor Changes
+
+
+- feat: `list` command ([#795](https://github.com/jsrepojs/jsrepo/pull/795))
+
 ## 3.7.1
 ### Patch Changes
 
