@@ -1,0 +1,130 @@
+---
+title: list
+description: List items available in registries.
+---
+
+```sh
+jsrepo list
+```
+
+`list` is a non-interactive command. It prints available registry items directly to stdout with no prompts, loading states, or other UI.
+
+## Usage
+
+List items from the registries in your `jsrepo.config` file:
+
+```sh
+jsrepo list
+```
+
+List items from one or more specific registries:
+
+```sh
+jsrepo list @ieedan/std
+```
+
+```sh
+jsrepo list @ieedan/std github/owner/repo
+```
+
+When multiple registries are provided, items are grouped under each registry:
+
+```
+@ieedan/std
+  math
+  result
+
+github/owner/repo
+  button — Button
+    A reusable button component.
+```
+
+With a single registry, items are listed without a registry header:
+
+```
+math
+result
+button — Button
+  A reusable button component.
+```
+
+Each item shows its identifier (`name`). When a `title` or `description` is available, those are included as well.
+
+Output as JSON:
+
+```sh
+jsrepo list @ieedan/std --json
+```
+
+```json
+{
+	"items": [
+		{
+			"registry": "@ieedan/std",
+			"name": "math"
+		},
+		{
+			"registry": "@ieedan/std",
+			"name": "result",
+			"title": "Result",
+			"description": "A Result type for error handling."
+		}
+	]
+}
+```
+
+## Options
+
+### `--all`
+
+Include `when-needed` and `index` items. By default, only `when-added` items are shown:
+
+```sh
+jsrepo list @ieedan/std --all
+```
+
+### `--detail`
+
+Control how much information is shown for each item. Accepts `basic` (default) or `full`:
+
+```sh
+jsrepo list @ieedan/std --detail full
+```
+
+With `--detail full`, each item also includes type, add policy, categories, dependencies, env vars, meta, and files:
+
+```
+math
+  type: util
+  add: when-added
+  registry dependencies: types
+  files:
+    math.ts
+    math.test.ts [test]
+```
+
+When combined with `--json --detail full`, the full manifest item data is included in the JSON output.
+
+### `--json`
+
+Output as JSON instead of formatted text:
+
+```sh
+jsrepo list @ieedan/std --json
+```
+
+### `--cwd`
+
+The current working directory:
+
+```sh
+jsrepo list --cwd ./my-project
+```
+
+### `--verbose`
+
+Include debug logs:
+
+```sh
+jsrepo list @ieedan/std --verbose
+```
