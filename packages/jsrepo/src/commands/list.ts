@@ -140,48 +140,45 @@ export function formatResult({ registries, items, detail }: ListCommandResult): 
 		return pc.dim('No items found.');
 	}
 
-	const showRegistry = registries.length > 1;
 	const lines: string[] = [];
 
-	if (showRegistry) {
-		for (const registry of registries) {
-			const registryItems = items.filter((entry) => entry.registry.url === registry.url);
-			if (registryItems.length === 0) continue;
+	for (const registry of registries) {
+		const registryItems = items.filter((entry) => entry.registry.url === registry.url);
+		if (registryItems.length === 0) continue;
 
-			lines.push(pc.cyan(registry.url));
-			for (const entry of registryItems) {
-				lines.push(formatItem(entry.item, { detail, indent: '  ' }));
-			}
-			lines.push('');
+		lines.push(pc.cyan(registry.url));
+		for (const entry of registryItems) {
+			lines.push(formatItem(entry.item, { detail, indent: '  ' }));
 		}
-		return lines.join('\n').trimEnd();
-	}
-
-	for (const entry of items) {
-		lines.push(formatItem(entry.item, { detail, indent: '' }));
+		lines.push('');
 	}
 
 	return lines.join('\n').trimEnd();
 }
 
-export function formatJsonResult({ items, detail }: ListCommandResult): string {
-	const serializedItems = items.map(({ registry, item }) => {
-		if (detail === 'basic') {
-			return {
-				registry: registry.url,
-				name: item.name,
-				...(item.title !== undefined ? { title: item.title } : {}),
-				...(item.description !== undefined ? { description: item.description } : {}),
-			};
-		}
+export function formatJsonResult({ registries, items, detail }: ListCommandResult): string {
+	const serializedRegistries = registries
+		.map((registry) => ({
+			url: registry.url,
+			items: items
+				.filter((entry) => entry.registry.url === registry.url)
+				.map(({ item }) => serializeItem(item, detail)),
+		}))
+		.filter((registry) => registry.items.length > 0);
 
+	return stringify({ registries: serializedRegistries });
+}
+
+function serializeItem(item: Manifest['items'][number], detail: DetailLevel) {
+	if (detail === 'basic') {
 		return {
-			registry: registry.url,
-			...item,
+			name: item.name,
+			...(item.title !== undefined ? { title: item.title } : {}),
+			...(item.description !== undefined ? { description: item.description } : {}),
 		};
-	});
+	}
 
-	return stringify({ items: serializedItems });
+	return item;
 }
 
 function formatItem(

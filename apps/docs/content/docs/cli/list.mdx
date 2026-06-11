@@ -27,7 +27,7 @@ jsrepo list @ieedan/std
 jsrepo list @ieedan/std github/owner/repo
 ```
 
-When multiple registries are provided, items are grouped under each registry:
+Items are always grouped under their registry:
 
 ```
 @ieedan/std
@@ -37,15 +37,6 @@ When multiple registries are provided, items are grouped under each registry:
 github/owner/repo
   button — Button
     A reusable button component.
-```
-
-With a single registry, items are listed without a registry header:
-
-```
-math
-result
-button — Button
-  A reusable button component.
 ```
 
 Each item shows its identifier (`name`). When a `title` or `description` is available, those are included as well.
@@ -58,16 +49,19 @@ jsrepo list @ieedan/std --json
 
 ```json
 {
-	"items": [
+	"registries": [
 		{
-			"registry": "@ieedan/std",
-			"name": "math"
-		},
-		{
-			"registry": "@ieedan/std",
-			"name": "result",
-			"title": "Result",
-			"description": "A Result type for error handling."
+			"url": "@ieedan/std",
+			"items": [
+				{
+					"name": "math"
+				},
+				{
+					"name": "result",
+					"title": "Result",
+					"description": "A Result type for error handling."
+				}
+			]
 		}
 	]
 }
@@ -94,13 +88,14 @@ jsrepo list @ieedan/std --detail full
 With `--detail full`, each item also includes type, add policy, categories, dependencies, env vars, meta, and files:
 
 ```
-math
-  type: util
-  add: when-added
-  registry dependencies: types
-  files:
-    math.ts
-    math.test.ts [test]
+@ieedan/std
+  math
+    type: util
+    add: when-added
+    registry dependencies: types
+    files:
+      math.ts
+      math.test.ts [test]
 ```
 
 When combined with `--json --detail full`, the full manifest item data is included in the JSON output.
