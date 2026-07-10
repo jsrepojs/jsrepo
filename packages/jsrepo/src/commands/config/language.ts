@@ -86,7 +86,7 @@ export async function runLanguage(
 
 	const newCodeResult = await addPluginsToConfig({
 		plugins: languages,
-		key: 'languages',
+		key: 'plugins',
 		config: { path: config.path, code },
 	});
 	if (newCodeResult.isErr()) return err(newCodeResult.error);

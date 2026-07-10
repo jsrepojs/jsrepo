@@ -52,6 +52,14 @@ export function bun(): RemoteDependencyResolver {
 	};
 }
 
+export default function bunPlugin() {
+	return definePlugin({
+		build: {
+			remoteDependencyResolver: bun(),
+		},
+	});
+}
+
 type BunWorkspaceState = {
 	workspacePackages: Map<string, string>;
 };

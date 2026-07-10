@@ -10,7 +10,29 @@ import { parsePackageName } from './utils';
 
 export * from './output';
 
-export { provider as default } from './provider';
+import { definePlugin } from 'jsrepo';
+import { provider, type ShadcnOptions } from './provider';
+
+export { provider } from './provider';
+
+/**
+ * Shadcn registry provider plugin for jsrepo.
+ *
+ * @example
+ * ```ts
+ * import { defineConfig } from "jsrepo";
+ * import shadcn from "@jsrepo/shadcn";
+ *
+ * export default defineConfig({
+ *   plugins: [shadcn()],
+ * });
+ * ```
+ */
+export default function shadcn(options: ShadcnOptions = {}) {
+	return definePlugin({
+		providers: [provider(options)],
+	});
+}
 
 export type ShadcnRegistryItemType = (typeof registryItemTypeSchema.options)[number];
 

@@ -23,17 +23,17 @@ export const schema = defaultCommandOptionsSchema.extend({
 	yes: z.boolean(),
 });
 
-export type ConfigAddTransformOptions = z.infer<typeof schema>;
+export type ConfigAddPluginOptions = z.infer<typeof schema>;
 
-export const transform = new Command('transform')
-	.description('Add a transform to your config.')
+export const plugin = new Command('plugin')
+	.description('Add a plugin to your config.')
 	.argument(
-		'[transforms...]',
-		'Names of the transforms you want to add to your config. ex: (@jsrepo/transform-prettier, @jsrepo/transform-biome)'
+		'[plugins...]',
+		'Names of the plugins you want to add to your config. ex: (@jsrepo/transform-prettier, @jsrepo/shadcn)'
 	)
 	.addOption(commonOptions.cwd)
 	.addOption(commonOptions.yes)
-	.action(async (transforms, rawOptions) => {
+	.action(async (pluginsArg, rawOptions) => {
 		const options = parseOptions(schema, rawOptions);
 
 		const configResult = await loadConfigSearch({
@@ -44,49 +44,49 @@ export const transform = new Command('transform')
 
 		const config = configResult.config;
 		const cwd = path.dirname(configResult.path) as AbsolutePath;
-		const transformOptions = { ...options, cwd };
+		const pluginOptions = { ...options, cwd };
 
 		await runBeforeHooks(
 			config,
-			{ command: 'config.transform', options: transformOptions },
+			{ command: 'config.plugin', options: pluginOptions },
 			{ cwd, yes: options.yes }
 		);
 
 		intro();
 
-		const result = await tryCommand(runTransform(transforms, transformOptions, configResult));
+		const result = await tryCommand(runPlugin(pluginsArg, pluginOptions, configResult));
 
 		outro(formatResult(result));
 
 		await runAfterHooks(
 			config,
-			{ command: 'config.transform', options: transformOptions, result },
+			{ command: 'config.plugin', options: pluginOptions, result },
 			{ cwd }
 		);
 	});
 
-export type ConfigAddTransformCommandResult = {
+export type ConfigAddPluginCommandResult = {
 	duration: number;
-	transforms: number;
+	plugins: number;
 };
 
-export async function runTransform(
-	transformsArg: string[],
-	options: ConfigAddTransformOptions,
+export async function runPlugin(
+	pluginsArg: string[],
+	options: ConfigAddPluginOptions,
 	config: { config: Config; path: AbsolutePath }
-): Promise<Result<ConfigAddTransformCommandResult, CLIError>> {
+): Promise<Result<ConfigAddPluginCommandResult, CLIError>> {
 	const start = performance.now();
 
-	const transformsResult = parsePlugins(transformsArg, 'transform');
-	if (transformsResult.isErr()) return err(transformsResult.error);
-	const transforms = transformsResult.value;
+	const pluginsResult = parsePlugins(pluginsArg, 'plugin');
+	if (pluginsResult.isErr()) return err(pluginsResult.error);
+	const plugins = pluginsResult.value;
 
 	const codeResult = readFileSync(config.path);
 	if (codeResult.isErr()) return err(codeResult.error);
 	const code = codeResult.value;
 
 	const newCodeResult = await addPluginsToConfig({
-		plugins: transforms,
+		plugins,
 		key: 'plugins',
 		config: { path: config.path, code },
 	});
@@ -98,9 +98,9 @@ export async function runTransform(
 
 	await promptInstallDependencies(
 		{
-			devDependencies: transforms.map((transform) => ({
-				name: transform.packageName,
-				version: transform.version,
+			devDependencies: plugins.map((plugin) => ({
+				name: plugin.packageName,
+				version: plugin.version,
 			})),
 			dependencies: [],
 		},
@@ -110,14 +110,14 @@ export async function runTransform(
 	const end = performance.now();
 	const duration = end - start;
 
-	return ok({ duration, transforms: transformsArg.length });
+	return ok({ duration, plugins: pluginsArg.length });
 }
 
 export function formatResult({
 	duration,
-	transforms: items,
-}: ConfigAddTransformCommandResult): string {
-	return `Added ${pc.green(items.toString())} ${items > 1 ? 'transforms' : 'transform'} in ${pc.green(
+	plugins: items,
+}: ConfigAddPluginCommandResult): string {
+	return `Added ${pc.green(items.toString())} ${items > 1 ? 'plugins' : 'plugin'} in ${pc.green(
 		`${duration.toFixed(2)}ms`
 	)}.`;
 }
