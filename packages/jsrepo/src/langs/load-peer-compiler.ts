@@ -14,18 +14,18 @@ export type LoadPeerCompilerOptions = {
 };
 
 /**
- * Normalizes CommonJS interop for a dynamically imported module.
+ * Normalizes ESM default interop for a dynamically imported module.
  *
  * @remarks
- * `svelte/compiler` and `vue/compiler-sfc` ship as CommonJS. When a CJS module is
- * imported by an explicit file URL, Node exposes its `module.exports` under the
- * namespace's `default` key rather than as top-level named exports (the exports
- * lexer can't always statically detect them). In that case the namespace's only
- * own key is `default`, so we unwrap it to get at the actual API.
+ * Only used for the ESM fallback path. When a CommonJS module is reached via
+ * `import()`, Node exposes its `module.exports` under `default`; unwrap it so
+ * callers get the real API regardless of how the exports lexer analyzed the file.
  */
 function interopDefault<T>(mod: Record<string, unknown>): T {
-	const keys = Object.keys(mod);
-	if (keys.length === 1 && keys[0] === 'default' && mod.default != null) {
+	if (
+		mod?.default != null &&
+		(typeof mod.default === 'object' || typeof mod.default === 'function')
+	) {
 		return mod.default as T;
 	}
 	return mod as T;
@@ -44,27 +44,43 @@ function interopDefault<T>(mod: Record<string, unknown>): T {
  * even though the user *did* install the dependency in their project. Resolving
  * from `cwd` first ensures we find the copy the user actually installed.
  *
+ * `svelte/compiler` and `vue/compiler-sfc` ship as CommonJS, so we load them with
+ * `require()` — which returns `module.exports` directly with the real API on it.
+ * This avoids the ESM-interop ambiguity (exports ending up under `default`) that
+ * varies between Node versions when a CJS file is reached via `import()`. Modules
+ * that are ESM-only fall back to a dynamic `import()`.
+ *
  * @throws {MissingPeerDependencyError} if the module can't be resolved from either location.
  */
 export async function loadPeerCompiler<T>(
 	specifier: string,
 	{ cwd, packageName, feature }: LoadPeerCompilerOptions
 ): Promise<T> {
-	let mod: Record<string, unknown>;
+	// resolve from the user's project first, then jsrepo's own location
+	const bases = [pathToFileURL(joinAbsolute(cwd, 'package.json')).href, import.meta.url];
 
-	try {
-		// resolve relative to the user's project first
-		const require = createRequire(pathToFileURL(joinAbsolute(cwd, 'package.json')));
-		const resolved = require.resolve(specifier);
-		mod = await import(pathToFileURL(resolved).href);
-	} catch {
-		// fall back to resolving relative to jsrepo itself (local dev / hoisted installs)
+	for (const base of bases) {
+		const require = createRequire(base);
+
+		let resolved: string;
 		try {
-			mod = await import(specifier);
+			resolved = require.resolve(specifier);
 		} catch {
-			throw new MissingPeerDependencyError(packageName, feature);
+			// not resolvable from this base, try the next one
+			continue;
+		}
+
+		try {
+			// CJS: returns module.exports with the real API, no interop ambiguity
+			return require(specifier) as T;
+		} catch (error) {
+			// ESM-only module: require() throws, fall back to a dynamic import
+			if ((error as NodeJS.ErrnoException)?.code === 'ERR_REQUIRE_ESM') {
+				return interopDefault<T>(await import(pathToFileURL(resolved).href));
+			}
+			throw error;
 		}
 	}
 
-	return interopDefault<T>(mod);
+	throw new MissingPeerDependencyError(packageName, feature);
 }
