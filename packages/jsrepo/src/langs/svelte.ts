@@ -1,6 +1,6 @@
 import { getImports, installDependencies, resolveImports, transformImports } from '@/langs/js';
+import { loadPeerCompiler } from '@/langs/load-peer-compiler';
 import type { Language } from '@/langs/types';
-import { MissingPeerDependencyError } from '@/utils/errors';
 import type { AbsolutePath } from '@/utils/types';
 
 // biome-ignore lint/complexity/noBannedTypes: leave me alone for a minute
@@ -8,17 +8,17 @@ export type SvelteOptions = {};
 
 let svelteCompiler: typeof import('svelte/compiler') | null = null;
 
-async function loadSvelteCompiler() {
+async function loadSvelteCompiler(cwd: AbsolutePath) {
 	if (svelteCompiler) {
 		return svelteCompiler;
 	}
 
-	try {
-		svelteCompiler = await import('svelte/compiler');
-		return svelteCompiler;
-	} catch {
-		throw new MissingPeerDependencyError('svelte', 'Svelte language support');
-	}
+	svelteCompiler = await loadPeerCompiler<typeof import('svelte/compiler')>('svelte/compiler', {
+		cwd,
+		packageName: 'svelte',
+		feature: 'Svelte language support',
+	});
+	return svelteCompiler;
 }
 
 /**
@@ -32,7 +32,7 @@ export function svelte(_options: SvelteOptions = {}): Language {
 		name: 'svelte',
 		canResolveDependencies: (fileName) => fileName.endsWith('.svelte'),
 		resolveDependencies: async (code, opts) => {
-			const sv = await loadSvelteCompiler();
+			const sv = await loadSvelteCompiler(opts.cwd);
 			const neededScripts: string[] = [];
 			await sv.preprocess(code, {
 				script: async ({ content }) => {

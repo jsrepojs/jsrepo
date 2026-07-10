@@ -1,6 +1,6 @@
 import { getImports, installDependencies, resolveImports, transformImports } from '@/langs/js';
+import { loadPeerCompiler } from '@/langs/load-peer-compiler';
 import type { Language } from '@/langs/types';
-import { MissingPeerDependencyError } from '@/utils/errors';
 import type { AbsolutePath } from '@/utils/types';
 
 // biome-ignore lint/complexity/noBannedTypes: leave me alone for a minute
@@ -8,17 +8,17 @@ export type VueOptions = {};
 
 let vueCompiler: typeof import('vue/compiler-sfc') | null = null;
 
-async function loadVueCompiler() {
+async function loadVueCompiler(cwd: AbsolutePath) {
 	if (vueCompiler) {
 		return vueCompiler;
 	}
 
-	try {
-		vueCompiler = await import('vue/compiler-sfc');
-		return vueCompiler;
-	} catch {
-		throw new MissingPeerDependencyError('vue', 'Vue language support');
-	}
+	vueCompiler = await loadPeerCompiler<typeof import('vue/compiler-sfc')>('vue/compiler-sfc', {
+		cwd,
+		packageName: 'vue',
+		feature: 'Vue language support',
+	});
+	return vueCompiler;
 }
 
 /**
@@ -32,7 +32,7 @@ export function vue(_options: VueOptions = {}): Language {
 		name: 'vue',
 		canResolveDependencies: (fileName) => fileName.endsWith('.vue'),
 		resolveDependencies: async (code, opts) => {
-			const v = await loadVueCompiler();
+			const v = await loadVueCompiler(opts.cwd);
 			const neededScripts: string[] = [];
 			const parsed = v.parse(code, {
 				filename: opts.fileName,
