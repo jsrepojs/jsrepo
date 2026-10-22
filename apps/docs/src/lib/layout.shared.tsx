@@ -9,7 +9,7 @@ import Link from "next/link";
  * Home Layout: app/(home)/layout.tsx
  * Docs Layout: app/docs/layout.tsx
  */
-export function baseOptions(): BaseLayoutProps {
+export function baseOptions() {
 	return {
 		nav: {
 			title: (
@@ -21,5 +21,5 @@ export function baseOptions(): BaseLayoutProps {
 		// see https://fumadocs.dev/docs/ui/navigation/links
 		links: [],
 		githubUrl: "https://github.com/jsrepojs/jsrepo",
-	};
+	} satisfies BaseLayoutProps;
 }

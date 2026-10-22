@@ -18,7 +18,7 @@ export function LanguageToggle(props: LanguageSelectProps): React.ReactElement {
   return (
     <Popover>
       <PopoverTrigger
-        aria-label={context.text.chooseLanguage}
+        aria-label="Choose a language"
         {...props}
         className={cn(
           buttonVariants({
@@ -32,7 +32,7 @@ export function LanguageToggle(props: LanguageSelectProps): React.ReactElement {
       </PopoverTrigger>
       <PopoverContent className="flex flex-col overflow-x-hidden p-0">
         <p className="mb-1 p-2 text-xs font-medium text-fd-muted-foreground">
-          {context.text.chooseLanguage}
+          Choose a language
         </p>
         {context.locales.map((item) => (
           <button

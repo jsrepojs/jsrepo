@@ -7,4 +7,4 @@ import { list } from '@/commands/list';
 import { publish } from '@/commands/publish';
 import { update } from '@/commands/update';
 
-export { add, build, config, init, auth, list, publish, update };
+export { add, auth, build, config, init, list, publish, update };

@@ -42,16 +42,16 @@ function createDefaultLangs(): Language[] {
 
 export const DEFAULT_LANGS = createDefaultLangs();
 
-export {
-	js,
-	type JsOptions,
-	svelte,
-	type SvelteOptions,
-	vue,
-	type VueOptions,
-	css,
-	type CssOptions,
-	html,
-	type HtmlOptions,
-};
 export * from '@/langs/types';
+export {
+	type CssOptions,
+	css,
+	type HtmlOptions,
+	html,
+	type JsOptions,
+	js,
+	type SvelteOptions,
+	svelte,
+	type VueOptions,
+	vue,
+};

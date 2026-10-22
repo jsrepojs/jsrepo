@@ -257,7 +257,7 @@ function validateRegistryPrepublish(
 		return err(new InvalidRegistryNameError(buildResult.name));
 	}
 
-	if (!scope || !scope.startsWith('@')) {
+	if (!scope?.startsWith('@')) {
 		return err(new InvalidRegistryNameError(buildResult.name));
 	}
 
@@ -265,7 +265,7 @@ function validateRegistryPrepublish(
 		return err(new InvalidRegistryNameError(buildResult.name));
 	}
 
-	if (!registryName || !registryName.match(NAME_REGEX)) {
+	if (!registryName?.match(NAME_REGEX)) {
 		return err(new InvalidRegistryNameError(buildResult.name));
 	}
 
