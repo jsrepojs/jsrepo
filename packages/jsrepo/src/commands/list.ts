@@ -38,10 +38,7 @@ export const list = new Command('list')
 	.option('--all', 'Include when-needed and index items.', false)
 	.option('--json', 'Output as JSON.', false)
 	.addOption(
-		new Option(
-			'--detail <level>',
-			`Amount of detail to show (${detailLevels.join(', ')}).`
-		)
+		new Option('--detail <level>', `Amount of detail to show (${detailLevels.join(', ')}).`)
 			.choices([...detailLevels])
 			.default('basic')
 	)
@@ -56,9 +53,7 @@ export const list = new Command('list')
 		});
 
 		const config = configResult?.config ?? ({} as Config);
-		const cwd = configResult
-			? (path.dirname(configResult.path) as AbsolutePath)
-			: options.cwd;
+		const cwd = configResult ? (path.dirname(configResult.path) as AbsolutePath) : options.cwd;
 
 		await runBeforeHooks(
 			config,
@@ -66,7 +61,9 @@ export const list = new Command('list')
 			{ cwd, yes: true }
 		);
 
-		const result = await tryCommand(runList(registriesArg, { ...options, cwd }, configResult?.config));
+		const result = await tryCommand(
+			runList(registriesArg, { ...options, cwd }, configResult?.config)
+		);
 
 		process.stdout.write(`${options.json ? formatJsonResult(result) : formatResult(result)}\n`);
 
@@ -126,10 +123,7 @@ export async function runList(
 	});
 }
 
-function shouldIncludeItem(
-	item: Manifest['items'][number],
-	all: boolean
-): boolean {
+function shouldIncludeItem(item: Manifest['items'][number], all: boolean): boolean {
 	if (all) return true;
 	if (item.name === 'index') return false;
 	return (item.add ?? 'when-added') === 'when-added';
@@ -243,9 +237,7 @@ function formatItemDetails(item: Manifest['items'][number], indent: string): str
 	}
 
 	if (item.envVars && Object.keys(item.envVars).length > 0) {
-		lines.push(
-			`${detailIndent}${pc.dim('env vars:')} ${Object.keys(item.envVars).join(', ')}`
-		);
+		lines.push(`${detailIndent}${pc.dim('env vars:')} ${Object.keys(item.envVars).join(', ')}`);
 	}
 
 	if (item.meta && Object.keys(item.meta).length > 0) {

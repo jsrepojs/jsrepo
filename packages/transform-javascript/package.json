@@ -46,7 +46,7 @@
 		"jsrepo": "workspace:*"
 	},
 	"devDependencies": {
-		"@svecosystem/strip-types": "^0.0.4",
+		"@svecosystem/strip-types": "^0.0.5",
 		"@types/node": "catalog:",
 		"sucrase": "^3.35.1",
 		"tsdown": "catalog:",

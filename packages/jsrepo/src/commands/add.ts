@@ -181,9 +181,9 @@ export async function runAdd(
 
 		const possibleItems = Array.from(resolvedRegistries.entries()).flatMap(([_, registry]) => {
 			return registry.manifest.items.map((item) => ({
-					item,
-					registry,
-				}));
+				item,
+				registry,
+			}));
 		});
 
 		if (!options.all) {

@@ -14,23 +14,23 @@ import { safeParseFromJSON } from '@/utils/zod';
 
 export const DEFAULT_PROVIDERS = [jsrepo(), github(), gitlab(), bitbucket(), azure(), http()];
 
-export {
-	github,
-	type GitHubOptions,
-	gitlab,
-	type GitLabOptions,
-	bitbucket,
-	type BitBucketOptions,
-	azure,
-	type AzureOptions,
-	http,
-	type HttpOptions,
-	jsrepo,
-	type JsrepoOptions,
-	fs,
-	type FsOptions,
-};
 export * from '@/providers/types';
+export {
+	type AzureOptions,
+	azure,
+	type BitBucketOptions,
+	bitbucket,
+	type FsOptions,
+	fs,
+	type GitHubOptions,
+	type GitLabOptions,
+	github,
+	gitlab,
+	type HttpOptions,
+	http,
+	type JsrepoOptions,
+	jsrepo,
+};
 
 export async function fetchManifest(
 	provider: Provider,

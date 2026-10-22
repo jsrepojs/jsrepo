@@ -44,8 +44,8 @@
 		"jsrepo": "workspace:*"
 	},
 	"dependencies": {
-		"@biomejs/js-api": "^4.0.0",
-		"@biomejs/wasm-nodejs": "^2.3.13"
+		"@biomejs/js-api": "^6.1.0",
+		"@biomejs/wasm-nodejs": "^2.6.2"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",
