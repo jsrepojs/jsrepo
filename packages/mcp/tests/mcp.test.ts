@@ -27,7 +27,7 @@ describe('server', () => {
 		const result = await session.callTool('list_items_in_registry', {
 			cwd: process.cwd(),
 			registries: ['@ieedan/shadcn-svelte-extras@beta'],
-			query: 'math',
+			query: 'button',
 		});
 
 		assert(result.content?.[0].type === 'text');
