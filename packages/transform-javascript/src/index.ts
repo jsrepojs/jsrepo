@@ -1,5 +1,5 @@
 import { strip } from '@svecosystem/strip-types';
-import type { Transform } from 'jsrepo';
+import { definePlugin, type Transform } from 'jsrepo';
 import { Unreachable } from 'jsrepo/errors';
 import type { ItemRelativePath } from 'jsrepo/utils';
 import { transform } from 'sucrase';
@@ -31,13 +31,15 @@ export const SUPPORTED_EXTENSIONS: FileExtension[] = [
  *
  * export default defineConfig({
  *  // ...
- *  transforms: [stripTypes()],
+ *  plugins: [stripTypes()],
  * });
  * ```
  *
  * @param options - The options for the transform plugin.
  */
-export default function ({ supportedExtensions = SUPPORTED_EXTENSIONS }: Options = {}): Transform {
+export function createJavascriptTransform({
+	supportedExtensions = SUPPORTED_EXTENSIONS,
+}: Options = {}): Transform {
 	return {
 		transform: async ({ code, fileName }) => {
 			if (
@@ -86,4 +88,10 @@ function updateFileExtension(
 		}
 	}
 	throw new Unreachable();
+}
+
+export default function stripTypes(options: Options = {}) {
+	return definePlugin({
+		transforms: [createJavascriptTransform(options)],
+	});
 }

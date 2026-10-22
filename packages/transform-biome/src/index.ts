@@ -1,8 +1,8 @@
 import { Biome, Distribution } from '@biomejs/js-api';
-import type { Transform } from 'jsrepo';
+import { definePlugin, type Transform } from 'jsrepo';
 
 /**
- * A transform plugin for jsrepo to format code with prettier.
+ * A transform plugin for jsrepo to format code with biome.
  * @example
  * ```ts
  * import { defineConfig } from "jsrepo";
@@ -10,13 +10,11 @@ import type { Transform } from 'jsrepo';
  *
  * export default defineConfig({
  *  // ...
- *  transforms: [biome()],
+ *  plugins: [biome()],
  * });
  * ```
- *
- * @param options - The options for the transform plugin.
  */
-export default function (): Transform {
+export function createBiomeTransform(): Transform {
 	return {
 		transform: async ({ code, fileName, options }) => {
 			return {
@@ -39,4 +37,10 @@ async function tryFormat(code: string, { fileName, cwd }: { fileName: string; cw
 		console.error(err);
 		return undefined;
 	}
+}
+
+export default function biome() {
+	return definePlugin({
+		transforms: [createBiomeTransform()],
+	});
 }

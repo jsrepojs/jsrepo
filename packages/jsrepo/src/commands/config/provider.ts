@@ -88,7 +88,7 @@ export async function runProvider(
 
 	const newCodeResult = await addPluginsToConfig({
 		plugins: providers,
-		key: 'providers',
+		key: 'plugins',
 		config: { path: config.path, code },
 	});
 	if (newCodeResult.isErr()) return err(newCodeResult.error);

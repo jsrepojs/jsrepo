@@ -87,7 +87,7 @@ export async function runTransform(
 
 	const newCodeResult = await addPluginsToConfig({
 		plugins: transforms,
-		key: 'transforms',
+		key: 'plugins',
 		config: { path: config.path, code },
 	});
 	if (newCodeResult.isErr()) return err(newCodeResult.error);

@@ -1,5 +1,5 @@
 import { camelCase, kebabCase, pascalCase, snakeCase } from 'change-case';
-import type { Transform } from 'jsrepo';
+import { definePlugin, type Transform } from 'jsrepo';
 import type { ItemRelativePath } from 'jsrepo/utils';
 
 export type CaseType = 'kebab' | 'camel' | 'snake' | 'pascal';
@@ -27,13 +27,13 @@ const caseTransformers: Record<CaseType, (input: string) => string> = {
  *
  * export default defineConfig({
  *  // ...
- *  transforms: [fileCasing({ to: "camel" })],
+ *  plugins: [fileCasing({ to: "camel" })],
  * });
  * ```
  *
  * @param options - The options for the transform plugin.
  */
-export default function ({
+export function createFileCasingTransform({
 	to = 'kebab',
 	transformDirectories = true,
 }: Partial<Options> = {}): Transform {
@@ -74,4 +74,10 @@ export default function ({
 			};
 		},
 	};
+}
+
+export default function fileCasing(options: Partial<Options> = {}) {
+	return definePlugin({
+		transforms: [createFileCasingTransform(options)],
+	});
 }

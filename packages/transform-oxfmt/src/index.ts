@@ -1,4 +1,4 @@
-import type { Transform } from 'jsrepo';
+import { definePlugin, type Transform } from 'jsrepo';
 import { type FormatOptions, format } from 'oxfmt';
 
 /**
@@ -10,13 +10,13 @@ import { type FormatOptions, format } from 'oxfmt';
  *
  * export default defineConfig({
  *  // ...
- *  transforms: [oxfmt()],
+ *  plugins: [oxfmt()],
  * });
  * ```
  *
  * @param options - The options for the transform plugin.
  */
-export default function (options: FormatOptions = {}): Transform {
+export function createOxfmtTransform(options: FormatOptions = {}): Transform {
 	return {
 		transform: async ({ code, fileName }) => {
 			return { code: await tryFormat(fileName, code, options) };
@@ -38,4 +38,10 @@ async function tryFormat(
 	} catch {
 		return undefined;
 	}
+}
+
+export default function oxfmt(options: FormatOptions = {}) {
+	return definePlugin({
+		transforms: [createOxfmtTransform(options)],
+	});
 }

@@ -4,6 +4,7 @@ import path from 'pathe';
 import { createConfigLoader } from 'unconfig';
 import type { AbsolutePath } from '@/api/utils';
 import type { Config } from '@/utils/config';
+import { resolveConfig, type PartialConfig } from '@/utils/config/resolve';
 import { ConfigNotFoundError, FailedToLoadConfigError } from '@/utils/errors';
 import { createPathsMatcher, type PathsMatcher, tryGetTsconfig } from '@/utils/tsconfig';
 
@@ -54,7 +55,7 @@ export function loadConfigOptional({
 			const loadResult = await _createConfigLoader({ cwd }).load();
 			if (loadResult.sources.length === 0) return null;
 
-			return loadResult.config;
+			return resolveConfig(loadResult.config as PartialConfig) as Config;
 		})(),
 		(err) => new FailedToLoadConfigError(err)
 	);
@@ -78,7 +79,10 @@ export async function loadConfigSearch({
 	const loadResult = await _createConfigLoader({ cwd }).load();
 
 	if (loadResult.sources.length > 0) {
-		return { config: loadResult.config, path: loadResult.sources[0]! as AbsolutePath };
+		return {
+			config: resolveConfig(loadResult.config as PartialConfig) as Config,
+			path: loadResult.sources[0]! as AbsolutePath,
+		};
 	}
 
 	let shouldContinue = !promptForContinueIfNull;

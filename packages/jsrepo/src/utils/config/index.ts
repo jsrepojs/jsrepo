@@ -3,7 +3,6 @@ import { DEFAULT_LANGS, type Language } from '@/langs';
 import type { Output } from '@/outputs/types';
 import { DEFAULT_PROVIDERS, type ProviderFactory } from '@/providers';
 import type { RemoteDependency, UnresolvedFile } from '@/utils/build';
-import type { AfterHook, BeforeHook } from '@/utils/hooks';
 import type {
 	AbsolutePath,
 	ItemRelativePath,
@@ -11,6 +10,7 @@ import type {
 	MaybePromise,
 	Prettify,
 } from '@/utils/types';
+import { resolveConfig, type PartialConfig } from '@/utils/config/resolve';
 import { extract, type MaybeGetterAsync } from '@/utils/utils';
 import type { Warning } from '@/utils/warnings';
 
@@ -141,8 +141,8 @@ export type Config = {
 	 * ```
 	 */
 	hooks?: {
-		after?: AfterHook | AfterHook[];
-		before?: BeforeHook | BeforeHook[];
+		after?: import('@/utils/hooks').AfterHook | import('@/utils/hooks').AfterHook[];
+		before?: import('@/utils/hooks').BeforeHook | import('@/utils/hooks').BeforeHook[];
 	};
 };
 
@@ -377,20 +377,9 @@ export type Transform = {
 	}) => Promise<{ code?: string; fileName?: ItemRelativePath }>;
 };
 
-export function defineConfig(config: Partial<Config> | (() => Partial<Config>)): Config {
-	const c = extract(config);
+export type { PartialConfig } from '@/utils/config/resolve';
+export { resolveConfig } from '@/utils/config/resolve';
 
-	return {
-		providers: c.providers ?? DEFAULT_PROVIDERS,
-		registries: c.registries ?? [],
-		registry: c.registry ?? [],
-		languages: c.languages ?? DEFAULT_LANGS,
-		transforms: c.transforms ?? [],
-		paths: c.paths ?? {},
-		hooks: c.hooks,
-		build: {
-			onwarn: c.build?.onwarn ?? c.onwarn,
-			...c.build,
-		},
-	};
+export function defineConfig(config: PartialConfig | (() => PartialConfig)): Config {
+	return resolveConfig(extract(config)) as Config;
 }

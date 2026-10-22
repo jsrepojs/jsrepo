@@ -107,6 +107,14 @@ export function pnpm(): RemoteDependencyResolver {
 	};
 }
 
+export default function pnpmPlugin() {
+	return definePlugin({
+		build: {
+			remoteDependencyResolver: pnpm(),
+		},
+	});
+}
+
 const stateCache = new Map<string, ParsedState>();
 
 function getOrParseState(cwd: string): ParsedState {

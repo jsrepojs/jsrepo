@@ -55,7 +55,7 @@ export async function addPluginsToConfig({
 		code: string;
 	};
 	plugins: Plugin[];
-	key: 'transforms' | 'providers' | 'languages';
+	key: 'transforms' | 'providers' | 'languages' | 'plugins';
 }): Promise<
 	Result<string, InvalidKeyTypeError | CouldNotFindJsrepoImportError | ConfigObjectNotFoundError>
 > {
@@ -338,11 +338,23 @@ export const OFFICIAL_PLUGINS = [
 		shorthand: 'filecasing',
 		name: '@jsrepo/transform-filecasing',
 	},
+	{
+		shorthand: 'shadcn',
+		name: '@jsrepo/shadcn',
+	},
+	{
+		shorthand: 'pnpm',
+		name: '@jsrepo/pnpm',
+	},
+	{
+		shorthand: 'bun',
+		name: '@jsrepo/bun',
+	},
 ];
 
 export function parsePlugins(
 	plugins: string[],
-	key: 'transform' | 'provider' | 'language'
+	key: 'transform' | 'provider' | 'language' | 'plugin'
 ): Result<Plugin[], InvalidPluginError> {
 	const pluginsResult = plugins.map((plugin) => parsePluginName(plugin, key));
 	const finalPlugins: Plugin[] = [];
@@ -355,7 +367,7 @@ export function parsePlugins(
 
 export function parsePluginName(
 	plugin: string,
-	key: 'transform' | 'provider' | 'language'
+	key: 'transform' | 'provider' | 'language' | 'plugin'
 ): Result<Plugin, InvalidPluginError> {
 	const officialPlugin = OFFICIAL_PLUGINS.find((p) => p.shorthand === plugin);
 	if (officialPlugin) {
@@ -372,16 +384,18 @@ export function parsePluginName(
 	if (parsedPackage.isErr()) return err(new InvalidPluginError(plugin));
 
 	let name = parsedPackage.value.name;
+	const pluginKey = key === 'plugin' ? undefined : key;
 	if (parsedPackage.value.name.startsWith('@')) {
 		if (parsedPackage.value.name.startsWith('@jsrepo/')) {
-			if (!parsedPackage.value.name.split('/')[1]?.includes(key)) {
+			const packageSuffix = parsedPackage.value.name.split('/')[1]!;
+			if (pluginKey && !packageSuffix.includes(pluginKey)) {
 				// hack around names like @jsrepo/shadcn
-				name = `jsrepo-${key}-${parsedPackage.value.name.split('/')[1]!}`;
+				name = `jsrepo-${pluginKey}-${packageSuffix}`;
 			} else {
 				// add jsrepo- prefix back to official plugins
 				// instead of @jsrepo/transform-prettier
 				// we want jsrepo-transform-prettier
-				name = `jsrepo-${parsedPackage.value.name.split('/')[1]!}`;
+				name = `jsrepo-${packageSuffix}`;
 			}
 		} else {
 			// use the second portion of the name
@@ -392,7 +406,9 @@ export function parsePluginName(
 	}
 
 	return ok({
-		name: kebabToCamel(name.replace(`jsrepo-${key}-`, '')),
+		name: kebabToCamel(
+			pluginKey ? name.replace(`jsrepo-${pluginKey}-`, '') : name.replace(/^jsrepo-/, '')
+		),
 		packageName: parsedPackage.value.name,
 		version: parsedPackage.value.version,
 	});
