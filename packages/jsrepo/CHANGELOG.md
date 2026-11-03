@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.8.3
+
+### Patch Changes
+
+- fix: Resolve `package.json#imports` aliases (ex: `#lib`) in the `paths` config ([#803](https://github.com/jsrepojs/jsrepo/pull/803))
+
 ## 3.8.2
 
 ### Patch Changes

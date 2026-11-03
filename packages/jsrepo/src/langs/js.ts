@@ -16,7 +16,13 @@ import type {
 import type { LocalDependency, RemoteDependency, UnresolvedImport } from '@/utils/build';
 import { transformShadcnImports } from '@/utils/compat/shadcn';
 import { existsSync, readdirSync, statSync } from '@/utils/fs';
-import { findNearestPackageJson, shouldInstall } from '@/utils/package';
+import {
+	findNearestPackageJson,
+	getMatchingPackageImport,
+	isRecord,
+	resolvePackageImportTargets,
+	shouldInstall,
+} from '@/utils/package';
 import { parsePackageName } from '@/utils/parse-package-name';
 import { dirname, joinAbsolute } from '@/utils/path';
 import { detectPackageManager, runCommands } from '@/utils/prompts';
@@ -27,7 +33,6 @@ import { validateNpmPackageName } from '@/utils/validate-npm-package-name';
 import { InvalidImportWarning, UnresolvableDynamicImportWarning } from '@/utils/warnings';
 
 const SUPPORTED_EXTENSIONS = ['.js', '.ts', '.jsx', '.tsx', '.mjs', '.mts'] as const;
-const SUPPORTED_PACKAGE_IMPORT_CONDITIONS = new Set(['default', 'import', 'node']);
 
 // biome-ignore lint/complexity/noBannedTypes: leave me alone for a minute
 export type JsOptions = {};
@@ -387,83 +392,6 @@ function tryResolvePackageImportsAlias(
 	}
 
 	return err('Module not found');
-}
-
-function getMatchingPackageImport(
-	specifier: string,
-	imports: Record<string, unknown>
-): { target: unknown; wildcardMatch?: string } | null {
-	if (Object.hasOwn(imports, specifier)) {
-		return { target: imports[specifier] };
-	}
-
-	const patternMatches: Array<{
-		target: unknown;
-		wildcardMatch: string;
-		prefixLength: number;
-		suffixLength: number;
-	}> = [];
-
-	for (const [key, target] of Object.entries(imports)) {
-		const wildcardIndex = key.indexOf('*');
-		if (wildcardIndex === -1) continue;
-
-		const prefix = key.slice(0, wildcardIndex);
-		const suffix = key.slice(wildcardIndex + 1);
-
-		if (!specifier.startsWith(prefix)) continue;
-		if (!specifier.endsWith(suffix)) continue;
-
-		patternMatches.push({
-			target,
-			wildcardMatch: specifier.slice(prefix.length, specifier.length - suffix.length),
-			prefixLength: prefix.length,
-			suffixLength: suffix.length,
-		});
-	}
-
-	if (patternMatches.length === 0) return null;
-
-	patternMatches.sort((a, b) => {
-		if (a.prefixLength !== b.prefixLength) return b.prefixLength - a.prefixLength;
-		return b.suffixLength - a.suffixLength;
-	});
-
-	const bestMatch = patternMatches[0];
-	if (!bestMatch) return null;
-
-	return {
-		target: bestMatch.target,
-		wildcardMatch: bestMatch.wildcardMatch,
-	};
-}
-
-function resolvePackageImportTargets(target: unknown, wildcardMatch?: string): string[] {
-	if (typeof target === 'string') {
-		if (wildcardMatch === undefined) return [target];
-		return [target.replaceAll('*', wildcardMatch)];
-	}
-
-	if (Array.isArray(target)) {
-		return target.flatMap((entry) => resolvePackageImportTargets(entry, wildcardMatch));
-	}
-
-	if (isRecord(target)) {
-		const resolvedTargets: string[] = [];
-
-		for (const [condition, value] of Object.entries(target)) {
-			if (!SUPPORTED_PACKAGE_IMPORT_CONDITIONS.has(condition)) continue;
-			resolvedTargets.push(...resolvePackageImportTargets(value, wildcardMatch));
-		}
-
-		return resolvedTargets;
-	}
-
-	return [];
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function isPotentiallyRemotePackageSpecifier(specifier: string): boolean {
