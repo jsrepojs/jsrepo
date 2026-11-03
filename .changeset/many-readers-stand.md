@@ -1,5 +1,5 @@
 ---
-"@jsrepo/shadcn-svelte": minor
+"@jsrepo/shadcn-svelte": patch
 ---
 
 feat: initial release
