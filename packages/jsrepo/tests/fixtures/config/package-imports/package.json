@@ -1,0 +1,15 @@
+{
+	"name": "package-imports",
+	"private": true,
+	"type": "module",
+	"imports": {
+		"#lib": "./src/lib/index.js",
+		"#lib/*": "./src/lib/*",
+		"#utils": "./src/utils",
+		"#conditional/*": {
+			"types": "./nope/*",
+			"default": "./src/conditional/*"
+		},
+		"#pkg": "some-package"
+	}
+}

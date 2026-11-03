@@ -5,6 +5,7 @@ import { createConfigLoader } from 'unconfig';
 import type { AbsolutePath } from '@/api/utils';
 import type { Config } from '@/utils/config';
 import { ConfigNotFoundError, FailedToLoadConfigError } from '@/utils/errors';
+import { resolvePackageImportsDirectory } from '@/utils/package';
 import { createPathsMatcher, type PathsMatcher, tryGetTsconfig } from '@/utils/tsconfig';
 
 /**
@@ -132,16 +133,16 @@ export function resolvePath(
 	// don't resolve relative paths
 	if (p.startsWith('./')) return p;
 
-	if (matcher === null) {
-		return path.relative(cwd, path.join(path.resolve(cwd), p));
+	const matchedPaths = matcher ? matcher(p) : [];
+	if (matchedPaths.length > 0) return path.relative(cwd, matchedPaths[0]!);
+
+	// fallback to node.js subpath imports (ex: #lib) from the package.json
+	if (p.startsWith('#')) {
+		const resolved = resolvePackageImportsDirectory(p, {
+			cwd: path.resolve(cwd) as AbsolutePath,
+		});
+		if (resolved !== null) return resolved;
 	}
 
-	const matchedPaths = matcher(p);
-	const resolved = matchedPaths.length > 0 ? path.relative(cwd, matchedPaths[0]!) : undefined;
-
-	if (!resolved) {
-		return path.relative(cwd, path.join(path.resolve(cwd), p));
-	}
-
-	return resolved;
+	return path.relative(cwd, path.join(path.resolve(cwd), p));
 }
