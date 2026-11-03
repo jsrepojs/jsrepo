@@ -46,7 +46,32 @@ export default defineConfig({
 });
 ```
 
-Now running `jsrepo build` will output a **shadcn-svelte** registry to the `./public/r/shadcn-svelte` directory.
+Now running `jsrepo build` will output a **shadcn-svelte** registry to the `./public/r/shadcn-svelte` directory. This is the same `index.json` and `[item].json` format that `shadcn-svelte registry build` produces, so your users can add your items with the **shadcn-svelte** CLI.
+
+Unlike running `shadcn-svelte registry build` yourself, the output is generated from your jsrepo build so any [transforms](/docs/transforms) you have configured are applied to the files that your users receive.
+
+## Aliases
+
+The **shadcn-svelte** CLI replaces your registry's internal import paths with the aliases from your users' project when they add an item. For this to work the `aliases` option needs to match the paths that you use to import code within your registry.
+
+Any alias that you don't provide uses the same default as `shadcn-svelte registry build`: `$lib/registry/ui`, `$lib/registry/components`, `$lib/registry/hooks`, `$lib/registry/lib` and `$lib/utils`.
+
+## Targets
+
+By default each file is installed using its path relative to the item (for example `button/index.ts` for a folder item) inside of the directory for the type of the file, so a `ui` item is installed into your user's `ui` alias.
+
+If you set a `target` on a file it is converted to the format that **shadcn-svelte** expects:
+
+- `registry:file` and `registry:page` files require a target and it is used as is. Use `~/` to install relative to the root of the project (for example `~/.env.example`).
+- For other types a target inside of the alias for the type (for example `$lib/components/fancy/card.svelte` with a `components` alias of `$lib/components`) is made relative to that alias (`fancy/card.svelte`).
+- Targets that start with `~/` are always passed through as is.
+- Any other target will throw an error since **shadcn-svelte** has no way to install it.
+
+## What is included
+
+- Files with the `example`, `doc` and `test` roles are not included in the output since they should not be installed in your users' projects. Items that only have those files are not output.
+- Items of type `registry:base` and `registry:font` are not supported.
+- `envVars` are not supported by **shadcn-svelte** so they are ignored.
 
 ## defineShadcnSvelteRegistry
 

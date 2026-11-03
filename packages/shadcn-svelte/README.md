@@ -22,7 +22,19 @@ import { output } from "@jsrepo/shadcn-svelte/output";
 export default defineConfig({
 	registry: {
         // ...
-		outputs: [output({ dir: "./public/r" })],
+		outputs: [
+			output({
+				dir: "./public/r",
+				// should match how your registry's code imports other registry code
+				aliases: {
+					lib: "$lib",
+					ui: "$lib/components/ui",
+					components: "$lib/components",
+					utils: "$lib/utils",
+					hooks: "$lib/hooks",
+				},
+			}),
+		],
 	},
 });
 ```

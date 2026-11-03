@@ -44,7 +44,8 @@
 		"build": "tsdown",
 		"dev": "tsdown --watch",
 		"check": "tsc --noEmit",
-		"bundle-analyze": "FORCE_COLOR=1 pnpx bundle-analyze . --fail-if-exceeds-bytes 500000"
+		"bundle-analyze": "FORCE_COLOR=1 pnpx bundle-analyze . --fail-if-exceeds-bytes 500000",
+		"test": "vitest run"
 	},
 	"packageManager": "pnpm@10.28.2",
 	"peerDependencies": {
@@ -52,12 +53,10 @@
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",
-		"package-manager-detector": "^1.6.0",
-		"picocolors": "catalog:",
 		"shadcn-svelte": "^1.2.7",
-		"tinyexec": "^1.0.2",
 		"tsdown": "catalog:",
 		"typescript": "catalog:",
+		"vitest": "catalog:",
 		"zod": "catalog:"
 	}
 }

@@ -1,0 +1,70 @@
+{
+	"$schema": "https://shadcn-svelte.com/schema/registry.json",
+	"name": "@jsrepo/shadcn-svelte-fixture",
+	"homepage": "https://example.com",
+	"aliases": {
+		"lib": "$lib",
+		"ui": "$lib/components/ui",
+		"components": "$lib/components",
+		"utils": "$lib/utils",
+		"hooks": "$lib/hooks"
+	},
+	"items": [
+		{
+			"name": "utils",
+			"type": "registry:lib",
+			"dependencies": ["clsx@^2.1.1"],
+			"devDependencies": [],
+			"registryDependencies": [],
+			"files": [{ "path": "src/lib/utils.ts", "type": "registry:lib" }]
+		},
+		{
+			"name": "use-counter",
+			"type": "registry:hook",
+			"dependencies": [],
+			"devDependencies": [],
+			"registryDependencies": [],
+			"files": [{ "path": "src/lib/hooks/use-counter.svelte.ts", "type": "registry:hook" }]
+		},
+		{
+			"name": "widget",
+			"title": "Widget",
+			"description": "A widget.",
+			"type": "registry:ui",
+			"dependencies": [],
+			"devDependencies": [],
+			"registryDependencies": ["local:use-counter", "local:utils"],
+			"files": [
+				{ "path": "src/lib/components/ui/widget/index.ts", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/widget/widget-label.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/widget/widget.svelte", "type": "registry:ui" }
+			]
+		},
+		{
+			"name": "card",
+			"type": "registry:component",
+			"dependencies": [],
+			"devDependencies": [],
+			"registryDependencies": ["local:utils", "local:widget"],
+			"files": [{ "path": "src/lib/components/card.svelte", "type": "registry:component" }]
+		},
+		{
+			"name": "env-example",
+			"type": "registry:file",
+			"dependencies": [],
+			"devDependencies": [],
+			"registryDependencies": [],
+			"files": [{ "path": ".env.example", "type": "registry:file", "target": "~/.env.example" }]
+		},
+		{
+			"name": "demo-page",
+			"type": "registry:page",
+			"dependencies": [],
+			"devDependencies": [],
+			"registryDependencies": ["local:card"],
+			"files": [
+				{ "path": "src/routes/demo/+page.svelte", "type": "registry:page", "target": "demo/+page.svelte" }
+			]
+		}
+	]
+}
