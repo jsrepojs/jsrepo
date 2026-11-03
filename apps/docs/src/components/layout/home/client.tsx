@@ -13,7 +13,7 @@ import {
   NavigationMenuTrigger,
   NavigationMenuViewport,
 } from '../../navigation-menu';
-import { useNav } from 'fumadocs-ui/contexts/layout';
+import { useNav } from 'fumadocs-ui/legacy/layout';
 import { buttonVariants } from '../../ui/button';
 
 export const navItemVariants = cva('[&_svg]:size-4', {

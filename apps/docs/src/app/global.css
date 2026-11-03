@@ -3,6 +3,13 @@
 @import "fumadocs-ui/css/preset.css";
 @import "tw-animate-css";
 
+/* defaults the vendored layout components expect (no longer provided by fumadocs-ui/css/preset.css) */
+:root {
+	--fd-banner-height: 0px;
+	--fd-nav-height: 0px;
+	--fd-tocnav-height: 0px;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

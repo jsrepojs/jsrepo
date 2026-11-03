@@ -1,5 +1,29 @@
 # jsrepo
 
+## 3.8.2
+
+### Patch Changes
+
+- chore: bump deps ([#801](https://github.com/jsrepojs/jsrepo/pull/801))
+
+## 3.8.1
+### Patch Changes
+
+
+- fix: resolve the `svelte`/`vue` compilers from the consumer's project directory instead of jsrepo's own install location, so builds no longer report `<pkg> is required for <lang> language support to work` when the framework is installed in the project but jsrepo lives in a different `node_modules` ([#798](https://github.com/jsrepojs/jsrepo/pull/798))
+
+## 3.8.0
+### Minor Changes
+
+
+- feat: `list` command ([#795](https://github.com/jsrepojs/jsrepo/pull/795))
+
+## 3.7.1
+### Patch Changes
+
+
+- feat: allow for configuring the indent character in JSON files ([#790](https://github.com/jsrepojs/jsrepo/pull/790))
+
 ## 3.7.0
 ### Minor Changes
 

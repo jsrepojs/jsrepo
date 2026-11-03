@@ -6,7 +6,7 @@ import {
   type LinkItemType,
   type NavOptions,
 } from '../shared/index';
-import { NavProvider } from 'fumadocs-ui/contexts/layout';
+import { NavProvider } from 'fumadocs-ui/legacy/layout';
 import {
   LargeSearchToggle,
   SearchToggle,

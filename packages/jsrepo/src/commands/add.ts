@@ -180,12 +180,10 @@ export async function runAdd(
 		const resolvedRegistries = resolvedRegistriesResult.value;
 
 		const possibleItems = Array.from(resolvedRegistries.entries()).flatMap(([_, registry]) => {
-			return registry.manifest.items
-				.filter((item) => item)
-				.map((item) => ({
-					item,
-					registry,
-				}));
+			return registry.manifest.items.map((item) => ({
+				item,
+				registry,
+			}));
 		});
 
 		if (!options.all) {

@@ -1,5 +1,34 @@
 # @jsrepo/shadcn
 
+## 8.0.2
+
+### Patch Changes
+
+- chore: bump deps ([#801](https://github.com/jsrepojs/jsrepo/pull/801))
+- Updated dependencies [[`a43f89e`](https://github.com/jsrepojs/jsrepo/commit/a43f89e591e1205893212ded7678655657f6bcba)]:
+  - jsrepo@3.8.2
+
+## 8.0.1
+### Patch Changes
+
+- Updated dependencies [[`fa66592`](https://github.com/jsrepojs/jsrepo/commit/fa665920f91c3eb01cc9216e968e86d5b769c491)]:
+  - jsrepo@3.8.1
+
+## 8.0.0
+### Patch Changes
+
+- Updated dependencies [[`c205517`](https://github.com/jsrepojs/jsrepo/commit/c205517ceb25925d84a6cab0a4da700406668b83)]:
+  - jsrepo@3.8.0
+
+## 7.0.1
+### Patch Changes
+
+
+- feat: allow for configuring the indent character in JSON files ([#790](https://github.com/jsrepojs/jsrepo/pull/790))
+
+- Updated dependencies [[`cf2eaf8`](https://github.com/jsrepojs/jsrepo/commit/cf2eaf8cdb2c964038dbee76ff51d9c6a92652f1)]:
+  - jsrepo@3.7.1
+
 ## 7.0.0
 ### Patch Changes
 

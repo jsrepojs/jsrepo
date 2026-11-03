@@ -1,7 +1,7 @@
 {
 	"name": "@jsrepo/transform-javascript",
 	"description": "A transform plugin for jsrepo to strip types from TypeScript code.",
-	"version": "7.0.0",
+	"version": "8.0.2",
 	"license": "MIT",
 	"homepage": "https://jsrepo.dev",
 	"author": {
@@ -46,7 +46,7 @@
 		"jsrepo": "workspace:*"
 	},
 	"devDependencies": {
-		"@svecosystem/strip-types": "^0.0.4",
+		"@svecosystem/strip-types": "^0.0.5",
 		"@types/node": "catalog:",
 		"sucrase": "^3.35.1",
 		"tsdown": "catalog:",

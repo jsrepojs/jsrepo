@@ -90,8 +90,8 @@ export class RegistryItemNotFoundError extends JsrepoError {
 			`${pc.bold(itemName)} not found in ${pc.bold(registry ? `${registry}` : 'any registry')}.`,
 			{
 				suggestion: registry
-					? `Run ${pc.bold(`\`jsrepo add --registry ${registry}\``)} to list all items in this registry`
-					: `Run ${pc.bold(`jsrepo add`)} to list all available registry items.`,
+					? `Run ${pc.bold(`\`jsrepo list ${registry}\``)} to list all items in this registry`
+					: `Run ${pc.bold(`\`jsrepo list\``)} to list all available registry items.`,
 			}
 		);
 	}

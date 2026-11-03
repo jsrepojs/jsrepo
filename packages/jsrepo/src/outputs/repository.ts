@@ -6,6 +6,7 @@ import { rmSync, writeFileSync } from '@/utils/fs';
 import { type StringifyFormat, stringify } from '@/utils/json';
 import { joinAbsolute, type RelativeToCwdPath, relativeToCwd } from '@/utils/path';
 import type { ItemRelativePath } from '@/utils/types';
+import { valueOptional } from '@/utils/zod';
 
 export type RepositoryOutputOptions = {
 	/** Whether or not to format the output. @default false */
@@ -91,39 +92,36 @@ export const RepositoryOutputFileSchema = z.object({
 	role: z.string().optional(),
 	relativePath: z.string().transform((v) => v as RelativeToCwdPath),
 	_imports_: z.array(UnresolvedImportSchema),
-	target: z.union([z.string(), z.undefined()]),
-	registryDependencies: z.union([z.array(z.string()), z.undefined()]),
-	dependencies: z.union([z.array(RemoteDependencySchema), z.undefined()]),
-	devDependencies: z.union([z.array(RemoteDependencySchema), z.undefined()]),
+	target: valueOptional(z.string()),
+	registryDependencies: valueOptional(z.array(z.string())),
+	dependencies: valueOptional(z.array(RemoteDependencySchema)),
+	devDependencies: valueOptional(z.array(RemoteDependencySchema)),
 });
 
 export type RepositoryOutputFile = z.infer<typeof RepositoryOutputFileSchema>;
 
 export const RepositoryOutputManifestItemSchema = z.object({
 	name: z.string(),
-	title: z.union([z.string(), z.undefined()]),
-	description: z.union([z.string(), z.undefined()]),
+	title: valueOptional(z.string()),
+	description: valueOptional(z.string()),
 	type: z.string(),
-	registryDependencies: z.union([z.array(z.string()), z.undefined()]),
-	add: z.union([RegistryItemAddSchema, z.undefined()]),
+	registryDependencies: valueOptional(z.array(z.string())),
+	add: valueOptional(RegistryItemAddSchema),
 	files: z.union([z.array(RepositoryOutputFileSchema), z.undefined()]).default([]),
-	dependencies: z.union([z.array(z.union([RemoteDependencySchema, z.string()])), z.undefined()]),
-	devDependencies: z.union([
-		z.array(z.union([RemoteDependencySchema, z.string()])),
-		z.undefined(),
-	]),
-	envVars: z.union([z.record(z.string(), z.string()), z.undefined()]),
-	categories: z.union([z.array(z.string()), z.undefined()]),
-	meta: z.union([z.record(z.string(), z.string()), z.undefined()]),
+	dependencies: valueOptional(z.array(z.union([RemoteDependencySchema, z.string()]))),
+	devDependencies: valueOptional(z.array(z.union([RemoteDependencySchema, z.string()]))),
+	envVars: valueOptional(z.record(z.string(), z.string())),
+	categories: valueOptional(z.array(z.string())),
+	meta: valueOptional(z.record(z.string(), z.string())),
 });
 
 export type RepositoryOutputManifestItem = z.infer<typeof RepositoryOutputManifestItemSchema>;
 
 export const RepositoryOutputManifestSchema = RegistryMetaSchema.extend({
 	type: z.literal('repository'),
-	plugins: z.union([RegistryPluginsSchema, z.undefined()]),
+	plugins: valueOptional(RegistryPluginsSchema),
 	items: z.array(RepositoryOutputManifestItemSchema),
-	defaultPaths: z.union([z.record(z.string(), z.string()), z.undefined()]),
+	defaultPaths: valueOptional(z.record(z.string(), z.string())),
 });
 
 export type RepositoryOutputManifest = z.infer<typeof RepositoryOutputManifestSchema>;

@@ -11,6 +11,7 @@ const cli = program
 	.addCommand(commands.build)
 	.addCommand(commands.config)
 	.addCommand(commands.init)
+	.addCommand(commands.list)
 	.addCommand(commands.publish)
 	.addCommand(commands.update);
 

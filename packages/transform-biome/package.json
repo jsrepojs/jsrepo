@@ -1,7 +1,7 @@
 {
 	"name": "@jsrepo/transform-biome",
 	"description": "A transform plugin for jsrepo to format code with biome.",
-	"version": "7.0.0",
+	"version": "8.0.2",
 	"license": "MIT",
 	"homepage": "https://jsrepo.dev",
 	"author": {
@@ -44,8 +44,8 @@
 		"jsrepo": "workspace:*"
 	},
 	"dependencies": {
-		"@biomejs/js-api": "^4.0.0",
-		"@biomejs/wasm-nodejs": "^2.3.13"
+		"@biomejs/js-api": "^6.1.0",
+		"@biomejs/wasm-nodejs": "^2.6.2"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",

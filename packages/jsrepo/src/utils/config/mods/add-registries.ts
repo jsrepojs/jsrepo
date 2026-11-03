@@ -110,7 +110,7 @@ export async function addRegistriesToConfig(
 		}
 
 		for (const value of state.configKeyPropertyDeclaration.value.elements) {
-			if (!value || value.type !== 'Literal') continue;
+			if (value?.type !== 'Literal') continue;
 			if (typeof value.value !== 'string') continue;
 
 			registries = registries.filter((r) => r !== value.value);

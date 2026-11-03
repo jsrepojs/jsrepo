@@ -24,3 +24,14 @@ export function safeParseFromJSON<T>(
 		return err(new InvalidJSONError(error));
 	}
 }
+
+/**
+ * A value that may be `undefined` and may be missing from the parsed JSON entirely.
+ *
+ * The inferred output type keeps the key required (`key: T | undefined`) so that code building these
+ * objects has to pass it explicitly. `z.union([schema, z.undefined()])` can't be used for this since
+ * zod 4.4 requires the key to be present in the input for it.
+ */
+export function valueOptional<T extends z.ZodType>(schema: T) {
+	return schema.optional().transform((value) => value);
+}

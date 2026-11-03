@@ -18,6 +18,7 @@ import type {
 	ConfigAddTransformOptions,
 } from '@/commands/config/transform';
 import type { InitCommandResult, InitOptions } from '@/commands/init';
+import type { ListCommandResult, ListOptions } from '@/commands/list';
 import type { PublishCommandResult, PublishOptions } from '@/commands/publish';
 import type { UpdateCommandResult, UpdateOptions } from '@/commands/update';
 import type { Config } from '@/utils/config';
@@ -31,6 +32,7 @@ export type BeforeArgs =
 	| { command: 'auth'; options: AuthOptions }
 	| { command: 'build'; options: BuildOptions }
 	| { command: 'init'; options: InitOptions }
+	| { command: 'list'; options: ListOptions }
 	| { command: 'publish'; options: PublishOptions }
 	| { command: 'update'; options: UpdateOptions };
 
@@ -55,6 +57,7 @@ export type AfterArgs =
 	| { command: 'auth'; options: AuthOptions; result: AuthCommandResult }
 	| { command: 'build'; options: BuildOptions; result: BuildCommandResult }
 	| { command: 'init'; options: InitOptions; result: InitCommandResult }
+	| { command: 'list'; options: ListOptions; result: ListCommandResult }
 	| { command: 'publish'; options: PublishOptions; result: PublishCommandResult }
 	| { command: 'update'; options: UpdateOptions; result: UpdateCommandResult };
 

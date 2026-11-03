@@ -23,7 +23,7 @@ import {
   CollapsibleTrigger,
 } from './ui/collapsible';
 import { type ScrollAreaProps } from '@radix-ui/react-scroll-area';
-import { useSidebar } from 'fumadocs-ui/contexts/sidebar';
+import { useSidebar } from 'fumadocs-ui/legacy/sidebar';
 import { cva } from 'class-variance-authority';
 import type {
   CollapsibleContentProps,
