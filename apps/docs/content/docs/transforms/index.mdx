@@ -29,7 +29,7 @@ Transforms are also pluggable so you can create your own and share them with the
 You can add transforms to your config by running the following command:
 
 ```sh
-jsrepo config transform jsrepo-transform-my-transform
+jsrepo config plugin jsrepo-transform-my-transform
 ```
 
 This will automatically install the transform and add it to your config:
@@ -39,16 +39,21 @@ import { defineConfig } from "jsrepo";
 import myTransform from "jsrepo-transform-my-transform"; // [!code ++]
 
 export default defineConfig({
-	transforms: [myTransform()], // [!code ++]
+	plugins: [myTransform()], // [!code ++]
 });
 ```
+
+<Callout type="info">
+	Transforms are a part of the unified [plugin](/docs/plugins) system. Transforms can also still be added directly with the `transforms` option and the `jsrepo config transform` command.
+</Callout>
 
 ## Transform authors
 
 When creating transforms we recommend you follow a few rules:
 
 1. Name your transform package with the following naming convention: `jsrepo-transform-<name>` or `@<org>/jsrepo-transform-<name>`
-2. Export the transform as the `default` export
+2. Export a function that returns the transform as the `default` export
+3. Return a [plugin](/docs/plugins) (with `name` and `transforms`) so users can add it to the `plugins` array. To keep supporting the legacy `transforms` option return an object that is also a `Transform` (see [plugins](/docs/plugins#compatibility-with-the-legacy-options))
 
 The name of your transform in the config will be the name of your package without the `jsrepo-transform-` prefix converted to camel case.
 

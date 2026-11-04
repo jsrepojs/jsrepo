@@ -13,17 +13,17 @@ Install the package:
 pnpm install @jsrepo/bun -D
 ```
 
-Add the resolver to your jsrepo config:
+Add the plugin to your jsrepo config:
 
 ```ts
 import { defineConfig } from "jsrepo";
-import { bun } from "@jsrepo/bun";
+import bun from "@jsrepo/bun";
 
 export default defineConfig({
-  build: {
-    remoteDependencyResolver: bun(),
-  },
+  plugins: [bun()],
 });
 ```
 
 Now your `workspace:` versions will be resolved to concrete versions when building your registry.
+
+You can also use the named `bun` export with the legacy `build.remoteDependencyResolver` option.

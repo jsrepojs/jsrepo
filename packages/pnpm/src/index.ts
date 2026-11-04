@@ -1,11 +1,33 @@
 import fs, { existsSync } from 'node:fs';
 import type {
+	Plugin,
 	RemoteDependency,
 	RemoteDependencyResolver,
 	RemoteDependencyResolverOptions,
 } from 'jsrepo/config';
 import { join } from 'pathe';
 import { type ParsedState, parsePnpmState } from './catalog.js';
+
+/**
+ * A plugin that resolves `workspace:` and `catalog:` versions to concrete semver strings when building your registry.
+ *
+ * @example
+ * ```ts
+ * import { defineConfig } from "jsrepo";
+ * import pnpm from "@jsrepo/pnpm";
+ *
+ * export default defineConfig({
+ *   // ...
+ *   plugins: [pnpm()],
+ * });
+ * ```
+ */
+export default function plugin(): Plugin {
+	return {
+		name: 'pnpm',
+		build: { remoteDependencyResolver: pnpm() },
+	};
+}
 
 /**
  * Resolve `workspace:` and `catalog:` versions to concrete semver strings.
@@ -22,6 +44,8 @@ import { type ParsedState, parsePnpmState } from './catalog.js';
  *   },
  * });
  * ```
+ *
+ * Prefer the default export which can be added to the `plugins` array.
  */
 export function pnpm(): RemoteDependencyResolver {
 	return async (

@@ -13,7 +13,7 @@ import type {
 	RegistryItemFolderFile,
 	RegistryItemType,
 	RegistryMeta,
-	RegistryPlugin,
+	RegistryPlugins,
 } from '@/utils/config';
 import { isOptionalRole } from '@/utils/roles';
 import type { AbsolutePath, ItemRelativePath, LooseAutocomplete } from '@/utils/types';
@@ -90,11 +90,7 @@ const DO_NOT_RESOLVE_EXTENSIONS = [
 export const MANIFEST_FILE = 'registry.json';
 
 export type BuildResult = RegistryMeta & {
-	plugins?: {
-		languages?: RegistryPlugin[];
-		providers?: RegistryPlugin[];
-		transforms?: RegistryPlugin[];
-	};
+	plugins?: RegistryPlugins;
 	items: ResolvedItem[];
 	defaultPaths?: Record<string, string>;
 };

@@ -25,8 +25,10 @@ import type { DependencyKey, RemoteDependency } from '@/utils/build';
 import type { Config, RegistryPlugin } from '@/utils/config';
 import {
 	addPluginsToConfig,
+	type ConfigPluginKey,
 	neededPlugins,
-	type Plugin,
+	type PluginKind,
+	type PluginToAdd,
 	parsePluginName,
 } from '@/utils/config/mods/add-plugins';
 import { addRegistriesToConfig } from '@/utils/config/mods/add-registries';
@@ -182,7 +184,7 @@ export async function runInit(
 					version: undefined,
 				},
 			],
-			key: 'transforms',
+			key: 'plugins',
 			config: { path: configPath, code: configCode },
 		});
 		if (addPluginsToConfigResult.isErr()) return err(addPluginsToConfigResult.error);
@@ -237,7 +239,7 @@ export async function runInit(
 	);
 	const resolvedRegistries = resolvedRegistriesResult.value;
 
-	const pluginChoices = new Map<string, { install: boolean; plugin: Plugin }>();
+	const pluginChoices = new Map<string, { install: boolean; plugin: PluginToAdd }>();
 	for (const [_, resolved] of resolvedRegistries) {
 		const initRegistryResult = await initRegistry(resolved, {
 			configCode,
@@ -426,7 +428,7 @@ async function initRegistry(
 		configCode: string;
 		configPath: AbsolutePath;
 		options: InitOptions;
-		pluginChoices: Map<string, { install: boolean; plugin: Plugin }>;
+		pluginChoices: Map<string, { install: boolean; plugin: PluginToAdd }>;
 		config: Config | null;
 	}
 ): Promise<
@@ -464,25 +466,34 @@ async function initPlugins(
 		configCode: string;
 		configPath: AbsolutePath;
 		options: InitOptions;
-		pluginChoices: Map<string, { install: boolean; plugin: Plugin }>;
+		pluginChoices: Map<string, { install: boolean; plugin: PluginToAdd }>;
 	}
 ): Promise<
 	Result<string, InvalidKeyTypeError | ConfigObjectNotFoundError | CouldNotFindJsrepoImportError>
 > {
 	if (!registry.manifest.plugins) return ok(configCode);
 
-	for (const [key, plugins] of Object.entries(registry.manifest.plugins)) {
+	const groups: { key: ConfigPluginKey; plugins: RegistryPlugin[] }[] = Array.isArray(
+		registry.manifest.plugins
+	)
+		? [{ key: 'plugins', plugins: registry.manifest.plugins }]
+		: Object.entries(registry.manifest.plugins).map(([key, plugins]) => ({
+				key: key as ConfigPluginKey,
+				plugins: plugins ?? [],
+			}));
+
+	for (const { key, plugins } of groups) {
 		const getWantedPluginsResult = await getWantedPlugins(plugins, {
 			pluginChoices,
 			options,
-			type: key.slice(0, -1) as never,
+			type: key.slice(0, -1) as PluginKind,
 			config: { path: configPath, code: configCode },
 		});
 		if (getWantedPluginsResult.isErr()) return err(getWantedPluginsResult.error);
 		const wantedPlugins = getWantedPluginsResult.value;
 		const addPluginsToConfigResult = await addPluginsToConfig({
 			plugins: wantedPlugins,
-			key: key as keyof typeof registry.manifest.plugins,
+			key,
 			config: { path: configPath, code: configCode },
 		});
 		if (addPluginsToConfigResult.isErr()) return err(addPluginsToConfigResult.error);
@@ -576,14 +587,14 @@ async function getWantedPlugins(
 		type,
 		config,
 	}: {
-		pluginChoices: Map<string, { install: boolean; plugin: Plugin }>;
+		pluginChoices: Map<string, { install: boolean; plugin: PluginToAdd }>;
 		options: InitOptions;
-		type: 'provider' | 'transform' | 'language';
+		type: PluginKind;
 		config: { path: AbsolutePath; code: string };
 	}
-): Promise<Result<Plugin[], InvalidPluginError>> {
-	const wantedPlugins: Plugin[] = [];
-	const addPlugin = (plugin: Plugin, install: boolean) => {
+): Promise<Result<PluginToAdd[], InvalidPluginError>> {
+	const wantedPlugins: PluginToAdd[] = [];
+	const addPlugin = (plugin: PluginToAdd, install: boolean) => {
 		pluginChoices.set(plugin.packageName, { install, plugin });
 		wantedPlugins.push(plugin);
 	};
@@ -593,7 +604,7 @@ async function getWantedPlugins(
 		const parsePluginNameResult = parsePluginName(plugin.package, type);
 		if (parsePluginNameResult.isErr()) return err(parsePluginNameResult.error);
 		const pluginName = parsePluginNameResult.value.name;
-		const mappedPlugin: Plugin = {
+		const mappedPlugin: PluginToAdd = {
 			name: pluginName,
 			packageName: plugin.package,
 			version: plugin.version,
@@ -606,7 +617,7 @@ async function getWantedPlugins(
 		let shouldAddPlugin = options.yes;
 		if (!options.yes) {
 			const response = await confirm({
-				message: `Would you like to add the ${pc.cyan(plugin.package)} ${type} plugin?`,
+				message: `Would you like to add the ${pc.cyan(plugin.package)} ${type === 'plugin' ? '' : `${type} `}plugin?`,
 			});
 
 			if (isCancel(response)) {

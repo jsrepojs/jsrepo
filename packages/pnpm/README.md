@@ -13,17 +13,17 @@ Install the package:
 pnpm install @jsrepo/pnpm -D
 ```
 
-Add the resolver to your jsrepo config:
+Add the plugin to your jsrepo config:
 
 ```ts
 import { defineConfig } from "jsrepo";
-import { pnpm } from "@jsrepo/pnpm";
+import pnpm from "@jsrepo/pnpm";
 
 export default defineConfig({
-  build: {
-    remoteDependencyResolver: pnpm(),
-  },
+  plugins: [pnpm()],
 });
 ```
 
 Now your `workspace:` and `catalog:` versions will be resolved to concrete versions when building your registry.
+
+You can also use the named `pnpm` export with the legacy `build.remoteDependencyResolver` option.

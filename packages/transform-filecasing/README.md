@@ -10,7 +10,7 @@ A transform plugin for transforming file and folder names to different case form
 Run the following command to install and add the transform to your config:
 
 ```sh
-jsrepo config transform filecasing
+jsrepo config plugin filecasing
 ```
 
 ### Manual Configuration
@@ -21,14 +21,14 @@ Install the transform plugin:
 pnpm install @jsrepo/transform-filecasing -D
 ```
 
-Add the transform to your config:
+Add the plugin to your config:
 
 ```ts
 import { defineConfig } from "jsrepo";
 import fileCasing from "@jsrepo/transform-filecasing";
 
 export default defineConfig({
-    transforms: [fileCasing({ to: "camel" })],
+    plugins: [fileCasing({ to: "camel" })],
 });
 ```
 
@@ -50,7 +50,7 @@ import fileCasing from "@jsrepo/transform-filecasing";
 export default defineConfig({
     // Config path: 'src/lib/components/ui'
     // Item path: 'button/index.ts'
-    transforms: [fileCasing({ to: "pascal" })],
+    plugins: [fileCasing({ to: "pascal" })],
 });
 // Result: 'src/lib/components/ui/Button/Index.ts'
 // Only the item's relative path is transformed, not the config path
@@ -65,7 +65,7 @@ import fileCasing from "@jsrepo/transform-filecasing";
 export default defineConfig({
     // Config path: 'src/lib/components/ui'
     // Item path: 'my-components/use-hook.ts'
-    transforms: [fileCasing({ to: "camel", transformDirectories: false })],
+    plugins: [fileCasing({ to: "camel", transformDirectories: false })],
 });
 // Result: 'src/lib/components/ui/my-components/useHook.ts'
 // Only the filename is transformed, directories in the item path are preserved

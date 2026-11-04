@@ -10,7 +10,7 @@ A transform plugin for formatting registry items with Biome using your local bio
 Run the following command to install and add the transform to your config:
 
 ```sh
-jsrepo config transform @jsrepo/transform-biome
+jsrepo config plugin @jsrepo/transform-biome
 ```
 
 ### Manual Configuration
@@ -21,13 +21,13 @@ Install the transform plugin:
 pnpm install @jsrepo/transform-biome -D
 ```
 
-Add the transform to your config:
+Add the plugin to your config:
 
 ```ts
 import { defineConfig } from "jsrepo";
 import biome from "@jsrepo/transform-biome";
 
 export default defineConfig({
-	transforms: [biome()],
+	plugins: [biome()],
 });
 ```
