@@ -62,6 +62,16 @@ export type Plugin = {
 	transforms?: Transform[];
 	/** Settings for `jsrepo build`. */
 	build?: PluginBuild;
+	/**
+	 * Lifecycle hooks run before and after CLI commands.
+	 * These run after the hooks defined in your config (in the order of the `plugins` array) and run for every command.
+	 */
+	hooks?: ConfigHooks;
+};
+
+export type ConfigHooks = {
+	after?: AfterHook | AfterHook[];
+	before?: BeforeHook | BeforeHook[];
 };
 
 export type PluginBuild = {
@@ -196,10 +206,7 @@ export type Config = {
 	 * });
 	 * ```
 	 */
-	hooks?: {
-		after?: AfterHook | AfterHook[];
-		before?: BeforeHook | BeforeHook[];
-	};
+	hooks?: ConfigHooks;
 };
 
 export const RegistryMetaSchema = z.object({
@@ -478,13 +485,25 @@ export function defineConfig(config: Partial<Config> | (() => Partial<Config>)):
 		languages,
 		transforms,
 		paths: c.paths ?? {},
-		hooks: c.hooks,
+		hooks: mergeHooks([c.hooks, ...plugins.map((plugin) => plugin.hooks)]),
 		build: {
 			...c.build,
 			onwarn: c.build?.onwarn ?? c.onwarn,
 			transforms: buildTransforms,
 			remoteDependencyResolver,
 		},
+	};
+}
+
+/** Combines hooks in order. Returns `undefined` if there are no hooks so configs without hooks stay unchanged. */
+function mergeHooks(hooks: (ConfigHooks | undefined)[]): ConfigHooks | undefined {
+	const defined = hooks.filter((h): h is ConfigHooks => h !== undefined);
+	if (defined.length === 0) return undefined;
+	if (defined.length === 1) return defined[0];
+
+	return {
+		before: defined.flatMap((h) => h.before ?? []),
+		after: defined.flatMap((h) => h.after ?? []),
 	};
 }
 

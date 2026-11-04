@@ -30,6 +30,7 @@ jsrepo config plugin @jsrepo/transform-prettier @jsrepo/shadcn
 - **Providers** and **languages** from plugins are checked _before_ the defaults, so you don't need to spread `DEFAULT_PROVIDERS` or `DEFAULT_LANGS` to keep them.
 - **Transforms** (and `build.transforms`) run in the order they are configured. Anything in your top level `transforms` runs first, followed by plugins in the order of the `plugins` array.
 - **Remote dependency resolvers** run in order, each one receiving the result of the previous one.
+- **Hooks** run after the `hooks` in your config, in the order of the `plugins` array. Plugin hooks run for every command, so use the `command` argument to limit them to the commands you care about.
 
 ## Plugin authors
 
@@ -61,6 +62,10 @@ A plugin is an object with a `name` and any of the following:
 		"build.remoteDependencyResolver": {
 			description: "Rewrites remote dependencies when building the registry.",
 			type: "RemoteDependencyResolver",
+		},
+		hooks: {
+			description: "Functions or shell commands to run before and after CLI commands.",
+			type: "{ before?: BeforeHook | BeforeHook[]; after?: AfterHook | AfterHook[] }",
 		},
 	}}
 />

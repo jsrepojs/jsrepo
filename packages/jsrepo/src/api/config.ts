@@ -2,6 +2,7 @@ export type { RemoteDependency } from '@/utils/build';
 export {
 	type BuildTransform,
 	type Config,
+	type ConfigHooks,
 	defineConfig,
 	type Plugin,
 	type PluginBuild,

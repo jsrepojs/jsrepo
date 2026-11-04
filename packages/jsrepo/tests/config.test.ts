@@ -1,5 +1,6 @@
 import { DEFAULT_LANGS, DEFAULT_PROVIDERS, defineConfig, type Plugin } from 'jsrepo';
 import { describe, expect, it } from 'vitest';
+import { runHooks } from '@/utils/hooks';
 
 describe('config', () => {
 	it('should add default providers', () => {
@@ -123,6 +124,59 @@ describe('config', () => {
 			const onwarn = () => undefined;
 			expect(defineConfig({ build: { onwarn } }).build.onwarn).toBe(onwarn);
 			expect(defineConfig({ onwarn }).build.onwarn).toBe(onwarn);
+		});
+
+		it('should leave hooks undefined when there are none', () => {
+			expect(defineConfig({ plugins: [{ name: 'test' }] }).hooks).toBeUndefined();
+		});
+
+		it('should keep config hooks when plugins have no hooks', () => {
+			const before = async () => undefined;
+			const config = defineConfig({ hooks: { before }, plugins: [{ name: 'test' }] });
+			expect(config.hooks).toEqual({ before });
+		});
+
+		it('should add plugin hooks after config hooks in order', () => {
+			const a = async () => undefined;
+			const b = async () => undefined;
+			const c = async () => undefined;
+			const d = 'echo done';
+			const config = defineConfig({
+				hooks: { before: a, after: d },
+				plugins: [
+					{ name: 'one', hooks: { before: [b, c] } },
+					{ name: 'two', hooks: { after: a } },
+				],
+			});
+			expect(config.hooks?.before).toEqual([a, b, c]);
+			expect(config.hooks?.after).toEqual([d, a]);
+		});
+
+		it('should run plugin hooks', async () => {
+			const calls: string[] = [];
+			const config = defineConfig({
+				hooks: {
+					before: async () => {
+						calls.push('config');
+					},
+				},
+				plugins: [
+					{
+						name: 'test',
+						hooks: {
+							before: async () => {
+								calls.push('plugin');
+							},
+						},
+					},
+				],
+			});
+			const result = await runHooks(config as never, 'before', {
+				command: 'config.plugin',
+				options: {} as never,
+			});
+			expect(result.isOk()).toBe(true);
+			expect(calls).toEqual(['config', 'plugin']);
 		});
 
 		it('should throw for invalid plugins', () => {

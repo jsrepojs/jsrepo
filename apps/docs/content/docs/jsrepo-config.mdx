@@ -385,3 +385,20 @@ export default defineConfig({
 	},
 });
 ```
+
+Plugins can also provide hooks. They run after the hooks in your config, in the order of the `plugins` array:
+
+```ts title="my-plugin.ts"
+import type { Plugin } from "jsrepo";
+
+export default function myPlugin(): Plugin {
+	return {
+		name: "my-plugin",
+		hooks: {
+			after: ({ command }) => {
+				if (command === "build") console.log("Built!");
+			},
+		},
+	};
+}
+```
