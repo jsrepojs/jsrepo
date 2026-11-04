@@ -58,11 +58,11 @@ export default defineConfig({
 
 ## Provider plugins
 
-Provider plugins are a way to add support for additional providers to **jsrepo**.
+Provider plugins are a way to add support for additional providers to **jsrepo**. Plugins can be added to the `plugins` array of your config (read more about plugins [here](/docs/plugins)) and any providers they add are used alongside the defaults.
 
 ### Adding provider plugins
 
-You can add provider plugins by running the following command:
+If the provider is a [plugin](/docs/plugins) you can add it with `jsrepo config plugin <plugin>`. Providers that haven't adopted the plugin API can be added by running the following command:
 
 ```sh
 jsrepo config provider <plugin>

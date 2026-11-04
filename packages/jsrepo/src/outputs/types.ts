@@ -19,8 +19,11 @@ export const RegistryPluginSchema = z.object({
 	optional: z.boolean().optional(),
 });
 
-export const RegistryPluginsSchema = z.object({
-	languages: z.array(RegistryPluginSchema).optional(),
-	providers: z.array(RegistryPluginSchema).optional(),
-	transforms: z.array(RegistryPluginSchema).optional(),
-});
+export const RegistryPluginsSchema = z.union([
+	z.array(RegistryPluginSchema),
+	z.object({
+		languages: z.array(RegistryPluginSchema).optional(),
+		providers: z.array(RegistryPluginSchema).optional(),
+		transforms: z.array(RegistryPluginSchema).optional(),
+	}),
+]);

@@ -1,3 +1,4 @@
+import type { Plugin } from 'jsrepo/config';
 import { JsrepoError, ProviderFetchError } from 'jsrepo/errors';
 import type { CreateOptions, FetchOptions, Provider, ProviderFactory } from 'jsrepo/providers';
 
@@ -11,7 +12,7 @@ export type ShadcnOptions = {
 };
 
 /**
- * A provider for the shadcn registry index.
+ * A plugin that adds a provider for the shadcn registry index.
  * @param options
  * @returns
  *
@@ -26,16 +27,20 @@ export type ShadcnOptions = {
  * import shadcn from "@jsrepo/shadcn";
  *
  * export default defineConfig({
- * 	providers: [shadcn()],
+ * 	plugins: [shadcn()],
  * });
  * ```
+ *
+ * The returned plugin can also be used with the legacy `providers` option.
  */
-export function provider(options: ShadcnOptions = {}): ProviderFactory {
-	return {
+export function provider(options: ShadcnOptions = {}): Plugin & ProviderFactory {
+	const factory: ProviderFactory = {
 		name: 'shadcn',
 		matches: (url: string) => url.startsWith('shadcn:'),
 		create: (url: string, createOpts: CreateOptions) => Shadcn.create(url, options, createOpts),
 	};
+
+	return { ...factory, providers: [factory] };
 }
 
 type ShadcnState = {

@@ -1,4 +1,5 @@
 import type {
+	Plugin,
 	RemoteDependency,
 	RemoteDependencyResolver,
 	RemoteDependencyResolverOptions,
@@ -8,6 +9,27 @@ import {
 	findBunWorkspaceRoot,
 	getWorkspacePatterns,
 } from './workspace.js';
+
+/**
+ * A plugin that resolves `workspace:` and `catalog:` versions to concrete semver strings when building your registry.
+ *
+ * @example
+ * ```ts
+ * import { defineConfig } from "jsrepo";
+ * import bun from "@jsrepo/bun";
+ *
+ * export default defineConfig({
+ *   // ...
+ *   plugins: [bun()],
+ * });
+ * ```
+ */
+export default function plugin(): Plugin {
+	return {
+		name: 'bun',
+		build: { remoteDependencyResolver: bun() },
+	};
+}
 
 /**
  * Resolve `workspace:` and `catalog:` versions to concrete semver strings.
@@ -24,6 +46,8 @@ import {
  *   },
  * });
  * ```
+ *
+ * Prefer the default export which can be added to the `plugins` array.
  */
 export function bun(): RemoteDependencyResolver {
 	return async (

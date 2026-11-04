@@ -568,4 +568,89 @@ describe('parsePluginName', () => {
 			version: undefined,
 		});
 	});
+
+	it('should add shorthand plugins', () => {
+		const result = parsePluginName('pnpm', 'plugin');
+		expect(result._unsafeUnwrap()).toEqual({
+			name: 'pnpm',
+			packageName: '@jsrepo/pnpm',
+			version: undefined,
+		});
+	});
+
+	it('should parse plugin names for the unified plugins key', () => {
+		const cases = [
+			['@jsrepo/transform-prettier', 'prettier'],
+			['@jsrepo/shadcn', 'shadcn'],
+			['jsrepo-language-go', 'go'],
+			['@example/jsrepo-plugin-foo-bar', 'fooBar'],
+			['@example/jsrepo-provider-jsr', 'jsr'],
+			['some-package', 'somePackage'],
+		] as const;
+		for (const [packageName, name] of cases) {
+			expect(parsePluginName(packageName, 'plugin')._unsafeUnwrap()).toEqual({
+				name,
+				packageName,
+				version: undefined,
+			});
+		}
+	});
+});
+
+describe('addPluginsToConfig with the plugins key', () => {
+	const prettier = {
+		name: 'prettier',
+		packageName: '@jsrepo/transform-prettier',
+		version: undefined,
+	};
+
+	it('should add the plugins key without default arrays', async () => {
+		const result = await addPluginsToConfig({
+			plugins: [prettier],
+			config: {
+				code: dedent`import { defineConfig } from 'jsrepo';
+
+                export default defineConfig({
+                    registries: [],
+                });
+                `,
+				path: 'jsrepo.config.ts',
+			},
+			key: 'plugins',
+		});
+
+		expect(result._unsafeUnwrap()).toEqual(
+			[
+				"import { defineConfig } from 'jsrepo';",
+				"import prettier from '@jsrepo/transform-prettier';",
+				'',
+				'export default defineConfig({',
+				'    registries: [],',
+				'\tplugins: [prettier()]',
+				'});',
+			].join('\n')
+		);
+	});
+
+	it('should append to an existing plugins array', async () => {
+		const result = await addPluginsToConfig({
+			plugins: [prettier],
+			config: {
+				code: dedent`import { defineConfig } from 'jsrepo';
+                import shadcn from '@jsrepo/shadcn';
+
+                export default defineConfig({
+                    plugins: [shadcn()],
+                });
+                `,
+				path: 'jsrepo.config.ts',
+			},
+			key: 'plugins',
+		});
+
+		expect(result._unsafeUnwrap()).toContain('plugins: [shadcn(), prettier()]');
+		expect(result._unsafeUnwrap()).toContain(
+			"import prettier from '@jsrepo/transform-prettier';"
+		);
+	});
 });

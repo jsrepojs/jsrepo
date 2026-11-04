@@ -199,7 +199,7 @@ export default defineConfig({${
 			? `\n\tregistries: ${stringify(projectConfig.registries, { format: true })},\n\tpaths: ${stringify(
 					projectConfig.paths,
 					{ format: true }
-				)},${oldProjectConfig?.formatter ? `\n\ttransforms: [${oldProjectConfig.formatter}()],` : ''}`
+				)},${oldProjectConfig?.formatter ? `\n\tplugins: [${oldProjectConfig.formatter}()],` : ''}`
 			: ''
 	}
 });`;

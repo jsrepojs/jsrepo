@@ -1,5 +1,5 @@
 import { camelCase, kebabCase, pascalCase, snakeCase } from 'change-case';
-import type { Transform } from 'jsrepo';
+import type { Plugin, Transform } from 'jsrepo';
 import type { ItemRelativePath } from 'jsrepo/utils';
 
 export type CaseType = 'kebab' | 'camel' | 'snake' | 'pascal';
@@ -19,7 +19,7 @@ const caseTransformers: Record<CaseType, (input: string) => string> = {
 };
 
 /**
- * A transform plugin for jsrepo to transform file and folder name cases.
+ * A plugin for jsrepo to transform file and folder name cases.
  * @example
  * ```ts
  * import { defineConfig } from "jsrepo";
@@ -27,22 +27,24 @@ const caseTransformers: Record<CaseType, (input: string) => string> = {
  *
  * export default defineConfig({
  *  // ...
- *  transforms: [fileCasing({ to: "camel" })],
+ *  plugins: [fileCasing({ to: "camel" })],
  * });
  * ```
  *
- * @param options - The options for the transform plugin.
+ * The returned plugin can also be used with the legacy `transforms` option.
+ *
+ * @param options - The options for the plugin.
  */
 export default function ({
 	to = 'kebab',
 	transformDirectories = true,
-}: Partial<Options> = {}): Transform {
+}: Partial<Options> = {}): Plugin & Transform {
 	const transformer = caseTransformers[to];
 	if (!transformer) {
 		throw new Error(`Invalid case type: "${to}". Expected one of: kebab, camel, snake, pascal`);
 	}
 
-	return {
+	const transform: Transform = {
 		transform: async ({ fileName }) => {
 			const parts = fileName.split('/');
 
@@ -74,4 +76,6 @@ export default function ({
 			};
 		},
 	};
+
+	return { ...transform, name: 'filecasing', transforms: [transform] };
 }

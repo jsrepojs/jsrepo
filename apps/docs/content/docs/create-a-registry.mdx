@@ -560,7 +560,23 @@ export default defineConfig({
 
 #### Plugins
 
-You can configure the `plugins` key to automatically install plugins to the user's project when they initialize your registry.
+You can configure the `plugins` key to automatically install plugins to the user's project when they initialize your registry. Provide an array of plugins to add them to the `plugins` array of the user's config:
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+
+export default defineConfig({
+	registry: {
+		plugins: [
+			{ package: "jsrepo-plugin-go" }, // [!code ++]
+			// by setting the optional key to true the user will be prompted to install the plugin if it is not already installed. // [!code ++]
+			{ package: "@jsrepo/transform-prettier", optional: true }, // [!code ++]
+		],
+	},
+});
+```
+
+Plugins that haven't adopted the unified plugin API can still be provided by type:
 
 ```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
