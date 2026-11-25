@@ -1,5 +1,13 @@
 # @jsrepo/transform-biome
 
+## 8.0.5
+
+### Patch Changes
+
+- chore: bump deps ([#811](https://github.com/jsrepojs/jsrepo/pull/811))
+- Updated dependencies [[`5cbce32`](https://github.com/jsrepojs/jsrepo/commit/5cbce32771eb844640e17b7944419dd924e45287)]:
+  - jsrepo@3.8.5
+
 ## 8.0.4
 
 ### Patch Changes

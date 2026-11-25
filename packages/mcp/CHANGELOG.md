@@ -1,5 +1,13 @@
 # @jsrepo/mcp
 
+## 0.0.33
+
+### Patch Changes
+
+- chore: bump deps ([#811](https://github.com/jsrepojs/jsrepo/pull/811))
+- Updated dependencies [[`5cbce32`](https://github.com/jsrepojs/jsrepo/commit/5cbce32771eb844640e17b7944419dd924e45287)]:
+  - jsrepo@3.8.5
+
 ## 0.0.32
 
 ### Patch Changes
