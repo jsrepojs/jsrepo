@@ -1,5 +1,11 @@
 # jsrepo
 
+## 3.8.4
+
+### Patch Changes
+
+- fix: Bump `picomatch` (bundled via `fast-glob`) to 2.3.2 to pick up fixes for CVE-2026-33671 and CVE-2026-33672 ([#809](https://github.com/jsrepojs/jsrepo/pull/809))
+
 ## 3.8.3
 
 ### Patch Changes
