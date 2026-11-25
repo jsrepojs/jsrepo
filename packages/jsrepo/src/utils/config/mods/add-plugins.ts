@@ -39,11 +39,15 @@ class VisitorState {
 	mainObjectExpression: ObjectExpression | null = null;
 }
 
-export type Plugin = {
+/** A plugin package that should be added to the user's config. */
+export type PluginToAdd = {
 	name: string;
 	packageName: string;
 	version: string | undefined;
 };
+
+export type ConfigPluginKey = 'plugins' | 'transforms' | 'providers' | 'languages';
+export type PluginKind = 'plugin' | 'transform' | 'provider' | 'language';
 
 export async function addPluginsToConfig({
 	plugins,
@@ -54,8 +58,8 @@ export async function addPluginsToConfig({
 		path: string;
 		code: string;
 	};
-	plugins: Plugin[];
-	key: 'transforms' | 'providers' | 'languages';
+	plugins: PluginToAdd[];
+	key: ConfigPluginKey;
 }): Promise<
 	Result<string, InvalidKeyTypeError | CouldNotFindJsrepoImportError | ConfigObjectNotFoundError>
 > {
@@ -338,14 +342,26 @@ export const OFFICIAL_PLUGINS = [
 		shorthand: 'filecasing',
 		name: '@jsrepo/transform-filecasing',
 	},
+	{
+		shorthand: 'shadcn',
+		name: '@jsrepo/shadcn',
+	},
+	{
+		shorthand: 'pnpm',
+		name: '@jsrepo/pnpm',
+	},
+	{
+		shorthand: 'bun',
+		name: '@jsrepo/bun',
+	},
 ];
 
 export function parsePlugins(
 	plugins: string[],
-	key: 'transform' | 'provider' | 'language'
-): Result<Plugin[], InvalidPluginError> {
+	key: PluginKind
+): Result<PluginToAdd[], InvalidPluginError> {
 	const pluginsResult = plugins.map((plugin) => parsePluginName(plugin, key));
-	const finalPlugins: Plugin[] = [];
+	const finalPlugins: PluginToAdd[] = [];
 	for (const result of pluginsResult) {
 		if (result.isErr()) return err(result.error);
 		finalPlugins.push(result.value);
@@ -355,8 +371,8 @@ export function parsePlugins(
 
 export function parsePluginName(
 	plugin: string,
-	key: 'transform' | 'provider' | 'language'
-): Result<Plugin, InvalidPluginError> {
+	key: PluginKind
+): Result<PluginToAdd, InvalidPluginError> {
 	const officialPlugin = OFFICIAL_PLUGINS.find((p) => p.shorthand === plugin);
 	if (officialPlugin) {
 		const parsedPlugin = parsePluginName(officialPlugin.name, key);
@@ -370,6 +386,14 @@ export function parsePluginName(
 
 	const parsedPackage = parsePackageName(plugin);
 	if (parsedPackage.isErr()) return err(new InvalidPluginError(plugin));
+
+	if (key === 'plugin') {
+		return ok({
+			name: pluginIdentifier(parsedPackage.value.name),
+			packageName: parsedPackage.value.name,
+			version: parsedPackage.value.version,
+		});
+	}
 
 	let name = parsedPackage.value.name;
 	if (parsedPackage.value.name.startsWith('@')) {
@@ -396,4 +420,19 @@ export function parsePluginName(
 		packageName: parsedPackage.value.name,
 		version: parsedPackage.value.version,
 	});
+}
+
+/**
+ * Creates the identifier used when importing a plugin into the config.
+ *
+ * - `@jsrepo/transform-prettier` -> `prettier`
+ * - `jsrepo-language-go` -> `go`
+ * - `@example/jsrepo-plugin-foo-bar` -> `fooBar`
+ */
+function pluginIdentifier(packageName: string): string {
+	const base = packageName.split('/').pop() ?? packageName;
+	const stripped = base
+		.replace(/^jsrepo-/, '')
+		.replace(/^(plugin|transform|provider|language)-/, '');
+	return kebabToCamel(stripped === '' ? base : stripped);
 }

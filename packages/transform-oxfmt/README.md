@@ -10,7 +10,7 @@ A transform plugin for formatting registry items with oxfmt before they are adde
 Run the following command to install and add the transform to your config:
 
 ```sh
-jsrepo config transform @jsrepo/transform-oxfmt
+jsrepo config plugin @jsrepo/transform-oxfmt
 ```
 
 ### Manual Configuration
@@ -21,14 +21,14 @@ Install the transform plugin:
 pnpm install @jsrepo/transform-oxfmt -D
 ```
 
-Add the transform to your config:
+Add the plugin to your config:
 
 ```ts
 import { defineConfig } from "jsrepo";
 import oxfmt from "@jsrepo/transform-oxfmt";
 
 export default defineConfig({
-	transforms: [oxfmt()],
+	plugins: [oxfmt()],
 });
 ```
 
@@ -41,6 +41,6 @@ import { defineConfig } from "jsrepo";
 import oxfmt from "@jsrepo/transform-oxfmt";
 
 export default defineConfig({
-	transforms: [oxfmt({ semi: false })],
+	plugins: [oxfmt({ semi: false })],
 });
 ```

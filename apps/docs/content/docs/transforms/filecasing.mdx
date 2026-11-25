@@ -24,7 +24,7 @@ The [@jsrepo/transform-filecasing](https://npmjs.com/package/@jsrepo/transform-f
 To add the **@jsrepo/transform-filecasing** transform to your config run the following command:
 
 ```sh
-jsrepo config transform filecasing
+jsrepo config plugin filecasing
 ```
 
 This will automatically install the transform and add it to your config:
@@ -34,7 +34,7 @@ import { defineConfig } from "jsrepo";
 import fileCasing from "@jsrepo/transform-filecasing"; // [!code ++]
 
 export default defineConfig({
-	transforms: [fileCasing({ to: "camel" })], // [!code ++]
+	plugins: [fileCasing({ to: "camel" })], // [!code ++]
 });
 ```
 
@@ -65,7 +65,7 @@ import fileCasing from "@jsrepo/transform-filecasing";
 
 export default defineConfig({
 	// Config path: 'src/lib/components/ui'
-	transforms: [fileCasing({ to: "pascal" })],
+	plugins: [fileCasing({ to: "pascal" })],
 });
 ```
 
@@ -84,7 +84,7 @@ import { defineConfig } from "jsrepo";
 import fileCasing from "@jsrepo/transform-filecasing";
 
 export default defineConfig({
-	transforms: [fileCasing({ to: "camel", transformDirectories: false })],
+	plugins: [fileCasing({ to: "camel", transformDirectories: false })],
 });
 ```
 

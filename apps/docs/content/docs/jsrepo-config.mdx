@@ -76,7 +76,7 @@ import prettier from "@jsrepo/transform-prettier";
 
 export default defineConfig({
 	registries: ["https://example.com/registry"],
-	transforms: [prettier()],
+	plugins: [prettier()],
 	paths: {
 		block: "src/components",
 		component: "src/components/ui",
@@ -92,13 +92,10 @@ Plugins are a big part of what makes jsrepo so powerful but having to manually a
 To add a plugin run the following command:
 
 ```sh
-# add a transform plugin
-jsrepo config transform @jsrepo/transform-prettier
-# add a provider plugin
-jsrepo config provider jsrepo-provider-<provider>
-# add a language plugin
-jsrepo config language jsrepo-language-<language>
+jsrepo config plugin @jsrepo/transform-prettier
 ```
+
+Read more about plugins [here](/docs/plugins).
 
 This will automatically install the plugin and add it to your config:
 
@@ -108,7 +105,7 @@ import prettier from "@jsrepo/transform-prettier"; // [!code ++]
 
 export default defineConfig({
 	registries: ["https://example.com/registry"],
-	transforms: [prettier()], // [!code ++]
+	plugins: [prettier()], // [!code ++]
 	paths: {
 		block: "src/components",
 		component: "src/components/ui",
@@ -120,6 +117,24 @@ export default defineConfig({
 As your config grows this will continue to work (so long as you don't use some really contrived syntax for your config).
 
 ## Options
+
+### plugins
+
+Plugins add providers, languages, transforms, and build settings to **jsrepo** from a single place. You can read more about plugins [here](/docs/plugins).
+
+```ts title="jsrepo.config.ts"
+import { defineConfig } from "jsrepo";
+import prettier from "@jsrepo/transform-prettier";
+import shadcn from "@jsrepo/shadcn";
+
+export default defineConfig({
+	plugins: [prettier(), shadcn()], // [!code highlight]
+});
+```
+
+<Callout type="info">
+	The `languages`, `providers`, `transforms` and `build` options below continue to work. Plugins are applied alongside them.
+</Callout>
 
 ### languages
 
@@ -258,12 +273,10 @@ For pnpm workspaces (workspace and catalog protocols), use `@jsrepo/pnpm`:
 
 ```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
-import { pnpm } from "@jsrepo/pnpm";
+import pnpm from "@jsrepo/pnpm";
 
 export default defineConfig({
-	build: {
-		remoteDependencyResolver: pnpm(),
-	},
+	plugins: [pnpm()],
 });
 ```
 
@@ -271,14 +284,14 @@ For bun workspaces, use `@jsrepo/bun`:
 
 ```ts title="jsrepo.config.ts"
 import { defineConfig } from "jsrepo";
-import { bun } from "@jsrepo/bun";
+import bun from "@jsrepo/bun";
 
 export default defineConfig({
-	build: {
-		remoteDependencyResolver: bun(),
-	},
+	plugins: [bun()],
 });
 ```
+
+You can also set the resolver directly with `build.remoteDependencyResolver` using the named `pnpm` and `bun` exports.
 
 Or implement a custom resolver:
 
@@ -371,4 +384,21 @@ export default defineConfig({
 		],
 	},
 });
+```
+
+Plugins can also provide hooks. They run after the hooks in your config, in the order of the `plugins` array:
+
+```ts title="my-plugin.ts"
+import type { Plugin } from "jsrepo";
+
+export default function myPlugin(): Plugin {
+	return {
+		name: "my-plugin",
+		hooks: {
+			after: ({ command }) => {
+				if (command === "build") console.log("Built!");
+			},
+		},
+	};
+}
 ```

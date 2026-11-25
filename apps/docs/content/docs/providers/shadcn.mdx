@@ -17,7 +17,7 @@ The **shadcn** registry index is a nice way to shorten shadcn registry urls. If 
 Since this doesn't come by default you will need to add it to your `jsrepo.config.ts` file. You can do this with a command:
 
 ```sh
-jsrepo config provider @jsrepo/shadcn
+jsrepo config plugin @jsrepo/shadcn
 ```
 
 ```ts title="jsrepo.config.ts"
@@ -25,7 +25,7 @@ import { defineConfig } from "jsrepo";
 import shadcn from "@jsrepo/shadcn"; // [!code ++]
 
 export default defineConfig({
-	providers: [shadcn()], // [!code ++]
+	plugins: [shadcn()], // [!code ++]
 });
 ```
 

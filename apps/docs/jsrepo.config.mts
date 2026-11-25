@@ -1,4 +1,4 @@
-import { defineConfig, DEFAULT_PROVIDERS } from "jsrepo";
+import { defineConfig } from "jsrepo";
 import shadcn from '@jsrepo/shadcn';
 
 export default defineConfig({
@@ -10,5 +10,5 @@ export default defineConfig({
 		lib: '@/lib',
 		hook: '@/hooks',
 	},
-	providers: [...DEFAULT_PROVIDERS, shadcn()]
+	plugins: [shadcn()]
 });

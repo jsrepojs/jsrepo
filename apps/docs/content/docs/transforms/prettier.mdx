@@ -20,7 +20,7 @@ The [@jsrepo/transform-prettier](https://npmjs.com/package/@jsrepo/transform-pre
 To add the **@jsrepo/transform-prettier** transform to your config run the following command:
 
 ```sh
-jsrepo config transform prettier
+jsrepo config plugin prettier
 ```
 
 This will automatically install the transform and add it to your config:
@@ -30,6 +30,6 @@ import { defineConfig } from "jsrepo";
 import prettier from "@jsrepo/transform-prettier"; // [!code ++]
 
 export default defineConfig({
-	transforms: [prettier()], // [!code ++]
+	plugins: [prettier()], // [!code ++]
 });
 ```

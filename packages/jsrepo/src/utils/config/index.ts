@@ -3,6 +3,7 @@ import { DEFAULT_LANGS, type Language } from '@/langs';
 import type { Output } from '@/outputs/types';
 import { DEFAULT_PROVIDERS, type ProviderFactory } from '@/providers';
 import type { RemoteDependency, UnresolvedFile } from '@/utils/build';
+import { JsrepoError } from '@/utils/errors';
 import type { AfterHook, BeforeHook } from '@/utils/hooks';
 import type {
 	AbsolutePath,
@@ -32,7 +33,72 @@ export type BuildTransform = {
 	) => MaybePromise<{ content: string }>;
 };
 
+/**
+ * A plugin bundles everything an integration can contribute to jsrepo (providers, languages, transforms and build settings) behind a single entry in `plugins`.
+ *
+ * Plugin packages should export a function that returns a `Plugin` as their default export so that the `jsrepo` CLI can add them to your config.
+ *
+ * @example
+ * ```ts
+ * import type { Plugin } from "jsrepo";
+ *
+ * export default function myPlugin(): Plugin {
+ *   return {
+ *     name: "my-plugin",
+ *     providers: [myProvider()],
+ *     build: { remoteDependencyResolver: myResolver },
+ *   };
+ * }
+ * ```
+ */
+export type Plugin = {
+	/** The name of the plugin. Used in error messages. */
+	name: string;
+	/** Providers the plugin adds. These are checked before the default providers. */
+	providers?: ProviderFactory[];
+	/** Languages the plugin adds. These are checked before the default languages. */
+	languages?: Language[];
+	/** Transforms that run (in order) on registry items when they are added to a project. */
+	transforms?: Transform[];
+	/** Settings for `jsrepo build`. */
+	build?: PluginBuild;
+	/**
+	 * Lifecycle hooks run before and after CLI commands.
+	 * These run after the hooks defined in your config (in the order of the `plugins` array) and run for every command.
+	 */
+	hooks?: ConfigHooks;
+};
+
+export type ConfigHooks = {
+	after?: AfterHook | AfterHook[];
+	before?: BeforeHook | BeforeHook[];
+};
+
+export type PluginBuild = {
+	/** Transforms that run (in order) on the content of each file before it is added to the built registry output. */
+	transforms?: BuildTransform[];
+	/**
+	 * Resolve each remote dependency before it is added to the built registry output.
+	 * When multiple resolvers are configured they run in order with each receiving the result of the previous one.
+	 */
+	remoteDependencyResolver?: RemoteDependencyResolver;
+};
+
 export type Config = {
+	/**
+	 * Plugins that add providers, languages, transforms and build settings.
+	 * @example
+	 * ```ts
+	 * import { defineConfig } from "jsrepo";
+	 * import prettier from "@jsrepo/transform-prettier";
+	 * import shadcn from "@jsrepo/shadcn";
+	 *
+	 * export default defineConfig({
+	 *   plugins: [prettier(), shadcn()],
+	 * });
+	 * ```
+	 */
+	plugins: Plugin[];
 	/** An array of registries to fetch items from.
 	 * @example
 	 * ```ts
@@ -140,10 +206,7 @@ export type Config = {
 	 * });
 	 * ```
 	 */
-	hooks?: {
-		after?: AfterHook | AfterHook[];
-		before?: BeforeHook | BeforeHook[];
-	};
+	hooks?: ConfigHooks;
 };
 
 export const RegistryMetaSchema = z.object({
@@ -192,17 +255,26 @@ export type RegistryConfig = RegistryMeta & {
 	items: RegistryItem[];
 	/** An array of output strategies. These allow you to customize the way your registry is distributed. */
 	outputs?: Output[];
-	/** Plugins that users need to install to use your registry. (Will be installed automatically when initializing your registry)*/
-	plugins?: {
-		languages?: RegistryPlugin[];
-		providers?: RegistryPlugin[];
-		transforms?: RegistryPlugin[];
-	};
+	/**
+	 * Plugins that users need to install to use your registry. (Will be installed automatically when initializing your registry)
+	 *
+	 * Provide an array of plugin packages to add them to the `plugins` array of the users config.
+	 * Providing an object with `languages`, `providers`, and `transforms` is still supported for plugins that haven't adopted the unified plugin API.
+	 */
+	plugins?: RegistryPlugins;
 	/** The default path for each item type. You can also provide the path for a specific item with `<type>/<name>`. */
 	defaultPaths?: {
 		[key in RegistryItemType]?: string;
 	};
 };
+
+export type RegistryPlugins =
+	| RegistryPlugin[]
+	| {
+			languages?: RegistryPlugin[];
+			providers?: RegistryPlugin[];
+			transforms?: RegistryPlugin[];
+	  };
 
 export type RegistryPlugin = {
 	/** The name of the package */
@@ -380,17 +452,98 @@ export type Transform = {
 export function defineConfig(config: Partial<Config> | (() => Partial<Config>)): Config {
 	const c = extract(config);
 
+	const plugins = c.plugins ?? [];
+	validatePlugins(plugins);
+
+	const providers = unique([
+		// plugins go first so they can take precedence over the defaults
+		...plugins.flatMap((plugin) => plugin.providers ?? []),
+		...(c.providers ?? DEFAULT_PROVIDERS),
+	]);
+	const languages = unique([
+		...plugins.flatMap((plugin) => plugin.languages ?? []),
+		...(c.languages ?? DEFAULT_LANGS),
+	]);
+	const transforms = unique([
+		...(c.transforms ?? []),
+		...plugins.flatMap((plugin) => plugin.transforms ?? []),
+	]);
+	const buildTransforms = unique([
+		...(c.build?.transforms ?? []),
+		...plugins.flatMap((plugin) => plugin.build?.transforms ?? []),
+	]);
+	const remoteDependencyResolver = composeRemoteDependencyResolvers([
+		c.build?.remoteDependencyResolver,
+		...plugins.map((plugin) => plugin.build?.remoteDependencyResolver),
+	]);
+
 	return {
-		providers: c.providers ?? DEFAULT_PROVIDERS,
+		plugins,
+		providers,
 		registries: c.registries ?? [],
 		registry: c.registry ?? [],
-		languages: c.languages ?? DEFAULT_LANGS,
-		transforms: c.transforms ?? [],
+		languages,
+		transforms,
 		paths: c.paths ?? {},
-		hooks: c.hooks,
+		hooks: mergeHooks([c.hooks, ...plugins.map((plugin) => plugin.hooks)]),
 		build: {
-			onwarn: c.build?.onwarn ?? c.onwarn,
 			...c.build,
+			onwarn: c.build?.onwarn ?? c.onwarn,
+			transforms: buildTransforms,
+			remoteDependencyResolver,
 		},
+	};
+}
+
+/** Combines hooks in order. Returns `undefined` if there are no hooks so configs without hooks stay unchanged. */
+function mergeHooks(hooks: (ConfigHooks | undefined)[]): ConfigHooks | undefined {
+	const defined = hooks.filter((h): h is ConfigHooks => h !== undefined);
+	if (defined.length === 0) return undefined;
+	if (defined.length === 1) return defined[0];
+
+	return {
+		before: defined.flatMap((h) => h.before ?? []),
+		after: defined.flatMap((h) => h.after ?? []),
+	};
+}
+
+function unique<T>(items: T[]): T[] {
+	return Array.from(new Set(items));
+}
+
+function validatePlugins(plugins: unknown[]) {
+	if (!Array.isArray(plugins)) {
+		throw new JsrepoError('The `plugins` option must be an array.', {
+			suggestion: 'Wrap your plugin in an array. ex: `plugins: [myPlugin()]`',
+		});
+	}
+
+	for (const [index, plugin] of plugins.entries()) {
+		if (
+			typeof plugin !== 'object' ||
+			plugin === null ||
+			typeof (plugin as { name?: unknown }).name !== 'string'
+		) {
+			throw new JsrepoError(`Invalid plugin at \`plugins[${index}]\`.`, {
+				suggestion:
+					'Plugins must be an object with a `name`. If this is a provider, language, or transform from an older package add it to `providers`, `languages`, or `transforms` instead.',
+			});
+		}
+	}
+}
+
+/** Runs each resolver in order passing the output of one as the input to the next. */
+function composeRemoteDependencyResolvers(
+	resolvers: (RemoteDependencyResolver | undefined)[]
+): RemoteDependencyResolver | undefined {
+	const defined = resolvers.filter((r): r is RemoteDependencyResolver => r !== undefined);
+	if (defined.length <= 1) return defined[0];
+
+	return async (dep, options) => {
+		let resolved = dep;
+		for (const resolver of defined) {
+			resolved = await resolver(resolved, options);
+		}
+		return resolved;
 	};
 }

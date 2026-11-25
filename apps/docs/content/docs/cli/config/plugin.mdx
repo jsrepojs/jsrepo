@@ -1,0 +1,48 @@
+---
+title: plugin
+description: Add a plugin to your config.
+---
+
+```sh
+jsrepo config plugin
+```
+
+## Usage
+
+Add a plugin to your config. You will be prompted to install dependencies after adding:
+
+```sh
+jsrepo config plugin @jsrepo/transform-prettier
+```
+
+Add multiple plugins at once:
+
+```sh
+jsrepo config plugin @jsrepo/transform-prettier @jsrepo/shadcn
+```
+
+Official plugins can be added with their shorthand:
+
+```sh
+jsrepo config plugin prettier biome javascript oxfmt filecasing shadcn pnpm bun
+```
+
+The plugin package must export the plugin as its `default` export. Read more about plugins [here](/docs/plugins).
+
+## Options
+
+### `--cwd`
+
+The current working directory:
+
+```sh
+jsrepo config plugin @jsrepo/transform-prettier --cwd ./my-project
+```
+
+### `--yes`
+
+Skip the confirmation prompt:
+
+```sh
+jsrepo config plugin @jsrepo/transform-prettier --yes
+```

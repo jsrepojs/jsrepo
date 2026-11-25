@@ -20,7 +20,7 @@ The [@jsrepo/transform-biome](https://npmjs.com/package/@jsrepo/transform-biome)
 To add the **@jsrepo/transform-biome** transform to your config run the following command:
 
 ```sh
-jsrepo config transform biome
+jsrepo config plugin biome
 ```
 
 This will automatically install the transform and add it to your config:
@@ -30,6 +30,6 @@ import { defineConfig } from "jsrepo";
 import biome from "@jsrepo/transform-biome"; // [!code ++]
 
 export default defineConfig({
-	transforms: [biome()], // [!code ++]
+	plugins: [biome()], // [!code ++]
 });
 ```

@@ -161,7 +161,7 @@ import javascript from "@jsrepo/transform-javascript";
 import prettier from "@jsrepo/transform-prettier";
 
 export default defineConfig({
-	transforms: [javascript(), prettier()], // [!code highlight]
+	plugins: [javascript(), prettier()], // [!code highlight]
 });`}
 				/>
 			</div>

@@ -13,7 +13,7 @@ A transform plugin for transforming TypeScript registry items into JavaScript be
 Run the following command to install and add the transform to your config:
 
 ```sh
-jsrepo config transform javascript
+jsrepo config plugin javascript
 # or initialize any jsrepo project with the --js flag
 jsrepo init @ieedan/std --js
 ```
@@ -26,13 +26,13 @@ Install the transform plugin:
 pnpm install @jsrepo/transform-javascript -D
 ```
 
-Add the transform to your config:
+Add the plugin to your config:
 
 ```ts
 import { defineConfig } from "jsrepo";
 import javascript from "@jsrepo/transform-javascript";
 
 export default defineConfig({
-	transforms: [javascript()],
+	plugins: [javascript()],
 });
 ```

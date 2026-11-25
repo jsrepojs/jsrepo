@@ -10,6 +10,10 @@ import type {
 } from '@/commands/config/language';
 import type { ConfigMcpCommandResult, ConfigMcpOptions } from '@/commands/config/mcp';
 import type {
+	ConfigAddPluginCommandResult,
+	ConfigAddPluginOptions,
+} from '@/commands/config/plugin';
+import type {
 	ConfigAddProviderCommandResult,
 	ConfigAddProviderOptions,
 } from '@/commands/config/provider';
@@ -26,6 +30,7 @@ import type { Config } from '@/utils/config';
 export type BeforeArgs =
 	| { command: 'config.language'; options: ConfigAddLanguageOptions }
 	| { command: 'config.mcp'; options: ConfigMcpOptions }
+	| { command: 'config.plugin'; options: ConfigAddPluginOptions }
 	| { command: 'config.provider'; options: ConfigAddProviderOptions }
 	| { command: 'config.transform'; options: ConfigAddTransformOptions }
 	| { command: 'add'; options: AddOptions }
@@ -43,6 +48,11 @@ export type AfterArgs =
 			result: ConfigAddLanguageCommandResult;
 	  }
 	| { command: 'config.mcp'; options: ConfigMcpOptions; result: ConfigMcpCommandResult }
+	| {
+			command: 'config.plugin';
+			options: ConfigAddPluginOptions;
+			result: ConfigAddPluginCommandResult;
+	  }
 	| {
 			command: 'config.provider';
 			options: ConfigAddProviderOptions;

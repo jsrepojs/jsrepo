@@ -1,8 +1,8 @@
 import { strip } from '@svecosystem/strip-types';
-import type { Transform } from 'jsrepo';
+import type { Plugin, Transform } from 'jsrepo';
 import { Unreachable } from 'jsrepo/errors';
 import type { ItemRelativePath } from 'jsrepo/utils';
-import { transform } from 'sucrase';
+import { transform as sucraseTransform } from 'sucrase';
 
 export type FileExtension = {
 	/** The TypeScript extension. */
@@ -23,7 +23,7 @@ export const SUPPORTED_EXTENSIONS: FileExtension[] = [
 ];
 
 /**
- * A transform plugin for jsrepo to strip types from TypeScript code. It also renames TypeScript files to JavaScript files.
+ * A plugin for jsrepo to strip types from TypeScript code. It also renames TypeScript files to JavaScript files.
  * @example
  * ```ts
  * import { defineConfig } from "jsrepo";
@@ -31,14 +31,18 @@ export const SUPPORTED_EXTENSIONS: FileExtension[] = [
  *
  * export default defineConfig({
  *  // ...
- *  transforms: [stripTypes()],
+ *  plugins: [stripTypes()],
  * });
  * ```
  *
- * @param options - The options for the transform plugin.
+ * The returned plugin can also be used with the legacy `transforms` option.
+ *
+ * @param options - The options for the plugin.
  */
-export default function ({ supportedExtensions = SUPPORTED_EXTENSIONS }: Options = {}): Transform {
-	return {
+export default function ({
+	supportedExtensions = SUPPORTED_EXTENSIONS,
+}: Options = {}): Plugin & Transform {
+	const transform: Transform = {
 		transform: async ({ code, fileName }) => {
 			if (
 				!endsWithOneOf(
@@ -57,7 +61,7 @@ export default function ({ supportedExtensions = SUPPORTED_EXTENSIONS }: Options
 			}
 
 			return {
-				code: transform(code, {
+				code: sucraseTransform(code, {
 					transforms: ['typescript', 'jsx'],
 					disableESTransforms: true,
 					filePath: fileName,
@@ -67,6 +71,8 @@ export default function ({ supportedExtensions = SUPPORTED_EXTENSIONS }: Options
 			};
 		},
 	};
+
+	return { ...transform, name: 'javascript', transforms: [transform] };
 }
 
 function endsWithOneOf(fileName: string, extensions: string[]): boolean {

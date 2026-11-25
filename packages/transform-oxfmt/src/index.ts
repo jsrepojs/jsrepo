@@ -1,8 +1,8 @@
-import type { Transform } from 'jsrepo';
+import type { Plugin, Transform } from 'jsrepo';
 import { type FormatOptions, format } from 'oxfmt';
 
 /**
- * A transform plugin for jsrepo to format code with oxfmt.
+ * A plugin for jsrepo to format code with oxfmt.
  * @example
  * ```ts
  * import { defineConfig } from "jsrepo";
@@ -10,18 +10,22 @@ import { type FormatOptions, format } from 'oxfmt';
  *
  * export default defineConfig({
  *  // ...
- *  transforms: [oxfmt()],
+ *  plugins: [oxfmt()],
  * });
  * ```
  *
- * @param options - The options for the transform plugin.
+ * The returned plugin can also be used with the legacy `transforms` option.
+ *
+ * @param options - The options for the plugin.
  */
-export default function (options: FormatOptions = {}): Transform {
-	return {
+export default function (options: FormatOptions = {}): Plugin & Transform {
+	const transform: Transform = {
 		transform: async ({ code, fileName }) => {
 			return { code: await tryFormat(fileName, code, options) };
 		},
 	};
+
+	return { ...transform, name: 'oxfmt', transforms: [transform] };
 }
 
 async function tryFormat(

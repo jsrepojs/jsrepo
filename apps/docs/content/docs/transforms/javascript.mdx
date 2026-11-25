@@ -18,7 +18,7 @@ The [@jsrepo/transform-javascript](https://npmjs.com/package/@jsrepo/transform-j
 ## Installation
 
 ```sh
-jsrepo config transform javascript
+jsrepo config plugin javascript
 # or initialize any jsrepo project with the --js flag
 jsrepo init @ieedan/std --js
 ```
@@ -31,7 +31,7 @@ import javascript from "@jsrepo/transform-javascript"; // [!code ++]
 
 export default defineConfig({
 	// ...
-	transforms: [javascript()], // [!code ++]
+	plugins: [javascript()], // [!code ++]
 });
 ```
 

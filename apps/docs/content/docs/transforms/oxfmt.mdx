@@ -20,7 +20,7 @@ The [@jsrepo/transform-oxfmt](https://npmjs.com/package/@jsrepo/transform-oxfmt)
 To add the **@jsrepo/transform-oxfmt** transform to your config run the following command:
 
 ```sh
-jsrepo config transform oxfmt
+jsrepo config plugin oxfmt
 ```
 
 This will automatically install the transform and add it to your config:
@@ -30,6 +30,6 @@ import { defineConfig } from "jsrepo";
 import oxfmt from "@jsrepo/transform-oxfmt"; // [!code ++]
 
 export default defineConfig({
-	transforms: [oxfmt()], // [!code ++]
+	plugins: [oxfmt()], // [!code ++]
 });
 ```
