@@ -1,4 +1,4 @@
-import type { Pattern } from 'fast-glob';
+import type fg from 'fast-glob';
 import pc from 'picocolors';
 import type { z } from 'zod';
 import type { RegistryItemType } from './config';
@@ -461,7 +461,7 @@ export class InvalidJSONError extends JsrepoError {
 }
 
 export class GlobError extends BuildError {
-	constructor(error: unknown, pattern: Pattern, registryName: string) {
+	constructor(error: unknown, pattern: fg.Pattern, registryName: string) {
 		super(
 			`Error while parsing glob pattern ${pc.bold(pattern)}: ${error instanceof Error ? error.message : String(error)}`,
 			{
