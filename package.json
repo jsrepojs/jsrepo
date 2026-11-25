@@ -24,11 +24,11 @@
 		"build:example-registries": "pnpm -r --filter './examples/**' registry:build"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.6.2",
+		"@biomejs/biome": "2.6.9",
 		"@changesets/cli": "^3.0.3",
 		"@svitejs/changesets-changelog-github-compact": "^1.2.0",
 		"concurrently": "catalog:",
-		"pkg-pr-new": "^0.0.63",
+		"pkg-pr-new": "^0.0.94",
 		"wait-on": "^9.5.1"
 	},
 	"pnpm": {

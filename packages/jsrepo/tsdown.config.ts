@@ -18,6 +18,7 @@ export default defineConfig({
 		'@/': './src/',
 	},
 	minify: true,
+	outputOptions: { minifyInternalExports: false },
 	dts: {
 		sourcemap: true,
 	},

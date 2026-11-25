@@ -81,7 +81,7 @@
 	"packageManager": "pnpm@10.28.2",
 	"dependencies": {
 		"commander": "catalog:",
-		"oxc-parser": "^0.155.0",
+		"oxc-parser": "^0.160.0",
 		"unconfig": "^7.5.0"
 	},
 	"peerDependencies": {
@@ -109,7 +109,7 @@
 		"fast-glob": "^3.3.3",
 		"get-tsconfig": "^4.14.3",
 		"is-unicode-supported": "^2.1.0",
-		"magic-string": "^0.30.21",
+		"magic-string": "^1.4.5",
 		"nevereverthrow": "^0.3.0",
 		"node-machine-id": "^1.1.12",
 		"package-manager-detector": "^1.9.0",

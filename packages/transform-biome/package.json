@@ -45,7 +45,7 @@
 	},
 	"dependencies": {
 		"@biomejs/js-api": "^6.1.0",
-		"@biomejs/wasm-nodejs": "^2.6.2"
+		"@biomejs/wasm-nodejs": "^2.6.9"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",
