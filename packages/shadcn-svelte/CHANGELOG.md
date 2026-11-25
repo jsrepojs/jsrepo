@@ -1,5 +1,12 @@
 # @jsrepo/shadcn-svelte
 
+## 0.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`5cbce32`](https://github.com/jsrepojs/jsrepo/commit/5cbce32771eb844640e17b7944419dd924e45287)]:
+  - jsrepo@3.8.5
+
 ## 0.0.2
 
 ### Patch Changes

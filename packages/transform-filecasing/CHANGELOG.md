@@ -1,5 +1,12 @@
 # @jsrepo/transform-filecasing
 
+## 7.0.5
+
+### Patch Changes
+
+- Updated dependencies [[`5cbce32`](https://github.com/jsrepojs/jsrepo/commit/5cbce32771eb844640e17b7944419dd924e45287)]:
+  - jsrepo@3.8.5
+
 ## 7.0.4
 
 ### Patch Changes
